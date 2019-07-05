@@ -1,0 +1,213 @@
+scalar Date
+
+type Query {
+  projects(ids: [String!]!): [Project]!
+  projectById(id: String!): Project
+  user(id: String!): User
+}
+
+type Tag {
+  name: String!
+  _id: String!
+  color: String
+}
+
+type Task {
+  name: String!
+  points: Int!
+  completed: Boolean!
+  timeWorkedOn: Int!
+  color: String # hex
+  dueDate: Date # date string
+  startDate: Date # date string
+  assignedUsers: [String!]! # what if we had private tasks, that is a good idea, unique!
+  tags: [String!]!
+  subTasks: [SubTask!]!
+  comments: [Comment!]!
+  description: String
+  recurrance: String # daily | weekly
+  _id: String!
+}
+
+type User {
+  _id: String!
+  profileImg: String
+  username: String!
+  email: String!
+  projects: [Project!]!
+}
+
+type Profile {
+  _id: String!
+  profileImg: String
+  username: String!
+  email: String!
+  projects: [String!]!
+}
+
+type Project {
+  ownerId: String
+  name: String!
+  _id: String!
+  tags: [Tag!]
+  columnIds: [String!]!
+  columns: [Column!]!
+  swimlanes: [Swimlane!]!
+  users: [Profile!] # if null is a private project
+  tasks: [Task!]!
+  isPrivate: Boolean # defaults to false (public)
+}
+
+type Column {
+  _id: String!
+  name: String!
+  isCompletedColumn: Boolean
+  taskIds: [String!]!
+  taskLimit: Int
+}
+
+type Swimlane {
+  taskIds: [String!]!
+  name: String!
+  _id: String!
+}
+
+type SubTask {
+  name: String!
+  completed: Boolean!
+  _id: String!
+}
+
+type Comment {
+  description: String!
+  dateAdded: Date! # date string
+  lastEdited: Date # optional date string
+  _id: String!
+}
+
+input TaskInput {
+  name: String
+  points: Int
+  dueDate: Date # date string
+  recurrance: String # daily | weekly | none
+  color: String # hex
+}
+
+input ProjectInput {
+  name: String
+  columnIds: [String!]
+  categories: [String!]
+}
+
+input ColumnInput {
+  name: String
+  isCompletedColumn: Boolean
+  taskIds: [String!]
+  taskLimit: Int
+}
+
+input SwimlaneInput {
+  taskIds: [String!]
+  name: String
+}
+
+input DragTaskIdList {
+  id: String!
+  newIds: [String!]!
+}
+
+type Auth {
+  user: User!
+}
+
+type Void {
+  message: String!
+}
+
+type DeleteReturn {
+  id: String!
+}
+
+type TaskMerge {
+  project: Project!
+  task: Task
+}
+
+type ColumnMerge {
+  project: Project!
+  column: Column
+}
+
+type SwimlaneMerge {
+  project: Project!
+  swimlane: Swimlane
+}
+
+input SubtaskInfo {
+  name: String
+  completed: Boolean
+}
+
+type Mutation {
+  createTask(
+    projId: String!
+    taskInfo: TaskInput!
+    columnId: String!
+  ): TaskMerge!
+  editTask(projId: String!, task: TaskInput!, taskId: String!): TaskMerge!
+  deleteTask(projId: String!, id: String!): TaskMerge!
+  dragTask(
+    columnIds: [DragTaskIdList!]!
+    id: String!
+    swimlaneIds: [DragTaskIdList!]!
+    projectId: String!
+  ): TaskMerge!
+
+  # should these even be here?
+  register(username: String!, password: String!, email: String!): Auth!
+  login(email: String!, password: String!): Auth!
+  loginWithCookie: Auth!
+  logout: Void!
+
+  createProject(name: String!): Project!
+  editProject(id: String!, newProj: ProjectInput!): Project!
+  deleteProject(id: String!): DeleteReturn! # sends deleted project id back
+  createColumn(
+    projId: String!
+    name: String!
+    isCompletedColumn: Boolean
+    taskLimit: Int
+  ): ColumnMerge!
+  editColumn(
+    colId: String!
+    projectId: String!
+    newCol: ColumnInput!
+  ): ColumnMerge!
+  deleteColumn(_id: String!, projectId: String!): ColumnMerge!
+
+  joinProject(projectId: String!): Project!
+  leaveProject(projectId: String!): DeleteReturn!
+
+  createSwimlane(projId: String!, name: String!): SwimlaneMerge!
+  editSwimlane(
+    swimId: String!
+    projId: String!
+    newSwim: SwimlaneInput!
+  ): SwimlaneMerge!
+  deleteSwimlane(projId: String!, _id: String!): SwimlaneMerge!
+
+  removeMemberFromProject(projectId: String!, userId: String!): Project!
+
+  setComment(
+    projId: String!
+    taskId: String!
+    commentId: String
+    description: String!
+  ): Task!
+  setSubtask(
+    projId: String!
+    taskId: String!
+    subtaskId: String
+    info: SubtaskInfo
+  ): Task!
+}

@@ -1,0 +1,9 @@
+Architecture: Make columns nested inside projects,
+but tasks a seperate slice of state so that we can have them independently!
+
+RESPONSIVENESS
+Work on 400 wide by 800 tall
+FEATURES
+
+1 client
+Ad some ads ;)

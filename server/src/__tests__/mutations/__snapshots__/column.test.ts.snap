@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Column Mutations createColumn editColumn deleteColumn 1`] = `
+Object {
+  "columnIds": Array [],
+  "columns": Array [],
+  "id": "PROJECT_ID",
+  "name": "PHOON_TIME",
+  "ownerId": "OWNER_ID",
+  "swimlanes": Array [],
+  "tags": Array [],
+  "tasks": Array [],
+  "users": Array [],
+}
+`;
+
+exports[`Column Mutations createColumn editColumn deleteColumn 2`] = `
+Object {
+  "id": "LOLCOLID",
+  "isCompletedColumn": true,
+  "name": "new name lol",
+  "taskIds": Array [
+    "lol taskId",
+  ],
+  "taskLimit": 10,
+}
+`;
+
+exports[`Column Mutations createColumn editColumn deleteColumn 3`] = `
+Object {
+  "columnIds": Array [
+    "COL_ID 0",
+    "COL_ID 1",
+  ],
+  "columns": Array [
+    Object {
+      "id": "COL_ID 0",
+      "isCompletedColumn": false,
+      "name": "Todo",
+      "taskIds": Array [],
+      "taskLimit": 0,
+    },
+    Object {
+      "id": "COL_ID 1",
+      "isCompletedColumn": false,
+      "name": "column name",
+      "taskIds": Array [],
+      "taskLimit": null,
+    },
+  ],
+  "id": "PROJECT_ID",
+  "name": "PHOON_TIME",
+  "ownerId": "OWNER_ID",
+  "swimlanes": Array [],
+  "tags": Array [],
+  "tasks": Array [],
+  "users": Array [],
+}
+`;

@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Project Mutations createProject and editProject and deleteProject 1`] = `
+Object {
+  "columnIds": Array [
+    "COL_ID 0",
+  ],
+  "columns": Array [
+    Object {
+      "id": "COL_ID 0",
+      "isCompletedColumn": false,
+      "name": "Todo",
+      "taskIds": Array [],
+      "taskLimit": 0,
+    },
+  ],
+  "id": "PROJECT_ID",
+  "name": "project name",
+  "ownerId": "OWNER_ID",
+  "swimlanes": Array [],
+  "tags": Array [],
+  "tasks": Array [],
+  "users": Array [],
+}
+`;
+
+exports[`Project Mutations createProject and editProject and deleteProject 2`] = `
+Object {
+  "columnIds": Array [
+    "COL_ID 0",
+  ],
+  "columns": Array [
+    Object {
+      "id": "COL_ID 0",
+      "isCompletedColumn": false,
+      "name": "Todo",
+      "taskIds": Array [],
+      "taskLimit": 0,
+    },
+  ],
+  "id": "PROJECT_ID",
+  "name": "new name lol",
+  "ownerId": "OWNER_ID",
+  "swimlanes": Array [],
+  "tags": Array [],
+  "tasks": Array [],
+  "users": Array [],
+}
+`;

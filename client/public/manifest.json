@@ -1,0 +1,9 @@
+{
+  "name": "KanbanBrawn",
+  "version": "1.0",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "index.html"
+  },
+  "content_security_policy": "script-src 'self' 'sha256-DdssVry/i/lgxl+KSEtaKgQRt0Wer8v2oLATrI0GcA0='; object-src 'self'"
+}
