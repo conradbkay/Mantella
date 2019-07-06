@@ -1,3 +1,4 @@
+import { AuthenticationError } from 'apollo-server-core'
 import { UserModel } from './../../models/User'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
@@ -12,37 +13,41 @@ const createProject: MutationResolvers['createProject'] = async (
   const creatingId = Types.ObjectId()
   const colId = Types.ObjectId()
 
-  const [created] = await Promise.all([
-    ProjectModel.create({
-      _id: creatingId,
-      name: args.name,
-      ownerId: context.user._id,
-      users: [],
-      swimlanes: [],
-      columns: [
-        {
-          _id: colId,
-          name: 'Todo',
-          isCompletedColumn: false,
-          taskIds: [],
-          taskLimit: 0
-        }
-      ],
-      tasks: [],
-      enrolledUsers: [],
-      columnIds: [colId.toHexString()]
-    }),
-    UserModel.findByIdAndUpdate(context.user.id, {
-      $push: {
-        projects: creatingId
-      }
-    })
-  ])
+  const user = await UserModel.findById(context.userId)
 
-  if (created) {
-    return await purifyProject(created)
+  if (user) {
+    const [created] = await Promise.all([
+      ProjectModel.create({
+        _id: creatingId,
+        name: args.name,
+        ownerId: user._id,
+        users: [],
+        swimlanes: [],
+        columns: [
+          {
+            _id: colId,
+            name: 'Todo',
+            isCompletedColumn: false,
+            taskIds: [],
+            taskLimit: 0
+          }
+        ],
+        tasks: [],
+        enrolledUsers: [],
+        columnIds: [colId.toHexString()]
+      }),
+      UserModel.findByIdAndUpdate(user.id, {
+        $push: {
+          projects: creatingId
+        }
+      })
+    ])
+    if (created) {
+      return await purifyProject(created)
+    }
   }
-  return null
+
+  throw new AuthenticationError('user id not provided in token')
 }
 
 const editProject: MutationResolvers['editProject'] = async (parent, args) => {
