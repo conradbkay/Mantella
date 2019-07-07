@@ -13,7 +13,7 @@ import { CreateProject } from './components/createProject/CreateProject'
 import { NoMatch } from './components/NoMatch/NoMatch'
 import { Fab, CircularProgress } from '@material-ui/core'
 import { Timer } from '@material-ui/icons'
-import { About } from './components/About/About'
+import { About } from './components/Home/About'
 
 import { Header } from './components/Header'
 import { WelcomeDialog } from './components/Welcome/WelcomeDialog'
