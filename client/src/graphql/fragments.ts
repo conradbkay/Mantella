@@ -6,22 +6,26 @@ export const taskFields = gql`
   fragment taskFields on Task {
     points
     completed
-    tags
-    assignedUsers
-    id: _id
-    description
+    id
     dueDate
     startDate
-    recurrance
     color
     subTasks {
       name
       completed
-      id: _id
+      id
+    }
+    security {
+      public
+      assignedUsers
+    }
+    recurrance {
+      interval
+      nextDue
     }
     comments {
-      id: _id
-      description
+      id
+      comment
       dateAdded
       lastEdited
     }
@@ -32,7 +36,7 @@ export const taskFields = gql`
 
 export const profileFields = gql`
   fragment ProfileFields on Profile {
-    id: _id
+    id
     profileImg
     username
     email
@@ -42,9 +46,8 @@ export const profileFields = gql`
 
 export const columnFields = gql`
   fragment columnFields on Column {
-    id: _id
+    id
     name
-    isCompletedColumn
     taskIds
     taskLimit
   }
@@ -55,7 +58,8 @@ export const projectFields = gql`
   ${profileFields}
   ${columnFields}
   fragment projectFields on Project {
-    columnIds
+    isPrivate
+    columnOrder
     ownerId
     columns {
       ...columnFields
@@ -63,28 +67,22 @@ export const projectFields = gql`
     swimlanes {
       taskIds
       name
-      id: _id
+      id
     }
-    users {
-      ...ProfileFields
-    }
+
+    users
     tasks {
       ...taskFields
     }
-    id: _id
+    id
     name
-    tags {
-      name
-      color
-      id: _id
-    }
   }
 `
 
 export const userFields = gql`
   ${projectFields}
   fragment userFields on User {
-    id: _id
+    id
     profileImg
     username
     email

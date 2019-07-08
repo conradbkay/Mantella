@@ -8,7 +8,7 @@ import {
   Button
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
-import { TTask } from '../../types/task'
+import { TTask } from '../../types/project'
 
 type OwnProps = {
   draggingTask: TTask

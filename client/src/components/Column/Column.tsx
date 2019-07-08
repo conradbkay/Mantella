@@ -3,26 +3,23 @@ import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { CreateTask } from './CreateTask'
 import { Droppable } from 'react-beautiful-dnd'
-import { TTask } from '../../types/task'
-import { TColumn, TSwimLane } from '../../types/state'
+import { TColumn, TSwimlane, TTask } from '../../types/project'
 import { DeleteDialog } from '../utils/DeleteDialog'
 import { setColumnA } from '../../store/actions/column'
 import { ColumnTask } from '../Task/ColumnWrapper'
 import { TFilterData } from '../Project/Project'
-import { filterTasks } from '../../utils/filterTasks'
 import { ColumnHeader } from './ColumnHeader'
 import { TProject } from '../../types/project'
-import { getAllTasks, getUnassignedTasks } from '../../utils/utilities'
 import { useMutation } from '@apollo/react-hooks'
 import {
   DeleteColumnMutation,
   DeleteColumnMutationVariables
 } from '../../graphql/types'
-import { GQL_DELETE_COLUMN } from '../../graphql/mutations/column'
 import { setProjectA } from '../../store/actions/project'
-import { resToNiceProject } from '../../API/utils'
+import { GQL_DELETE_COLUMN } from '../../graphql/mutations/column'
+import { getUnassignedTasks } from '../../utils/utilities'
 
-const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimLane) => {
+const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimlane) => {
   const swimlaneTasks: TTask[] = []
   swimlane.taskIds.map(taskId => {
     const foundTask = filteredTasks.find(task => {
@@ -124,7 +121,7 @@ const CColumn = (props: ColumnProps) => {
       if (deleteCol && deleteCol.project) {
         props.setProject({
           id: deleteCol.project.id,
-          newProj: resToNiceProject(deleteCol.project)
+          newProj: deleteCol.project
         })
       }
     },
@@ -134,23 +131,14 @@ const CColumn = (props: ColumnProps) => {
     }
   })
 
-  const {
-    tasks,
-    column,
-    index,
-    isMobile,
-    filterData,
-    collapsed,
-    collapse,
-    project
-  } = props
+  const { tasks, column, index, isMobile, collapsed, collapse, project } = props
 
-  const projSwimlanes = project.swimlaneOrder.map(id => project.swimlanes[id])
+  const projSwimlanes = project.swimlanes
 
   const creatingDisabled = column.taskIds.length === column.taskLimit
 
   const sortedTasks = column.taskIds.map(id => tasks[id])
-  const filteredTasks: TTask[] = filterTasks(sortedTasks, filterData)
+  const filteredTasks: TTask[] = sortedTasks
 
   const unassignedTasks = getUnassignedTasks(filteredTasks, tasks, project)
 

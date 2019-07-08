@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash'
+import { TProject, TTask, TColumn, TSwimlane } from '../types/project'
 
 export const id = (
   arr: Array<any & { id: string }>,
@@ -40,9 +41,7 @@ export const getDaysInMonth = (month: number, year: number): Date[] => {
   return days
 }
 
-/*
-
-export const getTasksProject = (taskId: string, stateProjects: TProjects) => {
+export const getTasksProject = (taskId: string, stateProjects: TProject[]) => {
   const projects = [...Object.values(stateProjects)]
 
   for (const project of projects) {
@@ -57,14 +56,16 @@ export const getTasksProject = (taskId: string, stateProjects: TProjects) => {
 
 export const getUnassignedTasks = (
   filtered: TTask[],
-  tasks: TTasks,
+  tasks: TTask[],
   project: TProject
 ) => {
   return filtered.filter(task => {
-    const projSwimlanes = project.swimlaneOrder.map(id => project.swimlanes[id])
+    const projSwimlanes = project.swimlanes
     const swimlaneTasks = projSwimlanes.reduce(
       (accum, swimlane) => {
-        const swimlanesTasks = swimlane.taskIds.map(taskId => tasks[taskId])
+        const swimlanesTasks = swimlane.taskIds.map(
+          taskId => tasks[id(tasks, taskId)]
+        )
         return [...accum, ...swimlanesTasks]
       },
       [] as TTask[]
@@ -76,7 +77,7 @@ export const getUnassignedTasks = (
 export const getTasksSwimlane = (
   taskId: string,
   project: TProject
-): TSwimLane | null => {
+): TSwimlane | null => {
   let swimlaneReturn = null
 
   Object.values(project.swimlanes).map(swimlane => {
@@ -90,7 +91,7 @@ export const getTasksSwimlane = (
 }
 
 export const getProjIdFromColumnId = (
-  projects: TProjects,
+  projects: TProject[],
   columnId: string | undefined
 ): string | undefined => {
   let result
@@ -106,14 +107,14 @@ export const getProjIdFromColumnId = (
   return result
 }
 
-export const getAllColumnsArr = (projects: TProjects): TColumn[] => {
+export const getAllColumnsArr = (projects: TProject[]): TColumn[] => {
   return Object.values(projects).reduce(
     (accum, project) => [...accum, ...Object.values(project.columns)],
     []
   )
 }
 
-export const getAllTasksArr = (projects: TProjects): TTask[] => {
+export const getAllTasksArr = (projects: TProject[]): TTask[] => {
   let tasks: TTask[] = []
 
   Object.values(projects).map(project => {
@@ -123,8 +124,8 @@ export const getAllTasksArr = (projects: TProjects): TTask[] => {
   return tasks
 }
 
-export const getAllTasks = (projects: TProjects): TTasks => {
-  let tasks: TTasks = {}
+export const getAllTasks = (projects: TProject[]): TTask[] => {
+  let tasks: TTask[] = []
 
   Object.values(projects).map(project => {
     tasks = {
@@ -138,7 +139,7 @@ export const getAllTasks = (projects: TProjects): TTasks => {
 }
 
 export const getProjectIdFromTaskId = (
-  projects: TProjects,
+  projects: TProject[],
   taskId: string
 ): string => {
   let result = ''
@@ -167,4 +168,3 @@ export const moveInArray = (element: any, index: number, offset: number) => {
 
   return newArr
 }
-*/

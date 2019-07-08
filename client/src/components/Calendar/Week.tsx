@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { WithStyles, Theme, createStyles, withStyles } from '@material-ui/core'
-import { TTask } from '../../types/task'
+import { TTask } from '../../types/project'
 import { setTaskA } from '../../store/actions/task'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
@@ -9,7 +9,7 @@ import { subDays, addDays } from 'date-fns'
 import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
 import { NewDueTimeDialog } from './NewDueTimeDialog'
-import { differenceInCalendarDays } from 'date-fns/esm'
+import { differenceInCalendarDays } from 'date-fns'
 import { getAllTasksArr } from '../../utils/utilities'
 
 type TProps = ReturnType<typeof mapState> &

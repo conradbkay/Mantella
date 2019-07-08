@@ -18,16 +18,14 @@ export type Auth = {
 
 export type Column = {
   __typename?: 'Column'
-  _id: Scalars['String']
+  id: Scalars['String']
   name: Scalars['String']
-  isCompletedColumn?: Maybe<Scalars['Boolean']>
   taskIds: Array<Scalars['String']>
-  taskLimit?: Maybe<Scalars['Int']>
+  taskLimit: Scalars['Int']
 }
 
 export type ColumnInput = {
   name?: Maybe<Scalars['String']>
-  isCompletedColumn?: Maybe<Scalars['Boolean']>
   taskIds?: Maybe<Array<Scalars['String']>>
   taskLimit?: Maybe<Scalars['Int']>
 }
@@ -40,10 +38,10 @@ export type ColumnMerge = {
 
 export type Comment = {
   __typename?: 'Comment'
-  description: Scalars['String']
+  comment: Scalars['String']
   dateAdded: Scalars['Date']
   lastEdited?: Maybe<Scalars['Date']>
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type DeleteReturn = {
@@ -180,22 +178,20 @@ export type MutationRemoveMemberFromProjectArgs = {
 export type MutationSetCommentArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId?: Maybe<Scalars['String']>
-  description: Scalars['String']
-  deleting: Scalars['Boolean']
+  commentId: Scalars['String']
+  description?: Maybe<Scalars['String']>
 }
 
 export type MutationSetSubtaskArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  subtaskId?: Maybe<Scalars['String']>
+  subtaskId: Scalars['String']
   info?: Maybe<SubtaskInfo>
-  deleting: Scalars['Boolean']
 }
 
 export type Profile = {
   __typename?: 'Profile'
-  _id: Scalars['String']
+  id: Scalars['String']
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
@@ -204,22 +200,20 @@ export type Profile = {
 
 export type Project = {
   __typename?: 'Project'
-  ownerId?: Maybe<Scalars['String']>
+  ownerId: Scalars['String']
   name: Scalars['String']
-  _id: Scalars['String']
-  tags?: Maybe<Array<Tag>>
-  columnIds: Array<Scalars['String']>
+  id: Scalars['String']
+  columnOrder: Array<Scalars['String']>
   columns: Array<Column>
   swimlanes: Array<Swimlane>
-  users?: Maybe<Array<Profile>>
+  users?: Maybe<Array<Scalars['String']>>
   tasks: Array<Task>
-  isPrivate?: Maybe<Scalars['Boolean']>
+  isPrivate: Scalars['Boolean']
 }
 
 export type ProjectInput = {
   name?: Maybe<Scalars['String']>
   columnIds?: Maybe<Array<Scalars['String']>>
-  categories?: Maybe<Array<Scalars['String']>>
 }
 
 export type Query = {
@@ -241,23 +235,23 @@ export type QueryUserArgs = {
   id: Scalars['String']
 }
 
-export type SubTask = {
-  __typename?: 'SubTask'
+export type Subtask = {
+  __typename?: 'Subtask'
   name: Scalars['String']
   completed: Scalars['Boolean']
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type SubtaskInfo = {
-  name: Scalars['String']
-  completed: Scalars['Boolean']
+  name?: Maybe<Scalars['String']>
+  completed?: Maybe<Scalars['Boolean']>
 }
 
 export type Swimlane = {
   __typename?: 'Swimlane'
   taskIds: Array<Scalars['String']>
   name: Scalars['String']
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type SwimlaneInput = {
@@ -271,29 +265,20 @@ export type SwimlaneMerge = {
   swimlane?: Maybe<Swimlane>
 }
 
-export type Tag = {
-  __typename?: 'Tag'
-  name: Scalars['String']
-  _id: Scalars['String']
-  color?: Maybe<Scalars['String']>
-}
-
 export type Task = {
   __typename?: 'Task'
+  security?: Maybe<TaskSecurity>
+  id: Scalars['String']
   name: Scalars['String']
-  points: Scalars['Int']
+  points: Scalars['String']
   completed: Scalars['Boolean']
   timeWorkedOn: Scalars['Int']
-  color?: Maybe<Scalars['String']>
+  color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
   startDate?: Maybe<Scalars['Date']>
-  assignedUsers: Array<Scalars['String']>
-  tags: Array<Scalars['String']>
-  subTasks: Array<SubTask>
   comments: Array<Comment>
-  description?: Maybe<Scalars['String']>
-  recurrance?: Maybe<Scalars['String']>
-  _id: Scalars['String']
+  subTasks: Array<Subtask>
+  recurrance?: Maybe<TaskRecurrance>
 }
 
 export type TaskInput = {
@@ -310,9 +295,21 @@ export type TaskMerge = {
   task?: Maybe<Task>
 }
 
+export type TaskRecurrance = {
+  __typename?: 'TaskRecurrance'
+  interval?: Maybe<Scalars['Int']>
+  nextDue?: Maybe<Scalars['Date']>
+}
+
+export type TaskSecurity = {
+  __typename?: 'TaskSecurity'
+  public?: Maybe<Scalars['String']>
+  assignedUsers: Array<Scalars['String']>
+}
+
 export type User = {
   __typename?: 'User'
-  _id: Scalars['String']
+  id: Scalars['String']
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
@@ -417,29 +414,27 @@ export namespace QueryResolvers {
 
 export namespace ProjectResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Project> {
-    ownerId?: OwnerIdResolver<Maybe<string>, TypeParent, TContext>
+    ownerId?: OwnerIdResolver<string, TypeParent, TContext>
 
     name?: NameResolver<string, TypeParent, TContext>
 
-    _id?: _IdResolver<string, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
 
-    tags?: TagsResolver<Maybe<Tag[]>, TypeParent, TContext>
-
-    columnIds?: ColumnIdsResolver<string[], TypeParent, TContext>
+    columnOrder?: ColumnOrderResolver<string[], TypeParent, TContext>
 
     columns?: ColumnsResolver<Column[], TypeParent, TContext>
 
     swimlanes?: SwimlanesResolver<Swimlane[], TypeParent, TContext>
 
-    users?: UsersResolver<Maybe<Profile[]>, TypeParent, TContext>
+    users?: UsersResolver<Maybe<string[]>, TypeParent, TContext>
 
     tasks?: TasksResolver<Task[], TypeParent, TContext>
 
-    isPrivate?: IsPrivateResolver<Maybe<boolean>, TypeParent, TContext>
+    isPrivate?: IsPrivateResolver<boolean, TypeParent, TContext>
   }
 
   export type OwnerIdResolver<
-    R = Maybe<string>,
+    R = string,
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -448,17 +443,12 @@ export namespace ProjectResolvers {
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type _IdResolver<
+  export type IdResolver<
     R = string,
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type TagsResolver<
-    R = Maybe<Tag[]>,
-    Parent = Project,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type ColumnIdsResolver<
+  export type ColumnOrderResolver<
     R = string[],
     Parent = Project,
     TContext = {}
@@ -474,7 +464,7 @@ export namespace ProjectResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type UsersResolver<
-    R = Maybe<Profile[]>,
+    R = Maybe<string[]>,
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -484,67 +474,30 @@ export namespace ProjectResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type IsPrivateResolver<
-    R = Maybe<boolean>,
+    R = boolean,
     Parent = Project,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-}
-
-export namespace TagResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = Tag> {
-    name?: NameResolver<string, TypeParent, TContext>
-
-    _id?: _IdResolver<string, TypeParent, TContext>
-
-    color?: ColorResolver<Maybe<string>, TypeParent, TContext>
-  }
-
-  export type NameResolver<R = string, Parent = Tag, TContext = {}> = Resolver<
-    R,
-    Parent,
-    TContext
-  >
-  export type _IdResolver<R = string, Parent = Tag, TContext = {}> = Resolver<
-    R,
-    Parent,
-    TContext
-  >
-  export type ColorResolver<
-    R = Maybe<string>,
-    Parent = Tag,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
 
 export namespace ColumnResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Column> {
-    _id?: _IdResolver<string, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
 
     name?: NameResolver<string, TypeParent, TContext>
 
-    isCompletedColumn?: IsCompletedColumnResolver<
-      Maybe<boolean>,
-      TypeParent,
-      TContext
-    >
-
     taskIds?: TaskIdsResolver<string[], TypeParent, TContext>
 
-    taskLimit?: TaskLimitResolver<Maybe<number>, TypeParent, TContext>
+    taskLimit?: TaskLimitResolver<number, TypeParent, TContext>
   }
 
-  export type _IdResolver<
-    R = string,
-    Parent = Column,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
+  export type IdResolver<R = string, Parent = Column, TContext = {}> = Resolver<
+    R,
+    Parent,
+    TContext
+  >
   export type NameResolver<
     R = string,
-    Parent = Column,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type IsCompletedColumnResolver<
-    R = Maybe<boolean>,
     Parent = Column,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -554,7 +507,7 @@ export namespace ColumnResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type TaskLimitResolver<
-    R = Maybe<number>,
+    R = number,
     Parent = Column,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -566,7 +519,7 @@ export namespace SwimlaneResolvers {
 
     name?: NameResolver<string, TypeParent, TContext>
 
-    _id?: _IdResolver<string, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
   }
 
   export type TaskIdsResolver<
@@ -579,91 +532,57 @@ export namespace SwimlaneResolvers {
     Parent = Swimlane,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type _IdResolver<
+  export type IdResolver<
     R = string,
     Parent = Swimlane,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
 
-export namespace ProfileResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = Profile> {
-    _id?: _IdResolver<string, TypeParent, TContext>
-
-    profileImg?: ProfileImgResolver<Maybe<string>, TypeParent, TContext>
-
-    username?: UsernameResolver<string, TypeParent, TContext>
-
-    email?: EmailResolver<string, TypeParent, TContext>
-
-    projects?: ProjectsResolver<string[], TypeParent, TContext>
-  }
-
-  export type _IdResolver<
-    R = string,
-    Parent = Profile,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type ProfileImgResolver<
-    R = Maybe<string>,
-    Parent = Profile,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type UsernameResolver<
-    R = string,
-    Parent = Profile,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type EmailResolver<
-    R = string,
-    Parent = Profile,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type ProjectsResolver<
-    R = string[],
-    Parent = Profile,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-}
-
 export namespace TaskResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Task> {
+    security?: SecurityResolver<Maybe<TaskSecurity>, TypeParent, TContext>
+
+    id?: IdResolver<string, TypeParent, TContext>
+
     name?: NameResolver<string, TypeParent, TContext>
 
-    points?: PointsResolver<number, TypeParent, TContext>
+    points?: PointsResolver<string, TypeParent, TContext>
 
     completed?: CompletedResolver<boolean, TypeParent, TContext>
 
     timeWorkedOn?: TimeWorkedOnResolver<number, TypeParent, TContext>
 
-    color?: ColorResolver<Maybe<string>, TypeParent, TContext>
+    color?: ColorResolver<string, TypeParent, TContext>
 
     dueDate?: DueDateResolver<Maybe<Date>, TypeParent, TContext>
 
     startDate?: StartDateResolver<Maybe<Date>, TypeParent, TContext>
 
-    assignedUsers?: AssignedUsersResolver<string[], TypeParent, TContext>
-
-    tags?: TagsResolver<string[], TypeParent, TContext>
-
-    subTasks?: SubTasksResolver<SubTask[], TypeParent, TContext>
-
     comments?: CommentsResolver<Comment[], TypeParent, TContext>
 
-    description?: DescriptionResolver<Maybe<string>, TypeParent, TContext>
+    subTasks?: SubTasksResolver<Subtask[], TypeParent, TContext>
 
-    recurrance?: RecurranceResolver<Maybe<string>, TypeParent, TContext>
-
-    _id?: _IdResolver<string, TypeParent, TContext>
+    recurrance?: RecurranceResolver<Maybe<TaskRecurrance>, TypeParent, TContext>
   }
 
+  export type SecurityResolver<
+    R = Maybe<TaskSecurity>,
+    Parent = Task,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type IdResolver<R = string, Parent = Task, TContext = {}> = Resolver<
+    R,
+    Parent,
+    TContext
+  >
   export type NameResolver<R = string, Parent = Task, TContext = {}> = Resolver<
     R,
     Parent,
     TContext
   >
   export type PointsResolver<
-    R = number,
+    R = string,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -678,7 +597,7 @@ export namespace TaskResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type ColorResolver<
-    R = Maybe<string>,
+    R = string,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -692,81 +611,54 @@ export namespace TaskResolvers {
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type AssignedUsersResolver<
-    R = string[],
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type TagsResolver<
-    R = string[],
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type SubTasksResolver<
-    R = SubTask[],
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
   export type CommentsResolver<
     R = Comment[],
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type DescriptionResolver<
-    R = Maybe<string>,
+  export type SubTasksResolver<
+    R = Subtask[],
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type RecurranceResolver<
-    R = Maybe<string>,
+    R = Maybe<TaskRecurrance>,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type _IdResolver<R = string, Parent = Task, TContext = {}> = Resolver<
-    R,
-    Parent,
-    TContext
-  >
 }
 
-export namespace SubTaskResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = SubTask> {
-    name?: NameResolver<string, TypeParent, TContext>
+export namespace TaskSecurityResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = TaskSecurity> {
+    public?: PublicResolver<Maybe<string>, TypeParent, TContext>
 
-    completed?: CompletedResolver<boolean, TypeParent, TContext>
-
-    _id?: _IdResolver<string, TypeParent, TContext>
+    assignedUsers?: AssignedUsersResolver<string[], TypeParent, TContext>
   }
 
-  export type NameResolver<
-    R = string,
-    Parent = SubTask,
+  export type PublicResolver<
+    R = Maybe<string>,
+    Parent = TaskSecurity,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type CompletedResolver<
-    R = boolean,
-    Parent = SubTask,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type _IdResolver<
-    R = string,
-    Parent = SubTask,
+  export type AssignedUsersResolver<
+    R = string[],
+    Parent = TaskSecurity,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
 
 export namespace CommentResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Comment> {
-    description?: DescriptionResolver<string, TypeParent, TContext>
+    comment?: CommentResolver<string, TypeParent, TContext>
 
     dateAdded?: DateAddedResolver<Date, TypeParent, TContext>
 
     lastEdited?: LastEditedResolver<Maybe<Date>, TypeParent, TContext>
 
-    _id?: _IdResolver<string, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
   }
 
-  export type DescriptionResolver<
+  export type CommentResolver<
     R = string,
     Parent = Comment,
     TContext = {}
@@ -781,16 +673,61 @@ export namespace CommentResolvers {
     Parent = Comment,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type _IdResolver<
+  export type IdResolver<
     R = string,
     Parent = Comment,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
 
+export namespace SubtaskResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = Subtask> {
+    name?: NameResolver<string, TypeParent, TContext>
+
+    completed?: CompletedResolver<boolean, TypeParent, TContext>
+
+    id?: IdResolver<string, TypeParent, TContext>
+  }
+
+  export type NameResolver<
+    R = string,
+    Parent = Subtask,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type CompletedResolver<
+    R = boolean,
+    Parent = Subtask,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type IdResolver<
+    R = string,
+    Parent = Subtask,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+}
+
+export namespace TaskRecurranceResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = TaskRecurrance> {
+    interval?: IntervalResolver<Maybe<number>, TypeParent, TContext>
+
+    nextDue?: NextDueResolver<Maybe<Date>, TypeParent, TContext>
+  }
+
+  export type IntervalResolver<
+    R = Maybe<number>,
+    Parent = TaskRecurrance,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type NextDueResolver<
+    R = Maybe<Date>,
+    Parent = TaskRecurrance,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+}
+
 export namespace UserResolvers {
   export interface Resolvers<TContext = {}, TypeParent = User> {
-    _id?: _IdResolver<string, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
 
     profileImg?: ProfileImgResolver<Maybe<string>, TypeParent, TContext>
 
@@ -801,7 +738,7 @@ export namespace UserResolvers {
     projects?: ProjectsResolver<Project[], TypeParent, TContext>
   }
 
-  export type _IdResolver<R = string, Parent = User, TContext = {}> = Resolver<
+  export type IdResolver<R = string, Parent = User, TContext = {}> = Resolver<
     R,
     Parent,
     TContext
@@ -1109,11 +1046,9 @@ export namespace MutationResolvers {
 
     taskId: string
 
-    commentId?: Maybe<string>
+    commentId: string
 
-    description: string
-
-    deleting: boolean
+    description?: Maybe<string>
   }
 
   export type SetSubtaskResolver<
@@ -1126,11 +1061,9 @@ export namespace MutationResolvers {
 
     taskId: string
 
-    subtaskId?: Maybe<string>
+    subtaskId: string
 
     info?: Maybe<SubtaskInfo>
-
-    deleting: boolean
   }
 }
 
@@ -1227,6 +1160,46 @@ export namespace SwimlaneMergeResolvers {
   > = Resolver<R, Parent, TContext>
 }
 
+export namespace ProfileResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = Profile> {
+    id?: IdResolver<string, TypeParent, TContext>
+
+    profileImg?: ProfileImgResolver<Maybe<string>, TypeParent, TContext>
+
+    username?: UsernameResolver<string, TypeParent, TContext>
+
+    email?: EmailResolver<string, TypeParent, TContext>
+
+    projects?: ProjectsResolver<string[], TypeParent, TContext>
+  }
+
+  export type IdResolver<
+    R = string,
+    Parent = Profile,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type ProfileImgResolver<
+    R = Maybe<string>,
+    Parent = Profile,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type UsernameResolver<
+    R = string,
+    Parent = Profile,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type EmailResolver<
+    R = string,
+    Parent = Profile,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type ProjectsResolver<
+    R = string[],
+    Parent = Profile,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+}
+
 /** Directs the executor to skip this field or fragment when the `if` argument is true. */
 export type SkipDirectiveResolver<Result> = DirectiveResolverFn<
   Result,
@@ -1267,13 +1240,13 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<Date, any> {
 export type IResolvers<TContext = {}> = {
   Query?: QueryResolvers.Resolvers<TContext>
   Project?: ProjectResolvers.Resolvers<TContext>
-  Tag?: TagResolvers.Resolvers<TContext>
   Column?: ColumnResolvers.Resolvers<TContext>
   Swimlane?: SwimlaneResolvers.Resolvers<TContext>
-  Profile?: ProfileResolvers.Resolvers<TContext>
   Task?: TaskResolvers.Resolvers<TContext>
-  SubTask?: SubTaskResolvers.Resolvers<TContext>
+  TaskSecurity?: TaskSecurityResolvers.Resolvers<TContext>
   Comment?: CommentResolvers.Resolvers<TContext>
+  Subtask?: SubtaskResolvers.Resolvers<TContext>
+  TaskRecurrance?: TaskRecurranceResolvers.Resolvers<TContext>
   User?: UserResolvers.Resolvers<TContext>
   Mutation?: MutationResolvers.Resolvers<TContext>
   TaskMerge?: TaskMergeResolvers.Resolvers<TContext>
@@ -1282,6 +1255,7 @@ export type IResolvers<TContext = {}> = {
   DeleteReturn?: DeleteReturnResolvers.Resolvers<TContext>
   ColumnMerge?: ColumnMergeResolvers.Resolvers<TContext>
   SwimlaneMerge?: SwimlaneMergeResolvers.Resolvers<TContext>
+  Profile?: ProfileResolvers.Resolvers<TContext>
   Date?: GraphQLScalarType
 } & { [typeName: string]: never }
 
@@ -1294,66 +1268,61 @@ export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
   Task,
   | 'points'
   | 'completed'
-  | 'tags'
-  | 'assignedUsers'
-  | 'description'
+  | 'id'
   | 'dueDate'
   | 'startDate'
-  | 'recurrance'
   | 'color'
   | 'timeWorkedOn'
   | 'name'
-> & { id: Task['_id'] } & {
+> & {
     subTasks: Array<
-      { __typename?: 'SubTask' } & Pick<SubTask, 'name' | 'completed'> & {
-          id: SubTask['_id']
-        }
+      { __typename?: 'Subtask' } & Pick<Subtask, 'name' | 'completed' | 'id'>
+    >
+    security: Maybe<
+      { __typename?: 'TaskSecurity' } & Pick<
+        TaskSecurity,
+        'public' | 'assignedUsers'
+      >
+    >
+    recurrance: Maybe<
+      { __typename?: 'TaskRecurrance' } & Pick<
+        TaskRecurrance,
+        'interval' | 'nextDue'
+      >
     >
     comments: Array<
       { __typename?: 'Comment' } & Pick<
         Comment,
-        'description' | 'dateAdded' | 'lastEdited'
-      > & { id: Comment['_id'] }
+        'id' | 'comment' | 'dateAdded' | 'lastEdited'
+      >
     >
   }
 
 export type ProfileFieldsFragment = { __typename?: 'Profile' } & Pick<
   Profile,
-  'profileImg' | 'username' | 'email' | 'projects'
-> & { id: Profile['_id'] }
+  'id' | 'profileImg' | 'username' | 'email' | 'projects'
+>
 
 export type ColumnFieldsFragment = { __typename?: 'Column' } & Pick<
   Column,
-  'name' | 'isCompletedColumn' | 'taskIds' | 'taskLimit'
-> & { id: Column['_id'] }
+  'id' | 'name' | 'taskIds' | 'taskLimit'
+>
 
 export type ProjectFieldsFragment = { __typename?: 'Project' } & Pick<
   Project,
-  'columnIds' | 'ownerId' | 'name'
-> & { id: Project['_id'] } & {
+  'isPrivate' | 'columnOrder' | 'ownerId' | 'users' | 'id' | 'name'
+> & {
     columns: Array<{ __typename?: 'Column' } & ColumnFieldsFragment>
     swimlanes: Array<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name'> & {
-          id: Swimlane['_id']
-        }
+      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
     >
-    users: Maybe<Array<{ __typename?: 'Profile' } & ProfileFieldsFragment>>
     tasks: Array<{ __typename?: 'Task' } & TaskFieldsFragment>
-    tags: Maybe<
-      Array<
-        { __typename?: 'Tag' } & Pick<Tag, 'name' | 'color'> & {
-            id: Tag['_id']
-          }
-      >
-    >
   }
 
 export type UserFieldsFragment = { __typename?: 'User' } & Pick<
   User,
-  'profileImg' | 'username' | 'email'
-> & { id: User['_id'] } & {
-    projects: Array<{ __typename?: 'Project' } & ProjectFieldsFragment>
-  }
+  'id' | 'profileImg' | 'username' | 'email'
+> & { projects: Array<{ __typename?: 'Project' } & ProjectFieldsFragment> }
 
 export type LoginMutationVariables = {
   email: Scalars['String']
@@ -1463,9 +1432,7 @@ export type CreateSwimlaneMutation = { __typename?: 'Mutation' } & {
   createSwimlane: { __typename?: 'SwimlaneMerge' } & {
     project: { __typename?: 'Project' } & ProjectFieldsFragment
     swimlane: Maybe<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name'> & {
-          id: Swimlane['_id']
-        }
+      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
     >
   }
 }
@@ -1480,9 +1447,7 @@ export type EditSwimlaneMutation = { __typename?: 'Mutation' } & {
   editSwimlane: { __typename?: 'SwimlaneMerge' } & {
     project: { __typename?: 'Project' } & ProjectFieldsFragment
     swimlane: Maybe<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name'> & {
-          id: Swimlane['_id']
-        }
+      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
     >
   }
 }
@@ -1501,9 +1466,8 @@ export type DeleteSwimlaneMutation = { __typename?: 'Mutation' } & {
 export type SetSubtaskMutationVariables = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  subtaskId?: Maybe<Scalars['String']>
-  info: SubtaskInfo
-  deleting: Scalars['Boolean']
+  subtaskId: Scalars['String']
+  info?: Maybe<SubtaskInfo>
 }
 
 export type SetSubtaskMutation = { __typename?: 'Mutation' } & {
@@ -1513,9 +1477,8 @@ export type SetSubtaskMutation = { __typename?: 'Mutation' } & {
 export type SetCommentMutationVariables = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId?: Maybe<Scalars['String']>
-  description: Scalars['String']
-  deleting: Scalars['Boolean']
+  commentId: Scalars['String']
+  description?: Maybe<Scalars['String']>
 }
 
 export type SetCommentMutation = { __typename?: 'Mutation' } & {

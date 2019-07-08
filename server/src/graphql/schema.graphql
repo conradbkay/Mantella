@@ -19,26 +19,30 @@ type Comment {
   id: String!
 }
 
+type TaskSecurity {
+  public: String
+  assignedUsers: [String!]!
+}
+
+type TaskRecurrance {
+  interval: Int
+  nextDue: Date
+}
+
 type Task {
-  security: {
-    public: String
-    assignedUsers: [String!]!
-  }
+  security: TaskSecurity
 
   id: String!
   name: String!
   points: String!
   completed: Boolean!
-  timeWorkedOn: Number!
+  timeWorkedOn: Int!
   color: String!
   dueDate: Date
   startDate: Date
   comments: [Comment!]!
   subTasks: [Subtask!]!
-  recurrance: {
-    interval: Number
-    nextDue: Date
-  }
+  recurrance: TaskRecurrance
 }
 
 type User {
@@ -58,7 +62,7 @@ type Profile {
 }
 
 type Project {
-  ownerId: String
+  ownerId: String!
   name: String!
   id: String!
   columnOrder: [String!]!
@@ -81,7 +85,6 @@ type Swimlane {
   name: String!
   id: String!
 }
-
 
 input TaskInput {
   name: String

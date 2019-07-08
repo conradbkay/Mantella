@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { TTasks, TTask } from '../../types/task'
+import { TTask } from '../../types/project'
 import { getDate, getDay } from 'date-fns'
 import { BaseTask } from '../Task/Base'
-import { TaskModal } from '../TaskModal/TaskModal'
+// import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { flatten } from 'lodash'
 import {
@@ -39,7 +39,7 @@ const CWeekDay = (props: TProps) => {
   const [open, setOpen] = useState(false as false | TTask)
   const { day, tasks, index } = props
   // const hasPassed = index === 0
-  const withDate = Object.values(tasks).filter(
+  const withDate = tasks.filter(
     task => task.dueDate !== undefined && getDate(task.dueDate) === getDate(day)
   )
   withDate.sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime())
@@ -115,13 +115,13 @@ const CWeekDay = (props: TProps) => {
   )
 }
 
-const getTasks = (state: TState, filteringIds: string[]): TTasks => {
+const getTasks = (state: TState, filteringIds: string[]): TTask[] => {
   if (filteringIds.includes('-1') || filteringIds.length === 0) {
     // we dont want to filter anything
     return getAllTasks(state.projects)
   }
 
-  let result: TTasks = {}
+  let result: TTask[] = []
 
   const columnIds = flatten(
     Object.values(state.projects)

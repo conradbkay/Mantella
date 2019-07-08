@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react'
-import { TProjects } from '../../types/project'
+import { TProject } from '../../types/project'
 import {
   Select,
   MenuItem,
@@ -27,7 +27,7 @@ const styles = (theme: Theme) =>
   })
 
 type OwnProps = {
-  projects: TProjects
+  projects: TProject[]
   toggleProject: (id: string[]) => void
   currIds: string[]
   startDay: Date

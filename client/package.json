@@ -19,6 +19,7 @@
     "@material-ui/icons": "^4.2.1",
     "@material-ui/pickers": "^3.1.0",
     "@material-ui/styles": "^4.1.2",
+    "@types/date-fns": "^2.6.0",
     "apollo-cache-inmemory": "^1.5.1",
     "apollo-client": "^2.5.1",
     "apollo-link": "^1.2.11",
