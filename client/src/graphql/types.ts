@@ -206,7 +206,7 @@ export type Project = {
   columnOrder: Array<Scalars['String']>
   columns: Array<Column>
   swimlanes: Array<Swimlane>
-  users?: Maybe<Array<Scalars['String']>>
+  users: Array<Scalars['String']>
   tasks: Array<Task>
   isPrivate: Scalars['Boolean']
 }
@@ -297,13 +297,13 @@ export type TaskMerge = {
 
 export type TaskRecurrance = {
   __typename?: 'TaskRecurrance'
-  interval?: Maybe<Scalars['Int']>
-  nextDue?: Maybe<Scalars['Date']>
+  interval: Scalars['Int']
+  nextDue: Scalars['Date']
 }
 
 export type TaskSecurity = {
   __typename?: 'TaskSecurity'
-  public?: Maybe<Scalars['String']>
+  public: Scalars['Boolean']
   assignedUsers: Array<Scalars['String']>
 }
 
@@ -426,7 +426,7 @@ export namespace ProjectResolvers {
 
     swimlanes?: SwimlanesResolver<Swimlane[], TypeParent, TContext>
 
-    users?: UsersResolver<Maybe<string[]>, TypeParent, TContext>
+    users?: UsersResolver<string[], TypeParent, TContext>
 
     tasks?: TasksResolver<Task[], TypeParent, TContext>
 
@@ -464,7 +464,7 @@ export namespace ProjectResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type UsersResolver<
-    R = Maybe<string[]>,
+    R = string[],
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -630,13 +630,13 @@ export namespace TaskResolvers {
 
 export namespace TaskSecurityResolvers {
   export interface Resolvers<TContext = {}, TypeParent = TaskSecurity> {
-    public?: PublicResolver<Maybe<string>, TypeParent, TContext>
+    public?: PublicResolver<boolean, TypeParent, TContext>
 
     assignedUsers?: AssignedUsersResolver<string[], TypeParent, TContext>
   }
 
   export type PublicResolver<
-    R = Maybe<string>,
+    R = boolean,
     Parent = TaskSecurity,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -708,18 +708,18 @@ export namespace SubtaskResolvers {
 
 export namespace TaskRecurranceResolvers {
   export interface Resolvers<TContext = {}, TypeParent = TaskRecurrance> {
-    interval?: IntervalResolver<Maybe<number>, TypeParent, TContext>
+    interval?: IntervalResolver<number, TypeParent, TContext>
 
-    nextDue?: NextDueResolver<Maybe<Date>, TypeParent, TContext>
+    nextDue?: NextDueResolver<Date, TypeParent, TContext>
   }
 
   export type IntervalResolver<
-    R = Maybe<number>,
+    R = number,
     Parent = TaskRecurrance,
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type NextDueResolver<
-    R = Maybe<Date>,
+    R = Date,
     Parent = TaskRecurrance,
     TContext = {}
   > = Resolver<R, Parent, TContext>

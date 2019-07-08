@@ -77,7 +77,7 @@ export const projToSnapshot = (project: ProjectFieldsFragment) => {
         taskIds: column.taskIds.map((taskId, e) => `TASK_ID ${e}`)
       }
     }),
-    columnIds: project.columnIds.map((columnId, i) => `COL_ID ${i}`),
+    columnIds: project.columnOrder.map((columnId, i) => `COL_ID ${i}`),
     ownerId: 'OWNER_ID',
     swimlanes: project.swimlanes.map((swimlane, i) => {
       return {

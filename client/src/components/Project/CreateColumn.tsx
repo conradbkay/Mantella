@@ -49,7 +49,6 @@ const styles = (theme: Theme) =>
 
 const CCreateColumn = (props: CreateColumnProps) => {
   const [name, setName] = useState('')
-  const [isCompletedCol, setIsCompletedCol] = useState(false)
   const [WIPLimit, setWIPLimit] = useState(3)
   const [hasWIPLimit, setHasWIPLimit] = useState(false)
 
@@ -66,8 +65,7 @@ const CCreateColumn = (props: CreateColumnProps) => {
             taskIds: [],
             id: createColumn.column.id,
             name: createColumn.column.name,
-            isCompletedColumn: createColumn.column.isCompletedColumn || false,
-            taskLimit: hasWIPLimit ? WIPLimit : undefined
+            taskLimit: hasWIPLimit ? WIPLimit : 0
           }
         })
       } else {
@@ -89,8 +87,7 @@ const CCreateColumn = (props: CreateColumnProps) => {
           createColumnExec({
             variables: {
               name: name || 'Column',
-              projId: props.project.id,
-              isCompletedColumn: isCompletedCol || false,
+              projId: project.id,
               taskLimit: hasWIPLimit ? WIPLimit || undefined : undefined
             }
           })
@@ -113,21 +110,6 @@ const CCreateColumn = (props: CreateColumnProps) => {
             value={name}
             onChange={({ target }: Change) => setName(target.value)}
             fullWidth
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                disabled={
-                  Object.values(project.columns).filter(
-                    col => col.isCompletedColumn
-                  ).length !== 0
-                }
-                checked={isCompletedCol}
-                onChange={e => setIsCompletedCol(e.target.checked)}
-                value="isCompletedColumn"
-              />
-            }
-            label="Completed Column"
           />
           <div>
             <FormControlLabel

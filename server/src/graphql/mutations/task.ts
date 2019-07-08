@@ -1,6 +1,5 @@
 import { Project } from './../../../../client/src/graphql/types'
-import { purifyProject } from './../../utils'
-import { ProjectModel, TaskProps } from './../../models/Project'
+import { ProjectModel, TaskProps, ProjectProps } from './../../models/Project'
 import { MutationResolvers } from '../../graphql/types'
 import { Types } from 'mongoose'
 import uuid from 'uuid'
@@ -12,14 +11,22 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
 
   if (proj) {
     proj.tasks.push({
-      _id: taskId,
+      id: taskId.toHexString(),
       name: obj.taskInfo.name || 'Unnamed Task',
       points: obj.taskInfo.points || 0,
       completed: false,
       timeWorkedOn: 0,
       color: obj.taskInfo.color || '#FFFFFF',
       startDate: new Date(),
-      dueDate: obj.taskInfo.dueDate ? new Date(obj.taskInfo.dueDate) : undefined
+      dueDate: obj.taskInfo.dueDate
+        ? new Date(obj.taskInfo.dueDate)
+        : undefined,
+      subTasks: [],
+      comments: [],
+      security: {
+        assignedUsers: [],
+        public: true
+      }
     } as TaskProps)
 
     const column = (proj.columns as any).id(obj.columnId)
@@ -27,13 +34,13 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
 
     const newProj = await proj.save()
 
-    const pure = await purifyProject(newProj)
+    const pure: ProjectProps = await newProj.toObject()
 
     if (pure) {
-      const task = pure.tasks.find((tk) => taskId.equals(Types.ObjectId(tk._id)))
+      const task = pure.tasks.find((tk) => taskId.equals(Types.ObjectId(tk.id)))
       return {
         project: pure,
-        task: task
+        task: task!
       }
     }
   }
@@ -50,13 +57,11 @@ const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
     task.points = obj.task.points || task.points
     // dueDate
     // task.lastEdited = new Date()
-    task.recurrance = obj.task.recurrance || task.recurrance
+    // task.recurrance = obj.task.recurrance || task.recurrance
     task.color = obj.task.color || task.color
-    task._id = Types.ObjectId(obj.taskId)
 
     const newProj = await project.save()
-    const pure = await purifyProject(newProj)
-
+    const pure = await newProj.toObject()
     if (pure) {
       if (task) {
         return {
@@ -85,7 +90,7 @@ const deleteTask: MutationResolvers['deleteTask'] = async (parent, obj) => {
     })
 
     const newProj = await proj.save()
-    return { project: (await purifyProject(newProj)) as Project, task: null }
+    return { project: newProj.toObject(), task: null }
   }
 
   throw new Error('project not defined')
@@ -108,7 +113,7 @@ const dragTask: MutationResolvers['dragTask'] = async (
 
     const newProj = await proj.save()
 
-    const pure = await purifyProject(newProj)
+    const pure = await newProj.toObject()
 
     return {
       project: pure as Project,
@@ -168,16 +173,15 @@ const setComment: MutationResolvers['setComment'] = async (parent, obj) => {
         obj.commentId
       )
 
-      if (obj.deleting) {
+      if (!obj.description) {
         (comment as any).remove()
       } else {
-        comment.description =
-          obj.description !== undefined ? obj.description : comment.description
+        comment.comment = obj.description
       }
     } else {
       task.comments.push({
-        dateAdded: new Date(),
-        description: obj.description || 'Subtask',
+        dateAdded: new Date().toString(),
+        comment: obj.description || 'Comment',
         id: uuid()
       })
     }

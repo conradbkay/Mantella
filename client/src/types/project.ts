@@ -17,14 +17,17 @@ export type TProject = {
   columnOrder: string[]
 
   tasks: Array<{
-    security: {
-      public: boolean
-      assignedUsers: string[] // teams or users
-    }
+    security:
+      | {
+          public: boolean
+          assignedUsers: string[] // teams or users
+        }
+      | null
+      | undefined
 
     id: string
     name: string
-    points: string
+    points: number
     completed: boolean
     timeWorkedOn: number
     color: string
@@ -45,10 +48,10 @@ export type TProject = {
     recurrance?: {
       interval: number
       nextDue: Date
-    }
+    } | null
   }>
 
-  users: string[] | null // null if private
+  users: string[] // null if private
 
   isPrivate: boolean
 }
@@ -61,4 +64,4 @@ export type TTask = TProject['tasks'][0]
 
 export type TComment = TTask['comments'][0]
 
-export type TSubTask = TTask['subTasks'][0]
+export type TSubtask = TTask['subTasks'][0]

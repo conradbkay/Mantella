@@ -20,13 +20,13 @@ type Comment {
 }
 
 type TaskSecurity {
-  public: String
+  public: Boolean!
   assignedUsers: [String!]!
 }
 
 type TaskRecurrance {
-  interval: Int
-  nextDue: Date
+  interval: Int!
+  nextDue: Date!
 }
 
 type Task {
@@ -34,7 +34,7 @@ type Task {
 
   id: String!
   name: String!
-  points: String!
+  points: Int!
   completed: Boolean!
   timeWorkedOn: Int!
   color: String!
@@ -68,7 +68,7 @@ type Project {
   columnOrder: [String!]!
   columns: [Column!]!
   swimlanes: [Swimlane!]!
-  users: [String!] # if null is a private project
+  users: [String!]! # if null is a private project
   tasks: [Task!]!
   isPrivate: Boolean! # defaults to false (public)
 }

@@ -14,18 +14,16 @@ export type Auth = {
 }
 
 export type Column = {
-  _id: Scalars['String']
+  id: Scalars['String']
   name: Scalars['String']
-  isCompletedColumn?: Maybe<Scalars['Boolean']>
   taskIds: Array<Scalars['String']>
-  taskLimit?: Maybe<Scalars['Int']>
+  taskLimit: Scalars['Int']
 }
 
 export type ColumnInput = {
-  name: Scalars['String']
-  isCompletedColumn: Scalars['Boolean']
-  taskIds: Array<Scalars['String']>
-  taskLimit: Scalars['Int']
+  name?: Maybe<Scalars['String']>
+  taskIds?: Maybe<Array<Scalars['String']>>
+  taskLimit?: Maybe<Scalars['Int']>
 }
 
 export type ColumnMerge = {
@@ -34,10 +32,10 @@ export type ColumnMerge = {
 }
 
 export type Comment = {
-  description: Scalars['String']
+  comment: Scalars['String']
   dateAdded: Scalars['Date']
   lastEdited?: Maybe<Scalars['Date']>
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type DeleteReturn = {
@@ -50,25 +48,25 @@ export type DragTaskIdList = {
 }
 
 export type Mutation = {
-  createTask?: Maybe<TaskMerge>
-  editTask?: Maybe<TaskMerge>
-  deleteTask?: Maybe<TaskMerge>
-  dragTask?: Maybe<TaskMerge>
-  register?: Maybe<Auth>
-  login?: Maybe<Auth>
-  loginWithCookie?: Maybe<Auth>
-  logout?: Maybe<Void>
-  createProject?: Maybe<Project>
-  editProject?: Maybe<Project>
-  deleteProject?: Maybe<DeleteReturn>
-  createColumn?: Maybe<ColumnMerge>
-  editColumn?: Maybe<ColumnMerge>
-  deleteColumn?: Maybe<ColumnMerge>
-  joinProject?: Maybe<Project>
-  leaveProject?: Maybe<DeleteReturn>
-  createSwimlane?: Maybe<SwimlaneMerge>
-  editSwimlane?: Maybe<SwimlaneMerge>
-  deleteSwimlane?: Maybe<SwimlaneMerge>
+  createTask: TaskMerge
+  editTask: TaskMerge
+  deleteTask: TaskMerge
+  dragTask: TaskMerge
+  register: Auth
+  login: Auth
+  loginWithCookie: Auth
+  logout: Void
+  createProject: Project
+  editProject: Project
+  deleteProject: DeleteReturn
+  createColumn: ColumnMerge
+  editColumn: ColumnMerge
+  deleteColumn: ColumnMerge
+  joinProject: Project
+  leaveProject: DeleteReturn
+  createSwimlane: SwimlaneMerge
+  editSwimlane: SwimlaneMerge
+  deleteSwimlane: SwimlaneMerge
   removeMemberFromProject: Project
   setComment: Task
   setSubtask: Task
@@ -172,21 +170,19 @@ export type MutationRemoveMemberFromProjectArgs = {
 export type MutationSetCommentArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId?: Maybe<Scalars['String']>
-  description: Scalars['String']
-  deleting: Scalars['Boolean']
+  commentId: Scalars['String']
+  description?: Maybe<Scalars['String']>
 }
 
 export type MutationSetSubtaskArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  subtaskId?: Maybe<Scalars['String']>
+  subtaskId: Scalars['String']
   info?: Maybe<SubtaskInfo>
-  deleting: Scalars['Boolean']
 }
 
 export type Profile = {
-  _id: Scalars['String']
+  id: Scalars['String']
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
@@ -194,22 +190,20 @@ export type Profile = {
 }
 
 export type Project = {
-  ownerId?: Maybe<Scalars['String']>
+  ownerId: Scalars['String']
   name: Scalars['String']
-  _id: Scalars['String']
-  tags?: Maybe<Array<Tag>>
-  columnIds: Array<Scalars['String']>
+  id: Scalars['String']
+  columnOrder: Array<Scalars['String']>
   columns: Array<Column>
   swimlanes: Array<Swimlane>
-  users?: Maybe<Array<Profile>>
+  users: Array<Scalars['String']>
   tasks: Array<Task>
-  isPrivate?: Maybe<Scalars['Boolean']>
+  isPrivate: Scalars['Boolean']
 }
 
 export type ProjectInput = {
-  name: Scalars['String']
-  columnIds: Array<Scalars['String']>
-  categories: Array<Scalars['String']>
+  name?: Maybe<Scalars['String']>
+  columnIds?: Maybe<Array<Scalars['String']>>
 }
 
 export type Query = {
@@ -230,26 +224,26 @@ export type QueryUserArgs = {
   id: Scalars['String']
 }
 
-export type SubTask = {
+export type Subtask = {
   name: Scalars['String']
   completed: Scalars['Boolean']
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type SubtaskInfo = {
-  name: Scalars['String']
-  completed: Scalars['Boolean']
+  name?: Maybe<Scalars['String']>
+  completed?: Maybe<Scalars['Boolean']>
 }
 
 export type Swimlane = {
   taskIds: Array<Scalars['String']>
   name: Scalars['String']
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type SwimlaneInput = {
-  taskIds: Array<Scalars['String']>
-  name: Scalars['String']
+  taskIds?: Maybe<Array<Scalars['String']>>
+  name?: Maybe<Scalars['String']>
 }
 
 export type SwimlaneMerge = {
@@ -257,27 +251,19 @@ export type SwimlaneMerge = {
   swimlane?: Maybe<Swimlane>
 }
 
-export type Tag = {
-  name: Scalars['String']
-  _id: Scalars['String']
-  color?: Maybe<Scalars['String']>
-}
-
 export type Task = {
+  security?: Maybe<TaskSecurity>
+  id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
   completed: Scalars['Boolean']
   timeWorkedOn: Scalars['Int']
-  color?: Maybe<Scalars['String']>
+  color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
   startDate?: Maybe<Scalars['Date']>
-  assignedUsers: Array<Scalars['String']>
-  tags: Array<Scalars['String']>
-  subTasks: Array<SubTask>
   comments: Array<Comment>
-  description?: Maybe<Scalars['String']>
-  recurrance?: Maybe<Scalars['String']>
-  _id: Scalars['String']
+  subTasks: Array<Subtask>
+  recurrance?: Maybe<TaskRecurrance>
 }
 
 export type TaskInput = {
@@ -293,8 +279,18 @@ export type TaskMerge = {
   task?: Maybe<Task>
 }
 
+export type TaskRecurrance = {
+  interval: Scalars['Int']
+  nextDue: Scalars['Date']
+}
+
+export type TaskSecurity = {
+  public: Scalars['Boolean']
+  assignedUsers: Array<Scalars['String']>
+}
+
 export type User = {
-  _id: Scalars['String']
+  id: Scalars['String']
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
@@ -385,16 +381,16 @@ export type ResolversTypes = {
   Query: {}
   String: Scalars['String']
   Project: Project
-  Tag: Tag
   Column: Column
-  Boolean: Scalars['Boolean']
   Int: Scalars['Int']
   Swimlane: Swimlane
-  Profile: Profile
   Task: Task
+  TaskSecurity: TaskSecurity
+  Boolean: Scalars['Boolean']
   Date: Scalars['Date']
-  SubTask: SubTask
   Comment: Comment
+  Subtask: Subtask
+  TaskRecurrance: TaskRecurrance
   User: User
   Mutation: {}
   TaskInput: TaskInput
@@ -409,6 +405,7 @@ export type ResolversTypes = {
   SwimlaneMerge: SwimlaneMerge
   SwimlaneInput: SwimlaneInput
   SubtaskInfo: SubtaskInfo
+  Profile: Profile
 }
 
 export type AuthResolvers<
@@ -422,15 +419,10 @@ export type ColumnResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Column']
 > = {
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  isCompletedColumn?: Resolver<
-    Maybe<ResolversTypes['Boolean']>,
-    ParentType,
-    ContextType
-  >
   taskIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
-  taskLimit?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+  taskLimit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
 }
 
 export type ColumnMergeResolvers<
@@ -445,10 +437,10 @@ export type CommentResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Comment']
 > = {
-  description?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  comment?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   dateAdded?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
   lastEdited?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export interface DateScalarConfig
@@ -468,109 +460,105 @@ export type MutationResolvers<
   ParentType = ResolversTypes['Mutation']
 > = {
   createTask?: Resolver<
-    Maybe<ResolversTypes['TaskMerge']>,
+    ResolversTypes['TaskMerge'],
     ParentType,
     ContextType,
     MutationCreateTaskArgs
   >
   editTask?: Resolver<
-    Maybe<ResolversTypes['TaskMerge']>,
+    ResolversTypes['TaskMerge'],
     ParentType,
     ContextType,
     MutationEditTaskArgs
   >
   deleteTask?: Resolver<
-    Maybe<ResolversTypes['TaskMerge']>,
+    ResolversTypes['TaskMerge'],
     ParentType,
     ContextType,
     MutationDeleteTaskArgs
   >
   dragTask?: Resolver<
-    Maybe<ResolversTypes['TaskMerge']>,
+    ResolversTypes['TaskMerge'],
     ParentType,
     ContextType,
     MutationDragTaskArgs
   >
   register?: Resolver<
-    Maybe<ResolversTypes['Auth']>,
+    ResolversTypes['Auth'],
     ParentType,
     ContextType,
     MutationRegisterArgs
   >
   login?: Resolver<
-    Maybe<ResolversTypes['Auth']>,
+    ResolversTypes['Auth'],
     ParentType,
     ContextType,
     MutationLoginArgs
   >
-  loginWithCookie?: Resolver<
-    Maybe<ResolversTypes['Auth']>,
-    ParentType,
-    ContextType
-  >
-  logout?: Resolver<Maybe<ResolversTypes['Void']>, ParentType, ContextType>
+  loginWithCookie?: Resolver<ResolversTypes['Auth'], ParentType, ContextType>
+  logout?: Resolver<ResolversTypes['Void'], ParentType, ContextType>
   createProject?: Resolver<
-    Maybe<ResolversTypes['Project']>,
+    ResolversTypes['Project'],
     ParentType,
     ContextType,
     MutationCreateProjectArgs
   >
   editProject?: Resolver<
-    Maybe<ResolversTypes['Project']>,
+    ResolversTypes['Project'],
     ParentType,
     ContextType,
     MutationEditProjectArgs
   >
   deleteProject?: Resolver<
-    Maybe<ResolversTypes['DeleteReturn']>,
+    ResolversTypes['DeleteReturn'],
     ParentType,
     ContextType,
     MutationDeleteProjectArgs
   >
   createColumn?: Resolver<
-    Maybe<ResolversTypes['ColumnMerge']>,
+    ResolversTypes['ColumnMerge'],
     ParentType,
     ContextType,
     MutationCreateColumnArgs
   >
   editColumn?: Resolver<
-    Maybe<ResolversTypes['ColumnMerge']>,
+    ResolversTypes['ColumnMerge'],
     ParentType,
     ContextType,
     MutationEditColumnArgs
   >
   deleteColumn?: Resolver<
-    Maybe<ResolversTypes['ColumnMerge']>,
+    ResolversTypes['ColumnMerge'],
     ParentType,
     ContextType,
     MutationDeleteColumnArgs
   >
   joinProject?: Resolver<
-    Maybe<ResolversTypes['Project']>,
+    ResolversTypes['Project'],
     ParentType,
     ContextType,
     MutationJoinProjectArgs
   >
   leaveProject?: Resolver<
-    Maybe<ResolversTypes['DeleteReturn']>,
+    ResolversTypes['DeleteReturn'],
     ParentType,
     ContextType,
     MutationLeaveProjectArgs
   >
   createSwimlane?: Resolver<
-    Maybe<ResolversTypes['SwimlaneMerge']>,
+    ResolversTypes['SwimlaneMerge'],
     ParentType,
     ContextType,
     MutationCreateSwimlaneArgs
   >
   editSwimlane?: Resolver<
-    Maybe<ResolversTypes['SwimlaneMerge']>,
+    ResolversTypes['SwimlaneMerge'],
     ParentType,
     ContextType,
     MutationEditSwimlaneArgs
   >
   deleteSwimlane?: Resolver<
-    Maybe<ResolversTypes['SwimlaneMerge']>,
+    ResolversTypes['SwimlaneMerge'],
     ParentType,
     ContextType,
     MutationDeleteSwimlaneArgs
@@ -599,7 +587,7 @@ export type ProfileResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Profile']
 > = {
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   profileImg?: Resolver<
     Maybe<ResolversTypes['String']>,
     ParentType,
@@ -614,28 +602,23 @@ export type ProjectResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Project']
 > = {
-  ownerId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  tags?: Resolver<Maybe<Array<ResolversTypes['Tag']>>, ParentType, ContextType>
-  columnIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  columnOrder?: Resolver<
+    Array<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >
   columns?: Resolver<Array<ResolversTypes['Column']>, ParentType, ContextType>
   swimlanes?: Resolver<
     Array<ResolversTypes['Swimlane']>,
     ParentType,
     ContextType
   >
-  users?: Resolver<
-    Maybe<Array<ResolversTypes['Profile']>>,
-    ParentType,
-    ContextType
-  >
+  users?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
   tasks?: Resolver<Array<ResolversTypes['Task']>, ParentType, ContextType>
-  isPrivate?: Resolver<
-    Maybe<ResolversTypes['Boolean']>,
-    ParentType,
-    ContextType
-  >
+  isPrivate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type QueryResolvers<
@@ -662,13 +645,13 @@ export type QueryResolvers<
   >
 }
 
-export type SubTaskResolvers<
+export type SubtaskResolvers<
   ContextType = any,
-  ParentType = ResolversTypes['SubTask']
+  ParentType = ResolversTypes['Subtask']
 > = {
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   completed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type SwimlaneResolvers<
@@ -677,7 +660,7 @@ export type SwimlaneResolvers<
 > = {
   taskIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type SwimlaneMergeResolvers<
@@ -692,45 +675,30 @@ export type SwimlaneMergeResolvers<
   >
 }
 
-export type TagResolvers<
-  ContextType = any,
-  ParentType = ResolversTypes['Tag']
-> = {
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  color?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-}
-
 export type TaskResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Task']
 > = {
+  security?: Resolver<
+    Maybe<ResolversTypes['TaskSecurity']>,
+    ParentType,
+    ContextType
+  >
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   completed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   timeWorkedOn?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  color?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  color?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   dueDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>
   startDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>
-  assignedUsers?: Resolver<
-    Array<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >
-  tags?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
-  subTasks?: Resolver<Array<ResolversTypes['SubTask']>, ParentType, ContextType>
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>
-  description?: Resolver<
-    Maybe<ResolversTypes['String']>,
-    ParentType,
-    ContextType
-  >
+  subTasks?: Resolver<Array<ResolversTypes['Subtask']>, ParentType, ContextType>
   recurrance?: Resolver<
-    Maybe<ResolversTypes['String']>,
+    Maybe<ResolversTypes['TaskRecurrance']>,
     ParentType,
     ContextType
   >
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
 }
 
 export type TaskMergeResolvers<
@@ -741,11 +709,31 @@ export type TaskMergeResolvers<
   task?: Resolver<Maybe<ResolversTypes['Task']>, ParentType, ContextType>
 }
 
+export type TaskRecurranceResolvers<
+  ContextType = any,
+  ParentType = ResolversTypes['TaskRecurrance']
+> = {
+  interval?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
+  nextDue?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+}
+
+export type TaskSecurityResolvers<
+  ContextType = any,
+  ParentType = ResolversTypes['TaskSecurity']
+> = {
+  public?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
+  assignedUsers?: Resolver<
+    Array<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >
+}
+
 export type UserResolvers<
   ContextType = any,
   ParentType = ResolversTypes['User']
 > = {
-  _id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   profileImg?: Resolver<
     Maybe<ResolversTypes['String']>,
     ParentType,
@@ -774,12 +762,13 @@ export type Resolvers<ContextType = any> = {
   Profile?: ProfileResolvers<ContextType>
   Project?: ProjectResolvers<ContextType>
   Query?: QueryResolvers<ContextType>
-  SubTask?: SubTaskResolvers<ContextType>
+  Subtask?: SubtaskResolvers<ContextType>
   Swimlane?: SwimlaneResolvers<ContextType>
   SwimlaneMerge?: SwimlaneMergeResolvers<ContextType>
-  Tag?: TagResolvers<ContextType>
   Task?: TaskResolvers<ContextType>
   TaskMerge?: TaskMergeResolvers<ContextType>
+  TaskRecurrance?: TaskRecurranceResolvers<ContextType>
+  TaskSecurity?: TaskSecurityResolvers<ContextType>
   User?: UserResolvers<ContextType>
   Void?: VoidResolvers<ContextType>
 }

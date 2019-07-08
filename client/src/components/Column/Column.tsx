@@ -17,7 +17,7 @@ import {
 } from '../../graphql/types'
 import { setProjectA } from '../../store/actions/project'
 import { GQL_DELETE_COLUMN } from '../../graphql/mutations/column'
-import { getUnassignedTasks } from '../../utils/utilities'
+import { getUnassignedTasks, getAllTasks, id } from '../../utils/utilities'
 
 const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimlane) => {
   const swimlaneTasks: TTask[] = []
@@ -35,18 +35,16 @@ const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimlane) => {
 
 const TaskMap = ({
   taskArr,
-  taskProps,
   project
 }: {
   taskArr: TTask[]
-  taskProps: { isCompletedColumn?: boolean }
   project: TProject
 }) => (
   <div>
     {taskArr.map((task, i) => {
       return task ? (
         <div key={task.id}>
-          <ColumnTask project={project} task={task} index={i} {...taskProps} />
+          <ColumnTask project={project} task={task} index={i} />
         </div>
       ) : null
     })}
@@ -137,7 +135,7 @@ const CColumn = (props: ColumnProps) => {
 
   const creatingDisabled = column.taskIds.length === column.taskLimit
 
-  const sortedTasks = column.taskIds.map(id => tasks[id])
+  const sortedTasks = column.taskIds.map(colId => tasks[id(tasks, colId)])
   const filteredTasks: TTask[] = sortedTasks
 
   const unassignedTasks = getUnassignedTasks(filteredTasks, tasks, project)
@@ -179,13 +177,7 @@ const CColumn = (props: ColumnProps) => {
                   ref={provided.innerRef}
                 >
                   <div>
-                    <TaskMap
-                      project={project}
-                      taskProps={{
-                        isCompletedColumn: column.isCompletedColumn
-                      }}
-                      taskArr={unassignedTasks}
-                    />
+                    <TaskMap project={project} taskArr={unassignedTasks} />
                   </div>
                   {
                     provided.placeholder /* makes it expand when we hover over draggable */
@@ -216,13 +208,7 @@ const CColumn = (props: ColumnProps) => {
                       {...prov.droppableProps}
                       style={columnWrapper(snap.isDraggingOver)}
                     >
-                      <TaskMap
-                        project={project}
-                        taskProps={{
-                          isCompletedColumn: column.isCompletedColumn
-                        }}
-                        taskArr={swimlaneTasks}
-                      />
+                      <TaskMap project={project} taskArr={swimlaneTasks} />
 
                       {prov.placeholder}
                     </div>
@@ -237,7 +223,7 @@ const CColumn = (props: ColumnProps) => {
       {deleting && (
         <DeleteDialog
           name="Column"
-          deleteFunc={(id: string) => {
+          deleteFunc={(colId: string) => {
             deleteColumn()
           }}
           id={column.id}
@@ -258,7 +244,7 @@ const CColumn = (props: ColumnProps) => {
 const mapState = (state: TState, ownProps: OwnProps) => {
   return {
     tasks: getAllTasks(state.projects),
-    project: state.projects[ownProps.projectId]
+    project: state.projects[id(state.projects, ownProps.projectId)]
   }
 }
 

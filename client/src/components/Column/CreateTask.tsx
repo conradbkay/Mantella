@@ -19,7 +19,6 @@ import {
 
 import { Change } from '../../types/types'
 import { setTaskA } from '../../store/actions/task'
-import { ChooseColor } from '../utils/chooseColor'
 import { TState } from '../../types/state'
 import {
   CreateTaskMutation,
@@ -28,8 +27,9 @@ import {
 import { GQL_CREATE_TASK } from '../../graphql/mutations/task'
 import { setProjectA } from '../../store/actions/project'
 import { useMutation } from '@apollo/react-hooks'
-import { resToNiceTask, resToNiceProject } from '../../API/utils'
 import { Close } from '@material-ui/icons'
+import { id } from '../../utils/utilities'
+import { ChooseColor } from '../utils/chooseColor'
 
 type CreateTaskProps = ReturnType<typeof mapState> &
   typeof actionCreators &
@@ -65,13 +65,13 @@ const CCreateTask = (props: CreateTaskProps) => {
     onCompleted: ({ createTask }) => {
       if (createTask && createTask.task && createTask.project) {
         props.setTask({
-          newTask: resToNiceTask(createTask.task),
+          newTask: createTask.task,
           id: createTask.task.id,
           projectId: createTask.project.id
         })
         props.setProject({
           id: createTask.project.id,
-          newProj: resToNiceProject(createTask.project)
+          newProj: createTask.project
         })
       }
       props.onClose()
@@ -145,7 +145,9 @@ const CCreateTask = (props: CreateTaskProps) => {
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   return {
-    column: state.projects[ownProps.projectId].columns[ownProps.columnId]
+    column: state.projects[id(state.projects, ownProps.projectId)].columns.find(
+      col => col.id === ownProps.columnId
+    )!
   }
 }
 const actionCreators = {

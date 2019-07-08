@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
-import { TaskModal } from '../TaskModal/TaskModal'
 import { Draggable } from 'react-beautiful-dnd'
-import { TTask } from '../../types/task'
+import { TTask } from '../../types/project'
 import { BaseTask } from './Base'
 import { TProject } from '../../types/project'
 
@@ -15,6 +14,8 @@ type TaskProps = TaskOwnProps
 
 export const ColumnTask = (props: TaskProps) => {
   const [open, setOpen] = useState(false)
+
+  console.log(open)
 
   const { task, index, isCompletedColumn } = props
   return task ? (
@@ -31,13 +32,13 @@ export const ColumnTask = (props: TaskProps) => {
           />
         )}
       </Draggable>
-      {open && (
+      {/*open && (
         <TaskModal
           task={task}
           onClose={() => setOpen(false)}
           projectId={props.project.id}
         />
-      )}
+      )*/}
     </>
   ) : null
 }

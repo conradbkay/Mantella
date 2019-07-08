@@ -33,7 +33,6 @@ import {
   GQL_EDIT_SWIMLANE,
   GQL_CREATE_SWIMLANE
 } from '../../graphql/mutations/swimlane'
-import { resToNiceSwimlanes, resToNiceProject } from '../../API/utils'
 
 type TProps = {
   onClose: () => void
@@ -77,7 +76,7 @@ const CProjectSettings = (props: TProps) => {
     onCompleted: ({ deleteSwimlane }) => {
       if (deleteSwimlane && deleteSwimlane.project) {
         props.setProject({
-          newProj: resToNiceProject(deleteSwimlane.project),
+          newProj: deleteSwimlane.project,
           id: deleteSwimlane.project.id
         })
       }
@@ -90,9 +89,7 @@ const CProjectSettings = (props: TProps) => {
   >(GQL_EDIT_SWIMLANE, {
     onCompleted: ({ editSwimlane }) => {
       if (editSwimlane && editSwimlane.swimlane) {
-        const edited = resToNiceSwimlanes([editSwimlane.swimlane])[
-          editSwimlane.swimlane.id
-        ]
+        const edited = editSwimlane.swimlane
 
         props.setSwimlane({
           newSwimlane: edited,
@@ -110,7 +107,7 @@ const CProjectSettings = (props: TProps) => {
     onCompleted: ({ createSwimlane }) => {
       if (createSwimlane && createSwimlane.project) {
         props.setProject({
-          newProj: resToNiceProject(createSwimlane.project),
+          newProj: createSwimlane.project,
           id: createSwimlane.project.id
         })
       }
@@ -158,42 +155,40 @@ const CProjectSettings = (props: TProps) => {
         >
           Swimlanes
         </Typography>
-        {props.project.swimlaneOrder
-          .map(swimlaneId => props.project.swimlanes[swimlaneId])
-          .map(swimlane => (
-            <div key={swimlane.id} style={{ display: 'flex' }}>
-              <TextField
-                fullWidth
-                onChange={e => {
-                  props.setSwimlane({
-                    newSwimlane: { ...swimlane, name: e.target.value },
-                    projectId: props.project.id,
-                    id: swimlane.id
-                  })
-                }}
-                onBlur={() => {
-                  editSwimlaneExec({
-                    variables: {
-                      projId: props.project.id,
-                      swimId: swimlane.id,
-                      newSwim: { name: swimlane.name }
-                    }
-                  })
-                }}
-                value={swimlane.name}
-                style={{ marginRight: 16 }}
-              />
-              <IconButton
-                onClick={() => {
-                  deleteSwimlaneExec({
-                    variables: { projId: props.project.id, swimId: swimlane.id }
-                  })
-                }}
-              >
-                <Delete />
-              </IconButton>
-            </div>
-          ))}
+        {props.project.swimlanes.map(swimlane => (
+          <div key={swimlane.id} style={{ display: 'flex' }}>
+            <TextField
+              fullWidth
+              onChange={e => {
+                props.setSwimlane({
+                  newSwimlane: { ...swimlane, name: e.target.value },
+                  projectId: props.project.id,
+                  id: swimlane.id
+                })
+              }}
+              onBlur={() => {
+                editSwimlaneExec({
+                  variables: {
+                    projId: props.project.id,
+                    swimId: swimlane.id,
+                    newSwim: { name: swimlane.name }
+                  }
+                })
+              }}
+              value={swimlane.name}
+              style={{ marginRight: 16 }}
+            />
+            <IconButton
+              onClick={() => {
+                deleteSwimlaneExec({
+                  variables: { projId: props.project.id, swimId: swimlane.id }
+                })
+              }}
+            >
+              <Delete />
+            </IconButton>
+          </div>
+        ))}
         <IconButton
           onClick={() => {
             createSwimlaneExec({

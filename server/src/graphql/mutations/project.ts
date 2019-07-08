@@ -2,7 +2,6 @@ import { AuthenticationError } from 'apollo-server-core'
 import { UserModel } from './../../models/User'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
-import { purifyProject } from '../../utils'
 import { Types } from 'mongoose'
 
 const createProject: MutationResolvers['createProject'] = async (
@@ -43,7 +42,7 @@ const createProject: MutationResolvers['createProject'] = async (
       })
     ])
     if (created) {
-      return await purifyProject(created)
+      return created.toObject()
     }
   }
 
@@ -56,14 +55,14 @@ const editProject: MutationResolvers['editProject'] = async (parent, args) => {
     if (project) {
       project.name = args.newProj.name ? args.newProj.name : project.name
       project._id = Types.ObjectId(args.id)
-      project.columnIds = args.newProj.columnIds
+      project.columnOrder = args.newProj.columnIds
         ? args.newProj.columnIds
-        : project.columnIds
+        : project.columnOrder
 
       const newProj = await project.save()
 
       if (newProj) {
-        return await purifyProject(newProj)
+        return newProj.toObject()
       }
     }
   }

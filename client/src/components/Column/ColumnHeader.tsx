@@ -23,7 +23,7 @@ import {
   MoreHoriz
 } from '@material-ui/icons'
 import { setColumnA } from '../../store/actions/column'
-import { TColumn } from '../../types/state'
+import { TColumn } from '../../types/project'
 import { GQL_EDIT_COLUMN } from '../../graphql/mutations/column'
 import {
   EditColumnMutationVariables,
@@ -37,7 +37,6 @@ import { setProjectA } from '../../store/actions/project'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { TProject } from '../../types/project'
 import { moveInArray } from '../../utils/utilities'
-import { resToNiceProject } from '../../API/utils'
 
 type OwnProps = {
   setDeleting: Dispatch<SetStateAction<boolean>>
@@ -106,7 +105,7 @@ const ColumnHeaderComp = withStyles(styles)(
         if (editProject) {
           props.setProject({
             id: editProject.id,
-            newProj: resToNiceProject(editProject)
+            newProj: editProject
           })
         }
       }
@@ -126,9 +125,8 @@ const ColumnHeaderComp = withStyles(styles)(
             newCol: {
               name: col.name,
               id: col.id,
-              isCompletedColumn: col.isCompletedColumn || false,
               taskIds: col.taskIds || [],
-              taskLimit: col.taskLimit || undefined
+              taskLimit: col.taskLimit || 0
             }
           })
         }

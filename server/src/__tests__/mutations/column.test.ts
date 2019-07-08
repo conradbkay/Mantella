@@ -31,7 +31,7 @@ describe('Column Mutations', () => {
     const col = createData!.createColumn!.column!
 
     expect(
-      createData!.createColumn!.project!.columnIds!.includes(col.id)
+      createData!.createColumn!.project!.columnOrder!.includes(col.id)
     ).toBeTruthy()
     expect(col.name).toBe('column name')
     expect(
@@ -55,7 +55,6 @@ describe('Column Mutations', () => {
         id: col.id,
         newCol: {
           name: 'new name lol',
-          isCompletedColumn: true,
           taskLimit: 10,
           taskIds: ['lol taskId']
         }
@@ -93,7 +92,7 @@ describe('Column Mutations', () => {
     })
 
     expect(
-      deleteData!.deleteColumn!.project!.columnIds.includes(newCol.id)
+      deleteData!.deleteColumn!.project!.columnOrder.includes(newCol.id)
     ).toBe(false)
 
     expect(

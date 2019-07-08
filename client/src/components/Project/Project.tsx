@@ -10,7 +10,6 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  ButtonBase,
   Fab
 } from '@material-ui/core'
 import { TState } from '../../types/state'
@@ -34,9 +33,9 @@ import {
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { cloneDeep } from 'lodash'
-import { resToNiceProject } from '../../API/utils'
 import { useMutation } from '@apollo/react-hooks'
 import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
+import { id } from '../../utils/utilities'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -131,7 +130,7 @@ const CProject = (props: TProps) => {
       if (dragTask && dragTask.project) {
         props.setProject({
           id: dragTask.project.id,
-          newProj: resToNiceProject(dragTask.project)
+          newProj: dragTask.project
         })
       }
     }
@@ -181,31 +180,34 @@ const CProject = (props: TProps) => {
 
       // delete old swimlane reference
       if (fromSwimlane) {
-        proj.swimlanes[fromSwimlane.id].taskIds.splice(result.source.index, 1)
+        proj.swimlanes[id(proj.swimlanes, fromSwimlane.id)].taskIds.splice(
+          result.source.index,
+          1
+        )
       }
 
       // delete old column reference
-      proj.columns[fromColumn.id].taskIds.splice(
-        proj.columns[fromColumn.id].taskIds.indexOf(taskId),
+      proj.columns[id(proj.columns, fromColumn.id)].taskIds.splice(
+        proj.columns[id(proj.columns, fromColumn.id)].taskIds.indexOf(taskId),
         1
       )
 
       if (toSwimlane) {
         // add task to new swimlane
-        proj.swimlanes[toSwimlane.id].taskIds.splice(
+        proj.swimlanes[id(proj.swimlanes, toSwimlane.id)].taskIds.splice(
           result.destination.index,
           0,
           taskId
         )
 
-        proj.columns[toColumn.id].taskIds.splice(
+        proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
           result.destination.index,
           0,
           taskId
         )
       } else {
         const unassignedOfDestination = proj.columns[
-          toColumn.id
+          id(proj.columns, toColumn.id)
         ].taskIds.filter(tId => {
           const owner = Object.values(proj.swimlanes).find(swim => {
             return swim.taskIds.includes(tId)
@@ -215,20 +217,25 @@ const CProject = (props: TProps) => {
         })
 
         if (result.destination.index === 0) {
-          proj.columns[toColumn.id].taskIds.splice(0, 0, taskId)
+          proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
+            0,
+            0,
+            taskId
+          )
         } else if (
           result.destination.index === unassignedOfDestination.length
         ) {
-          proj.columns[toColumn.id].taskIds = [
-            ...proj.columns[toColumn.id].taskIds,
+          proj.columns[id(proj.columns, toColumn.id)].taskIds = [
+            ...proj.columns[id(proj.columns, toColumn.id)].taskIds,
             taskId
           ]
         } else {
           // gotta do some black magic
           const below = unassignedOfDestination[result.destination.index - 1]
           // add task to new column
-          proj.columns[toColumn.id].taskIds.splice(
-            proj.columns[toColumn.id].taskIds.indexOf(below) + 1,
+          proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
+            proj.columns[id(proj.columns, toColumn.id)].taskIds.indexOf(below) +
+              1,
             0,
             taskId
           )
@@ -262,7 +269,9 @@ const CProject = (props: TProps) => {
 
   const { classes, project } = props
   if (project) {
-    const projColumns = project.columnOrder.map(id => project.columns[id])
+    const projColumns = project.columnOrder.map(
+      colId => project.columns[id(project.columns, colId)]
+    )
 
     return (
       <div>
@@ -283,7 +292,7 @@ const CProject = (props: TProps) => {
                     newProj: {
                       name: editProject.name,
                       id: editProject.id,
-                      ...resToNiceProject(editProject)
+                      ...editProject
                     }
                   })
                   setName(editProject.name)
@@ -322,7 +331,7 @@ const CProject = (props: TProps) => {
                 marginLeft: 'auto'
               }}
             >
-              {Object.values(project.users).map((user, i) => {
+              {/* Object.values(project.users).map((user, i) => {
                 return (
                   <Tooltip key={user.id} title={user.username}>
                     <ButtonBase
@@ -353,7 +362,7 @@ const CProject = (props: TProps) => {
                     />
                   </Tooltip>
                 )
-              })}
+              }) */}
             </div>
             <IconButton onClick={() => setFiltering(true)}>
               <FilterList />
@@ -442,7 +451,6 @@ const CProject = (props: TProps) => {
           />
         )}
         <FilterTasks
-          tags={props.project.tags}
           project={project}
           changeFilter={(newFilter: TFilterData) => setFilterData(newFilter)}
           filterData={filterData}
@@ -456,7 +464,7 @@ const CProject = (props: TProps) => {
 }
 
 const mapState = (state: TState, ownProps: OwnProps) => ({
-  project: state.projects[ownProps.id]
+  project: state.projects[id(state.projects, ownProps.params.id)]
 })
 
 const actionCreators = {

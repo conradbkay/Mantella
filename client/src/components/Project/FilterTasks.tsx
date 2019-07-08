@@ -18,7 +18,6 @@ import {
 import { ChooseColor } from '../utils/chooseColor'
 import { addDays } from 'date-fns'
 import { TProject } from '../../types/project'
-import { TTags } from '../../types/state'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -37,7 +36,6 @@ type TProps = {
   open: boolean
   changeFilter: (newFilter: TFilterData) => void
   handleClose: () => void
-  tags: TTags
   project: TProject
 } & WithStyles<typeof styles>
 
@@ -85,41 +83,11 @@ const CFilterTasks = (props: TProps) => {
                 }}
               >
                 <MenuItem value={'all'}>All Members</MenuItem>
-                {Object.values(props.project.users).map(user => (
+                {/* Object.values(props.project.users).map(user => (
                   <MenuItem key={user.id} value={user.id}>
                     {user.username}
                   </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </ListItem>
-
-          <ListItem>
-            <FormControl style={{ width: '100%' }}>
-              <InputLabel htmlFor="select-multiple">Tags</InputLabel>
-              <Select
-                style={{ width: '100%' }}
-                multiple
-                value={filterData.tags}
-                onChange={(e: any) => {
-                  if (filterData.tags.includes('all')) {
-                    changeFilter({
-                      ...filterData,
-                      tags: e.target.value.filter((id: any) => id !== 'all')
-                    })
-                  } else if (e.target.value.length === 0) {
-                    changeFilter({ ...filterData, tags: ['all'] })
-                  } else {
-                    changeFilter({ ...filterData, tags: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value={'all'}>All Tags</MenuItem>
-                {Object.values(props.tags).map(tag => (
-                  <MenuItem key={tag.id} value={tag.id}>
-                    {tag.name}
-                  </MenuItem>
-                ))}
+                )) */}
               </Select>
             </FormControl>
           </ListItem>

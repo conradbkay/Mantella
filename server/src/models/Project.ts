@@ -68,7 +68,7 @@ export interface TaskProps {
 
   id: string
   name: string
-  points: string
+  points: number
   completed: boolean
   timeWorkedOn: number
   color: string

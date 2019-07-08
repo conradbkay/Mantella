@@ -48,7 +48,7 @@ describe('Project Mutations', () => {
     expect(editData).toBeTruthy()
 
     expect(editData!.editProject!.name).toBe('new name lol')
-    expect(editData!.editProject!.columnIds).toEqual(['real smooth'])
+    expect(editData!.editProject!.columnOrder).toEqual(['real smooth'])
     expect(editData!.editProject!.id).toBe(createData!.createProject!.id)
     expect(projToSnapshot(editData!.editProject!)).toMatchSnapshot()
 

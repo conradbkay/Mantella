@@ -1,32 +1,21 @@
-export const pls = 'pls'
+import { format, distanceInWordsToNow } from 'date-fns'
+import { hasPassed } from './hasPassed'
+import { TTask } from '../types/project'
+import { toDaysHHMMSS } from './convertToTime'
 
-/*
+// Jan 1st 12:02 am
 const baseFormat = (date: Date): string => format(date, 'MMM do h:mm a')
-const passedFormat = (date: Date): string => {
-  if (differenceInSeconds(new Date(), date) === 0) {
-    return 'Overdue by < 1 Minute'
-  }
-  return (
-    'Overdue by ' + toDaysHHMMSS(differenceInSeconds(new Date(), date), true)
-  )
+
+const overdueFormat = (date: Date): string => {
+  return 'Overdue by ' + distanceInWordsToNow(date)
 }
-*/
-/*
+
 const god = (date: Date, hasOver?: boolean): string => {
-  if (
-    hasOver &&
-    differenceInSeconds(new Date(), date) < 60 &&
-    differenceInSeconds(new Date(), date) > 0
-  ) {
-    return 'Overdue by < 1 Minute'
-  }
   return hasPassed(date) && hasOver
-    ? passedFormat(date)
+    ? overdueFormat(date)
     : 'Due ' + baseFormat(date)
 }
-*/
 
-/*
 export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
   if (!task.dueDate) {
     return ''
@@ -44,25 +33,12 @@ export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
     return god(task.dueDate, hasOverDue)
   }
 
-  if (task.recurrance === 'daily') {
-    return `Due every day at ${format(task.dueDate, 'h:mm a')} next: ${god(
-      task.dueDate,
-      hasOverDue
-    )}`
-  }
-
-  if (task.recurrance === 'weekly') {
-    return `Due every week on ${format(
-      task.dueDate,
-      'eee h:mm a'
-    )} next: ${baseFormat(task.dueDate)}`
-  }
-
-  if (task.recurrance === 'monthly') {
-    return 'Due every month on the' + format(task.dueDate, 'do at h:mm a') // due every month on the 23rd at 3:24 AM
+  if (task.recurrance) {
+    return `Due every ${toDaysHHMMSS(
+      task.recurrance.interval,
+      true
+    )} next: ${god(task.dueDate, hasOverDue)}`
   }
 
   return 'Due on the next big thonk?'
 }
-
-*/
