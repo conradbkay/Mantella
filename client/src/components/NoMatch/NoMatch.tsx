@@ -2,13 +2,17 @@ import React from 'react'
 import './styles.css'
 import { Link } from 'react-router-dom'
 import { Button } from '@material-ui/core'
+import { TState } from '../../types/state'
+import { connect } from 'react-redux'
 
-export const NoMatch = () => (
+const mapState = (state: TState) => ({
+  user: state.user
+})
+
+type TProps = ReturnType<typeof mapState>
+
+export const NoMatch = connect(mapState)((props: TProps) => (
   <div className="all">
-    <h1 style={{ marginTop: 100, textAlign: 'center' }}>
-      Your fault 乁( ⁰͡ Ĺ̯ ⁰͡ ) ㄏ
-    </h1>
-    <p className="zoom-area">or am I?</p>
     <section className="error-container">
       <span className="four">
         <span className="screen-reader-text">4</span>
@@ -23,7 +27,7 @@ export const NoMatch = () => (
         <Button
           color="secondary"
           style={{ width: 250 }}
-          to="/"
+          to={props.user ? '/dashboard' : '/'}
           component={Link}
           variant="contained"
         >
@@ -32,4 +36,4 @@ export const NoMatch = () => (
       </div>
     </section>
   </div>
-)
+))

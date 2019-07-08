@@ -1,5 +1,12 @@
 import { cloneDeep } from 'lodash'
 
+export const id = (
+  arr: Array<any & { id: string }>,
+  passedId: string
+): number => {
+  return arr.findIndex(item => item.id === passedId)
+}
+
 export const formalize = (str: string): string => {
   return str
     .toLowerCase()

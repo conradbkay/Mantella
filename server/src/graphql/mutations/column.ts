@@ -13,8 +13,6 @@ const editColumn: MutationResolvers['editColumn'] = async (parent, obj) => {
     )
 
     column.name = obj.newCol.name || column.name
-    column.isCompletedColumn =
-      obj.newCol.isCompletedColumn || column.isCompletedColumn
     column.taskIds = obj.newCol.taskIds || column.taskIds
     column.taskLimit = obj.newCol.taskLimit || column.taskLimit
 
@@ -37,7 +35,7 @@ const deleteColumn: MutationResolvers['deleteColumn'] = async (parent, obj) => {
   if (project && project.columns.length > 1) {
     (project.columns as any).id(obj._id).remove()
 
-    project.columnIds.splice(project.columnIds.indexOf(obj._id), 1)
+    project.columnOrder.splice(project.columnOrder.indexOf(obj._id), 1)
 
     const newProj = await project.save()
     const pure = await purifyProject(newProj)
@@ -62,7 +60,7 @@ const createColumn: MutationResolvers['createColumn'] = async (parent, obj) => {
       taskIds: [],
       taskLimit: obj.taskLimit || undefined
     } as ProjectProps['columns'][0])
-    project.columnIds.push(newId.toHexString())
+    project.columnOrder.push(newId.toHexString())
 
     const newProj = await project.save()
 

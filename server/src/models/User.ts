@@ -6,8 +6,9 @@ export const UserSchema = new Schema({
   password: { type: String, required: true },
   username: { type: String, required: true },
   profileImg: String,
-  projects: [{ type: Schema.Types.ObjectId, ref: 'Project', required: true }]
-} as any)
+  projects: [{ type: Schema.Types.ObjectId, ref: 'Project', required: true }],
+  id: { type: String, required: true }
+})
 
 export const getUserByEmail = async (email: string) => {
   return await UserModel.findOne({ email })

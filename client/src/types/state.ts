@@ -1,3 +1,5 @@
+import { TProject } from './project'
+
 export type TStopWatch = {
   pastTimes: number[]
   time: number
@@ -36,16 +38,6 @@ export type TSnackbar = {
   variant: TVariant
 }
 
-export type TTag = {
-  name: string
-  color: string
-  id: string
-}
-
-export type TTags = {
-  [name: string]: TTag
-}
-
 export type TAuthUser = TProfile
 
 export type TState = {
@@ -53,4 +45,5 @@ export type TState = {
   isLoading: boolean
   pomodoro: TPomodoro
   user: TAuthUser | null
+  projects: TProject[]
 }

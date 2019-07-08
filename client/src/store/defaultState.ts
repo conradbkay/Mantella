@@ -26,6 +26,6 @@ export const defaultState: TState = {
     }
   },
   snackbar: defaultSnackbar,
-  isLoading: false
-  // projects: {}
+  isLoading: false,
+  projects: []
 }

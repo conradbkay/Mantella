@@ -6,31 +6,43 @@ type Query {
   user(id: String!): User
 }
 
-type Tag {
+type Subtask {
   name: String!
-  _id: String!
-  color: String
+  completed: Boolean!
+  id: String!
+}
+
+type Comment {
+  comment: String!
+  dateAdded: Date! # date string
+  lastEdited: Date # optional date string
+  id: String!
 }
 
 type Task {
+  security: {
+    public: String
+    assignedUsers: [String!]!
+  }
+
+  id: String!
   name: String!
-  points: Int!
+  points: String!
   completed: Boolean!
-  timeWorkedOn: Int!
-  color: String # hex
-  dueDate: Date # date string
-  startDate: Date # date string
-  assignedUsers: [String!]! # what if we had private tasks, that is a good idea, unique!
-  tags: [String!]!
-  subTasks: [SubTask!]!
+  timeWorkedOn: Number!
+  color: String!
+  dueDate: Date
+  startDate: Date
   comments: [Comment!]!
-  description: String
-  recurrance: String # daily | weekly
-  _id: String!
+  subTasks: [Subtask!]!
+  recurrance: {
+    interval: Number
+    nextDue: Date
+  }
 }
 
 type User {
-  _id: String!
+  id: String!
   profileImg: String
   username: String!
   email: String!
@@ -38,7 +50,7 @@ type User {
 }
 
 type Profile {
-  _id: String!
+  id: String!
   profileImg: String
   username: String!
   email: String!
@@ -48,42 +60,28 @@ type Profile {
 type Project {
   ownerId: String
   name: String!
-  _id: String!
-  tags: [Tag!]
-  columnIds: [String!]!
+  id: String!
+  columnOrder: [String!]!
   columns: [Column!]!
   swimlanes: [Swimlane!]!
-  users: [Profile!] # if null is a private project
+  users: [String!] # if null is a private project
   tasks: [Task!]!
-  isPrivate: Boolean # defaults to false (public)
+  isPrivate: Boolean! # defaults to false (public)
 }
 
 type Column {
-  _id: String!
+  id: String!
   name: String!
-  isCompletedColumn: Boolean
   taskIds: [String!]!
-  taskLimit: Int
+  taskLimit: Int!
 }
 
 type Swimlane {
   taskIds: [String!]!
   name: String!
-  _id: String!
+  id: String!
 }
 
-type SubTask {
-  name: String!
-  completed: Boolean!
-  _id: String!
-}
-
-type Comment {
-  description: String!
-  dateAdded: Date! # date string
-  lastEdited: Date # optional date string
-  _id: String!
-}
 
 input TaskInput {
   name: String
@@ -96,12 +94,10 @@ input TaskInput {
 input ProjectInput {
   name: String
   columnIds: [String!]
-  categories: [String!]
 }
 
 input ColumnInput {
   name: String
-  isCompletedColumn: Boolean
   taskIds: [String!]
   taskLimit: Int
 }
@@ -201,13 +197,13 @@ type Mutation {
   setComment(
     projId: String!
     taskId: String!
-    commentId: String
-    description: String!
+    commentId: String!
+    description: String
   ): Task!
   setSubtask(
     projId: String!
     taskId: String!
-    subtaskId: String
+    subtaskId: String!
     info: SubtaskInfo
   ): Task!
 }

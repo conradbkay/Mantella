@@ -53,6 +53,8 @@ export const fabStyle: CSSProperties = {
 import { openSnackbarA } from './store/actions/snackbar'
 import { GQL_LOGIN_WITH_COOKIE } from './graphql/mutations/auth'
 import { client } from './apollo'
+import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
+import { Project } from './components/Project/Project'
 
 const Router = () => {
   const [open, setOpen] = useState(false)
@@ -97,22 +99,36 @@ const Router = () => {
         )}
         {loaded ? (
           <Switch>
-            <Route
+            <PublicOnlyRoute
               exact
               path="/login"
-              render={() => <AuthRender authType="Login" />}
+              component={AuthRender}
+              componentProps={{ authType: 'Login' }}
             />
-            <Route
+            <PublicOnlyRoute
               exact
               path="/register"
-              render={() => <AuthRender authType="Register" />}
+              component={AuthRender}
+              componentProps={{ authType: 'Register' }}
             />
-            <Route
+            <PrivateRoute
               exact
               path="/create-project"
-              render={() => <CreateProject />}
+              component={CreateProject}
+              componentProps={{}}
             />
-            <Route exact path="/" component={() => <About />} />
+            <PrivateRoute
+              exact
+              path="/project/:id"
+              component={Project}
+              componentProps={{}}
+            />
+            <PublicOnlyRoute
+              exact
+              path="/"
+              component={About}
+              componentProps={() => ({})}
+            />
             <Route component={NoMatch} />
           </Switch>
         ) : (

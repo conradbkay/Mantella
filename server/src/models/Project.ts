@@ -1,91 +1,101 @@
 import { Schema, model, Model, Document } from 'mongoose'
 
 export const ProjectSchema = new Schema({
+  id: { type: String, required: true },
   name: { type: String, required: true },
-  ownerId: { type: Schema.Types.ObjectId },
+  ownerId: String,
   swimlanes: [
     {
       taskIds: [String],
-      name: { type: String, required: true }
+      name: { type: String, required: true },
+      id: { type: String, required: true }
     }
   ],
   columns: [
     {
       name: { type: String, required: true },
       isCompletedColumn: Boolean,
-      taskIds: [String],
-      taskLimit: Number
+      taskLimit: { type: Number, required: true }, // 0 if no limit
+      id: { type: String, required: true }
     }
   ],
+  columnOrder: [String],
   tasks: [
     {
+      security: {
+        public: Boolean,
+        assignedUsers: [String]
+      },
+
+      id: { type: String, required: true },
       name: { type: String, required: true },
       points: { type: Number, required: true },
       completed: { type: Boolean, required: true },
       timeWorkedOn: { type: Number, required: true },
       color: { type: String, required: true },
       dueDate: Date,
-      assignedUsers: [{ type: Schema.Types.ObjectId, required: true }],
       startDate: Date,
-      tags: [String],
       comments: [
         {
-          description: { type: String, required: true },
+          comment: { type: String, required: true },
           dateAdded: { type: Date, required: true },
-          lastEdited: Date
+          lastEdited: Date,
+          id: String
         }
       ],
       subTasks: [
         {
           name: { type: String, required: true },
-          completed: { type: Boolean, required: true }
+          completed: { type: Boolean, required: true },
+          id: { type: String, required: true }
         }
       ],
-      description: String,
-      recurrance: String
+      recurrance: {
+        interval: Number,
+        nextDue: Date
+      }
     }
   ],
-  users: [{ type: Schema.Types.ObjectId, required: true, ref: 'User' }],
-  isPrivate: Boolean,
-  tags: [
-    {
-      name: { type: String, required: true },
-      color: String
-    }
-  ],
-  columnIds: [String]
+  users: [String],
+  isPrivate: Boolean
 })
 
-export interface TaskProps extends Document {
+export interface TaskProps {
+  security: {
+    public: boolean
+    assignedUsers: string[] // teams or users
+  }
+
+  id: string
   name: string
-  points: number
+  points: string
   completed: boolean
   timeWorkedOn: number
   color: string
   dueDate?: Date
-  assignedUsers: Array<typeof Schema.Types.ObjectId>
   startDate?: Date
-  tags: string[]
+
   comments: Array<{
-    description: string
-    dateAdded: Date
-    lastEdited?: Date
     id: string
+    comment: string
+    dateAdded: string
+    lastEdited?: Date
   }>
   subTasks: Array<{
     name: string
     completed: boolean
     id: string
   }>
-  description?: string
-  recurrance?: string
-  id: string
+  recurrance?: {
+    interval: number
+    nextDue: Date
+  }
 }
 
-export interface ProjectProps extends Document {
-  columnIds: string[]
+export interface ProjectProps {
+  id: string
   name: string
-  ownerId: typeof Schema.Types.ObjectId
+  ownerId: string
   swimlanes: Array<{
     taskIds: string[]
     name: string
@@ -93,23 +103,21 @@ export interface ProjectProps extends Document {
   }>
   columns: Array<{
     name: string
-    isCompletedColumn?: boolean
     taskIds: string[]
-    taskLimit?: number
+    taskLimit: number
     id: string
   }>
+
+  columnOrder: string[]
+
   tasks: TaskProps[]
-  users: Array<typeof Schema.Types.ObjectId>
-  isPrivate?: boolean
-  tags: Array<{
-    name: string
-    color?: string
-    id: string
-  }>
-  id: string
+
+  users: [string[]]
+
+  isPrivate: boolean
 }
 
-export const ProjectModel: Model<ProjectProps> = model(
+export const ProjectModel: Model<Document & ProjectProps> = model(
   'Project',
   ProjectSchema,
   'Projects'

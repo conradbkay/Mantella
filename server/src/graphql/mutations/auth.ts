@@ -1,4 +1,4 @@
-import { UserProps } from './../../models/User'
+import { UserProps, comparePassword } from './../../models/User'
 import bcrypt from 'bcryptjs'
 import { MutationResolvers } from '../../graphql/types'
 import { UserModel } from '../../models/User'
@@ -36,7 +36,6 @@ const loginWithCookie: MutationResolvers['loginWithCookie'] = async (
 }
 
 const login: MutationResolvers['login'] = async (parent, obj, context) => {
-  /*
   const user = await UserModel.findOne({ email: obj.email }).populate(
     'projects'
   )
@@ -62,14 +61,6 @@ const login: MutationResolvers['login'] = async (parent, obj, context) => {
     throw new AuthenticationError('Incorrect Password')
   }
   throw new AuthenticationError('User with Email does not exist!')
-  */
-  return {
-    user: {
-      _id: '5d04064a9b99a535a2a28950',
-      username: 'kayo',
-      email: 'fh@gmail.com'
-    }
-  } as any
 }
 
 const register: MutationResolvers['register'] = async (

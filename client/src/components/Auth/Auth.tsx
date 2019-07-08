@@ -180,6 +180,11 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                       variant="contained"
                       color="secondary"
                       fullWidth
+                      disabled={
+                        authType === 'Register'
+                          ? password.trim() === '' || password !== confirmText
+                          : false
+                      }
                       type="submit"
                       style={{
                         marginTop: 10

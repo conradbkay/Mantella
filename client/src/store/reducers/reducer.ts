@@ -1,3 +1,4 @@
+import { projectsReducer } from './projects'
 import { pomodoroReducer } from './pomodoro'
 import { TAction } from '../actions/types'
 import { Reducer, combineReducers } from 'redux'
@@ -35,6 +36,7 @@ const loadingReducer = createReducer<boolean>(false, loadingReducers)
 export const reducer: Reducer<TState, TAction> = combineReducers({
   isLoading: loadingReducer,
   snackbar: snackbarReducer,
+  projects: projectsReducer,
   pomodoro: pomodoroReducer,
   user: userReducer
 })
