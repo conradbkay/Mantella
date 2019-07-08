@@ -2,7 +2,6 @@ import { Project } from './../types'
 import { ProjectProps } from '../../models/Project'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
-import { purifyProject } from '../../utils'
 import { Types } from 'mongoose'
 
 const createSwimlane: MutationResolvers['createSwimlane'] = async (
@@ -23,7 +22,7 @@ const createSwimlane: MutationResolvers['createSwimlane'] = async (
 
     const newProj = await project.save()
 
-    const pure = await purifyProject(newProj)
+    const pure = await newProj.toObject()
 
     if (pure) {
       const newSwim = pure.swimlanes.find((swim) =>

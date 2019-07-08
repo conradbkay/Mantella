@@ -112,7 +112,7 @@ export interface ProjectProps {
 
   tasks: TaskProps[]
 
-  users: [string[]]
+  users: string[]
 
   isPrivate: boolean
 }

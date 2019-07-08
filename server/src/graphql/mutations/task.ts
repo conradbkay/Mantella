@@ -1,4 +1,3 @@
-import { Project } from './../../../../client/src/graphql/types'
 import { ProjectModel, TaskProps, ProjectProps } from './../../models/Project'
 import { MutationResolvers } from '../../graphql/types'
 import { Types } from 'mongoose'
@@ -44,8 +43,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       }
     }
   }
-
-  return null
+  throw new Error('proj id not exist')
 }
 const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
   const project = await ProjectModel.findById(obj.projId)
@@ -116,8 +114,8 @@ const dragTask: MutationResolvers['dragTask'] = async (
     const pure = await newProj.toObject()
 
     return {
-      project: pure as Project,
-      task: (newProj.tasks as any).id(obj.id).toObject()
+      project: pure as ProjectProps,
+      task: (newProj.tasks as any).id(obj.id).toObject() as TaskProps
     }
   }
 
