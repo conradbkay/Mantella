@@ -1,45 +1,43 @@
+import { ProjectProps } from './../../models/Project'
 import { AuthenticationError } from 'apollo-server-core'
 import { UserModel } from './../../models/User'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
-import { Types } from 'mongoose'
-
+import uuid from 'uuid'
 const createProject: MutationResolvers['createProject'] = async (
   parent,
   args,
   context
 ) => {
-  const creatingId = Types.ObjectId()
-  const colId = Types.ObjectId()
+  const creatingId = uuid()
+  const colId = uuid()
 
-  const user = await UserModel.findById(context.userId)
+  const user = await UserModel.findOne({ id: context.userId.id })
 
   if (user) {
+    user.projects.push(creatingId)
+
     const [created] = await Promise.all([
       ProjectModel.create({
-        _id: creatingId,
+        id: creatingId,
         name: args.name,
-        ownerId: user._id,
-        users: [],
+        ownerId: user.id,
+        users: [user.id],
         swimlanes: [],
         columns: [
           {
-            _id: colId,
+            id: colId,
             name: 'Todo',
-            isCompletedColumn: false,
             taskIds: [],
             taskLimit: 0
           }
         ],
         tasks: [],
         enrolledUsers: [],
-        columnIds: [colId.toHexString()]
-      }),
-      UserModel.findByIdAndUpdate(user.id, {
-        $push: {
-          projects: creatingId
-        }
-      })
+        columnOrder: [colId],
+        isPrivate: false
+      } as ProjectProps),
+      user.save()
     ])
     if (created) {
       return created.toObject()
@@ -51,10 +49,9 @@ const createProject: MutationResolvers['createProject'] = async (
 
 const editProject: MutationResolvers['editProject'] = async (parent, args) => {
   if (args.id) {
-    const project = await ProjectModel.findById(args.id)
+    const project = await ProjectModel.findOne({ id: args.id })
     if (project) {
       project.name = args.newProj.name ? args.newProj.name : project.name
-      project._id = Types.ObjectId(args.id)
       project.columnOrder = args.newProj.columnIds
         ? args.newProj.columnIds
         : project.columnOrder
@@ -80,19 +77,19 @@ const deleteProject: MutationResolvers['deleteProject'] = async (
       id: deleted._id
     }
   }
-  return null
+  throw new Error('proj not found')
 }
 
 const joinProject: MutationResolvers['joinProject'] = async () => {
-  return null
+  throw new Error('proj not found')
 }
 
 const leaveProject: MutationResolvers['leaveProject'] = async () => {
-  return null
+  throw new Error('proj not found')
 }
 
 const removeMemberFromProject: MutationResolvers['removeMemberFromProject'] = async () => {
-  return null as any
+  throw new Error('proj not found')
 }
 
 export const projectMutations = {

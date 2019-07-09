@@ -1,17 +1,18 @@
 import { TaskProps, ProjectProps } from './models/Project'
-import { DeepPartial } from 'apollo-env'
 import uuid from 'uuid'
 
-export const defaultTask: Partial<TaskProps> = {
+export const defaultTask: Omit<TaskProps, 'id'> = {
   name: 'Task',
   completed: false,
   points: 0,
-  tags: [],
   subTasks: [],
   timeWorkedOn: 0,
   comments: [],
-  assignedUsers: [],
-  color: '#FFFFFF'
+  color: '#FFFFFF',
+  security: {
+    public: true,
+    assignedUsers: []
+  }
 }
 
 export const tags = [
@@ -26,7 +27,7 @@ export const tags = [
   }
 ]
 
-export const taskObjects = (ids: any[]): Array<Partial<TaskProps>> => [
+export const taskObjects = (ids: any[]): TaskProps[] => [
   {
     ...defaultTask,
     id: ids[0],
@@ -111,41 +112,45 @@ export const taskObjects = (ids: any[]): Array<Partial<TaskProps>> => [
 ]
 
 export const projectData = (
-  ids: any[],
-  tasks: DeepPartial<ProjectProps['tasks']>,
-  newUserId: any,
-  projectId: any,
-  columnIds: any[]
-): Partial<ProjectProps> => ({
-  name: 'Tutorial Project',
-  swimlanes: [
-    { taskIds: [], name: 'Intermediate', id: uuid() },
-    { name: 'Beginner', taskIds: [ids[2], ids[4], ids[3]], id: uuid() },
-    { taskIds: [ids[6]], name: 'Advanced', id: uuid() }
-  ],
-  columns: [
-    {
-      id: columnIds[0],
-      name: 'Fundementals',
-      isCompletedColumn: false,
-      taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
-    } as any,
-    {
-      id: columnIds[1],
-      name: 'Setting Up',
-      isCompletedColumn: false,
-      taskIds: [ids[6], ids[7], ids[8], ids[9]]
-    } as any,
-    {
-      id: columnIds[2],
-      name: 'Other Features',
-      isCompletedColumn: true,
-      taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
-    } as any
-  ],
-  columnIds: columnIds,
-  ownerId: newUserId,
-  id: projectId,
-  tasks: tasks as any,
-  users: [newUserId]
-})
+  ids: string[],
+  tasks: ProjectProps['tasks'],
+  newUserId: string,
+  projectId: string
+): ProjectProps => {
+  const columnIds = [uuid(), uuid(), uuid()]
+
+  return {
+    name: 'Tutorial Project',
+    swimlanes: [
+      { taskIds: [], name: 'Intermediate', id: uuid() },
+      { name: 'Beginner', taskIds: [ids[2], ids[4], ids[3]], id: uuid() },
+      { taskIds: [ids[6]], name: 'Advanced', id: uuid() }
+    ],
+    columns: [
+      {
+        taskLimit: 0,
+        id: columnIds[0],
+        name: 'Fundementals',
+        taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
+      },
+      {
+        taskLimit: 0,
+        id: columnIds[1],
+        name: 'Setting Up',
+        taskIds: [ids[6], ids[7], ids[8], ids[9]]
+      },
+      {
+        taskLimit: 0,
+        id: columnIds[2],
+        name: 'Other Features',
+        taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
+      }
+    ],
+    columnOrder: columnIds,
+    ownerId: newUserId,
+    id: projectId,
+    tasks: tasks,
+    users: [newUserId],
+    isPrivate: false
+  }
+}

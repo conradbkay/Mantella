@@ -67,7 +67,7 @@ type TProps = WithStyles<typeof styles> &
 
 const SnackbarComponent = (props: TProps) => {
   // Find what Icon to use for snackbar by variant
-  const variantIcon: any = {
+  const variantIcon = {
     success: CheckCircleIcon,
     warning: WarningIcon,
     error: ErrorIcon,

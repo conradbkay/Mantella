@@ -1,4 +1,4 @@
-import { TTask } from './../../types/task'
+import { TTask } from './../../types/project'
 
 export const setTaskA = (args: {
   id: string

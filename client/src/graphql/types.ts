@@ -270,7 +270,7 @@ export type Task = {
   security?: Maybe<TaskSecurity>
   id: Scalars['String']
   name: Scalars['String']
-  points: Scalars['String']
+  points: Scalars['Int']
   completed: Scalars['Boolean']
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
@@ -547,7 +547,7 @@ export namespace TaskResolvers {
 
     name?: NameResolver<string, TypeParent, TContext>
 
-    points?: PointsResolver<string, TypeParent, TContext>
+    points?: PointsResolver<number, TypeParent, TContext>
 
     completed?: CompletedResolver<boolean, TypeParent, TContext>
 
@@ -582,7 +582,7 @@ export namespace TaskResolvers {
     TContext
   >
   export type PointsResolver<
-    R = string,
+    R = number,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>

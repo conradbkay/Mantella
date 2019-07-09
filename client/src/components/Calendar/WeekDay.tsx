@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
@@ -12,7 +11,8 @@ import {
   getAllTasks,
   getAllTasksArr,
   getProjectIdFromTaskId,
-  getAllColumnsArr
+  getAllColumnsArr,
+  id
 } from '../../utils/utilities'
 
 type OwnProps = {
@@ -36,7 +36,6 @@ const styles = (theme: Theme) => ({})
 type TProps = OwnProps & ReturnType<typeof mapState> & WithStyles<typeof styles>
 
 const CWeekDay = (props: TProps) => {
-  const [open, setOpen] = useState(false as false | TTask)
   const { day, tasks, index } = props
   // const hasPassed = index === 0
   const withDate = tasks.filter(
@@ -87,12 +86,15 @@ const CWeekDay = (props: TProps) => {
                   <BaseTask
                     project={
                       props.projects[
-                        getProjectIdFromTaskId(props.projects, task.id)
+                        id(
+                          props.projects,
+                          getProjectIdFromTaskId(props.projects, task.id)
+                        )
                       ]
                     }
                     margined
                     dense
-                    openFunc={() => setOpen(task)}
+                    openFunc={() => null}
                     provided={prov}
                     snapshot={snap}
                     task={task}
@@ -104,13 +106,6 @@ const CWeekDay = (props: TProps) => {
           </div>
         )}
       </Droppable>
-      {open && (
-        <TaskModal
-          projectId={getProjectIdFromTaskId(props.projects, open.id)}
-          task={open}
-          onClose={() => setOpen(false)}
-        />
-      )}
     </div>
   )
 }

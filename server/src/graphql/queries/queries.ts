@@ -2,35 +2,35 @@ import { QueryResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
 
 import { UserModel } from '../../models/User'
-import mongoose from 'mongoose'
-import { purifyProject, purifyProjects } from '../../utils'
 
 export const queries: QueryResolvers = {
   projects: async (obj, args, context, info) => {
     const projects = await ProjectModel.find({
       _id: {
-        $in: args.ids.map((id: string) => mongoose.Types.ObjectId(id))
+        $in: args.ids
       }
     })
 
-    return (await purifyProjects(projects)) || []
+    return projects.map((proj) => proj.toObject()) || []
   },
   projectById: async (obj, args, context, info) => {
-    const proj = await ProjectModel.findById(args.id)
+    const proj = await ProjectModel.findOne({ id: args.id })
 
     if (proj) {
-      return await purifyProject(proj)
+      return proj.toObject()
     }
 
-    return null
+    throw new Error('proj not found')
   },
   user: async (obj, args, context) => {
-    const user = await UserModel.findById(args.id)
+    const user = await UserModel.findOne({ id: args.id })
 
     if (user) {
       const userWithProjects = await user.populate('projects').execPopulate()
 
-      const newProjects = await purifyProjects(userWithProjects.projects)
+      const newProjects = userWithProjects.projects.map((proj: any) =>
+        proj.toObject()
+      )
 
       const returning = {
         ...user.toObject(),
@@ -39,6 +39,7 @@ export const queries: QueryResolvers = {
 
       return returning
     }
-    return null
+
+    throw new Error('proj not found')
   }
 }

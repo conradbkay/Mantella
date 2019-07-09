@@ -16,7 +16,8 @@ export const ProjectSchema = new Schema({
       name: { type: String, required: true },
       isCompletedColumn: Boolean,
       taskLimit: { type: Number, required: true }, // 0 if no limit
-      id: { type: String, required: true }
+      id: { type: String, required: true },
+      taskIds: [String]
     }
   ],
   columnOrder: [String],

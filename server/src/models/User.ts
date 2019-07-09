@@ -6,7 +6,7 @@ export const UserSchema = new Schema({
   password: { type: String, required: true },
   username: { type: String, required: true },
   profileImg: String,
-  projects: [{ type: Schema.Types.ObjectId, ref: 'Project', required: true }],
+  projects: [String],
   id: { type: String, required: true }
 })
 
@@ -15,7 +15,7 @@ export const getUserByEmail = async (email: string) => {
 }
 
 export const getUserById = async (id: string) => {
-  return await UserModel.findById(id)
+  return await UserModel.findOne({ id: id })
 }
 
 export const comparePassword = async (

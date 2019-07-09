@@ -1,7 +1,6 @@
 import { UserProps } from './../models/User'
 import express, { Response, Request, NextFunction } from 'express'
 import { UserModel } from '../models/User'
-import { purifyProjects } from '../utils'
 
 const router = express.Router()
 
@@ -14,11 +13,11 @@ interface UserRouteReq extends Request {
 }
 
 export const getUser = async (req: UserRouteReq, res: Response) => {
-  const user = await UserModel.findById(req.body.id)
+  const user = await UserModel.findOne({ id: req.body.id })
 
   const userWithProjects = await user!.populate('projects').execPopulate()
 
-  const newProjects = await purifyProjects(userWithProjects.projects)
+  const newProjects = userWithProjects.projects
 
   const returning = {
     ...(user!.toObject() as UserProps),

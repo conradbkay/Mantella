@@ -2,17 +2,16 @@ import { Project } from './../types'
 import { ProjectProps } from '../../models/Project'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
-import { Types } from 'mongoose'
-
+import uuid from 'uuid'
 const createSwimlane: MutationResolvers['createSwimlane'] = async (
   parent,
   obj
 ) => {
-  const project = await ProjectModel.findById(obj.projId)
+  const project = await ProjectModel.findOne({ id: obj.projId })
 
-  const newId = Types.ObjectId()
+  const newId = uuid()
 
-  const adding: any = { _id: newId }
+  const adding = { id: newId }
   if (project) {
     project.swimlanes.push({
       name: obj.name || 'swimlane',
@@ -25,9 +24,7 @@ const createSwimlane: MutationResolvers['createSwimlane'] = async (
     const pure = await newProj.toObject()
 
     if (pure) {
-      const newSwim = pure.swimlanes.find((swim) =>
-        newId.equals(Types.ObjectId(swim._id))
-      )
+      const newSwim = newProj.swimlanes.find((swim) => newId === swim.id)
 
       if (!newSwim) {
         throw new Error('Swimlane Not created in createSwimlane!')
@@ -39,23 +36,26 @@ const createSwimlane: MutationResolvers['createSwimlane'] = async (
       }
     }
   }
-  return null
+
+  throw new Error('proj not found')
 }
 const editSwimlane: MutationResolvers['editSwimlane'] = async (parent, obj) => {
-  const project = await ProjectModel.findById(obj.projId)
+  const project = await ProjectModel.findOne({ id: obj.projId })
 
   if (project) {
-    const swimlane: ProjectProps['swimlanes'][0] = (project.swimlanes as any).id(
-      obj.swimId
-    )
+    const swimlane: ProjectProps['swimlanes'][0] = project.swimlanes.find(
+      (swim) => swim.id === obj.swimId
+    )!
 
     swimlane.name = obj.newSwim.name || swimlane.name
     swimlane.taskIds = obj.newSwim.taskIds || swimlane.taskIds
 
     const newProj = await project.save()
-    const pure = await purifyProject(newProj)
+    const pure = await newProj.toObject()
 
-    const newSwim = pure ? (newProj.swimlanes as any).id(obj.swimId) : undefined
+    const newSwim = pure
+      ? newProj.swimlanes.find((swim) => swim.id === obj.swimId)
+      : undefined
 
     if (!newSwim) {
       throw new Error('Swimlane not edited in editSwimlane!')
@@ -66,7 +66,8 @@ const editSwimlane: MutationResolvers['editSwimlane'] = async (parent, obj) => {
       project: pure as Project
     }
   }
-  return null
+
+  throw new Error('proj not found')
 }
 const deleteSwimlane: MutationResolvers['deleteSwimlane'] = async (
   parent,
@@ -84,12 +85,12 @@ const deleteSwimlane: MutationResolvers['deleteSwimlane'] = async (
     { new: true }
   )
   if (deleted) {
-    const pure = await purifyProject(deleted)
+    const pure = await deleted.toObject()
 
     return { project: pure as Project, swimlane: null }
   }
 
-  return null
+  throw new Error('proj not found')
 }
 
 export const swimlaneMutations = {

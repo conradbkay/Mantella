@@ -1,16 +1,15 @@
 import { ProjectModel, TaskProps, ProjectProps } from './../../models/Project'
 import { MutationResolvers } from '../../graphql/types'
-import { Types } from 'mongoose'
 import uuid from 'uuid'
 
 const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
-  const taskId = Types.ObjectId()
+  const taskId = uuid()
 
-  const proj = await ProjectModel.findById(obj.projId)
+  const proj = await ProjectModel.findOne({ id: obj.projId })
 
   if (proj) {
     proj.tasks.push({
-      id: taskId.toHexString(),
+      id: taskId,
       name: obj.taskInfo.name || 'Unnamed Task',
       points: obj.taskInfo.points || 0,
       completed: false,
@@ -28,7 +27,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       }
     } as TaskProps)
 
-    const column = (proj.columns as any).id(obj.columnId)
+    const column = proj.columns.find((col) => col.id === obj.columnId)!
     column.taskIds = [...column.taskIds, taskId]
 
     const newProj = await proj.save()
@@ -36,7 +35,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
     const pure: ProjectProps = await newProj.toObject()
 
     if (pure) {
-      const task = pure.tasks.find((tk) => taskId.equals(Types.ObjectId(tk.id)))
+      const task = pure.tasks.find((tk) => taskId === tk.id)
       return {
         project: pure,
         task: task!
@@ -46,10 +45,10 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
   throw new Error('proj id not exist')
 }
 const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
-  const project = await ProjectModel.findById(obj.projId)
+  const project = await ProjectModel.findOne({ id: obj.projId })
 
   if (project) {
-    const task: TaskProps = (project.tasks as any).id(obj.taskId)
+    const task: TaskProps = project.tasks.find((tsk) => tsk.id === obj.taskId)!
 
     task.name = obj.task.name || task.name
     task.points = obj.task.points || task.points
@@ -64,7 +63,7 @@ const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
       if (task) {
         return {
           project: pure,
-          task: (newProj.tasks as any).id(obj.taskId)
+          task: newProj.tasks.find((tsk) => tsk.id === obj.taskId)
         }
       } else {
         throw new Error('Task not created')
@@ -74,10 +73,10 @@ const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
   throw new Error('project not able to be updated')
 }
 const deleteTask: MutationResolvers['deleteTask'] = async (parent, obj) => {
-  const proj = await ProjectModel.findById(obj.projId)
+  const proj = await ProjectModel.findOne({ id: obj.projId })
 
   if (proj) {
-    (proj.tasks as any).id(obj.id).remove()
+    (proj.tasks.find((tsk) => tsk.id === obj.id) as any).remove()
 
     proj.columns.map((column) => {
       column.taskIds.splice(column.taskIds.indexOf(obj.id), 1)
@@ -99,14 +98,15 @@ const dragTask: MutationResolvers['dragTask'] = async (
   obj,
   context
 ) => {
-  const proj = await ProjectModel.findById(obj.projectId)
+  const proj = await ProjectModel.findOne({ id: obj.projectId })
 
   if (proj) {
     obj.columnIds.map((colId) => {
-      (proj.columns as any).id(colId.id).taskIds = colId.newIds
+      proj.columns.find((col) => col.id === colId.id)!.taskIds = colId.newIds
     })
     obj.swimlaneIds.map((swimId) => {
-      (proj.swimlanes as any).id(swimId.id).taskIds = swimId.newIds
+      proj.swimlanes.find((swim) => swim.id === swimId.id)!.taskIds =
+        swimId.newIds
     })
 
     const newProj = await proj.save()
@@ -115,7 +115,9 @@ const dragTask: MutationResolvers['dragTask'] = async (
 
     return {
       project: pure as ProjectProps,
-      task: (newProj.tasks as any).id(obj.id).toObject() as TaskProps
+      task: (newProj.tasks.find(
+        (tsk) => tsk.id === obj.id
+      ) as any).toObject() as TaskProps
     }
   }
 
@@ -123,14 +125,14 @@ const dragTask: MutationResolvers['dragTask'] = async (
 }
 
 const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
-  const proj = await ProjectModel.findById(obj.projId)
+  const proj = await ProjectModel.findOne({ id: obj.projId })
   if (proj) {
-    const task: TaskProps = (proj.tasks as any).id(obj.taskId)
+    const task: TaskProps = proj.tasks.find((tsk) => tsk.id === obj.taskId)!
 
     if (obj.subtaskId) {
-      const subTask: TaskProps['subTasks'][0] = (task.subTasks as any).id(
-        obj.subtaskId
-      )
+      const subTask: TaskProps['subTasks'][0] = task.subTasks.find(
+        (subT) => subT.id === obj.subtaskId
+      )!
 
       if (obj.info) {
         (subTask as any).remove()
@@ -155,21 +157,21 @@ const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
 
     const newProj = await proj.save()
 
-    return (newProj.tasks as any).id(obj.taskId)
+    return newProj.tasks.find((tsk) => tsk.id === obj.taskId)!
   }
 
   throw new Error('project not defined')
 }
 
 const setComment: MutationResolvers['setComment'] = async (parent, obj) => {
-  const proj = await ProjectModel.findById(obj.projId)
+  const proj = await ProjectModel.findOne({ id: obj.projId })
   if (proj) {
-    const task: TaskProps = (proj.tasks as any).id(obj.taskId)
+    const task: TaskProps = proj.tasks.find((tsk) => tsk.id === obj.taskId)!
 
     if (obj.commentId) {
-      const comment: TaskProps['comments'][0] = (task.comments as any).id(
-        obj.commentId
-      )
+      const comment: TaskProps['comments'][0] = task.comments.find(
+        (com) => com.id === obj.commentId
+      )!
 
       if (!obj.description) {
         (comment as any).remove()
@@ -185,7 +187,7 @@ const setComment: MutationResolvers['setComment'] = async (parent, obj) => {
     }
     const newProj = await proj.save()
 
-    return (newProj.tasks as any).id(obj.taskId)
+    return newProj.tasks.find((tsk) => tsk.id === obj.taskId)!
   }
 
   throw new Error('project not defined')
