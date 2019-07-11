@@ -22,21 +22,21 @@ import {
   ArrowForward,
   MoreHoriz
 } from '@material-ui/icons'
-import { setColumnA } from '../../store/actions/column'
-import { TColumn } from '../../types/project'
-import { GQL_EDIT_COLUMN } from '../../graphql/mutations/column'
+import { setColumnA } from '../../../store/actions/column'
+import { TColumn } from '../../../types/project'
+import { GQL_EDIT_COLUMN } from '../../../graphql/mutations/column'
 import {
   EditColumnMutationVariables,
   EditColumnMutation,
   EditProjectMutation,
   EditProjectMutationVariables
-} from '../../graphql/types'
+} from '../../../graphql/types'
 import { useMutation } from '@apollo/react-hooks'
 import { connect } from 'react-redux'
-import { setProjectA } from '../../store/actions/project'
-import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
-import { TProject } from '../../types/project'
-import { moveInArray } from '../../utils/utilities'
+import { setProjectA } from '../../../store/actions/project'
+import { GQL_EDIT_PROJECT } from '../../../graphql/mutations/project'
+import { TProject } from '../../../types/project'
+import { moveInArray } from '../../../utils/utilities'
 
 type OwnProps = {
   setDeleting: Dispatch<SetStateAction<boolean>>
@@ -163,7 +163,7 @@ const ColumnHeaderComp = withStyles(styles)(
           />
           <span className={classes.lengthMarker}>
             ({column.taskIds.length}
-            {column.taskLimit && '/' + column.taskLimit})
+            {column.taskLimit ? '/' + column.taskLimit : ''})
           </span>
           <IconButton
             style={{ marginLeft: 'auto', marginRight: 5 }}

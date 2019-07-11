@@ -19,7 +19,7 @@ export const PrivateRoute = connect(mapState)(
         {...rest}
         render={props =>
           user !== null ? (
-            <PropComponent {...props} {...componentProps} />
+            <PropComponent params={props.match.params} {...componentProps} />
           ) : (
             <Redirect to="/login" />
           )

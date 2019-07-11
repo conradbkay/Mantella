@@ -1,23 +1,23 @@
 import React, { useState, CSSProperties } from 'react'
 import { connect } from 'react-redux'
-import { TState } from '../../types/state'
+import { TState } from '../../../types/state'
 import { CreateTask } from './CreateTask'
 import { Droppable } from 'react-beautiful-dnd'
-import { TColumn, TSwimlane, TTask } from '../../types/project'
-import { DeleteDialog } from '../utils/DeleteDialog'
-import { setColumnA } from '../../store/actions/column'
+import { TColumn, TSwimlane, TTask } from '../../../types/project'
+import { DeleteDialog } from '../../utils/DeleteDialog'
+import { setColumnA } from '../../../store/actions/column'
 import { ColumnTask } from '../Task/ColumnWrapper'
-import { TFilterData } from '../Project/Project'
+import { TFilterData } from '../Project'
 import { ColumnHeader } from './ColumnHeader'
-import { TProject } from '../../types/project'
+import { TProject } from '../../../types/project'
 import { useMutation } from '@apollo/react-hooks'
 import {
   DeleteColumnMutation,
   DeleteColumnMutationVariables
-} from '../../graphql/types'
-import { setProjectA } from '../../store/actions/project'
-import { GQL_DELETE_COLUMN } from '../../graphql/mutations/column'
-import { getUnassignedTasks, getAllTasks, id } from '../../utils/utilities'
+} from '../../../graphql/types'
+import { setProjectA } from '../../../store/actions/project'
+import { GQL_DELETE_COLUMN } from '../../../graphql/mutations/column'
+import { getUnassignedTasks, getAllTasks, id } from '../../../utils/utilities'
 
 const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimlane) => {
   const swimlaneTasks: TTask[] = []
@@ -133,7 +133,9 @@ const CColumn = (props: ColumnProps) => {
 
   const projSwimlanes = project.swimlanes
 
-  const creatingDisabled = column.taskIds.length === column.taskLimit
+  const creatingDisabled = column.taskLimit
+    ? column.taskIds.length === column.taskLimit
+    : false
 
   const sortedTasks = column.taskIds.map(colId => tasks[id(tasks, colId)])
   const filteredTasks: TTask[] = sortedTasks

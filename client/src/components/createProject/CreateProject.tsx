@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import {
   withStyles,
-  Paper,
   WithStyles,
   Avatar,
   Typography,
@@ -18,6 +17,13 @@ import { TState } from '../../types/state'
 import Helmet from 'react-helmet'
 import { useState } from 'react'
 import { openSnackbarA } from '../../store/actions/snackbar'
+import { useMutation } from '@apollo/react-hooks'
+import {
+  CreateProjectMutation,
+  CreateProjectMutationVariables
+} from '../../graphql/types'
+import { GQL_CREATE_PROJECT } from '../../graphql/mutations/project'
+import { setProjectA } from '../../store/actions/project'
 
 type CreateProjectProps = WithStyles<typeof formStyles> &
   typeof actionCreators &
@@ -26,16 +32,15 @@ type CreateProjectProps = WithStyles<typeof formStyles> &
 const CCreateProject = (props: CreateProjectProps) => {
   const [name, setName] = useState('')
 
-  /*
   const [createProjectExec, { loading }] = useMutation<
     CreateProjectMutation,
     CreateProjectMutationVariables
   >(GQL_CREATE_PROJECT, {
     onCompleted: ({ createProject }) => {
       if (createProject && createProject.id) {
-        props.createProject({
+        props.setProject({
           id: createProject.id,
-          newProj: resToNiceProject(createProject)
+          newProj: createProject
         })
 
         window.location.hash = '#/project/' + createProject!.id
@@ -48,7 +53,6 @@ const CCreateProject = (props: CreateProjectProps) => {
       props.openSnackbar('Error when creating project', 'error')
     }
   })
-  */
 
   const { classes } = props
 
@@ -67,24 +71,22 @@ const CCreateProject = (props: CreateProjectProps) => {
             e.preventDefault()
 
             if (props.user) {
-              /* createProjectExec({
+              createProjectExec({
                 variables: {
                   name: name || 'Unnamed Project'
                 }
-              }) */
+              })
             } else {
               props.openSnackbar("You havn't logged in, silly goose", 'warning')
             }
           }}
         >
-          <Paper className={classes.paper}>
+          <div className={classes.paper}>
             <Avatar className={classes.avatar}>
               <CalendarTodayRounded />
             </Avatar>
             <Typography style={{ fontSize: 17 }}>Create Project</Typography>
-            {/* loading */ true && (
-              <CircularProgress style={{ margin: '4px auto' }} />
-            )}
+            {loading && <CircularProgress style={{ margin: '4px auto' }} />}
             <div style={{ display: 'flex', width: '100%' }}>
               <TextField
                 autoFocus
@@ -105,7 +107,7 @@ const CCreateProject = (props: CreateProjectProps) => {
                 </Button>
               </div>
             </div>
-          </Paper>
+          </div>
         </form>
       </main>
     </>
@@ -116,7 +118,8 @@ const mapState = (state: TState) => ({
   user: state.user
 })
 const actionCreators = {
-  openSnackbar: openSnackbarA
+  openSnackbar: openSnackbarA,
+  setProject: setProjectA
 }
 
 export const CreateProject = connect(

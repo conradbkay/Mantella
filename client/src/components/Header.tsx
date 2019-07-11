@@ -11,8 +11,6 @@ import {
   Theme,
   WithStyles,
   createStyles,
-  Button,
-  Menu,
   IconButton,
   List,
   ListItem,
@@ -21,22 +19,23 @@ import {
   Drawer,
   Tab,
   Avatar,
-  Tooltip
+  Tooltip,
+  Button,
+  Menu
 } from '@material-ui/core'
 import { Trail } from 'react-spring/renderprops'
 import {
   HowToReg,
-  Dvr,
   PieChart,
   CalendarToday,
-  Add,
   Help,
   Settings,
-  Book
+  Business
 } from '@material-ui/icons'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
+import { ProjectFinder } from './ProjectFinder/ProjectFinder'
 
 /**
  * @todo Refresh changing tab is kinda slow
@@ -62,27 +61,17 @@ const noAuthItems = [
 ]
 
 const authItems = [
-  { label: 'Goals', pathname: '/goals', menuIcon: Book },
   { label: 'Settings', pathname: '/settings', menuIcon: Settings },
+  { label: 'Projects', pathname: '/projects', menuIcon: Business },
   {
-    label: 'Home',
+    label: 'Dashboard',
     pathname: '/dashboard',
     menuIcon: PieChart
   },
   {
-    label: 'New Proj',
-    pathname: '/create-project',
-    menuIcon: Add
-  },
-  {
     label: 'Calendar',
-    pathname: '/week',
+    pathname: '/calendar',
     menuIcon: CalendarToday
-  },
-  {
-    label: 'Tasks',
-    pathname: '/tasks',
-    menuIcon: Dvr
   }
 ]
 
@@ -134,12 +123,8 @@ type TProps = WithStyles<typeof styles> &
   ReturnType<typeof mapState>
 
 const Topbar = (props: TProps) => {
-  const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
   const [drawer, setDrawer] = useState(false)
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
+  const [anchorEl, setAnchorEl] = useState(null as any)
 
   const { classes } = props
 
@@ -178,9 +163,11 @@ const Topbar = (props: TProps) => {
                   <Menu
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
-                    onClose={handleClose}
+                    onClose={() => setAnchorEl(null)}
                   >
-                    <div style={{ outline: 'none', margin: 10 }}>progects</div>
+                    <div style={{ outline: 'none', margin: 10 }}>
+                      <ProjectFinder mini />
+                    </div>
                   </Menu>
                 </>
               )}

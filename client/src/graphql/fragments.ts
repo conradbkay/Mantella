@@ -55,7 +55,6 @@ export const columnFields = gql`
 
 export const projectFields = gql`
   ${taskFields}
-  ${profileFields}
   ${columnFields}
   fragment projectFields on Project {
     isPrivate

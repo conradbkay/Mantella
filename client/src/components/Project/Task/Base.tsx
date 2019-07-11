@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { TTask, TSubtask } from '../../types/project'
+import { TTask, TSubtask } from '../../../types/project'
 import { connect } from 'react-redux'
-import { TState } from '../../types/state'
-import { selectPomodoroTaskA, toggleTimerA } from '../../store/actions/pomodoro'
+import { TState } from '../../../types/state'
+import { selectPomodoroTaskA, toggleTimerA } from '../../../store/actions/pomodoro'
 import {
   LinearProgress,
   Badge,
@@ -13,8 +13,8 @@ import {
   Tooltip
 } from '@material-ui/core'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
-import { formatDueDate } from '../../utils/formatDueDate'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { formatDueDate } from '../../../utils/formatDueDate'
+import { toDaysHHMMSS } from '../../../utils/convertToTime'
 import {
   CheckBox,
   CheckBoxOutlineBlankOutlined,
@@ -23,10 +23,10 @@ import {
   Comment,
   List
 } from '@material-ui/icons'
-import { hasPassed } from '../../utils/hasPassed'
+import { hasPassed } from '../../../utils/hasPassed'
 import { Transition, animated } from 'react-spring/renderprops'
-import { TProject } from '../../types/project'
-import { selectMemberA } from '../../store/actions/project'
+import { TProject } from '../../../types/project'
+import { selectMemberA } from '../../../store/actions/project'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)

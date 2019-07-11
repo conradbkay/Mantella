@@ -17,7 +17,7 @@ import { selectMemberA, setProjectA } from '../../store/actions/project'
 import { CreateColumn } from './CreateColumn'
 import { Add, FilterList, Settings, Equalizer } from '@material-ui/icons'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Column } from '../Column/Column'
+import { Column } from './Column/Column'
 import { NoMatch } from '../NoMatch/NoMatch'
 import { FilterTasks } from './FilterTasks'
 import Helmet from 'react-helmet'
@@ -463,9 +463,11 @@ const CProject = (props: TProps) => {
   return <NoMatch />
 }
 
-const mapState = (state: TState, ownProps: OwnProps) => ({
-  project: state.projects[id(state.projects, ownProps.params.id)]
-})
+const mapState = (state: TState, ownProps: OwnProps) => {
+  return {
+    project: state.projects[id(state.projects, ownProps.params.id)]
+  }
+}
 
 const actionCreators = {
   setProject: setProjectA,

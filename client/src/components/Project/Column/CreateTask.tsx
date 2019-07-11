@@ -17,19 +17,19 @@ import {
   Tooltip
 } from '@material-ui/core'
 
-import { Change } from '../../types/types'
-import { setTaskA } from '../../store/actions/task'
-import { TState } from '../../types/state'
+import { Change } from '../../../types/types'
+import { setTaskA } from '../../../store/actions/task'
+import { TState } from '../../../types/state'
 import {
   CreateTaskMutation,
   CreateTaskMutationVariables
-} from '../../graphql/types'
-import { GQL_CREATE_TASK } from '../../graphql/mutations/task'
-import { setProjectA } from '../../store/actions/project'
+} from '../../../graphql/types'
+import { GQL_CREATE_TASK } from '../../../graphql/mutations/task'
+import { setProjectA } from '../../../store/actions/project'
 import { useMutation } from '@apollo/react-hooks'
 import { Close } from '@material-ui/icons'
-import { id } from '../../utils/utilities'
-import { ChooseColor } from '../utils/chooseColor'
+import { id } from '../../../utils/utilities'
+import { ChooseColor } from '../../utils/chooseColor'
 
 type CreateTaskProps = ReturnType<typeof mapState> &
   typeof actionCreators &

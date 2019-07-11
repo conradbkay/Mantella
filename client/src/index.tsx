@@ -13,7 +13,7 @@ import { CreateProject } from './components/createProject/CreateProject'
 import { NoMatch } from './components/NoMatch/NoMatch'
 import { Fab, CircularProgress } from '@material-ui/core'
 import { Timer } from '@material-ui/icons'
-import { About } from './components/Home/About'
+import { About } from './components/Landing/About'
 
 import { Header } from './components/Header'
 import { WelcomeDialog } from './components/Welcome/WelcomeDialog'
@@ -55,6 +55,8 @@ import { GQL_LOGIN_WITH_COOKIE } from './graphql/mutations/auth'
 import { client } from './apollo'
 import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
 import { Project } from './components/Project/Project'
+import { ProjectFinder } from './components/ProjectFinder/ProjectFinder'
+import { Settings } from './components/Settings/Settings'
 
 const Router = () => {
   const [open, setOpen] = useState(false)
@@ -99,6 +101,18 @@ const Router = () => {
         )}
         {loaded ? (
           <Switch>
+            <PrivateRoute
+              exact
+              path="/projects"
+              component={ProjectFinder}
+              componentProps={{}}
+            />
+            <PrivateRoute
+              exact
+              path="/settings"
+              component={Settings}
+              componentProps={{}}
+            />
             <PublicOnlyRoute
               exact
               path="/login"

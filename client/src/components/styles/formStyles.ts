@@ -11,7 +11,7 @@ export const formStyles = (theme: Theme) =>
       }
     },
     paper: {
-      marginTop: theme.spacing(8),
+      marginTop: 8,
       display: 'flex',
       flexDirection: 'column', // prevent all from being on one line
       alignItems: 'center',

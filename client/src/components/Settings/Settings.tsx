@@ -14,9 +14,9 @@ import { List } from '@material-ui/core'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import { Mutation, MutationResult } from 'react-apollo'
-import { openSnackbarA } from '../../../store/actions/snackbar'
-import { LogoutMutation, LogoutMutationVariables } from '../../../graphql/types'
-import { GQL_LOGOUT } from '../../../graphql/mutations/auth'
+import { openSnackbarA } from '../../store/actions/snackbar'
+import { LogoutMutation, LogoutMutationVariables } from '../../graphql/types'
+import { GQL_LOGOUT } from '../../graphql/mutations/auth'
 
 const styles = (theme: Theme) =>
   createStyles({

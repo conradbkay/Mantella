@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Draggable } from 'react-beautiful-dnd'
-import { TTask } from '../../types/project'
+import { TTask } from '../../../types/project'
 import { BaseTask } from './Base'
-import { TProject } from '../../types/project'
+import { TProject } from '../../../types/project'
 
 export interface TaskOwnProps {
   task: TTask

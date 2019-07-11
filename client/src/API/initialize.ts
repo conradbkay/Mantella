@@ -2,6 +2,7 @@ import { UserFieldsFragment } from './../graphql/types'
 import { TState } from '../types/state'
 import { RTDispatch } from '../types/types'
 import axios from 'axios'
+import { setProjectsA } from '../store/actions/project'
 
 /**
  * occurs when user authenticates
@@ -28,11 +29,7 @@ export const fetchQuery = async <T = any>(
 export const initializeAuthState = (user: UserFieldsFragment) => {
   return (dispatch: RTDispatch, getState: () => TState) => {
     if (user && user.projects) {
-      /* store.dispatch(
-        setProjectsA(
-          resToNiceProjects(user.projects as ProjectFieldsFragment[])
-        )
-      ) */
+      dispatch(setProjectsA(user.projects))
     }
   }
 }
