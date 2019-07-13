@@ -1,12 +1,9 @@
 module.exports = {
   service: {
-    endpoint: {
-      url: 'http://localhost:4000/graphql'
-    },
-    includes: ['./server/src/graphql/**/*.{graphql,gql,ts}'],
     localSchemaFile: './server/src/graphql/schema.graphql'
   },
   client: {
+    localSchemaFile: './server/src/graphql/schema.graphql',
     service: 'mantella',
     tagName: 'gql',
     url: 'http://localhost:4000/graphql'

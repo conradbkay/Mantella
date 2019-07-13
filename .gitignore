@@ -5,7 +5,7 @@
 /.vscode
 # testing
 /coverage
-
+apollo.config.js
 # production
 /build
 /client/node_modules
