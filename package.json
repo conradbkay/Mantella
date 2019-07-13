@@ -19,6 +19,7 @@
   "homepage": "https://github.com/conradkay/KanbanBrawn#readme",
   "dependencies": {
     "@playlyfe/gql": "^2.6.1",
+    "apollo": "^2.15.0",
     "concurrently": "^4.1.0",
     "copyfiles": "^2.1.0"
   }
