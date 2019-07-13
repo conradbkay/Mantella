@@ -4,30 +4,21 @@ export const ProjectSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
   ownerId: String,
-  swimlanes: [
+  lists: [
     {
       taskIds: [String],
       name: { type: String, required: true },
       id: { type: String, required: true }
     }
   ],
-  columns: [
-    {
-      name: { type: String, required: true },
-      isCompletedColumn: Boolean,
-      taskLimit: { type: Number, required: true }, // 0 if no limit
-      id: { type: String, required: true },
-      taskIds: [String]
-    }
-  ],
-  columnOrder: [String],
   tasks: [
     {
+      progress: { type: Number, required: true }, // 0 for none, 1 for in-progress, 2 for complete
       security: {
         public: Boolean,
         assignedUsers: [String]
       },
-
+      priority: String, // low, medium, high
       id: { type: String, required: true },
       name: { type: String, required: true },
       points: { type: Number, required: true },
@@ -67,6 +58,9 @@ export interface TaskProps {
     assignedUsers: string[] // teams or users
   }
 
+  progress: 0 | 1 | 2
+  priority?: 'High' | 'Medium' | 'Low'
+
   id: string
   name: string
   points: number
@@ -97,19 +91,11 @@ export interface ProjectProps {
   id: string
   name: string
   ownerId: string
-  swimlanes: Array<{
+  lists: Array<{
     taskIds: string[]
     name: string
     id: string
   }>
-  columns: Array<{
-    name: string
-    taskIds: string[]
-    taskLimit: number
-    id: string
-  }>
-
-  columnOrder: string[]
 
   tasks: TaskProps[]
 

@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { projectFields, columnFields } from '../fragments'
+import { projectFields, listFields } from '../fragments'
 
 export const GQL_CREATE_COLUMN = gql`
   ${projectFields}
@@ -39,7 +39,7 @@ export const GQL_DELETE_COLUMN = gql`
 `
 
 export const GQL_EDIT_COLUMN = gql`
-  ${columnFields}
+  ${listFields}
 
   mutation editColumn(
     $id: String!
@@ -48,7 +48,7 @@ export const GQL_EDIT_COLUMN = gql`
   ) {
     editColumn(colId: $id, projectId: $projectId, newCol: $newCol) {
       column {
-        ...columnFields
+        ...listFields
       }
     }
   }

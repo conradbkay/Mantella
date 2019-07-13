@@ -2,7 +2,7 @@ import {
   GQL_CREATE_COLUMN,
   GQL_EDIT_COLUMN,
   GQL_DELETE_COLUMN
-} from './../../../../client/src/graphql/mutations/column'
+} from '../../../../client/src/graphql/mutations/list'
 import {
   CreateColumnMutation,
   CreateColumnMutationVariables,

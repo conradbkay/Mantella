@@ -11,6 +11,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
     proj.tasks.push({
       id: taskId,
       name: obj.taskInfo.name || 'Unnamed Task',
+      progress: 0,
       points: obj.taskInfo.points || 0,
       completed: false,
       timeWorkedOn: 0,
@@ -27,8 +28,8 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       }
     } as TaskProps)
 
-    const column = proj.columns.find((col) => col.id === obj.columnId)!
-    column.taskIds = [...column.taskIds, taskId]
+    const list = proj.lists.find((col) => col.id === obj.listId)!
+    list.taskIds = [...list.taskIds, taskId]
 
     const newProj = await proj.save()
 
@@ -78,12 +79,8 @@ const deleteTask: MutationResolvers['deleteTask'] = async (parent, obj) => {
   if (proj) {
     (proj.tasks.find((tsk) => tsk.id === obj.id) as any).remove()
 
-    proj.columns.map((column) => {
-      column.taskIds.splice(column.taskIds.indexOf(obj.id), 1)
-    })
-
-    proj.swimlanes.map((swimlane) => {
-      swimlane.taskIds.splice(swimlane.taskIds.indexOf(obj.id), 1)
+    proj.lists.map((list) => {
+      list.taskIds.splice(list.taskIds.indexOf(obj.id), 1)
     })
 
     const newProj = await proj.save()
@@ -101,13 +98,15 @@ const dragTask: MutationResolvers['dragTask'] = async (
   const proj = await ProjectModel.findOne({ id: obj.projectId })
 
   if (proj) {
-    obj.columnIds.map((colId) => {
-      proj.columns.find((col) => col.id === colId.id)!.taskIds = colId.newIds
-    })
-    obj.swimlaneIds.map((swimId) => {
-      proj.swimlanes.find((swim) => swim.id === swimId.id)!.taskIds =
-        swimId.newIds
-    })
+    const oldList = proj.lists[
+      proj.lists.findIndex((list) => list.id === obj.oldListId)
+    ]!
+    const newList = proj.lists[
+      proj.lists.findIndex((list) => list.id === obj.newListId)
+    ]!
+
+    oldList.taskIds = oldList.taskIds.filter((taskId) => taskId !== obj.id)
+    newList.taskIds.splice(obj.newIndex, 0, obj.id)
 
     const newProj = await proj.save()
 

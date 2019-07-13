@@ -24,7 +24,7 @@ import {
 } from '@material-ui/icons'
 import { setColumnA } from '../../../store/actions/column'
 import { TColumn } from '../../../types/project'
-import { GQL_EDIT_COLUMN } from '../../../graphql/mutations/column'
+import { GQL_EDIT_COLUMN } from '../../../graphql/mutations/list'
 import {
   EditColumnMutationVariables,
   EditColumnMutation,

@@ -32,6 +32,9 @@ type TaskRecurrance {
 type Task {
   security: TaskSecurity
 
+  priority: String
+  progress: Int!
+
   id: String!
   name: String!
   points: Int!
@@ -65,22 +68,13 @@ type Project {
   ownerId: String!
   name: String!
   id: String!
-  columnOrder: [String!]!
-  columns: [Column!]!
-  swimlanes: [Swimlane!]!
+  lists: [List!]!
   users: [String!]! # if null is a private project
   tasks: [Task!]!
   isPrivate: Boolean! # defaults to false (public)
 }
 
-type Column {
-  id: String!
-  name: String!
-  taskIds: [String!]!
-  taskLimit: Int!
-}
-
-type Swimlane {
+type List {
   taskIds: [String!]!
   name: String!
   id: String!
@@ -95,24 +89,12 @@ input TaskInput {
 }
 
 input ProjectInput {
-  name: String
-  columnIds: [String!]
+  name: String!
 }
 
-input ColumnInput {
-  name: String
-  taskIds: [String!]
-  taskLimit: Int
-}
-
-input SwimlaneInput {
+input ListInput {
   taskIds: [String!]
   name: String
-}
-
-input DragTaskIdList {
-  id: String!
-  newIds: [String!]!
 }
 
 type Auth {
@@ -132,33 +114,31 @@ type TaskMerge {
   task: Task
 }
 
-type ColumnMerge {
+type ListMerge {
   project: Project!
-  column: Column
+  list: List
 }
 
-type SwimlaneMerge {
-  project: Project!
-  swimlane: Swimlane
-}
-
-input SubtaskInfo {
+input ListInfo {
   name: String
   completed: Boolean
 }
 
+input SubtaskInfo {
+  name: String!
+  completed: Boolean!
+}
+
 type Mutation {
-  createTask(
-    projId: String!
-    taskInfo: TaskInput!
-    columnId: String!
-  ): TaskMerge!
+  createTask(projId: String!, taskInfo: TaskInput!, listId: String!): TaskMerge!
   editTask(projId: String!, task: TaskInput!, taskId: String!): TaskMerge!
   deleteTask(projId: String!, id: String!): TaskMerge!
   dragTask(
-    columnIds: [DragTaskIdList!]!
+    oldListId: String!
+    newListId: String!
+    newIndex: Int!
     id: String!
-    swimlaneIds: [DragTaskIdList!]!
+    newProgress: Int!
     projectId: String!
   ): TaskMerge!
 
@@ -171,29 +151,12 @@ type Mutation {
   createProject(name: String!): Project!
   editProject(id: String!, newProj: ProjectInput!): Project!
   deleteProject(id: String!): DeleteReturn! # sends deleted project id back
-  createColumn(
-    projId: String!
-    name: String!
-    isCompletedColumn: Boolean
-    taskLimit: Int
-  ): ColumnMerge!
-  editColumn(
-    colId: String!
-    projectId: String!
-    newCol: ColumnInput!
-  ): ColumnMerge!
-  deleteColumn(_id: String!, projectId: String!): ColumnMerge!
-
   joinProject(projectId: String!): Project!
   leaveProject(projectId: String!): DeleteReturn!
 
-  createSwimlane(projId: String!, name: String!): SwimlaneMerge!
-  editSwimlane(
-    swimId: String!
-    projId: String!
-    newSwim: SwimlaneInput!
-  ): SwimlaneMerge!
-  deleteSwimlane(projId: String!, _id: String!): SwimlaneMerge!
+  createList(projId: String!, name: String!): ListMerge!
+  editList(listId: String!, projId: String!, newList: ListInput!): ListMerge!
+  deleteList(projId: String!, id: String!): DeleteReturn!
 
   removeMemberFromProject(projectId: String!, userId: String!): Project!
 

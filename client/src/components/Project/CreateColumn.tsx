@@ -25,7 +25,7 @@ import {
   CreateColumnMutation,
   CreateColumnMutationVariables
 } from '../../graphql/types'
-import { GQL_CREATE_COLUMN } from '../../graphql/mutations/column'
+import { GQL_CREATE_COLUMN } from '../../graphql/mutations/list'
 import { useMutation } from '@apollo/react-hooks'
 
 interface OwnProps {

@@ -12,7 +12,8 @@ export const defaultTask: Omit<TaskProps, 'id'> = {
   security: {
     public: true,
     assignedUsers: []
-  }
+  },
+  progress: 0
 }
 
 export const tags = [
@@ -121,32 +122,23 @@ export const projectData = (
 
   return {
     name: 'Tutorial Project',
-    swimlanes: [
-      { taskIds: [], name: 'Intermediate', id: uuid() },
-      { name: 'Beginner', taskIds: [ids[2], ids[4], ids[3]], id: uuid() },
-      { taskIds: [ids[6]], name: 'Advanced', id: uuid() }
-    ],
-    columns: [
+    lists: [
       {
-        taskLimit: 0,
         id: columnIds[0],
         name: 'Fundementals',
         taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
       },
       {
-        taskLimit: 0,
         id: columnIds[1],
         name: 'Setting Up',
         taskIds: [ids[6], ids[7], ids[8], ids[9]]
       },
       {
-        taskLimit: 0,
         id: columnIds[2],
         name: 'Other Features',
         taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
       }
     ],
-    columnOrder: columnIds,
     ownerId: newUserId,
     id: projectId,
     tasks: tasks,

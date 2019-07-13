@@ -23,13 +23,11 @@ const createProject: MutationResolvers['createProject'] = async (
         name: args.name,
         ownerId: user.id,
         users: [user.id],
-        swimlanes: [],
-        columns: [
+        lists: [
           {
             id: colId,
-            name: 'Todo',
-            taskIds: [],
-            taskLimit: 0
+            name: 'Generic',
+            taskIds: []
           }
         ],
         tasks: [],
@@ -52,9 +50,6 @@ const editProject: MutationResolvers['editProject'] = async (parent, args) => {
     const project = await ProjectModel.findOne({ id: args.id })
     if (project) {
       project.name = args.newProj.name ? args.newProj.name : project.name
-      project.columnOrder = args.newProj.columnIds
-        ? args.newProj.columnIds
-        : project.columnOrder
 
       const newProj = await project.save()
 

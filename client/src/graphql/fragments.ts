@@ -6,6 +6,10 @@ export const taskFields = gql`
   fragment taskFields on Task {
     points
     completed
+
+    progress
+    priority
+
     id
     dueDate
     startDate
@@ -44,29 +48,22 @@ export const profileFields = gql`
   }
 `
 
-export const columnFields = gql`
-  fragment columnFields on Column {
+export const listFields = gql`
+  fragment listFields on List {
     id
     name
     taskIds
-    taskLimit
   }
 `
 
 export const projectFields = gql`
   ${taskFields}
-  ${columnFields}
+  ${listFields}
   fragment projectFields on Project {
     isPrivate
-    columnOrder
     ownerId
-    columns {
-      ...columnFields
-    }
-    swimlanes {
-      taskIds
-      name
-      id
+    lists {
+      ...listFields
     }
 
     users

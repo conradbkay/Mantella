@@ -16,7 +16,7 @@ import {
   DeleteColumnMutationVariables
 } from '../../../graphql/types'
 import { setProjectA } from '../../../store/actions/project'
-import { GQL_DELETE_COLUMN } from '../../../graphql/mutations/column'
+import { GQL_DELETE_COLUMN } from '../../../graphql/mutations/list'
 import { getUnassignedTasks, getAllTasks, id } from '../../../utils/utilities'
 
 const getSwimlineTasks = (filteredTasks: TTask[], swimlane: TSwimlane) => {
