@@ -6,15 +6,15 @@ import {
 import {
   CreateColumnMutation,
   CreateColumnMutationVariables,
-  EditColumnMutation,
-  EditColumnMutationVariables,
+  EdiTListMutation,
+  EdiTListMutationVariables,
   DeleteColumnMutation,
   DeleteColumnMutationVariables
-} from './../../../../client/src/graphql/types'
+} from '../../../../client/src/graphql/types'
 import { gqlReq, projToSnapshot } from '../../testUtils'
 
 describe('Column Mutations', () => {
-  test('createColumn editColumn deleteColumn', async () => {
+  test('createColumn ediTList deleteColumn', async () => {
     const PROJECT_ID = '5d0802a03c5daa2803c62742'
 
     const { data: createData } = await gqlReq<
@@ -45,8 +45,8 @@ describe('Column Mutations', () => {
     /* edit column */
 
     const { data: editData } = await gqlReq<
-      EditColumnMutation,
-      EditColumnMutationVariables
+      EdiTListMutation,
+      EdiTListMutationVariables
     >({
       isMutation: true,
       query: GQL_EDIT_COLUMN,
@@ -61,7 +61,7 @@ describe('Column Mutations', () => {
       }
     })
 
-    const newCol = editData!.editColumn!.column!
+    const newCol = editData!.ediTList!.column!
 
     expect({
       name: newCol.name,

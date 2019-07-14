@@ -1,54 +1,41 @@
 import gql from 'graphql-tag'
 import { projectFields, listFields } from '../fragments'
 
-export const GQL_CREATE_COLUMN = gql`
+export const GQL_CREATE_LIST = gql`
   ${projectFields}
 
-  mutation createColumn(
-    $name: String!
-    $projId: String!
-    $isCompletedColumn: Boolean
-    $taskLimit: Int
-  ) {
-    createColumn(
-      projId: $projId
-      name: $name
-      isCompletedColumn: $isCompletedColumn
-      taskLimit: $taskLimit
-    ) {
+  mutation createList($name: String!, $projId: String!) {
+    createList(projId: $projId, name: $name) {
       project {
         ...projectFields
       }
-      column {
-        ...columnFields
+      list {
+        ...listFields
       }
     }
   }
 `
 
-export const GQL_DELETE_COLUMN = gql`
+export const GQL_DELETE_LIST = gql`
   ${projectFields}
 
-  mutation deleteColumn($projectId: String!, $id: String!) {
-    deleteColumn(projectId: $projectId, _id: $id) {
-      project {
-        ...projectFields
-      }
+  mutation deleteList($projectId: String!, $id: String!) {
+    deleteList(projId: $projectId, id: $id) {
+      id
     }
   }
 `
 
-export const GQL_EDIT_COLUMN = gql`
+export const GQL_EDIT_LIST = gql`
   ${listFields}
 
-  mutation editColumn(
-    $id: String!
-    $projectId: String!
-    $newCol: ColumnInput!
-  ) {
-    editColumn(colId: $id, projectId: $projectId, newCol: $newCol) {
-      column {
+  mutation editList($id: String!, $projectId: String!, $newList: ListInput!) {
+    editList(listId: $id, projId: $projectId, newList: $newList) {
+      list {
         ...listFields
+      }
+      project {
+        ...projectFields
       }
     }
   }

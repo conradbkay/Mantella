@@ -10,7 +10,7 @@ import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
 import { NewDueTimeDialog } from './NewDueTimeDialog'
 import { differenceInCalendarDays } from 'date-fns'
-import { getAllTasksArr } from '../../utils/utilities'
+import { getAllTasks } from '../../utils/utilities'
 
 type TProps = ReturnType<typeof mapState> &
   typeof actionCreators &
@@ -127,7 +127,7 @@ const CWeek = withStyles(styles)((props: TProps) => {
 })
 
 const mapState = (state: TState) => ({
-  tasks: getAllTasksArr(state.projects),
+  tasks: getAllTasks(state.projects),
   projects: state.projects
 })
 

@@ -1,19 +1,11 @@
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { TTask } from '../../types/project'
 import { getDate, getDay } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
 // import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
-import { flatten } from 'lodash'
-import {
-  getAllTasks,
-  getAllTasksArr,
-  getProjectIdFromTaskId,
-  getAllColumnsArr,
-  id
-} from '../../utils/utilities'
+import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 
 type OwnProps = {
   day: Date
@@ -110,36 +102,10 @@ const CWeekDay = (props: TProps) => {
   )
 }
 
-const getTasks = (state: TState, filteringIds: string[]): TTask[] => {
-  if (filteringIds.includes('-1') || filteringIds.length === 0) {
-    // we dont want to filter anything
-    return getAllTasks(state.projects)
-  }
-
-  let result: TTask[] = []
-
-  const columnIds = flatten(
-    Object.values(state.projects)
-      .filter(project => filteringIds.includes(project.id))
-      .map(project => project.columnOrder)
-  )
-
-  getAllColumnsArr(state.projects).map(column => {
-    if (columnIds.includes(column.id)) {
-      const columnTasks = getAllTasksArr(state.projects).filter(task =>
-        column.taskIds.includes(task.id)
-      )
-      columnTasks.map(columnTask => {
-        result = { ...result, [columnTask.id]: columnTask }
-      })
-    }
-  })
-
-  return result
-}
-
 const mapState = (state: TState, ownProps: OwnProps) => ({
-  tasks: getTasks(state, ownProps.filteringProjects),
+  tasks: state.projects.reduce((accum, proj) => {
+    return [...accum, ...proj.tasks]
+  }, []),
   projects: state.projects
 })
 

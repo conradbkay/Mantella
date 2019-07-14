@@ -2,7 +2,7 @@ import { UserAction } from './auth'
 import { ProjectAction } from './project'
 import { SnackbarAction } from './snackbar'
 import { LoadingAction } from './loading'
-import { ColumnAction } from './column'
+import { ListAction } from './list'
 import { PomodoroAction } from './pomodoro'
 import { TaskAction } from './task'
 
@@ -11,7 +11,7 @@ export type TAction = Readonly<
   | LoadingAction
   | ProjectAction
   | TaskAction
-  | ColumnAction
+  | ListAction
   | PomodoroAction
   | UserAction
 >

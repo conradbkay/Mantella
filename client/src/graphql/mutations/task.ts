@@ -46,9 +46,9 @@ export const GQL_CREATE_TASK = gql`
   mutation createTask(
     $taskInfo: TaskInput!
     $projId: String!
-    $columnId: String!
+    $listId: String!
   ) {
-    createTask(taskInfo: $taskInfo, projId: $projId, columnId: $columnId) {
+    createTask(taskInfo: $taskInfo, projId: $projId, listId: $listId) {
       project {
         ...projectFields
       }
@@ -91,15 +91,19 @@ export const GQL_DRAG_TASK = gql`
   ${projectFields}
 
   mutation dragTask(
-    $columnIds: [DragTaskIdList!]!
+    $oldListId: String!
+    $newListId: String!
+    $newIndex: Int!
     $id: String!
-    $swimlaneIds: [DragTaskIdList!]!
+    $newProgress: Int!
     $projectId: String!
   ) {
     dragTask(
-      columnIds: $columnIds
+      oldListId: $oldListId
+      newListId: $newListId
+      newIndex: $newIndex
       id: $id
-      swimlaneIds: $swimlaneIds
+      newProgress: $newProgress
       projectId: $projectId
     ) {
       task {

@@ -17,7 +17,6 @@ import { selectMemberA, setProjectA } from '../../store/actions/project'
 import { CreateColumn } from './CreateColumn'
 import { Add, FilterList, Settings, Equalizer } from '@material-ui/icons'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Column } from './Column/Column'
 import { NoMatch } from '../NoMatch/NoMatch'
 import { FilterTasks } from './FilterTasks'
 import Helmet from 'react-helmet'
@@ -26,16 +25,12 @@ import { ProjectSettings } from './ProjectSettings'
 import { Mutation, MutationResult } from 'react-apollo'
 import {
   EditProjectMutation,
-  EditProjectMutationVariables,
-  DragTaskMutation,
-  DragTaskMutationVariables
+  EditProjectMutationVariables
 } from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
-import { cloneDeep } from 'lodash'
-import { useMutation } from '@apollo/react-hooks'
-import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
 import { id } from '../../utils/utilities'
+import { ProjectCell } from './Cell/ProjectCell'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -99,16 +94,6 @@ export type TFilterData = {
 const CProject = (props: TProps) => {
   const [settings, setSettings] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  const initCollapsed: { [id: string]: boolean } = {}
-
-  if (props.project) {
-    Object.values(props.project.columns).map(column => {
-      initCollapsed[column.id] = false
-    })
-  }
-
-  const [collapsed, setCollapsed] = useState(initCollapsed)
   const [isMobile, setIsMobile] = useState(getMobile(window))
   const [filterData, setFilterData] = useState({
     dueDate: 'all',
@@ -122,7 +107,7 @@ const CProject = (props: TProps) => {
     props.project ? props.project.name : undefined
   )
 
-  const [dragTaskExec] = useMutation<
+  /* const [dragTaskExec] = useMutation<
     DragTaskMutation,
     DragTaskMutationVariables
   >(GQL_DRAG_TASK, {
@@ -134,7 +119,7 @@ const CProject = (props: TProps) => {
         })
       }
     }
-  })
+  }) */
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -147,117 +132,9 @@ const CProject = (props: TProps) => {
       return
     }
 
-    const proj = cloneDeep(props.project)
+    return
 
-    const taskId = result.draggableId
-
-    const [[oldColumnId, oldSwimlaneId], [newColumnId, newSwimlaneId]] = [
-      result.source.droppableId.split(' DIVIDER '),
-      result.destination.droppableId.split(' DIVIDER ')
-    ]
-
-    if (proj) {
-      /* when we are dragging to unassigned we must isolate all unassigned ids and use those for newIndex */
-
-      const fromColumn = Object.values(props.project.columns).find(
-        column => column.id === oldColumnId
-      )!
-
-      const fromSwimlane = Object.values(props.project.swimlanes).find(
-        swimlane => {
-          return swimlane.id === oldSwimlaneId
-        }
-      )
-
-      const toColumn = Object.values(props.project.columns).find(
-        column => column.id === newColumnId
-      )!
-      const toSwimlane = Object.values(props.project.swimlanes).find(
-        swimlane => {
-          return swimlane.id === newSwimlaneId
-        }
-      )
-
-      // delete old swimlane reference
-      if (fromSwimlane) {
-        proj.swimlanes[id(proj.swimlanes, fromSwimlane.id)].taskIds.splice(
-          result.source.index,
-          1
-        )
-      }
-
-      // delete old column reference
-      proj.columns[id(proj.columns, fromColumn.id)].taskIds.splice(
-        proj.columns[id(proj.columns, fromColumn.id)].taskIds.indexOf(taskId),
-        1
-      )
-
-      if (toSwimlane) {
-        // add task to new swimlane
-        proj.swimlanes[id(proj.swimlanes, toSwimlane.id)].taskIds.splice(
-          result.destination.index,
-          0,
-          taskId
-        )
-
-        proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
-          result.destination.index,
-          0,
-          taskId
-        )
-      } else {
-        const unassignedOfDestination = proj.columns[
-          id(proj.columns, toColumn.id)
-        ].taskIds.filter(tId => {
-          const owner = Object.values(proj.swimlanes).find(swim => {
-            return swim.taskIds.includes(tId)
-          })
-
-          return owner === undefined
-        })
-
-        if (result.destination.index === 0) {
-          proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
-            0,
-            0,
-            taskId
-          )
-        } else if (
-          result.destination.index === unassignedOfDestination.length
-        ) {
-          proj.columns[id(proj.columns, toColumn.id)].taskIds = [
-            ...proj.columns[id(proj.columns, toColumn.id)].taskIds,
-            taskId
-          ]
-        } else {
-          // gotta do some black magic
-          const below = unassignedOfDestination[result.destination.index - 1]
-          // add task to new column
-          proj.columns[id(proj.columns, toColumn.id)].taskIds.splice(
-            proj.columns[id(proj.columns, toColumn.id)].taskIds.indexOf(below) +
-              1,
-            0,
-            taskId
-          )
-        }
-      }
-    }
-    props.setProject({ id: project.id, newProj: proj })
-
-    dragTaskExec({
-      variables: {
-        columnIds: Object.values(proj.columns).map(col => ({
-          id: col.id,
-          newIds: col.taskIds
-        })),
-        id: taskId,
-        swimlaneIds: Object.values(proj.swimlanes).map(swim => ({
-          id: swim.id,
-          newIds: swim.taskIds
-        })),
-        projectId: proj.id
-      }
-    })
+    // const taskId = result.draggableId
   }
 
   React.useEffect(() => {
@@ -269,10 +146,6 @@ const CProject = (props: TProps) => {
 
   const { classes, project } = props
   if (project) {
-    const projColumns = project.columnOrder.map(
-      colId => project.columns[id(project.columns, colId)]
-    )
-
     return (
       <div>
         <Helmet>
@@ -387,40 +260,23 @@ const CProject = (props: TProps) => {
           }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
-            <div
-              style={{
-                display: 'flex',
-                flexGrow: 1,
-                flexDirection: isMobile ? 'column' : 'row'
-              }}
-            >
-              {projColumns.map((column, i) => {
-                return column ? (
-                  <div
-                    key={column.id}
-                    style={{
-                      display: 'flex',
-                      width: collapsed[column.id] ? 40 : '100%'
-                    }}
-                  >
-                    <Column
-                      isMobile={isMobile}
-                      index={i === projColumns.length - 1 ? 'end' : i}
-                      column={column}
-                      filterData={filterData}
-                      collapsed={collapsed[column.id] || false}
-                      collapse={() => {
-                        setCollapsed({
-                          ...collapsed,
-                          [column.id]: !collapsed[column.id]
-                        })
-                      }}
-                      projectId={project.id}
-                    />
-                  </div>
-                ) : null
-              })}
-            </div>
+            {[0, 1, 2].map(progress => (
+              <div
+                style={{
+                  display: 'flex',
+                  flexGrow: 1,
+                  flexDirection: isMobile ? 'column' : 'row'
+                }}
+              >
+                {project.lists.map(list => (
+                  <ProjectCell
+                    progress={progress}
+                    list={list}
+                    project={project}
+                  />
+                ))}
+              </div>
+            ))}
           </DragDropContext>
 
           {dialogOpen && (

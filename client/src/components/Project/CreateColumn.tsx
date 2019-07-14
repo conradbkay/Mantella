@@ -12,20 +12,18 @@ import {
   createStyles,
   WithStyles,
   IconButton,
-  withStyles,
-  Checkbox,
-  FormControlLabel
+  withStyles
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import { Change } from '../../types/types'
-import { setColumnA } from '../../store/actions/column'
+import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
 import {
-  CreateColumnMutation,
-  CreateColumnMutationVariables
+  CreateListMutation,
+  CreateListMutationVariables
 } from '../../graphql/types'
-import { GQL_CREATE_COLUMN } from '../../graphql/mutations/list'
+import { GQL_CREATE_LIST } from '../../graphql/mutations/list'
 import { useMutation } from '@apollo/react-hooks'
 
 interface OwnProps {
@@ -48,58 +46,49 @@ const styles = (theme: Theme) =>
   })
 
 const CCreateColumn = (props: CreateColumnProps) => {
-  const [name, setName] = useState('')
-  const [WIPLimit, setWIPLimit] = useState(3)
-  const [hasWIPLimit, setHasWIPLimit] = useState(false)
+  const { project, onClose, classes } = props
 
-  const [createColumnExec] = useMutation<
-    CreateColumnMutation,
-    CreateColumnMutationVariables
-  >(GQL_CREATE_COLUMN, {
-    onCompleted: ({ createColumn }: CreateColumnMutation) => {
-      if (createColumn && createColumn.project && createColumn.column) {
-        props.setColumn({
-          id: createColumn.column.id,
-          projectId: props.project.id,
-          newCol: {
-            taskIds: [],
-            id: createColumn.column.id,
-            name: createColumn.column.name,
-            taskLimit: hasWIPLimit ? WIPLimit : 0
-          }
-        })
-      } else {
-        console.log(
-          'RESULT NOT INCLUDING PROJECT OR COLUMN IN CREATE_COLUMN: ',
-          createColumn
-        )
-      }
+  const [name, setName] = useState('')
+
+  const [createListExec] = useMutation<
+    CreateListMutation,
+    CreateListMutationVariables
+  >(GQL_CREATE_LIST, {
+    onCompleted: ({ createList }) => {
+      props.setList({
+        id: createList.list!.id,
+        projectId: props.project.id,
+        newCol: {
+          taskIds: [],
+          id: createList.list!.id,
+          name: createList.list!.name
+        }
+      })
+
       onClose()
     }
   })
 
-  const { project, onClose, classes } = props
   return (
     <Dialog open={true} onClose={onClose}>
       <form
         onSubmit={e => {
           e.preventDefault()
-          createColumnExec({
+          createListExec({
             variables: {
-              name: name || 'Column',
-              projId: project.id,
-              taskLimit: hasWIPLimit ? WIPLimit || undefined : undefined
+              name: name || 'List',
+              projId: project.id
             }
           })
         }}
       >
-        <DialogTitle>Create Column</DialogTitle>
+        <DialogTitle>Create List</DialogTitle>
         <IconButton className={classes.closeButton} onClick={onClose}>
           <Close />
         </IconButton>
         <DialogContent>
           <DialogContentText>
-            Columns should contain either a type or date of task. Ex: "Amanda",
+            Lists should contain either a type or date of task. Ex: "Amanda",
             "Completing", or "Writing"
           </DialogContentText>
           <TextField
@@ -111,32 +100,6 @@ const CCreateColumn = (props: CreateColumnProps) => {
             onChange={({ target }: Change) => setName(target.value)}
             fullWidth
           />
-          <div>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={hasWIPLimit}
-                  onChange={e => setHasWIPLimit(e.target.checked)}
-                  value="isCompletedColumn"
-                />
-              }
-              label="Has Work in Progress Limit"
-            />
-          </div>
-          {hasWIPLimit && (
-            <TextField
-              label="WIP Limit"
-              value={WIPLimit}
-              type="number"
-              onChange={e => {
-                const val = parseInt(e.target.value)
-                if (val >= 1) {
-                  setWIPLimit(Math.floor(val)) // no decimals :P
-                }
-              }}
-              fullWidth
-            />
-          )}
         </DialogContent>
         <DialogActions>
           <Button fullWidth onClick={onClose} color="secondary">
@@ -153,7 +116,7 @@ const CCreateColumn = (props: CreateColumnProps) => {
 }
 
 const actionCreators = {
-  setColumn: setColumnA
+  setList: setListA
 }
 
 export const CreateColumn = connect(

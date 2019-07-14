@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Column Mutations createColumn editColumn deleteColumn 1`] = `
+exports[`Column Mutations createColumn ediTList deleteColumn 1`] = `
 Object {
   "columnIds": Array [],
   "columns": Array [],
@@ -14,7 +14,7 @@ Object {
 }
 `;
 
-exports[`Column Mutations createColumn editColumn deleteColumn 2`] = `
+exports[`Column Mutations createColumn ediTList deleteColumn 2`] = `
 Object {
   "id": "LOLCOLID",
   "isCompletedColumn": true,
@@ -26,7 +26,7 @@ Object {
 }
 `;
 
-exports[`Column Mutations createColumn editColumn deleteColumn 3`] = `
+exports[`Column Mutations createColumn ediTList deleteColumn 3`] = `
 Object {
   "columnIds": Array [
     "COL_ID 0",

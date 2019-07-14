@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import { TProject, TTask, TColumn, TSwimlane } from '../types/project'
+import { TProject, TTask } from '../types/project'
 
 export const id = (
   arr: Array<any & { id: string }>,
@@ -41,93 +41,10 @@ export const getDaysInMonth = (month: number, year: number): Date[] => {
   return days
 }
 
-export const getTasksProject = (taskId: string, stateProjects: TProject[]) => {
-  const projects = [...Object.values(stateProjects)]
-
-  for (const project of projects) {
-    for (const projectsColumn of Object.values(project.columns)) {
-      if (projectsColumn && projectsColumn.taskIds.includes(taskId)) {
-        return project
-      }
-    }
-  }
-  return
-}
-
-export const getUnassignedTasks = (
-  filtered: TTask[],
-  tasks: TTask[],
-  project: TProject
-) => {
-  return filtered.filter(task => {
-    const projSwimlanes = project.swimlanes
-    const swimlaneTasks = projSwimlanes.reduce(
-      (accum, swimlane) => {
-        const swimlanesTasks = swimlane.taskIds.map(
-          taskId => tasks[id(tasks, taskId)]
-        )
-        return [...accum, ...swimlanesTasks]
-      },
-      [] as TTask[]
-    )
-    return !swimlaneTasks.includes(task) // we don't want to duplicate
-  })
-}
-
-export const getTasksSwimlane = (
-  taskId: string,
-  project: TProject
-): TSwimlane | null => {
-  let swimlaneReturn = null
-
-  Object.values(project.swimlanes).map(swimlane => {
-    if (swimlane.taskIds.includes(taskId)) {
-      swimlaneReturn = swimlane
-    }
-    return
-  })
-
-  return swimlaneReturn
-}
-
-export const getProjIdFromColumnId = (
-  projects: TProject[],
-  columnId: string | undefined
-): string | undefined => {
-  let result
-  if (columnId === undefined) {
-    return undefined
-  }
-  Object.values(projects).map(project => {
-    if (Object.keys(project.columns).includes(columnId.toString())) {
-      result = project.id
-    }
-    return
-  })
-  return result
-}
-
-export const getAllColumnsArr = (projects: TProject[]): TColumn[] => {
-  return Object.values(projects).reduce(
-    (accum, project) => [...accum, ...Object.values(project.columns)],
-    []
-  )
-}
-
-export const getAllTasksArr = (projects: TProject[]): TTask[] => {
-  let tasks: TTask[] = []
-
-  Object.values(projects).map(project => {
-    tasks = [...tasks, ...Object.values(project.tasks)]
-  })
-
-  return tasks
-}
-
 export const getAllTasks = (projects: TProject[]): TTask[] => {
   let tasks: TTask[] = []
 
-  Object.values(projects).map(project => {
+  projects.map(project => {
     tasks = {
       ...tasks,
       ...project.tasks

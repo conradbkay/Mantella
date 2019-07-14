@@ -13,15 +13,9 @@ const SET_TASK = (
   if (action.newTask === null) {
     // REFERENCE CLEANUP
 
-    project.columns.map(column => {
-      if (column.taskIds.includes(action.id)) {
-        column.taskIds.splice(column.taskIds.indexOf(action.id), 1)
-      }
-    })
-
-    project.swimlanes.map(swimlane => {
-      if (swimlane.taskIds.includes(action.id)) {
-        swimlane.taskIds.splice(swimlane.taskIds.indexOf(action.id), 1)
+    project.lists.map(list => {
+      if (list.taskIds.includes(action.id)) {
+        list.taskIds.splice(list.taskIds.indexOf(action.id), 1)
       }
     })
 

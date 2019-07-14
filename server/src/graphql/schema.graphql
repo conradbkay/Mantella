@@ -30,7 +30,7 @@ type TaskRecurrance {
 }
 
 type Task {
-  security: TaskSecurity
+  security: TaskSecurity!
 
   priority: String
   progress: Int!

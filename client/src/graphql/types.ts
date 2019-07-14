@@ -16,26 +16,6 @@ export type Auth = {
   user: User
 }
 
-export type Column = {
-  __typename?: 'Column'
-  id: Scalars['String']
-  name: Scalars['String']
-  taskIds: Array<Scalars['String']>
-  taskLimit: Scalars['Int']
-}
-
-export type ColumnInput = {
-  name?: Maybe<Scalars['String']>
-  taskIds?: Maybe<Array<Scalars['String']>>
-  taskLimit?: Maybe<Scalars['Int']>
-}
-
-export type ColumnMerge = {
-  __typename?: 'ColumnMerge'
-  project: Project
-  column?: Maybe<Column>
-}
-
 export type Comment = {
   __typename?: 'Comment'
   comment: Scalars['String']
@@ -49,9 +29,27 @@ export type DeleteReturn = {
   id: Scalars['String']
 }
 
-export type DragTaskIdList = {
+export type List = {
+  __typename?: 'List'
+  taskIds: Array<Scalars['String']>
+  name: Scalars['String']
   id: Scalars['String']
-  newIds: Array<Scalars['String']>
+}
+
+export type ListInfo = {
+  name?: Maybe<Scalars['String']>
+  completed?: Maybe<Scalars['Boolean']>
+}
+
+export type ListInput = {
+  taskIds?: Maybe<Array<Scalars['String']>>
+  name?: Maybe<Scalars['String']>
+}
+
+export type ListMerge = {
+  __typename?: 'ListMerge'
+  project: Project
+  list?: Maybe<List>
 }
 
 export type Mutation = {
@@ -67,14 +65,11 @@ export type Mutation = {
   createProject: Project
   editProject: Project
   deleteProject: DeleteReturn
-  createColumn: ColumnMerge
-  editColumn: ColumnMerge
-  deleteColumn: ColumnMerge
   joinProject: Project
   leaveProject: DeleteReturn
-  createSwimlane: SwimlaneMerge
-  editSwimlane: SwimlaneMerge
-  deleteSwimlane: SwimlaneMerge
+  createList: ListMerge
+  editList: ListMerge
+  deleteList: DeleteReturn
   removeMemberFromProject: Project
   setComment: Task
   setSubtask: Task
@@ -83,7 +78,7 @@ export type Mutation = {
 export type MutationCreateTaskArgs = {
   projId: Scalars['String']
   taskInfo: TaskInput
-  columnId: Scalars['String']
+  listId: Scalars['String']
 }
 
 export type MutationEditTaskArgs = {
@@ -98,9 +93,11 @@ export type MutationDeleteTaskArgs = {
 }
 
 export type MutationDragTaskArgs = {
-  columnIds: Array<DragTaskIdList>
+  oldListId: Scalars['String']
+  newListId: Scalars['String']
+  newIndex: Scalars['Int']
   id: Scalars['String']
-  swimlaneIds: Array<DragTaskIdList>
+  newProgress: Scalars['Int']
   projectId: Scalars['String']
 }
 
@@ -128,24 +125,6 @@ export type MutationDeleteProjectArgs = {
   id: Scalars['String']
 }
 
-export type MutationCreateColumnArgs = {
-  projId: Scalars['String']
-  name: Scalars['String']
-  isCompletedColumn?: Maybe<Scalars['Boolean']>
-  taskLimit?: Maybe<Scalars['Int']>
-}
-
-export type MutationEditColumnArgs = {
-  colId: Scalars['String']
-  projectId: Scalars['String']
-  newCol: ColumnInput
-}
-
-export type MutationDeleteColumnArgs = {
-  _id: Scalars['String']
-  projectId: Scalars['String']
-}
-
 export type MutationJoinProjectArgs = {
   projectId: Scalars['String']
 }
@@ -154,20 +133,20 @@ export type MutationLeaveProjectArgs = {
   projectId: Scalars['String']
 }
 
-export type MutationCreateSwimlaneArgs = {
+export type MutationCreateListArgs = {
   projId: Scalars['String']
   name: Scalars['String']
 }
 
-export type MutationEditSwimlaneArgs = {
-  swimId: Scalars['String']
+export type MutationEditListArgs = {
+  listId: Scalars['String']
   projId: Scalars['String']
-  newSwim: SwimlaneInput
+  newList: ListInput
 }
 
-export type MutationDeleteSwimlaneArgs = {
+export type MutationDeleteListArgs = {
   projId: Scalars['String']
-  _id: Scalars['String']
+  id: Scalars['String']
 }
 
 export type MutationRemoveMemberFromProjectArgs = {
@@ -203,17 +182,14 @@ export type Project = {
   ownerId: Scalars['String']
   name: Scalars['String']
   id: Scalars['String']
-  columnOrder: Array<Scalars['String']>
-  columns: Array<Column>
-  swimlanes: Array<Swimlane>
+  lists: Array<List>
   users: Array<Scalars['String']>
   tasks: Array<Task>
   isPrivate: Scalars['Boolean']
 }
 
 export type ProjectInput = {
-  name?: Maybe<Scalars['String']>
-  columnIds?: Maybe<Array<Scalars['String']>>
+  name: Scalars['String']
 }
 
 export type Query = {
@@ -243,31 +219,15 @@ export type Subtask = {
 }
 
 export type SubtaskInfo = {
-  name?: Maybe<Scalars['String']>
-  completed?: Maybe<Scalars['Boolean']>
-}
-
-export type Swimlane = {
-  __typename?: 'Swimlane'
-  taskIds: Array<Scalars['String']>
   name: Scalars['String']
-  id: Scalars['String']
-}
-
-export type SwimlaneInput = {
-  taskIds?: Maybe<Array<Scalars['String']>>
-  name?: Maybe<Scalars['String']>
-}
-
-export type SwimlaneMerge = {
-  __typename?: 'SwimlaneMerge'
-  project: Project
-  swimlane?: Maybe<Swimlane>
+  completed: Scalars['Boolean']
 }
 
 export type Task = {
   __typename?: 'Task'
-  security?: Maybe<TaskSecurity>
+  security: TaskSecurity
+  priority?: Maybe<Scalars['String']>
+  progress: Scalars['Int']
   id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
@@ -420,11 +380,7 @@ export namespace ProjectResolvers {
 
     id?: IdResolver<string, TypeParent, TContext>
 
-    columnOrder?: ColumnOrderResolver<string[], TypeParent, TContext>
-
-    columns?: ColumnsResolver<Column[], TypeParent, TContext>
-
-    swimlanes?: SwimlanesResolver<Swimlane[], TypeParent, TContext>
+    lists?: ListsResolver<List[], TypeParent, TContext>
 
     users?: UsersResolver<string[], TypeParent, TContext>
 
@@ -448,18 +404,8 @@ export namespace ProjectResolvers {
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type ColumnOrderResolver<
-    R = string[],
-    Parent = Project,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type ColumnsResolver<
-    R = Column[],
-    Parent = Project,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type SwimlanesResolver<
-    R = Swimlane[],
+  export type ListsResolver<
+    R = List[],
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -480,68 +426,39 @@ export namespace ProjectResolvers {
   > = Resolver<R, Parent, TContext>
 }
 
-export namespace ColumnResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = Column> {
-    id?: IdResolver<string, TypeParent, TContext>
+export namespace ListResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = List> {
+    taskIds?: TaskIdsResolver<string[], TypeParent, TContext>
 
     name?: NameResolver<string, TypeParent, TContext>
 
-    taskIds?: TaskIdsResolver<string[], TypeParent, TContext>
-
-    taskLimit?: TaskLimitResolver<number, TypeParent, TContext>
+    id?: IdResolver<string, TypeParent, TContext>
   }
 
-  export type IdResolver<R = string, Parent = Column, TContext = {}> = Resolver<
+  export type TaskIdsResolver<
+    R = string[],
+    Parent = List,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type NameResolver<R = string, Parent = List, TContext = {}> = Resolver<
     R,
     Parent,
     TContext
   >
-  export type NameResolver<
-    R = string,
-    Parent = Column,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type TaskIdsResolver<
-    R = string[],
-    Parent = Column,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type TaskLimitResolver<
-    R = number,
-    Parent = Column,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-}
-
-export namespace SwimlaneResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = Swimlane> {
-    taskIds?: TaskIdsResolver<string[], TypeParent, TContext>
-
-    name?: NameResolver<string, TypeParent, TContext>
-
-    id?: IdResolver<string, TypeParent, TContext>
-  }
-
-  export type TaskIdsResolver<
-    R = string[],
-    Parent = Swimlane,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type NameResolver<
-    R = string,
-    Parent = Swimlane,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type IdResolver<
-    R = string,
-    Parent = Swimlane,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
+  export type IdResolver<R = string, Parent = List, TContext = {}> = Resolver<
+    R,
+    Parent,
+    TContext
+  >
 }
 
 export namespace TaskResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Task> {
-    security?: SecurityResolver<Maybe<TaskSecurity>, TypeParent, TContext>
+    security?: SecurityResolver<TaskSecurity, TypeParent, TContext>
+
+    priority?: PriorityResolver<Maybe<string>, TypeParent, TContext>
+
+    progress?: ProgressResolver<number, TypeParent, TContext>
 
     id?: IdResolver<string, TypeParent, TContext>
 
@@ -567,7 +484,17 @@ export namespace TaskResolvers {
   }
 
   export type SecurityResolver<
-    R = Maybe<TaskSecurity>,
+    R = TaskSecurity,
+    Parent = Task,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type PriorityResolver<
+    R = Maybe<string>,
+    Parent = Task,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type ProgressResolver<
+    R = number,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -789,21 +716,15 @@ export namespace MutationResolvers {
 
     deleteProject?: DeleteProjectResolver<DeleteReturn, TypeParent, TContext>
 
-    createColumn?: CreateColumnResolver<ColumnMerge, TypeParent, TContext>
-
-    editColumn?: EditColumnResolver<ColumnMerge, TypeParent, TContext>
-
-    deleteColumn?: DeleteColumnResolver<ColumnMerge, TypeParent, TContext>
-
     joinProject?: JoinProjectResolver<Project, TypeParent, TContext>
 
     leaveProject?: LeaveProjectResolver<DeleteReturn, TypeParent, TContext>
 
-    createSwimlane?: CreateSwimlaneResolver<SwimlaneMerge, TypeParent, TContext>
+    createList?: CreateListResolver<ListMerge, TypeParent, TContext>
 
-    editSwimlane?: EditSwimlaneResolver<SwimlaneMerge, TypeParent, TContext>
+    editList?: EditListResolver<ListMerge, TypeParent, TContext>
 
-    deleteSwimlane?: DeleteSwimlaneResolver<SwimlaneMerge, TypeParent, TContext>
+    deleteList?: DeleteListResolver<DeleteReturn, TypeParent, TContext>
 
     removeMemberFromProject?: RemoveMemberFromProjectResolver<
       Project,
@@ -826,7 +747,7 @@ export namespace MutationResolvers {
 
     taskInfo: TaskInput
 
-    columnId: string
+    listId: string
   }
 
   export type EditTaskResolver<
@@ -859,11 +780,15 @@ export namespace MutationResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext, DragTaskArgs>
   export interface DragTaskArgs {
-    columnIds: DragTaskIdList[]
+    oldListId: string
+
+    newListId: string
+
+    newIndex: number
 
     id: string
 
-    swimlaneIds: DragTaskIdList[]
+    newProgress: number
 
     projectId: string
   }
@@ -933,45 +858,6 @@ export namespace MutationResolvers {
     id: string
   }
 
-  export type CreateColumnResolver<
-    R = ColumnMerge,
-    Parent = {},
-    TContext = {}
-  > = Resolver<R, Parent, TContext, CreateColumnArgs>
-  export interface CreateColumnArgs {
-    projId: string
-
-    name: string
-
-    isCompletedColumn?: Maybe<boolean>
-
-    taskLimit?: Maybe<number>
-  }
-
-  export type EditColumnResolver<
-    R = ColumnMerge,
-    Parent = {},
-    TContext = {}
-  > = Resolver<R, Parent, TContext, EditColumnArgs>
-  export interface EditColumnArgs {
-    colId: string
-
-    projectId: string
-
-    newCol: ColumnInput
-  }
-
-  export type DeleteColumnResolver<
-    R = ColumnMerge,
-    Parent = {},
-    TContext = {}
-  > = Resolver<R, Parent, TContext, DeleteColumnArgs>
-  export interface DeleteColumnArgs {
-    _id: string
-
-    projectId: string
-  }
-
   export type JoinProjectResolver<
     R = Project,
     Parent = {},
@@ -990,39 +876,39 @@ export namespace MutationResolvers {
     projectId: string
   }
 
-  export type CreateSwimlaneResolver<
-    R = SwimlaneMerge,
+  export type CreateListResolver<
+    R = ListMerge,
     Parent = {},
     TContext = {}
-  > = Resolver<R, Parent, TContext, CreateSwimlaneArgs>
-  export interface CreateSwimlaneArgs {
+  > = Resolver<R, Parent, TContext, CreateListArgs>
+  export interface CreateListArgs {
     projId: string
 
     name: string
   }
 
-  export type EditSwimlaneResolver<
-    R = SwimlaneMerge,
+  export type EditListResolver<
+    R = ListMerge,
     Parent = {},
     TContext = {}
-  > = Resolver<R, Parent, TContext, EditSwimlaneArgs>
-  export interface EditSwimlaneArgs {
-    swimId: string
+  > = Resolver<R, Parent, TContext, EditListArgs>
+  export interface EditListArgs {
+    listId: string
 
     projId: string
 
-    newSwim: SwimlaneInput
+    newList: ListInput
   }
 
-  export type DeleteSwimlaneResolver<
-    R = SwimlaneMerge,
+  export type DeleteListResolver<
+    R = DeleteReturn,
     Parent = {},
     TContext = {}
-  > = Resolver<R, Parent, TContext, DeleteSwimlaneArgs>
-  export interface DeleteSwimlaneArgs {
+  > = Resolver<R, Parent, TContext, DeleteListArgs>
+  export interface DeleteListArgs {
     projId: string
 
-    _id: string
+    id: string
   }
 
   export type RemoveMemberFromProjectResolver<
@@ -1122,40 +1008,21 @@ export namespace DeleteReturnResolvers {
   > = Resolver<R, Parent, TContext>
 }
 
-export namespace ColumnMergeResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = ColumnMerge> {
+export namespace ListMergeResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = ListMerge> {
     project?: ProjectResolver<Project, TypeParent, TContext>
 
-    column?: ColumnResolver<Maybe<Column>, TypeParent, TContext>
+    list?: ListResolver<Maybe<List>, TypeParent, TContext>
   }
 
   export type ProjectResolver<
     R = Project,
-    Parent = ColumnMerge,
+    Parent = ListMerge,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type ColumnResolver<
-    R = Maybe<Column>,
-    Parent = ColumnMerge,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-}
-
-export namespace SwimlaneMergeResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = SwimlaneMerge> {
-    project?: ProjectResolver<Project, TypeParent, TContext>
-
-    swimlane?: SwimlaneResolver<Maybe<Swimlane>, TypeParent, TContext>
-  }
-
-  export type ProjectResolver<
-    R = Project,
-    Parent = SwimlaneMerge,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type SwimlaneResolver<
-    R = Maybe<Swimlane>,
-    Parent = SwimlaneMerge,
+  export type ListResolver<
+    R = Maybe<List>,
+    Parent = ListMerge,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
@@ -1240,8 +1107,7 @@ export interface DateScalarConfig extends GraphQLScalarTypeConfig<Date, any> {
 export type IResolvers<TContext = {}> = {
   Query?: QueryResolvers.Resolvers<TContext>
   Project?: ProjectResolvers.Resolvers<TContext>
-  Column?: ColumnResolvers.Resolvers<TContext>
-  Swimlane?: SwimlaneResolvers.Resolvers<TContext>
+  List?: ListResolvers.Resolvers<TContext>
   Task?: TaskResolvers.Resolvers<TContext>
   TaskSecurity?: TaskSecurityResolvers.Resolvers<TContext>
   Comment?: CommentResolvers.Resolvers<TContext>
@@ -1253,8 +1119,7 @@ export type IResolvers<TContext = {}> = {
   Auth?: AuthResolvers.Resolvers<TContext>
   Void?: VoidResolvers.Resolvers<TContext>
   DeleteReturn?: DeleteReturnResolvers.Resolvers<TContext>
-  ColumnMerge?: ColumnMergeResolvers.Resolvers<TContext>
-  SwimlaneMerge?: SwimlaneMergeResolvers.Resolvers<TContext>
+  ListMerge?: ListMergeResolvers.Resolvers<TContext>
   Profile?: ProfileResolvers.Resolvers<TContext>
   Date?: GraphQLScalarType
 } & { [typeName: string]: never }
@@ -1268,6 +1133,8 @@ export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
   Task,
   | 'points'
   | 'completed'
+  | 'progress'
+  | 'priority'
   | 'id'
   | 'dueDate'
   | 'startDate'
@@ -1278,11 +1145,9 @@ export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
     subTasks: Array<
       { __typename?: 'Subtask' } & Pick<Subtask, 'name' | 'completed' | 'id'>
     >
-    security: Maybe<
-      { __typename?: 'TaskSecurity' } & Pick<
-        TaskSecurity,
-        'public' | 'assignedUsers'
-      >
+    security: { __typename?: 'TaskSecurity' } & Pick<
+      TaskSecurity,
+      'public' | 'assignedUsers'
     >
     recurrance: Maybe<
       { __typename?: 'TaskRecurrance' } & Pick<
@@ -1303,19 +1168,16 @@ export type ProfileFieldsFragment = { __typename?: 'Profile' } & Pick<
   'id' | 'profileImg' | 'username' | 'email' | 'projects'
 >
 
-export type ColumnFieldsFragment = { __typename?: 'Column' } & Pick<
-  Column,
-  'id' | 'name' | 'taskIds' | 'taskLimit'
+export type ListFieldsFragment = { __typename?: 'List' } & Pick<
+  List,
+  'id' | 'name' | 'taskIds'
 >
 
 export type ProjectFieldsFragment = { __typename?: 'Project' } & Pick<
   Project,
-  'isPrivate' | 'columnOrder' | 'ownerId' | 'users' | 'id' | 'name'
+  'isPrivate' | 'ownerId' | 'users' | 'id' | 'name'
 > & {
-    columns: Array<{ __typename?: 'Column' } & ColumnFieldsFragment>
-    swimlanes: Array<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
-    >
+    lists: Array<{ __typename?: 'List' } & ListFieldsFragment>
     tasks: Array<{ __typename?: 'Task' } & TaskFieldsFragment>
   }
 
@@ -1361,40 +1223,37 @@ export type LogoutMutation = { __typename?: 'Mutation' } & {
   logout: { __typename?: 'Void' } & Pick<Void, 'message'>
 }
 
-export type CreateColumnMutationVariables = {
+export type CreateListMutationVariables = {
   name: Scalars['String']
   projId: Scalars['String']
-  isCompletedColumn?: Maybe<Scalars['Boolean']>
-  taskLimit?: Maybe<Scalars['Int']>
 }
 
-export type CreateColumnMutation = { __typename?: 'Mutation' } & {
-  createColumn: { __typename?: 'ColumnMerge' } & {
+export type CreateListMutation = { __typename?: 'Mutation' } & {
+  createList: { __typename?: 'ListMerge' } & {
     project: { __typename?: 'Project' } & ProjectFieldsFragment
-    column: Maybe<{ __typename?: 'Column' } & ColumnFieldsFragment>
+    list: Maybe<{ __typename?: 'List' } & ListFieldsFragment>
   }
 }
 
-export type DeleteColumnMutationVariables = {
+export type DeleteListMutationVariables = {
   projectId: Scalars['String']
   id: Scalars['String']
 }
 
-export type DeleteColumnMutation = { __typename?: 'Mutation' } & {
-  deleteColumn: { __typename?: 'ColumnMerge' } & {
-    project: { __typename?: 'Project' } & ProjectFieldsFragment
-  }
+export type DeleteListMutation = { __typename?: 'Mutation' } & {
+  deleteList: { __typename?: 'DeleteReturn' } & Pick<DeleteReturn, 'id'>
 }
 
-export type EditColumnMutationVariables = {
+export type EditListMutationVariables = {
   id: Scalars['String']
   projectId: Scalars['String']
-  newCol: ColumnInput
+  newList: ListInput
 }
 
-export type EditColumnMutation = { __typename?: 'Mutation' } & {
-  editColumn: { __typename?: 'ColumnMerge' } & {
-    column: Maybe<{ __typename?: 'Column' } & ColumnFieldsFragment>
+export type EditListMutation = { __typename?: 'Mutation' } & {
+  editList: { __typename?: 'ListMerge' } & {
+    list: Maybe<{ __typename?: 'List' } & ListFieldsFragment>
+    project: { __typename?: 'Project' } & ProjectFieldsFragment
   }
 }
 
@@ -1423,46 +1282,6 @@ export type EditProjectMutation = { __typename?: 'Mutation' } & {
   editProject: { __typename?: 'Project' } & ProjectFieldsFragment
 }
 
-export type CreateSwimlaneMutationVariables = {
-  projId: Scalars['String']
-  name: Scalars['String']
-}
-
-export type CreateSwimlaneMutation = { __typename?: 'Mutation' } & {
-  createSwimlane: { __typename?: 'SwimlaneMerge' } & {
-    project: { __typename?: 'Project' } & ProjectFieldsFragment
-    swimlane: Maybe<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
-    >
-  }
-}
-
-export type EditSwimlaneMutationVariables = {
-  projId: Scalars['String']
-  newSwim: SwimlaneInput
-  swimId: Scalars['String']
-}
-
-export type EditSwimlaneMutation = { __typename?: 'Mutation' } & {
-  editSwimlane: { __typename?: 'SwimlaneMerge' } & {
-    project: { __typename?: 'Project' } & ProjectFieldsFragment
-    swimlane: Maybe<
-      { __typename?: 'Swimlane' } & Pick<Swimlane, 'taskIds' | 'name' | 'id'>
-    >
-  }
-}
-
-export type DeleteSwimlaneMutationVariables = {
-  projId: Scalars['String']
-  swimId: Scalars['String']
-}
-
-export type DeleteSwimlaneMutation = { __typename?: 'Mutation' } & {
-  deleteSwimlane: { __typename?: 'SwimlaneMerge' } & {
-    project: { __typename?: 'Project' } & ProjectFieldsFragment
-  }
-}
-
 export type SetSubtaskMutationVariables = {
   projId: Scalars['String']
   taskId: Scalars['String']
@@ -1488,7 +1307,7 @@ export type SetCommentMutation = { __typename?: 'Mutation' } & {
 export type CreateTaskMutationVariables = {
   taskInfo: TaskInput
   projId: Scalars['String']
-  columnId: Scalars['String']
+  listId: Scalars['String']
 }
 
 export type CreateTaskMutation = { __typename?: 'Mutation' } & {
@@ -1523,9 +1342,11 @@ export type DeleteTaskMutation = { __typename?: 'Mutation' } & {
 }
 
 export type DragTaskMutationVariables = {
-  columnIds: Array<DragTaskIdList>
+  oldListId: Scalars['String']
+  newListId: Scalars['String']
+  newIndex: Scalars['Int']
   id: Scalars['String']
-  swimlaneIds: Array<DragTaskIdList>
+  newProgress: Scalars['Int']
   projectId: Scalars['String']
 }
 

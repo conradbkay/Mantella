@@ -172,9 +172,9 @@ export type Project = {
   ownerId: Scalars['String']
   name: Scalars['String']
   id: Scalars['String']
-  lists: Array<List>
+  lists: List[]
   users: Array<Scalars['String']>
-  tasks: Array<Task>
+  tasks: Task[]
   isPrivate: Scalars['Boolean']
 }
 
@@ -223,8 +223,8 @@ export type Task = {
   color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
   startDate?: Maybe<Scalars['Date']>
-  comments: Array<Comment>
-  subTasks: Array<Subtask>
+  comments: Comment[]
+  subTasks: Subtask[]
   recurrance?: Maybe<TaskRecurrance>
 }
 
@@ -256,7 +256,7 @@ export type User = {
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
-  projects: Array<Project>
+  projects: Project[]
 }
 
 export type Void = {

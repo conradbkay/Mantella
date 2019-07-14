@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { TProject } from '../../types/project'
-import { setProjectA, setSwimlaneA } from '../../store/actions/project'
+import { setProjectA } from '../../store/actions/project'
 import { Delete } from '@material-ui/icons'
 import {
   DeleteProjectMutation,
@@ -97,8 +97,7 @@ const CProjectSettings = (props: TProps) => {
 }
 
 const actionCreators = {
-  setProject: setProjectA,
-  setSwimlane: setSwimlaneA
+  setProject: setProjectA
 }
 
 export const ProjectSettings = connect(
