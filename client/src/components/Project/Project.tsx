@@ -149,6 +149,7 @@ const CProject = (props: TProps) => {
 
     const toList = editProject.lists[id(editProject.lists, toListId)]
 
+    // react-beautiful-dnd will not give accurate index, because each droppable has only the tasks with the same progress/column
     const actualIndex =
       result.destination.index +
       props.project.tasks.reduce((accum, task) => {
@@ -163,25 +164,23 @@ const CProject = (props: TProps) => {
 
     console.log(actualIndex)
 
-    console.log(fromList.taskIds)
-
+    // remove old taskId instance
     fromList.taskIds = fromList.taskIds.filter(
       taskId => taskId !== result.draggableId
     )
 
-    console.log(fromList.taskIds)
-
+    // add new taskId instance
     toList.taskIds.splice(actualIndex, 0, result.draggableId)
 
+    // change tasks column
     editProject.tasks[
       id(editProject.tasks, result.draggableId)
     ].progress = parseInt(toProgress, 10)
 
+    // mutate store to save changes
     props.setProject({ id: props.project.id, newProj: editProject })
 
     return
-
-    // const taskId = result.draggableId
   }
 
   React.useEffect(() => {
