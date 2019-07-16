@@ -12,12 +12,7 @@ const SET_PROJECT = (
   projects: TProject[],
   action: ReturnType<typeof setProjectA>
 ) => {
-  if (projects[id(projects, action.id)] && action.project !== null) {
-    projects[id(projects, action.id)] = Object.assign(
-      projects[id(projects, action.id)],
-      action.project
-    )
-  } else if (action.project) {
+  if (action.project) {
     projects[id(projects, action.id)] = action.project
   } else {
     delete projects[id(projects, action.id)]

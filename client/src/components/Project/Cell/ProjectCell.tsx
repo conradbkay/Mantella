@@ -1,6 +1,9 @@
 import React from 'react'
 import { TList, TProject } from '../../../types/project'
-import { Droppable } from 'react-beautiful-dnd'
+import { Droppable, Draggable } from 'react-beautiful-dnd'
+import { BaseTask } from '../Task/Base'
+import { Button } from '@material-ui/core'
+import { id } from '../../../utils/utilities'
 
 type OwnProps = {
   progress: number // 0, 1, or 2
@@ -10,26 +13,70 @@ type OwnProps = {
 type TProps = OwnProps
 
 export const ProjectCell = (props: TProps) => {
+  const tasks = props.list.taskIds
+    .map(taskId => props.project.tasks[id(props.project.tasks, taskId)])
+    .filter(task => task.progress === props.progress)
+
   return (
-    <Droppable droppableId={props.list.id}>
-      {(provided, snapshot) => (
-        <div
-          {...provided.droppableProps}
-          style={{
-            border: '1px solid gray',
-            flexDirection: 'column',
-            display: 'flex',
-            width: '100%',
-            minHeight: 78,
-            backgroundColor: snapshot.isDraggingOver ? '#bae3ff' : 'white',
-            transition: 'background-color .2s ease'
-          }}
-          ref={provided.innerRef}
-        >
-          <div></div>
-          {provided.placeholder}
-        </div>
+    <td
+      style={{
+        borderRight: '1px solid #aebacc',
+        borderBottom:
+          props.project.lists.findIndex(list => props.list.id === list.id) ===
+          props.project.lists.length - 1
+            ? '1px solid #aebacc'
+            : undefined,
+        borderTop: '1px solid #aebacc',
+        borderLeft: props.progress === 0 ? '1px solid #aebacc' : undefined,
+        overflowY: 'scroll',
+        width: '100%',
+        padding: 8
+      }}
+    >
+      <Droppable droppableId={`${props.list.id}DIVIDER${props.progress}`}>
+        {(dropProvided, dropSnapshot) => {
+          if (
+            props.progress === 0 &&
+            props.list.id === '6c1c7559-7c31-488e-b435-943d142a4ae7'
+          ) {
+            // console.log(dropProvided, dropSnapshot)
+          }
+
+          return (
+            <div
+              style={{
+                flexDirection: 'column',
+                display: 'flex',
+                minHeight: 78,
+                backgroundColor: dropSnapshot.isDraggingOver
+                  ? '#bae3ff'
+                  : 'white',
+                transition: 'background-color .2s ease'
+              }}
+              {...dropProvided.droppableProps}
+              ref={dropProvided.innerRef}
+            >
+              {tasks.map((task, i) => (
+                <Draggable draggableId={task.id} index={i} key={task.id}>
+                  {(dragProvided, dragSnapshot) => (
+                    <BaseTask
+                      openFunc={() => null}
+                      project={props.project}
+                      task={task}
+                      provided={dragProvided}
+                      snapshot={dragSnapshot}
+                    />
+                  )}
+                </Draggable>
+              ))}
+              {dropProvided.placeholder}
+            </div>
+          )
+        }}
+      </Droppable>
+      {props.progress === 0 && (
+        <Button style={{ width: '100%' }}>Create Task</Button>
       )}
-    </Droppable>
+    </td>
   )
 }

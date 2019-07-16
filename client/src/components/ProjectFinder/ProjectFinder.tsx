@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { TState } from '../../types/state'
-import { Button, Dialog } from '@material-ui/core'
+import { Button, Dialog, ButtonBase } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { Add, Edit } from '@material-ui/icons'
 import { CreateProject } from '../createProject/CreateProject'
+import { NoMatch } from '../NoMatch/NoMatch'
+import { Link } from 'react-router-dom'
 
 type OwnProps = {
   mini: boolean
@@ -12,7 +14,8 @@ type OwnProps = {
 type TProps = OwnProps & ReturnType<typeof mapState>
 
 const mapState = (state: TState) => ({
-  user: state.user!
+  user: state.user!,
+  projects: state.projects
 })
 
 export const ProjectFinder = connect(mapState)((props: TProps) => {
@@ -20,7 +23,7 @@ export const ProjectFinder = connect(mapState)((props: TProps) => {
   const [secret, setSecret] = useState(false)
   const [creating, setCreating] = useState(false)
 
-  return (
+  return props.user ? (
     <div style={{ margin: 32 }}>
       <div
         style={{
@@ -43,7 +46,7 @@ export const ProjectFinder = connect(mapState)((props: TProps) => {
             WebkitBackgroundClip: secret ? 'text' : undefined
           }}
         >
-          👋 Hello <strong>{props.user!.username.split(' ')[0]}</strong> I
+          👋 Hello <strong>{props.user.username.split(' ')[0]}</strong> I
           {secret ? ' absolutely do not' : ''} believe in you
         </p>
 
@@ -65,11 +68,30 @@ export const ProjectFinder = connect(mapState)((props: TProps) => {
           Manage
         </Button>
       </div>
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+        {props.projects.map(project => (
+          <ButtonBase
+            component={Link}
+            to={`/project/${project.id}`}
+            style={{
+              padding: '16px',
+              borderRadius: 4,
+              margin: 16,
+              border: '1px solid #969696'
+            }}
+          >
+            {project.name}
+          </ButtonBase>
+        ))}
+      </div>
+
       {creating && (
         <Dialog open={creating} onClose={() => setCreating(false)}>
           <CreateProject />
         </Dialog>
       )}
     </div>
+  ) : (
+    <NoMatch />
   )
 })

@@ -78,7 +78,7 @@ const CPomodoro = (props: TProps) => {
       // set tab title
 
       document.title = pomodoro.paused
-        ? 'KanbanBRAWN'
+        ? 'Mantella'
         : `${pomodoro.working ? 'Work ' : 'Break '} ${toDaysHHMMSS(
             pomodoro.currSeconds - 1
           )}`

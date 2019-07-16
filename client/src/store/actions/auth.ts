@@ -19,7 +19,7 @@ export const registerA = (user: UserFieldsFragment) => {
     if (user) {
       const authUser = transformUser(user)
 
-      dispatch(openSnackbarA('Registered! Welcome To KanbanBrawn!', 'success'))
+      dispatch(openSnackbarA('Registered! Welcome To Mantella!', 'success'))
 
       dispatch({ type: 'REGISTER', user: authUser })
 

@@ -181,7 +181,7 @@ const Topbar = (props: TProps) => {
                     {item => trailProps => (
                       <a
                         target="_blank"
-                        href="https://github.com/conradkay/KanbanBrawn"
+                        href="https://github.com/conradkay/Mantella"
                         style={{
                           ...trailProps,
                           color: 'black',
@@ -190,7 +190,7 @@ const Topbar = (props: TProps) => {
                         }}
                         className={classes.tagline}
                       >
-                        KanbanBrawn
+                        Mantella
                       </a>
                     )}
                   </Trail>

@@ -22,7 +22,7 @@ export const WelcomeDialog = () => {
     <Dialog open={open} onClose={() => setOpen(false)}>
       <div style={{ minWidth: 500, minHeight: 200, padding: 25 }}>
         <div style={{ fontSize: 22, fontWeight: 600 }}>
-          Welcome to KanbanBrawn 🎉
+          Welcome to Mantella 🎉
         </div>
         <IconButton
           style={{
@@ -42,11 +42,11 @@ export const WelcomeDialog = () => {
           }}
         >
           {/* put icon between each section man */}
-          Greetings, Welcome to KanbanBrawn, and I trust that you have made the
+          Greetings, Welcome to Mantella, and I trust that you have made the
           right decision ??!
           <br />
           <br />
-          KanbanBrawn let's you create tasks, stay on top of it, and track your
+          Mantella let's you create tasks, stay on top of it, and track your
           progress so that you can get what you need to do under contro.
           <br />
           <br />
@@ -61,7 +61,7 @@ export const WelcomeDialog = () => {
           feedback!
           <br />
           <br />
-          <a href="https://github.com/conradkay/KanbanBrawn">Github Page</a>
+          <a href="https://github.com/conradkay/Mantella">Github Page</a>
         </p>
       </div>
       <div style={{ margin: 8, display: 'flex', justifyContent: 'flex-end' }}>

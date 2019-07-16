@@ -84,8 +84,6 @@ const CWeekDay = (props: TProps) => {
                         )
                       ]
                     }
-                    margined
-                    dense
                     openFunc={() => null}
                     provided={prov}
                     snapshot={snap}

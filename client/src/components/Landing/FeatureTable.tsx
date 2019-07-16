@@ -9,15 +9,10 @@ import {
 } from '@material-ui/core'
 import { Check, Close, Traffic } from '@material-ui/icons'
 
-const tableHeadData: string[] = [
-  'Feature',
-  'KanbanBrawn',
-  'Trello',
-  'KanbanFlow'
-]
+const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
 
 const features = [
-  // first in array is feature name, second is for kanbanBrawn, third is trello, fourth is kanbanFlow
+  // first in array is feature name, second is for Mantella, third is trello, fourth is kanbanFlow
   ['Subtasks', 'CHECK', 'CHECK', 'CHECK'],
   ['EPIC DESIGN', 'Material', 'Minimal', 'Nice'],
   ['Multiple Projects', 'CHECK', 'CHECK', 'CHECK'],

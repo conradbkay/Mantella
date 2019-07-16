@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import { TTask, TSubtask } from '../../../types/project'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
-import { selectPomodoroTaskA, toggleTimerA } from '../../../store/actions/pomodoro'
+import {
+  selectPomodoroTaskA,
+  toggleTimerA
+} from '../../../store/actions/pomodoro'
 import {
   LinearProgress,
   Badge,
@@ -113,15 +116,10 @@ export const SubtaskMap = ({
 )
 
 interface OwnProps {
-  dense?: boolean
-  bulky?: boolean
   project: TProject
   task: TTask
-  projectName?: string
-  isCompletedColumn?: boolean
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
-  margined?: boolean
   openFunc(): void
 }
 
@@ -178,20 +176,11 @@ const CBaseTask = (props: TaskProps) => {
     }
   }, 1000)
 
-  const {
-    task,
-    isSelectingTask,
-    provided,
-    snapshot,
-    openFunc,
-    bulky,
-    dense,
-    project,
-    projectName
-  } = props
-  const MIN_HEIGHT = dense ? 10 : bulky ? 40 : 20
+  const { task, isSelectingTask, provided, snapshot, openFunc, project } = props
+  const MIN_HEIGHT = 20
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
+
   return task ? (
     <div style={{ width: '100%' }}>
       <div
@@ -206,8 +195,7 @@ const CBaseTask = (props: TaskProps) => {
           borderBottom: task.subTasks.length ? 'none' : 'border',
           ...provided.draggableProps.style,
           color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
-          outline: 'none',
-          margin: props.margined ? 6 : 0
+          outline: 'none'
         }}
         onClick={() => {
           /* if (project && project.selectingMember) {
@@ -293,25 +281,19 @@ const CBaseTask = (props: TaskProps) => {
                     })}
                   {task.name ? task.name : 'Unnamed Task'}
                 </div>
-                {bulky && projectName && (
-                  <div style={{ fontSize: 15, color: '#4f4f4f' }}>
-                    {projectName}
-                  </div>
-                )}
               </span>
             </div>
-            {!dense && (
-              <SubtaskMap
-                show={showSubTasks}
-                subTasks={task.subTasks}
-                taskId={task.id}
-                onCheckbox={(subId: string) => {
-                  console.log('SUBTASK COMPLETE NOT IMPLEMENTED BY APOLLO YET')
-                  // props.completeSubTask(task.id, project.id, subId)
-                }}
-              />
-            )}
-            {!dense && task.comments.length !== 0 && (
+            <SubtaskMap
+              show={showSubTasks}
+              subTasks={task.subTasks}
+              taskId={task.id}
+              onCheckbox={(subId: string) => {
+                console.log('SUBTASK COMPLETE NOT IMPLEMENTED BY APOLLO YET')
+                // props.completeSubTask(task.id, project.id, subId)
+              }}
+            />
+
+            {task.comments.length !== 0 && (
               <Transition
                 initial={null}
                 items={showComments}

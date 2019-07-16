@@ -52,7 +52,7 @@ export const About = withStyles(styles)((props: TProps) => {
         />
         <meta
           name="description"
-          content="KanbanBrawn is the most innovative open-source task manager and kanban Board!"
+          content="Mantella is the most innovative open-source task manager and kanban Board!"
         />
       </Helmet>
       <div className={classes.heroContent}>
@@ -66,7 +66,7 @@ export const About = withStyles(styles)((props: TProps) => {
           }}
         >
           <Typography variant="h2" className={classes.heroTitle}>
-            KanbanBrawn — It's Free
+            Mantella — It's Free
           </Typography>
           <Button
             variant="contained"

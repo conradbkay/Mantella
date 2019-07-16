@@ -32,7 +32,7 @@ export const taskObjects = (ids: any[]): TaskProps[] => [
   {
     ...defaultTask,
     id: ids[0],
-    name: 'Welcome To KanbanBrawn!'
+    name: 'Welcome To Mantella!'
   },
   { ...defaultTask, id: ids[1], name: 'This is a Task, click on it!' },
   {
@@ -108,7 +108,7 @@ export const taskObjects = (ids: any[]): TaskProps[] => [
     ...defaultTask,
     id: ids[15],
     name:
-      'I hope you enjoy KanbanBrawn, email me with feature requests or bugs, I appreciate all feedback!'
+      'I hope you enjoy Mantella, email me with feature requests or bugs, I appreciate all feedback!'
   }
 ]
 

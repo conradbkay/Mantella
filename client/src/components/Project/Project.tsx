@@ -10,7 +10,8 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Fab
+  Fab,
+  TableBody
 } from '@material-ui/core'
 import { TState } from '../../types/state'
 import { selectMemberA, setProjectA } from '../../store/actions/project'
@@ -31,6 +32,7 @@ import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
+import { cloneDeep } from 'apollo-utilities'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -95,6 +97,10 @@ const CProject = (props: TProps) => {
   const [settings, setSettings] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(getMobile(window))
+
+  if (isMobile) {
+  }
+
   const [filterData, setFilterData] = useState({
     dueDate: 'all',
     color: 'all',
@@ -131,6 +137,47 @@ const CProject = (props: TProps) => {
     ) {
       return
     }
+
+    const [[fromListId], [toListId, toProgress]] = [
+      result.source.droppableId.split('DIVIDER'),
+      result.destination.droppableId.split('DIVIDER')
+    ]
+
+    const editProject = cloneDeep(props.project)
+
+    const fromList = editProject.lists[id(editProject.lists, fromListId)]
+
+    const toList = editProject.lists[id(editProject.lists, toListId)]
+
+    const actualIndex =
+      result.destination.index +
+      props.project.tasks.reduce((accum, task) => {
+        if (
+          task.progress < parseInt(toProgress, 10) &&
+          toList.taskIds.includes(task.id)
+        ) {
+          return accum + 1
+        }
+        return accum
+      }, 0)
+
+    console.log(actualIndex)
+
+    console.log(fromList.taskIds)
+
+    fromList.taskIds = fromList.taskIds.filter(
+      taskId => taskId !== result.draggableId
+    )
+
+    console.log(fromList.taskIds)
+
+    toList.taskIds.splice(actualIndex, 0, result.draggableId)
+
+    editProject.tasks[
+      id(editProject.tasks, result.draggableId)
+    ].progress = parseInt(toProgress, 10)
+
+    props.setProject({ id: props.project.id, newProj: editProject })
 
     return
 
@@ -260,23 +307,53 @@ const CProject = (props: TProps) => {
           }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
-            {[0, 1, 2].map(progress => (
-              <div
-                style={{
-                  display: 'flex',
-                  flexGrow: 1,
-                  flexDirection: isMobile ? 'column' : 'row'
-                }}
-              >
+            <table
+              style={{
+                tableLayout: 'fixed',
+                width: '100%',
+                borderCollapse: 'separate'
+              }}
+            >
+              <TableBody>
+                <tr style={{ display: 'flex' }}>
+                  {[0, 1, 2].map(col => (
+                    <td
+                      key={col}
+                      style={{
+                        width: '100%',
+                        border: '1px solid #aebacc',
+                        borderBottom: 'none',
+                        borderLeft: col ? 'none' : '1px solid #aebacc',
+                        textAlign: 'center',
+                        padding: 8,
+                        fontSize: 18
+                      }}
+                    >
+                      {col === 0
+                        ? 'No Progress'
+                        : col === 1
+                        ? 'In Progress'
+                        : 'Complete'}
+                    </td>
+                  ))}
+                </tr>
                 {project.lists.map(list => (
-                  <ProjectCell
-                    progress={progress}
-                    list={list}
-                    project={project}
-                  />
+                  <tr
+                    style={{ verticalAlign: 'top', display: 'flex' }}
+                    key={list.id}
+                  >
+                    {[0, 1, 2].map((progress, i) => (
+                      <ProjectCell
+                        key={i}
+                        progress={progress}
+                        list={list}
+                        project={project}
+                      />
+                    ))}
+                  </tr>
                 ))}
-              </div>
-            ))}
+              </TableBody>
+            </table>
           </DragDropContext>
 
           {dialogOpen && (

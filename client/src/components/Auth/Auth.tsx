@@ -43,7 +43,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
       <Helmet>
         <style type="text/css">{` body { background-color: #1d364c; }`}</style>
         <meta
-          content="Get started with KanbanBrawn today, totally free!"
+          content="Get started with Mantella today, totally free!"
           name={'description'}
         />
       </Helmet>
