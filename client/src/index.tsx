@@ -55,7 +55,6 @@ import { GQL_LOGIN_WITH_COOKIE } from './graphql/mutations/auth'
 import { client } from './apollo'
 import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
 import { Project } from './components/Project/Project'
-import { ProjectFinder } from './components/ProjectFinder/ProjectFinder'
 import { Settings } from './components/Settings/Settings'
 
 const Router = () => {
@@ -101,12 +100,6 @@ const Router = () => {
         )}
         {loaded ? (
           <Switch>
-            <PrivateRoute
-              exact
-              path="/projects"
-              component={ProjectFinder}
-              componentProps={{}}
-            />
             <PrivateRoute
               exact
               path="/settings"

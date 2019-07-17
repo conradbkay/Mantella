@@ -14,7 +14,6 @@ import { CalendarTodayRounded } from '@material-ui/icons'
 import { connect } from 'react-redux'
 import { Change } from '../../types/types'
 import { TState } from '../../types/state'
-import Helmet from 'react-helmet'
 import { useState } from 'react'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { useMutation } from '@apollo/react-hooks'
@@ -58,13 +57,6 @@ const CCreateProject = (props: CreateProjectProps) => {
 
   return (
     <>
-      <Helmet>
-        <style type="text/css">{` body { background-color: #1d364c; }`}</style>
-        <meta
-          name="description"
-          content="Create a project today to jumpstart your time"
-        />
-      </Helmet>
       <main style={{ margin: 'auto' }} className={classes.layout}>
         <form
           onSubmit={e => {

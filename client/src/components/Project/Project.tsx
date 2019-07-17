@@ -171,12 +171,6 @@ const CProject = (props: TProps) => {
         actualIndex >
         fromList.taskIds.findIndex(taskId => taskId === result.draggableId)
 
-      console.log(
-        addingLater,
-        actualIndex,
-        fromList.taskIds.findIndex(taskId => taskId === result.draggableId)
-      )
-
       if (addingLater) {
         actualIndex -= 1
       }
@@ -342,12 +336,13 @@ const CProject = (props: TProps) => {
                       key={col}
                       style={{
                         width: '100%',
-                        border: '1px solid #aebacc',
-                        borderBottom: 'none',
+                        backgroundColor: '#f2f2f2',
                         borderLeft: col ? 'none' : '1px solid #aebacc',
+                        borderRight: '1px solid #aebacc',
+                        borderTop: '1px solid #aebacc',
                         textAlign: 'center',
                         padding: 8,
-                        fontSize: 18
+                        fontSize: 20
                       }}
                     >
                       {col === 0

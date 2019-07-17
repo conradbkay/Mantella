@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { TState } from '../../types/state'
-import { Button, Dialog, ButtonBase } from '@material-ui/core'
+import { Button, Dialog, ListItemText, ButtonBase } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { Add, Edit } from '@material-ui/icons'
 import { CreateProject } from '../createProject/CreateProject'
@@ -20,7 +20,6 @@ const mapState = (state: TState) => ({
 
 export const ProjectFinder = connect(mapState)((props: TProps) => {
   const [manageMode, setManageMode] = useState(false) // when in manage mode project cards will be different
-  const [secret, setSecret] = useState(false)
   const [creating, setCreating] = useState(false)
 
   return props.user ? (
@@ -28,28 +27,10 @@ export const ProjectFinder = connect(mapState)((props: TProps) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'left',
           maxWidth: 1500,
           margin: '0px auto'
         }}
       >
-        <p
-          onMouseEnter={() => setSecret(true)}
-          style={{
-            fontSize: 22,
-            backgroundClip: secret ? 'text' : undefined,
-            backgroundImage: secret
-              ? 'repeating-linear-gradient(45deg, violet, indigo, blue, green, orange, red, violet)' // 'linear-gradient(to-left, violet, indigo, blue, green, yellow, orange, red)'
-              : undefined,
-            color: secret ? 'transparent' : undefined,
-            WebkitTextFillColor: secret ? 'transparent' : undefined,
-            WebkitBackgroundClip: secret ? 'text' : undefined
-          }}
-        >
-          👋 Hello <strong>{props.user.username.split(' ')[0]}</strong> I
-          {secret ? ' absolutely do not' : ''} believe in you
-        </p>
-
         <Button
           style={{ marginLeft: 'auto' }}
           variant="contained"
@@ -68,22 +49,11 @@ export const ProjectFinder = connect(mapState)((props: TProps) => {
           Manage
         </Button>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-        {props.projects.map(project => (
-          <ButtonBase
-            component={Link}
-            to={`/project/${project.id}`}
-            style={{
-              padding: '16px',
-              borderRadius: 4,
-              margin: 16,
-              border: '1px solid #969696'
-            }}
-          >
-            {project.name}
-          </ButtonBase>
-        ))}
-      </div>
+      {props.projects.map(project => (
+        <ButtonBase component={Link} to={`/project/${project.id}`}>
+          <ListItemText primary={project.name} />
+        </ButtonBase>
+      ))}
 
       {creating && (
         <Dialog open={creating} onClose={() => setCreating(false)}>

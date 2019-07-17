@@ -29,8 +29,7 @@ import {
   PieChart,
   CalendarToday,
   Help,
-  Settings,
-  Business
+  Settings
 } from '@material-ui/icons'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -62,7 +61,6 @@ const noAuthItems = [
 
 const authItems = [
   { label: 'Settings', pathname: '/settings', menuIcon: Settings },
-  { label: 'Projects', pathname: '/projects', menuIcon: Business },
   {
     label: 'Dashboard',
     pathname: '/dashboard',

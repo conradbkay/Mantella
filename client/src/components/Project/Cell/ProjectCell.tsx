@@ -20,14 +20,17 @@ export const ProjectCell = (props: TProps) => {
   return (
     <td
       style={{
-        borderRight: '1px solid #aebacc',
+        borderRight: `1px ${props.progress !== 2 ? 'dashed' : 'solid'} #aebacc`,
         borderBottom:
           props.project.lists.findIndex(list => props.list.id === list.id) ===
           props.project.lists.length - 1
             ? '1px solid #aebacc'
             : undefined,
         borderTop: '1px solid #aebacc',
-        borderLeft: props.progress === 0 ? '1px solid #aebacc' : undefined,
+        borderLeft:
+          props.progress === 0
+            ? `1px ${props.progress ? 'dashed' : 'solid'} #aebacc`
+            : undefined,
         overflowY: 'scroll',
         width: '100%',
         padding: 8
