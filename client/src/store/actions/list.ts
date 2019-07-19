@@ -5,7 +5,7 @@ export const setListA = (args: {
   projectId: string
   newCol: TList | null
 }) => ({
-  type: 'SET_COLUMN',
+  type: 'SET_LIST',
   id: args.id,
   projectId: args.projectId,
   newColumn: args.newCol

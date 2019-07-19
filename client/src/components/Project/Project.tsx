@@ -383,7 +383,7 @@ const CProject = (props: TProps) => {
         <Tooltip
           placement="left"
           classes={{ tooltip: classes.tooltip }}
-          title="Add Column"
+          title="Add List"
         >
           <Fab
             onClick={() => setDialogOpen(true)}

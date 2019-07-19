@@ -1,67 +1,115 @@
 import React, { useState } from 'react'
-import { TState } from '../../types/state'
-import { Button, Dialog, ListItemText, ButtonBase } from '@material-ui/core'
-import { connect } from 'react-redux'
-import { Add, Edit } from '@material-ui/icons'
-import { CreateProject } from '../createProject/CreateProject'
-import { NoMatch } from '../NoMatch/NoMatch'
+import {
+  TextField,
+  List,
+  ListSubheader,
+  ListItem,
+  ListItemText,
+  Theme,
+  createStyles,
+  withStyles,
+  WithStyles,
+  Button,
+  Typography
+} from '@material-ui/core'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { formalize } from '../../utils/utilities'
+import { TState } from '../../types/state'
+
+const styles = (theme: Theme) =>
+  createStyles({
+    list: {
+      backgroundColor: '#FAFAFA',
+      margin: '25px auto 0px auto',
+      borderRadius: 0,
+      width: '100%'
+    }
+  })
 
 type OwnProps = {
-  mini: boolean
+  variant?: 'menu'
+  noButton?: true
+  onClick?(): void
 }
 
-type TProps = OwnProps & ReturnType<typeof mapState>
+type TProps = ReturnType<typeof mapState> & WithStyles<typeof styles> & OwnProps
 
-const mapState = (state: TState) => ({
-  user: state.user!,
-  projects: state.projects
-})
+const CProjectSearch = (props: TProps) => {
+  const [search, setSearch] = useState('')
 
-export const ProjectFinder = connect(mapState)((props: TProps) => {
-  const [manageMode, setManageMode] = useState(false) // when in manage mode project cards will be different
-  const [creating, setCreating] = useState(false)
+  const { classes } = props
 
-  return props.user ? (
-    <div style={{ margin: 32 }}>
-      <div
-        style={{
-          display: 'flex',
-          maxWidth: 1500,
-          margin: '0px auto'
-        }}
-      >
-        <Button
-          style={{ marginLeft: 'auto' }}
-          variant="contained"
-          color="secondary"
-          onClick={() => setCreating(true)}
-        >
-          <Add style={{ marginRight: 8 }} />
-          Create Project
-        </Button>
-        <Button
-          variant="outlined"
-          style={{ marginLeft: 8 }}
-          onClick={() => setManageMode(!manageMode)}
-        >
-          <Edit style={{ marginRight: 8 }} />
-          Manage
-        </Button>
-      </div>
-      {props.projects.map(project => (
-        <ButtonBase component={Link} to={`/project/${project.id}`}>
-          <ListItemText primary={project.name} />
-        </ButtonBase>
-      ))}
+  let projects = [...Object.values(props.projects)]
 
-      {creating && (
-        <Dialog open={creating} onClose={() => setCreating(false)}>
-          <CreateProject />
-        </Dialog>
+  projects = projects.filter(project => {
+    const myString: string = formalize(project.name)
+    const searchInput = formalize(search)
+
+    return myString.indexOf(searchInput) > -1
+  })
+
+  return (
+    <div style={{ maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto' }}>
+      {props.variant !== 'menu' && (
+        <Typography align="center" style={{ marginBottom: 10 }} variant="h4">
+          Projects
+        </Typography>
       )}
+      <TextField
+        autoFocus={props.variant === 'menu' ? true : undefined}
+        style={{ borderRadius: '0%' }}
+        fullWidth
+        label="Filter by Name or Category"
+        variant={props.variant === 'menu' ? ('standard' as any) : 'outlined'}
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+      />
+      <List
+        className={classes.list}
+        subheader={<ListSubheader component="div">Projects</ListSubheader>}
+      >
+        {projects.map((project, i) => {
+          const isLink = project.id === ('create-project' as any)
+          const urlPrefix = isLink ? '' : '/project/'
+          return (
+            <div key={project.id} style={{ whiteSpace: 'nowrap' }}>
+              <ListItem
+                button
+                disabled={location.hash.split('/project/')[1] === project.id}
+                to={urlPrefix + project.id.toString()}
+                onClick={props.onClick}
+                component={Link}
+              >
+                <ListItemText primary={project.name} />
+              </ListItem>
+            </div>
+          )
+        })}
+      </List>
+      <div style={{ marginTop: 20 }}>
+        {!props.noButton && (
+          <Button
+            variant="outlined"
+            color="primary"
+            to="/create-project"
+            component={Link}
+            fullWidth
+          >
+            Create Project
+          </Button>
+        )}
+      </div>
     </div>
-  ) : (
-    <NoMatch />
   )
-})
+}
+
+const mapState = (state: TState) => {
+  return {
+    projects: state.projects
+  }
+}
+
+export const ProjectFinder = connect(mapState)(
+  withStyles(styles)(CProjectSearch)
+)

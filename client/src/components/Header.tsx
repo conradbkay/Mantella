@@ -164,7 +164,7 @@ const Topbar = (props: TProps) => {
                     onClose={() => setAnchorEl(null)}
                   >
                     <div style={{ outline: 'none', margin: 10 }}>
-                      <ProjectFinder mini />
+                      <ProjectFinder variant="menu" />
                     </div>
                   </Menu>
                 </>

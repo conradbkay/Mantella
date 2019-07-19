@@ -38,13 +38,6 @@ export const ProjectCell = (props: TProps) => {
     >
       <Droppable droppableId={`${props.list.id}DIVIDER${props.progress}`}>
         {(dropProvided, dropSnapshot) => {
-          if (
-            props.progress === 0 &&
-            props.list.id === '6c1c7559-7c31-488e-b435-943d142a4ae7'
-          ) {
-            // console.log(dropProvided, dropSnapshot)
-          }
-
           return (
             <div
               style={{
