@@ -52,7 +52,9 @@
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
     "react-apollo": "^2.5.6",
+    "reflect-metadata": "^0.1.13",
     "sinon": "^7.3.2",
+    "sqlite3": "^4.0.9",
     "ts-jest": "^24.0.2",
     "ts-mongoose": "0.0.14",
     "uuid": "^3.3.2"

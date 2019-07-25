@@ -6,6 +6,7 @@ import { BaseTask } from '../Project/Task/Base'
 // import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
+import React from 'react'
 
 type OwnProps = {
   day: Date
@@ -33,7 +34,9 @@ const CWeekDay = (props: TProps) => {
   const withDate = tasks.filter(
     task => task.dueDate !== undefined && getDate(task.dueDate) === getDate(day)
   )
-  withDate.sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime())
+  if (withDate.length) {
+    withDate.sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime())
+  }
 
   return (
     <div

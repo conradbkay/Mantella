@@ -19,20 +19,23 @@ import { CreateColumn } from './CreateColumn'
 import { Add, FilterList, Settings, Equalizer } from '@material-ui/icons'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
-import { FilterTasks } from './FilterTasks'
 import Helmet from 'react-helmet'
 import { ProjectSettings } from './ProjectSettings'
 
 import { Mutation, MutationResult } from 'react-apollo'
 import {
   EditProjectMutation,
-  EditProjectMutationVariables
+  EditProjectMutationVariables,
+  DragTaskMutation,
+  DragTaskMutationVariables
 } from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
 import { cloneDeep } from 'apollo-utilities'
+import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
+import { useMutation } from '@apollo/react-hooks'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -86,11 +89,12 @@ export const getMobile = (window: Window) => {
 }
 
 export type TFilterData = {
-  dueDate: 'all' | 'none' | 'today' | 'tomorrow' | 'has' | [Date, Date]
-  color: string | 'all' // what if we have a multiselect? string is the key of colors object
-  points: number
-  members: Array<string | 'all'>
-  tags: Array<string | 'all'>
+  dueDate: {
+    start: Date
+    end: Date
+  }
+  color?: string // what if we have a multiselect? string is the key of colors object
+  points?: number
 }
 
 const CProject = (props: TProps) => {
@@ -101,31 +105,14 @@ const CProject = (props: TProps) => {
   if (isMobile) {
   }
 
-  const [filterData, setFilterData] = useState({
-    dueDate: 'all',
-    color: 'all',
-    points: 0,
-    members: ['all'],
-    tags: ['all']
-  } as TFilterData)
-  const [filtering, setFiltering] = useState(false)
   const [name, setName] = useState(
     props.project ? props.project.name : undefined
   )
 
-  /* const [dragTaskExec] = useMutation<
+  const [dragTaskExec] = useMutation<
     DragTaskMutation,
     DragTaskMutationVariables
-  >(GQL_DRAG_TASK, {
-    onCompleted: ({ dragTask }) => {
-      if (dragTask && dragTask.project) {
-        props.setProject({
-          id: dragTask.project.id,
-          newProj: dragTask.project
-        })
-      }
-    }
-  }) */
+  >(GQL_DRAG_TASK, {})
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -195,6 +182,17 @@ const CProject = (props: TProps) => {
 
     // mutate store to save changes
     props.setProject({ id: props.project.id, newProj: editProject })
+
+    dragTaskExec({
+      variables: {
+        id: result.draggableId,
+        newIndex: actualIndex,
+        oldListId: fromListId,
+        newListId: toListId,
+        newProgress: parseInt(toProgress),
+        projectId: props.project.id
+      }
+    })
 
     return
   }
@@ -299,7 +297,7 @@ const CProject = (props: TProps) => {
                 )
               }) */}
             </div>
-            <IconButton onClick={() => setFiltering(true)}>
+            <IconButton onClick={() => null}>
               <FilterList />
             </IconButton>
             <IconButton
@@ -399,13 +397,6 @@ const CProject = (props: TProps) => {
             onClose={() => setSettings(false)}
           />
         )}
-        <FilterTasks
-          project={project}
-          changeFilter={(newFilter: TFilterData) => setFilterData(newFilter)}
-          filterData={filterData}
-          handleClose={() => setFiltering(false)}
-          open={filtering}
-        />
       </div>
     )
   }

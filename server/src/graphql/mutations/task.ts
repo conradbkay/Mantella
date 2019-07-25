@@ -105,6 +105,12 @@ const dragTask: MutationResolvers['dragTask'] = async (
       proj.lists.findIndex((list) => list.id === obj.newListId)
     ]!
 
+    const task = proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === obj.id)]
+
+    if (task) {
+      task.progress = obj.newProgress as 0 | 1 | 2
+    }
+
     oldList.taskIds = oldList.taskIds.filter((taskId) => taskId !== obj.id)
     newList.taskIds.splice(obj.newIndex, 0, obj.id)
 
@@ -114,8 +120,8 @@ const dragTask: MutationResolvers['dragTask'] = async (
 
     return {
       project: pure as ProjectProps,
-      task: (newProj.tasks.find(
-        (tsk) => tsk.id === obj.id
+      task: (pure.tasks.find(
+        (tsk: any) => tsk.id === obj.id
       ) as any).toObject() as TaskProps
     }
   }

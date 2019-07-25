@@ -57,6 +57,7 @@ import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
 import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings/Settings'
 import { Dashboard } from './components/Dashboard/Dashboard'
+import { CalendarWeek } from './components/Calendar/Week'
 
 const Router = () => {
   const [open, setOpen] = useState(false)
@@ -105,6 +106,12 @@ const Router = () => {
               exact
               path="/settings"
               component={Settings}
+              componentProps={{}}
+            />
+            <PrivateRoute
+              exact
+              path="/calendar"
+              component={CalendarWeek}
               componentProps={{}}
             />
             <PublicOnlyRoute

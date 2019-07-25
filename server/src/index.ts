@@ -3,6 +3,7 @@ import * as http from 'http'
 const nodemon = require('nodemon')
 import Server from './server'
 import { Response, NextFunction } from 'express'
+import 'reflect-metadata'
 debug('ts-express:server')
 
 /* set port */

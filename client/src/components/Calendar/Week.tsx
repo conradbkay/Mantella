@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { WithStyles, Theme, createStyles, withStyles } from '@material-ui/core'
-import { TTask } from '../../types/project'
 import { setTaskA } from '../../store/actions/task'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
@@ -8,9 +7,8 @@ import { DropResult, DragDropContext } from 'react-beautiful-dnd'
 import { subDays, addDays } from 'date-fns'
 import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
-import { NewDueTimeDialog } from './NewDueTimeDialog'
 import { differenceInCalendarDays } from 'date-fns'
-import { getAllTasks } from '../../utils/utilities'
+import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 
 type TProps = ReturnType<typeof mapState> &
   typeof actionCreators &
@@ -45,7 +43,10 @@ const styles = (theme: Theme) =>
 const CWeek = withStyles(styles)((props: TProps) => {
   const [filterProjectId, setFilterProjectId] = useState(['-1'])
   const [baseDay, setBaseDay] = useState(new Date())
-  const [droppingTask, setDroppingTask] = useState(null as TTask | null)
+
+  const allTasks = props.projects.reduce((tasks, project) => {
+    return [...tasks, ...project.tasks]
+  }, [])
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -54,7 +55,7 @@ const CWeek = withStyles(styles)((props: TProps) => {
       return // dragging outside boundaries or dropping into the same day
     }
 
-    const task = props.tasks[draggableId as any]
+    const task = allTasks[id(allTasks, draggableId)]
 
     const findNewDate = (taskDueDate: Date) => {
       const newDay = new Date(parseInt(destination.droppableId))
@@ -66,15 +67,14 @@ const CWeek = withStyles(styles)((props: TProps) => {
 
     const newTask = {
       ...task,
-      dueDate: findNewDate(props.tasks[draggableId as any].dueDate!)
+      dueDate: findNewDate(allTasks[id(allTasks, draggableId)].dueDate!)
     }
 
-    /* props.editTask(
-      draggableId,
+    props.setTask({
+      id: draggableId,
       newTask,
-      props.tasks.find(tsk => tsk.id === draggableId)!.id
-    ) */
-    setDroppingTask(newTask)
+      projectId: getProjectIdFromTaskId(props.projects, draggableId)
+    })
   }
 
   const days = getDays(baseDay)
@@ -85,8 +85,8 @@ const CWeek = withStyles(styles)((props: TProps) => {
           startDay={days[0]}
           currIds={filterProjectId}
           projects={props.projects}
-          toggleProject={(id: string[]) => {
-            setFilterProjectId(id)
+          toggleProject={(projId: string[]) => {
+            setFilterProjectId(projId)
           }}
           setDate={(newDay: Date) => setBaseDay(newDay)}
         />
@@ -105,29 +105,11 @@ const CWeek = withStyles(styles)((props: TProps) => {
           </div>
         </DragDropContext>
       </div>
-      {droppingTask !== null && (
-        <NewDueTimeDialog
-          onEdit={() => {
-            /* props.editTask(
-              droppingTask!.id,
-              droppingTask!,
-              props.tasks.find(task => task.id === droppingTask!.id)!.id
-            ) */
-            setDroppingTask(null)
-          }}
-          handleDateChange={(date: Date) =>
-            setDroppingTask({ ...droppingTask!, dueDate: date })
-          }
-          draggingTask={droppingTask}
-          onClose={() => setDroppingTask(null)}
-        />
-      )}
     </>
   )
 })
 
 const mapState = (state: TState) => ({
-  tasks: getAllTasks(state.projects),
   projects: state.projects
 })
 
@@ -135,7 +117,7 @@ const actionCreators = {
   setTask: setTaskA
 }
 
-export const Week = connect(
+export const CalendarWeek = connect(
   mapState,
   actionCreators
 )(CWeek)

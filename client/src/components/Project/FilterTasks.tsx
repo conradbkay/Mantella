@@ -1,24 +1,4 @@
-import React, { useState } from 'react'
-import { TFilterData } from './Project'
-import {
-  Drawer,
-  List,
-  ListItem,
-  WithStyles,
-  Theme,
-  createStyles,
-  withStyles,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Switch
-} from '@material-ui/core'
-import { ChooseColor } from '../utils/chooseColor'
-import { addDays } from 'date-fns'
-import { TProject } from '../../types/project'
-
+/*
 const styles = (theme: Theme) =>
   createStyles({
     appBarShift: {},
@@ -32,9 +12,8 @@ const styles = (theme: Theme) =>
   })
 
 type TProps = {
-  filterData: TFilterData
   open: boolean
-  changeFilter: (newFilter: TFilterData) => void
+  setFilterData: (newTasks: TTask[]) => void
   handleClose: () => void
   project: TProject
 } & WithStyles<typeof styles>
@@ -42,7 +21,7 @@ type TProps = {
 const CFilterTasks = (props: TProps) => {
   const [custom, setCustom] = useState(false)
 
-  const { open, classes, handleClose, filterData, changeFilter } = props
+  const { open, classes, handleClose, project, setTasks } = props
   return (
     <div>
       <Drawer
@@ -61,35 +40,6 @@ const CFilterTasks = (props: TProps) => {
                 changeFilter({ ...filterData, color })
               }
             />
-          </ListItem>
-          <ListItem>
-            <FormControl style={{ width: '100%' }}>
-              <InputLabel htmlFor="select-multiple">Assigned Member</InputLabel>
-              <Select
-                style={{ width: '100%' }}
-                multiple
-                value={filterData.members}
-                onChange={(e: any) => {
-                  if (e.target.value.length === 0) {
-                    changeFilter({ ...filterData, members: ['all'] })
-                  } else if (filterData.members.includes('all')) {
-                    changeFilter({
-                      ...filterData,
-                      members: e.target.value.filter((id: any) => id !== 'all')
-                    })
-                  } else {
-                    changeFilter({ ...filterData, members: e.target.value })
-                  }
-                }}
-              >
-                <MenuItem value={'all'}>All Members</MenuItem>
-                {/* Object.values(props.project.users).map(user => (
-                  <MenuItem key={user.id} value={user.id}>
-                    {user.username}
-                  </MenuItem>
-                )) */}
-              </Select>
-            </FormControl>
           </ListItem>
 
           <FormControlLabel
@@ -174,7 +124,7 @@ const CFilterTasks = (props: TProps) => {
                         })
                       }
                     }}
-                  /> */}
+                  />
                 </div>
               </div>
             )}
@@ -186,3 +136,6 @@ const CFilterTasks = (props: TProps) => {
 }
 
 export const FilterTasks = withStyles(styles)(CFilterTasks)
+*/
+
+export default ''
