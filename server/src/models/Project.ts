@@ -18,7 +18,6 @@ export const ProjectSchema = new Schema({
         public: Boolean,
         assignedUsers: [String]
       },
-      priority: String, // low, medium, high
       id: { type: String, required: true },
       name: { type: String, required: true },
       points: { type: Number, required: true },
@@ -59,7 +58,6 @@ export interface TaskProps {
   }
 
   progress: 0 | 1 | 2
-  priority?: 'High' | 'Medium' | 'Low'
 
   id: string
   name: string

@@ -35,7 +35,7 @@ export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
 
   if (task.recurrance) {
     return `Due every ${toDaysHHMMSS(
-      task.recurrance.interval,
+      task.recurrance.interval!,
       true
     )} next: ${god(task.dueDate, hasOverDue)}`
   }

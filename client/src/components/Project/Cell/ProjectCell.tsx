@@ -1,14 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { TList, TProject } from '../../../types/project'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
 import { Button } from '@material-ui/core'
 import { id } from '../../../utils/utilities'
+import { CreateTask } from '../Task/Create'
 
 type OwnProps = {
   progress: number // 0, 1, or 2
   list: TList
   project: TProject
+  openFunc: (id: string) => void
 }
 type TProps = OwnProps
 
@@ -16,6 +18,8 @@ export const ProjectCell = (props: TProps) => {
   const tasks = props.list.taskIds
     .map(taskId => props.project.tasks[id(props.project.tasks, taskId)])
     .filter(task => task.progress === props.progress)
+
+  const [creating, setCreating] = useState(false)
 
   return (
     <td
@@ -36,6 +40,9 @@ export const ProjectCell = (props: TProps) => {
         padding: 8
       }}
     >
+      {props.progress === 0 && (
+        <h2 style={{ marginBottom: 8 }}>{props.list.name}</h2>
+      )}
       <Droppable droppableId={`${props.list.id}DIVIDER${props.progress}`}>
         {(dropProvided, dropSnapshot) => {
           return (
@@ -56,7 +63,7 @@ export const ProjectCell = (props: TProps) => {
                 <Draggable draggableId={task.id} index={i} key={task.id}>
                   {(dragProvided, dragSnapshot) => (
                     <BaseTask
-                      openFunc={() => null}
+                      openFunc={() => props.openFunc(task.id)}
                       project={props.project}
                       task={task}
                       provided={dragProvided}
@@ -71,7 +78,18 @@ export const ProjectCell = (props: TProps) => {
         }}
       </Droppable>
       {props.progress === 0 && (
-        <Button style={{ width: '100%' }}>Create Task</Button>
+        <Button
+          style={{ width: '100%', marginTop: 8 }}
+          onClick={() => setCreating(true)}
+        >
+          Create Task
+        </Button>
+      )}
+      {creating && (
+        <CreateTask
+          onClose={() => setCreating(false)}
+          projectId={props.project.id}
+        />
       )}
     </td>
   )

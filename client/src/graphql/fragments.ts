@@ -8,7 +8,6 @@ export const taskFields = gql`
     completed
 
     progress
-    priority
 
     id
     dueDate

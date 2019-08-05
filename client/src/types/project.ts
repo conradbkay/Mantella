@@ -22,7 +22,6 @@ export interface TTask {
   } | null
 
   progress: 0 | 1 | 2 | number
-  priority?: 'High' | 'Medium' | 'Low' | null | string
 
   id: string
   name: string
@@ -45,8 +44,8 @@ export interface TTask {
     id: string
   }>
   recurrance?: {
-    interval: number
-    nextDue: Date
+    interval?: number
+    nextDue?: Date
   } | null
 }
 

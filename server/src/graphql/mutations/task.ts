@@ -120,9 +120,7 @@ const dragTask: MutationResolvers['dragTask'] = async (
 
     return {
       project: pure as ProjectProps,
-      task: (pure.tasks.find(
-        (tsk: any) => tsk.id === obj.id
-      ) as any).toObject() as TaskProps
+      task: pure.tasks.find((tsk: any) => tsk.id === obj.id) as any
     }
   }
 

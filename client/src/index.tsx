@@ -25,10 +25,10 @@ import { loginA } from './store/actions/auth'
 import { Mutation } from './graphql/types'
 import { fetchQuery } from './API/initialize'
 
-// const primary = '#0336FF'
-// const secondary = '#00838f'
-const primary = '#f4511e'
-const secondary = '#3f51b5'
+const secondary = '#0336FF'
+const primary = '#00838f'
+// const primary = '#f4511e'
+// const secondary = '#3f51b5'
 
 /** @description Material ui theme, used in wrapper.tsx */
 

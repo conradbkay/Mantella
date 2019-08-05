@@ -32,7 +32,6 @@ type TaskRecurrance {
 type Task {
   security: TaskSecurity!
 
-  priority: String
   progress: Int!
 
   id: String!

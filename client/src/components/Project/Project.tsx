@@ -36,6 +36,7 @@ import { ProjectCell } from './Cell/ProjectCell'
 import { cloneDeep } from 'apollo-utilities'
 import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
 import { useMutation } from '@apollo/react-hooks'
+import { EditTaskModal } from './Task/Edit'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -98,6 +99,7 @@ export type TFilterData = {
 }
 
 const CProject = (props: TProps) => {
+  const [editingTaskId, setEditingTaskId] = useState('')
   const [settings, setSettings] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(getMobile(window))
@@ -113,6 +115,12 @@ const CProject = (props: TProps) => {
     DragTaskMutation,
     DragTaskMutationVariables
   >(GQL_DRAG_TASK, {})
+  if (dragTaskExec) {
+  }
+
+  const draggo = (vars: DragTaskMutationVariables) => {
+    dragTaskExec({ variables: vars })
+  }
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
@@ -183,15 +191,13 @@ const CProject = (props: TProps) => {
     // mutate store to save changes
     props.setProject({ id: props.project.id, newProj: editProject })
 
-    dragTaskExec({
-      variables: {
-        id: result.draggableId,
-        newIndex: actualIndex,
-        oldListId: fromListId,
-        newListId: toListId,
-        newProgress: parseInt(toProgress),
-        projectId: props.project.id
-      }
+    draggo({
+      id: result.draggableId,
+      newIndex: actualIndex,
+      oldListId: fromListId,
+      newListId: toListId,
+      newProgress: parseInt(toProgress),
+      projectId: props.project.id
     })
 
     return
@@ -358,6 +364,7 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
+                        openFunc={(tId: string) => setEditingTaskId(tId)}
                         key={i}
                         progress={progress}
                         list={list}
@@ -395,6 +402,13 @@ const CProject = (props: TProps) => {
           <ProjectSettings
             project={props.project}
             onClose={() => setSettings(false)}
+          />
+        )}
+        {editingTaskId && (
+          <EditTaskModal
+            taskId={editingTaskId}
+            onClose={() => setEditingTaskId('')}
+            projectId={props.project.id}
           />
         )}
       </div>

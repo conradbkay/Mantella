@@ -12,7 +12,7 @@ import {
   Button,
   Typography
 } from '@material-ui/core'
-import { Link } from 'react-router-dom'
+import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { formalize } from '../../utils/utilities'
 import { TState } from '../../types/state'
@@ -33,7 +33,10 @@ type OwnProps = {
   onClick?(): void
 }
 
-type TProps = ReturnType<typeof mapState> & WithStyles<typeof styles> & OwnProps
+type TProps = ReturnType<typeof mapState> &
+  WithStyles<typeof styles> &
+  OwnProps &
+  RouteComponentProps
 
 const CProjectSearch = (props: TProps) => {
   const [search, setSearch] = useState('')
@@ -76,7 +79,9 @@ const CProjectSearch = (props: TProps) => {
             <div key={project.id} style={{ whiteSpace: 'nowrap' }}>
               <ListItem
                 button
-                disabled={location.hash.split('/project/')[1] === project.id}
+                disabled={
+                  props.location.pathname.split('/project/')[1] === project.id
+                }
                 to={urlPrefix + project.id.toString()}
                 onClick={props.onClick}
                 component={Link}
@@ -110,6 +115,6 @@ const mapState = (state: TState) => {
   }
 }
 
-export const ProjectFinder = connect(mapState)(
-  withStyles(styles)(CProjectSearch)
+export const ProjectFinder = withRouter(
+  connect(mapState)(withStyles(styles)(CProjectSearch))
 )

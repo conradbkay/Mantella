@@ -172,9 +172,9 @@ export type Project = {
   ownerId: Scalars['String']
   name: Scalars['String']
   id: Scalars['String']
-  lists: List[]
+  lists: Array<List>
   users: Array<Scalars['String']>
-  tasks: Task[]
+  tasks: Array<Task>
   isPrivate: Scalars['Boolean']
 }
 
@@ -212,7 +212,7 @@ export type SubtaskInfo = {
 }
 
 export type Task = {
-  security?: Maybe<TaskSecurity>
+  security: TaskSecurity
   priority?: Maybe<Scalars['String']>
   progress: Scalars['Int']
   id: Scalars['String']
@@ -223,8 +223,8 @@ export type Task = {
   color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
   startDate?: Maybe<Scalars['Date']>
-  comments: Comment[]
-  subTasks: Subtask[]
+  comments: Array<Comment>
+  subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
 }
 
@@ -256,7 +256,7 @@ export type User = {
   profileImg?: Maybe<Scalars['String']>
   username: Scalars['String']
   email: Scalars['String']
-  projects: Project[]
+  projects: Array<Project>
 }
 
 export type Void = {
@@ -588,11 +588,7 @@ export type TaskResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Task']
 > = {
-  security?: Resolver<
-    Maybe<ResolversTypes['TaskSecurity']>,
-    ParentType,
-    ContextType
-  >
+  security?: Resolver<ResolversTypes['TaskSecurity'], ParentType, ContextType>
   priority?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   progress?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
