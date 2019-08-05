@@ -17,8 +17,6 @@ export const GQL_CREATE_LIST = gql`
 `
 
 export const GQL_DELETE_LIST = gql`
-  ${projectFields}
-
   mutation deleteList($projectId: String!, $id: String!) {
     deleteList(projId: $projectId, id: $id) {
       id

@@ -27,7 +27,9 @@ import {
   EditProjectMutation,
   EditProjectMutationVariables,
   DragTaskMutation,
-  DragTaskMutationVariables
+  DragTaskMutationVariables,
+  DeleteListMutation,
+  DeleteListMutationVariables
 } from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
@@ -37,6 +39,8 @@ import { cloneDeep } from 'apollo-utilities'
 import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
 import { useMutation } from '@apollo/react-hooks'
 import { EditTaskModal } from './Task/Edit'
+import { setListA } from '../../store/actions/list'
+import { GQL_DELETE_LIST } from '../../graphql/mutations/list'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -103,6 +107,7 @@ const CProject = (props: TProps) => {
   const [settings, setSettings] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(getMobile(window))
+  const [collapsedLists, setCollapsedLists] = useState([] as string[])
 
   if (isMobile) {
   }
@@ -111,12 +116,15 @@ const CProject = (props: TProps) => {
     props.project ? props.project.name : undefined
   )
 
+  const [deleteListExec] = useMutation<
+    DeleteListMutation,
+    DeleteListMutationVariables
+  >(GQL_DELETE_LIST, {})
+
   const [dragTaskExec] = useMutation<
     DragTaskMutation,
     DragTaskMutationVariables
   >(GQL_DRAG_TASK, {})
-  if (dragTaskExec) {
-  }
 
   const draggo = (vars: DragTaskMutationVariables) => {
     dragTaskExec({ variables: vars })
@@ -364,6 +372,29 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
+                        deleteList={listId => {
+                          props.setList({
+                            id: listId,
+                            projectId: props.project.id,
+                            newCol: null
+                          })
+                          deleteListExec({
+                            variables: {
+                              projectId: props.project.id,
+                              id: list.id
+                            }
+                          })
+                        }}
+                        collapseList={listId => {
+                          if (collapsedLists.includes(listId)) {
+                            setCollapsedLists(
+                              collapsedLists.filter(lId => listId !== lId)
+                            )
+                          } else {
+                            setCollapsedLists([...collapsedLists, listId])
+                          }
+                        }}
+                        collapsedLists={collapsedLists}
                         openFunc={(tId: string) => setEditingTaskId(tId)}
                         key={i}
                         progress={progress}
@@ -426,7 +457,8 @@ const mapState = (state: TState, ownProps: OwnProps) => {
 const actionCreators = {
   setProject: setProjectA,
   selectMember: selectMemberA,
-  openSnackbar: openSnackbarA
+  openSnackbar: openSnackbarA,
+  setList: setListA
 }
 
 export const Project = withStyles(styles)(

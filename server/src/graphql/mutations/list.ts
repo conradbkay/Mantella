@@ -34,6 +34,8 @@ const deleteList: MutationResolvers['deleteList'] = async (parent, obj) => {
   if (project && project.lists.length > 1) {
     (project.lists.find((l) => l.id === obj.id) as any).remove()
 
+    await project.save()
+
     return { id: obj.id }
   } else {
     throw new Error('cant delete last list!')
