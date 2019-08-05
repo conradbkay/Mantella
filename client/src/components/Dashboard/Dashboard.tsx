@@ -2,8 +2,8 @@ import React from 'react'
 import Chart from 'chart.js'
 
 /**
- * Section 1: A chart about a project
- * Section 2: A list of overdue Tasks, or can be toggled to assigned tasks
+ * Section 1: A chart about a project,
+ * Section 2: A list of overdue Tasks, or can be toggled to assigned tasks,
  * Section 3(full-width): A calendar
  */
 
