@@ -21,7 +21,6 @@ export const ProjectSchema = new Schema({
       id: { type: String, required: true },
       name: { type: String, required: true },
       points: { type: Number, required: true },
-      completed: { type: Boolean, required: true },
       timeWorkedOn: { type: Number, required: true },
       color: { type: String, required: true },
       dueDate: Date,
@@ -62,7 +61,6 @@ export interface TaskProps {
   id: string
   name: string
   points: number
-  completed: boolean
   timeWorkedOn: number
   color: string
   dueDate?: Date

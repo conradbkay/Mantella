@@ -13,7 +13,6 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       name: obj.taskInfo.name || 'Unnamed Task',
       progress: 0,
       points: obj.taskInfo.points || 0,
-      completed: false,
       timeWorkedOn: 0,
       color: obj.taskInfo.color || '#FFFFFF',
       startDate: new Date(),

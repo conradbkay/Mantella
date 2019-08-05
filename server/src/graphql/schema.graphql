@@ -37,7 +37,6 @@ type Task {
   id: String!
   name: String!
   points: Int!
-  completed: Boolean!
   timeWorkedOn: Int!
   color: String!
   dueDate: Date

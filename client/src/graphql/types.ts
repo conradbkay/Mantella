@@ -226,12 +226,10 @@ export type SubtaskInfo = {
 export type Task = {
   __typename?: 'Task'
   security: TaskSecurity
-  priority?: Maybe<Scalars['String']>
   progress: Scalars['Int']
   id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
-  completed: Scalars['Boolean']
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
@@ -456,8 +454,6 @@ export namespace TaskResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Task> {
     security?: SecurityResolver<TaskSecurity, TypeParent, TContext>
 
-    priority?: PriorityResolver<Maybe<string>, TypeParent, TContext>
-
     progress?: ProgressResolver<number, TypeParent, TContext>
 
     id?: IdResolver<string, TypeParent, TContext>
@@ -465,8 +461,6 @@ export namespace TaskResolvers {
     name?: NameResolver<string, TypeParent, TContext>
 
     points?: PointsResolver<number, TypeParent, TContext>
-
-    completed?: CompletedResolver<boolean, TypeParent, TContext>
 
     timeWorkedOn?: TimeWorkedOnResolver<number, TypeParent, TContext>
 
@@ -488,11 +482,6 @@ export namespace TaskResolvers {
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type PriorityResolver<
-    R = Maybe<string>,
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
   export type ProgressResolver<
     R = number,
     Parent = Task,
@@ -510,11 +499,6 @@ export namespace TaskResolvers {
   >
   export type PointsResolver<
     R = number,
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type CompletedResolver<
-    R = boolean,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -1132,9 +1116,7 @@ export type IDirectiveResolvers<Result> = {
 export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
   Task,
   | 'points'
-  | 'completed'
   | 'progress'
-  | 'priority'
   | 'id'
   | 'dueDate'
   | 'startDate'

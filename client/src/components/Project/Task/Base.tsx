@@ -217,7 +217,7 @@ const CBaseTask = (props: TaskProps) => {
             colorSecondary: props.classes.badgeColor,
             badge: props.classes.badge
           }}
-          color={!task.completed ? 'primary' : 'secondary'}
+          color={'primary'}
           badgeContent={task.points}
           style={{
             width: '100%',
@@ -239,7 +239,7 @@ const CBaseTask = (props: TaskProps) => {
                   marginTop: 4
                 }}
               >
-                {task.completed ? (
+                {task.progress === 2 ? (
                   <CheckBox onClick={onClickCheckbox} />
                 ) : (
                   <CheckBoxOutlineBlankOutlined onClick={onClickCheckbox} />
@@ -410,7 +410,7 @@ const CBaseTask = (props: TaskProps) => {
             variant="determinate"
             color="secondary"
             value={
-              task.completed
+              task.progress === 2
                 ? 100
                 : (task.subTasks.filter(subTask => subTask.completed).length /
                     task.subTasks.length) *

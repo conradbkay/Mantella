@@ -26,7 +26,6 @@ export interface TTask {
   id: string
   name: string
   points: number
-  completed: boolean
   timeWorkedOn: number
   color: string
   dueDate?: Date

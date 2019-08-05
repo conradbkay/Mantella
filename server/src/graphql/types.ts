@@ -213,12 +213,10 @@ export type SubtaskInfo = {
 
 export type Task = {
   security: TaskSecurity
-  priority?: Maybe<Scalars['String']>
   progress: Scalars['Int']
   id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
-  completed: Scalars['Boolean']
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
@@ -589,12 +587,10 @@ export type TaskResolvers<
   ParentType = ResolversTypes['Task']
 > = {
   security?: Resolver<ResolversTypes['TaskSecurity'], ParentType, ContextType>
-  priority?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
   progress?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  completed?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
   timeWorkedOn?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   color?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   dueDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>

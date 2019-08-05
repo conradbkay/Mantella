@@ -3,7 +3,6 @@ import uuid from 'uuid'
 
 export const defaultTask: Omit<TaskProps, 'id'> = {
   name: 'Task',
-  completed: false,
   points: 0,
   subTasks: [],
   timeWorkedOn: 0,
