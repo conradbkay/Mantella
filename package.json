@@ -22,6 +22,7 @@
     "apollo": "^2.15.0",
     "concurrently": "^4.1.0",
     "copyfiles": "^2.1.0",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "react-scripts": "^2.1.8"
   }
 }
