@@ -7,6 +7,10 @@
     "dev-start": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm start\"",
     "start": "cd server && npm start"
   },
+  "engines": {
+    "node": "10.16.1",
+    "npm": "6.9.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/conradkay/KanbanBrawn.git"
