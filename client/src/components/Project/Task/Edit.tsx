@@ -9,6 +9,7 @@ import {
   EditTaskMutation,
   EditTaskMutationVariables
 } from '../../../graphql/types'
+import { setTaskA } from '../../../store/actions/task'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -18,7 +19,9 @@ const mapState = (state: TState, ownProps: OwnProps) => {
   }
 }
 
-const actionCreators = {}
+const actionCreators = {
+  setTask: setTaskA
+}
 
 type OwnProps = {
   onClose: () => void
@@ -57,6 +60,11 @@ export const EditTaskModal = connect(
       <Dialog open onClose={() => props.onClose()}>
         <form
           onSubmit={e => {
+            props.setTask({
+              id: props.task.id,
+              projectId: props.projectId,
+              newTask: task
+            })
             editTaskExec()
             e.preventDefault()
             props.onClose()
