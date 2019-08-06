@@ -7,13 +7,7 @@ debug('ts-express:server')
 
 /* set port */
 
-function purifyProjectPort(val: number | string): number | string | boolean {
-  return typeof val === 'string' ? parseInt(val, 10) : val
-}
-
-const port = purifyProjectPort(process.env.PORT || 4000)
-
-Server.set('port', port)
+Server.set('port', process.env.PORT || 4000)
 
 Server.use((err: Error, req: any, res: any, next: any) => {
   console.error('Throwing an Error: ', err.message) // Log error message in our server's console
@@ -23,7 +17,7 @@ Server.use((err: Error, req: any, res: any, next: any) => {
 /* create server */
 const server = http.createServer(Server)
 
-server.listen(port, onListening)
+server.listen(process.env.PORT || 4000, onListening)
 server.on('error', onError)
 process.on('SIGINT', () => {
   console.log('Bye bye!')
