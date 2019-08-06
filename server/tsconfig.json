@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "skipLibCheck": true,
     "outDir": "./build/",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
