@@ -46,7 +46,7 @@ function onError(error: NodeJS.ErrnoException): void {
     throw error
   }
 
-  const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port
+  const bind = 'Port ' + process.env.PORT || 4000
   switch (error.code) {
     case 'EACCES':
       console.error(`BEEP BOOP: ${bind} requires elevated privileges`)
