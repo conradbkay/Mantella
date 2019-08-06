@@ -6,7 +6,7 @@
   "scripts": {
     "dev-start": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm start\"",
     "start": "cd server && npm start",
-    "heroku-postbuild": "cd client && yarn && yarn run build"
+    "heroku-postbuild": "cd client && npm i && npm run build"
   },
   "repository": {
     "type": "git",
