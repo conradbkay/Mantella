@@ -1,1 +1,1 @@
-web: nodemon
+web: cd server && nodemon
