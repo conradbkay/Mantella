@@ -40,8 +40,8 @@ function onListening(): void {
   const addr = server.address()
 
   console.log(
-    `🚀  Server ready at Server listening on port ${
-      typeof addr === 'string' ? addr : addr.port
+    `🚀  Server ready, listening on port ${
+      typeof addr === 'string' && addr !== null ? addr : addr.port.toString()
     }`
   )
 }
