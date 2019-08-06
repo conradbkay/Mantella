@@ -206,9 +206,6 @@ const Topbar = (props: TProps) => {
 
                 <div className={classes.tabContainer}>
                   <Tabs
-                    action={actions =>
-                      setTimeout(actions.updateIndicator.bind(actions), 0)
-                    }
                     value={value === -1 ? false : value}
                     indicatorColor="primary"
                     textColor="primary"
