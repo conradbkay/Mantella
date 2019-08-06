@@ -1,7 +1,6 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "types": [],
     "outDir": "./build/",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
