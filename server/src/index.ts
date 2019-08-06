@@ -30,13 +30,7 @@ process.on('exit', (code) => {
 })
 
 function onListening(): void {
-  const addr = server.address()
-
-  console.log(
-    `🚀  Server ready, listening on port ${
-      typeof addr === 'string' && addr !== null ? addr : addr.port.toString()
-    }`
-  )
+  console.log(`🚀  Server ready, listening on port 4000`)
 }
 
 /** error handling :) */
