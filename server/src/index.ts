@@ -46,7 +46,7 @@ function onListening(): void {
   )
 }
 
-/** error handling */
+/** error handling :) */
 
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== 'listen') {
