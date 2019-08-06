@@ -1,8 +1,7 @@
-import debug from 'debug'
+const debug = require('debug')
 import * as http from 'http'
 const nodemon = require('nodemon')
 import Server from './server'
-import { Response, NextFunction } from 'express'
 import 'reflect-metadata'
 debug('ts-express:server')
 
@@ -16,7 +15,7 @@ const port = purifyProjectPort(process.env.PORT || 4000)
 
 Server.set('port', port)
 
-Server.use((err: Error, req: any, res: Response, next: NextFunction) => {
+Server.use((err: Error, req: any, res: any, next: any) => {
   console.error('Throwing an Error: ', err.message) // Log error message in our server's console
   res.status((err as any).statusCode || 500).json({ error: err.message })
 })
