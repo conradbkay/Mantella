@@ -1,6 +1,7 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
+    "types": [],
     "outDir": "./build/",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
@@ -30,11 +31,5 @@
     "removeComments": false,
     "baseUrl": "."
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "webpack",
-    "src/components/home/lib"
-  ]
+  "exclude": ["node_modules", "build", "scripts", "webpack"]
 }

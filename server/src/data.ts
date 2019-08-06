@@ -1,7 +1,7 @@
 import { TaskProps, ProjectProps } from './models/Project'
 import uuid from 'uuid'
 
-export const defaultTask: Omit<TaskProps, 'id'> = {
+export const defaultTask: any = {
   name: 'Task',
   points: 0,
   subTasks: [],
