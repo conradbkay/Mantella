@@ -29,7 +29,7 @@ import { GQL_REGISTER, GQL_LOGIN } from '../../graphql/mutations/auth'
 type OwnProps = {
   authType: 'Register' | 'Login'
 }
-
+// I <3 Mantella
 type TProps = WithStyles<typeof formStyles> & typeof actionCreators & OwnProps
 
 const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
