@@ -5,7 +5,7 @@
   "main": "./server/src/index.ts",
   "scripts": {
     "dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm start\"",
-    "start": "ts-node ./server/src/index.ts",
+    "start": "cd server && ts-node ./src/index.ts",
     "heroku-postbuild": "cd server && tsc && cd ../client && npm install && npm run build"
   },
   "engines": {
