@@ -13,16 +13,6 @@ require('dotenv').config()
 const app: Express = express()
 app.use(cors({ credentials: true }))
 
-app.use(express.static(path.join(__dirname, '../../client/build')))
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/build/index.html'))
-})
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/public/index.html'))
-})
-
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
 
@@ -60,6 +50,16 @@ gqlServer.applyMiddleware({
   app,
   path: '/graphql',
   cors: false
+})
+
+app.use(express.static(path.join(__dirname, '../../client/build')))
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '../../client/build/index.html'))
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '../../client/public/index.html'))
 })
 
 export default app
