@@ -14,7 +14,6 @@ const app: Express = express()
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 
 app.use(express.static(path.join(__dirname, 'client/build')))
-app.use(express.static(path.join(__dirname, 'client/build')))
 app.get('*', (req, res) => {
   res.sendfile(path.join((__dirname = 'client/build/index.html')))
 })
