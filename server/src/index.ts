@@ -30,7 +30,9 @@ process.on('exit', (code) => {
 })
 
 function onListening(): void {
-  console.log(`🚀  Server ready, listening on port 4000`)
+  console.log(
+    `🚀  Server ready, listening on port ${process.env.PORT || 4000}`
+  )
 }
 
 /** error handling :) */
