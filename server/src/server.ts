@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 import { gqlServer } from './graphql/graphql'
 const morgan = require('morgan')
+import path from 'path'
 import jwt from 'express-jwt'
 import cors from 'cors'
 import router from './routes/routes'
@@ -11,6 +12,16 @@ import router from './routes/routes'
 require('dotenv').config()
 const app: Express = express()
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+
+app.use(express.static(path.join(__dirname, 'client/build')))
+app.use(express.static(path.join(__dirname, 'client/build')))
+app.get('*', (req, res) => {
+  res.sendfile(path.join((__dirname = 'client/build/index.html')))
+})
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/client/public/index.html'))
+})
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
