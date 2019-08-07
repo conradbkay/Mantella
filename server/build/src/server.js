@@ -7,12 +7,20 @@ const mongoose_1 = tslib_1.__importDefault(require("mongoose"));
 const cookie_parser_1 = tslib_1.__importDefault(require("cookie-parser"));
 const graphql_1 = require("./graphql/graphql");
 const morgan = require('morgan');
+const path_1 = tslib_1.__importDefault(require("path"));
 const express_jwt_1 = tslib_1.__importDefault(require("express-jwt"));
 const cors_1 = tslib_1.__importDefault(require("cors"));
 const routes_1 = tslib_1.__importDefault(require("./routes/routes"));
 require('dotenv').config();
 const app = express_1.default();
 app.use(cors_1.default({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(express_1.default.static(path_1.default.join(__dirname, 'client/build')));
+app.get('*', (req, res) => {
+    res.sendfile(path_1.default.join((__dirname = 'client/build/index.html')));
+});
+app.get('*', (req, res) => {
+    res.sendFile(path_1.default.join(__dirname + '/client/public/index.html'));
+});
 morgan.token('graphql-query', (req) => {
     const { variables } = req.body;
     return `GRAPHQL ${Object.keys(variables || {}).length
