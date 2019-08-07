@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/conradkay/KanbanBrawn/issues"
   },
-  "homepage": "https://github.com/conradkay/KanbanBrawn#readme",
+  "homepage": "https://mantella.herokuapp.com",
   "dependencies": {
     "@playlyfe/gql": "^2.6.1",
     "@types/node": "^12.6.9",
