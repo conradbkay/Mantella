@@ -14,6 +14,7 @@ const app: Express = express()
 
 app.use(cors({ credentials: true }))
 
+/*
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Credentials', true as any)
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
   )
   next()
 })
+*/
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
