@@ -6,13 +6,13 @@ import { gqlServer } from './graphql/graphql'
 const morgan = require('morgan')
 import path from 'path'
 import jwt from 'express-jwt'
-// import cors from 'cors'
+import cors from 'cors'
 import router from './routes/routes'
 
 require('dotenv').config()
 const app: Express = express()
 
-// app.use(cors({credentials: true}))
+app.use(cors({ credentials: true }))
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
