@@ -13,7 +13,7 @@ export const fetchQuery = async <T = any>(
   variables?: T
 ) => {
   const axiosFunc = await axios.post(
-    `http://localhost:80/graphql`,
+    `/graphql`,
     {
       query: queryString,
       variables
