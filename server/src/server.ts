@@ -11,7 +11,25 @@ import router from './routes/routes'
 
 require('dotenv').config()
 const app: Express = express()
-app.use(cors({ credentials: true }))
+
+const whitelist = [
+  'http://localhost:3000',
+  'http://localhost:4000',
+  'http://mantella.herokuapp.com'
+]
+
+const corsOptions = {
+  credentials: true,
+  origin: (origin: string, callback: any) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(corsOptions))
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
