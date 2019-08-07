@@ -42,25 +42,7 @@ export const WelcomeDialog = () => {
           }}
         >
           {/* put icon between each section man */}
-          Greetings, Welcome to Mantella, and I trust that you have made the
-          right decision ??!
-          <br />
-          <br />
-          Mantella let's you create tasks, stay on top of it, and track your
-          progress so that you can get what you need to do under contro.
-          <br />
-          <br />
-          It motivates you to keep going by giving you ice cream, or whatever
-          else floats your boat.
-          <br />
-          <br />
-          This rewards yourself for doing the right thing. I took this
-          philosophy from my unmotivated friend who would place M&Ms at the end
-          of every page of a book. If you love the app, contribute to it online,
-          or create an issue or feature request, I greatly apreciate any
-          feedback!
-          <br />
-          <br />
+          Greetings, Welcome to Mantella, hello
           <a href="https://github.com/conradkay/Mantella">Github Page</a>
         </p>
       </div>
