@@ -6,24 +6,13 @@ import { gqlServer } from './graphql/graphql'
 const morgan = require('morgan')
 import path from 'path'
 import jwt from 'express-jwt'
-import cors from 'cors'
+// import cors from 'cors'
 import router from './routes/routes'
 
 require('dotenv').config()
 const app: Express = express()
 
-/* const whitelist = [
-  'http://localhost:3000',
-  'http://localhost:4000',
-  'http://mantella.herokuapp.com'
-] */
-
-const corsOptions = {
-  credentials: true,
-  origin: '*'
-}
-
-app.use(cors(corsOptions))
+// app.use(cors({credentials: true}))
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
