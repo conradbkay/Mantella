@@ -13,13 +13,14 @@ require('dotenv').config()
 const app: Express = express()
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
 
-app.use(express.static(path.join(__dirname, 'client/build')))
+app.use(express.static(path.join(__dirname, '../../client/build')))
+
 app.get('*', (req, res) => {
-  res.sendfile(path.join((__dirname = 'client/build/index.html')))
+  res.sendFile(path.join(__dirname + '../../client/build/index.html'))
 })
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/public/index.html'))
+  res.sendFile(path.join(__dirname + '../../client/public/index.html'))
 })
 
 morgan.token('graphql-query', (req: Request) => {
