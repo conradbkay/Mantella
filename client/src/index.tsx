@@ -194,6 +194,4 @@ export const Wrapper = () => {
   )
 }
 
-console.log(process.env.PORT)
-
 render(<Wrapper />, document.getElementById('root'))

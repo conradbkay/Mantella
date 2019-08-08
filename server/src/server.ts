@@ -12,20 +12,14 @@ import router from './routes/routes'
 require('dotenv').config()
 const app: Express = express()
 
-app.use(cors({ credentials: true }))
-
-/*
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Credentials', true as any)
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json'
-  )
-  next()
-})
-*/
+app.use(
+  cors({
+    credentials: true,
+    origin: (origin, callback) => {
+      return callback(null, true)
+    }
+  })
+)
 
 morgan.token('graphql-query', (req: Request) => {
   const { variables } = req.body
@@ -66,14 +60,17 @@ gqlServer.applyMiddleware({
   cors: false
 })
 
-app.use(express.static(path.join(__dirname, '../../client/build')))
+app.use(express.static(path.join(__dirname, '/../../client/build')))
 
+/*
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/build/index.html'))
+  res.sendFile(path.join(__dirname + '/../../client/public/index.html'))
 })
 
+
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '../../client/public/index.html'))
+  res.sendFile(path.join(__dirname + '/../../client/build/index.html'))
 })
+*/
 
 export default app
