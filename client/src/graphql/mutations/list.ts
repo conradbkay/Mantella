@@ -1,5 +1,5 @@
 import gql from 'graphql-tag'
-import { projectFields, listFields } from '../fragments'
+import { projectFields } from '../fragments'
 
 export const GQL_CREATE_LIST = gql`
   ${projectFields}
@@ -25,7 +25,7 @@ export const GQL_DELETE_LIST = gql`
 `
 
 export const GQL_EDIT_LIST = gql`
-  ${listFields}
+  ${projectFields}
 
   mutation editList($id: String!, $projectId: String!, $newList: ListInput!) {
     editList(listId: $id, projId: $projectId, newList: $newList) {

@@ -319,7 +319,6 @@ const CBaseTask = (props: TaskProps) => {
                                 formatDueDate(
                                   {
                                     ...task,
-                                    startDate: undefined,
                                     dueDate: new Date(comment.dateAdded),
                                     recurrance: undefined
                                   },

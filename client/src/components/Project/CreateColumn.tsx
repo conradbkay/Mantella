@@ -58,9 +58,8 @@ const CCreateColumn = (props: CreateColumnProps) => {
       props.setList({
         id: createList.list!.id,
         projectId: props.project.id,
-        newCol: {
+        newList: {
           taskIds: [],
-          id: createList.list!.id,
           name: createList.list!.name
         }
       })

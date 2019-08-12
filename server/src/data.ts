@@ -1,12 +1,14 @@
 import { TaskProps, ProjectProps } from './models/Project'
 import uuid from 'uuid'
 
-export const defaultTask: any = {
+export const defaultTask: TaskProps = {
   name: 'Task',
   points: 0,
   subTasks: [],
   timeWorkedOn: 0,
   comments: [],
+  createdAt: new Date(),
+  id: undefined as any,
   color: '#FFFFFF',
   security: {
     public: true,

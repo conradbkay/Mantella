@@ -21,14 +21,6 @@ export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
     return ''
   }
 
-  if (task.startDate && task.dueDate) {
-    return (
-      // tslint:disable-next-line:prefer-template
-      format(task.startDate, 'MMM d') +
-      ' - ' +
-      format(task.dueDate, 'MMM d, h:mm a')
-    )
-  }
   if (!task.recurrance) {
     return god(task.dueDate, hasOverDue)
   }

@@ -24,7 +24,7 @@ export const ProjectSchema = new Schema({
       timeWorkedOn: { type: Number, required: true },
       color: { type: String, required: true },
       dueDate: Date,
-      startDate: Date,
+      createdAt: { type: Date, required: true },
       comments: [
         {
           comment: { type: String, required: true },
@@ -64,7 +64,7 @@ export interface TaskProps {
   timeWorkedOn: number
   color: string
   dueDate?: Date
-  startDate?: Date
+  createdAt: Date
 
   comments: Array<{
     id: string

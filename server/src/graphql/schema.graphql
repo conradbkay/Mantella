@@ -25,8 +25,8 @@ type TaskSecurity {
 }
 
 type TaskRecurrance {
-  interval: Int!
-  nextDue: Date!
+  interval: Int
+  nextDue: Date
 }
 
 type Task {
@@ -40,7 +40,7 @@ type Task {
   timeWorkedOn: Int!
   color: String!
   dueDate: Date
-  startDate: Date
+  createdAt: Date!
   comments: [Comment!]!
   subTasks: [Subtask!]!
   recurrance: TaskRecurrance

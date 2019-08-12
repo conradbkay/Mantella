@@ -367,7 +367,10 @@ const CProject = (props: TProps) => {
                 </tr>
                 {project.lists.map(list => (
                   <tr
-                    style={{ verticalAlign: 'top', display: 'flex' }}
+                    style={{
+                      verticalAlign: 'top',
+                      display: 'flex'
+                    }}
                     key={list.id}
                   >
                     {[0, 1, 2].map((progress, i) => (
@@ -376,7 +379,7 @@ const CProject = (props: TProps) => {
                           props.setList({
                             id: listId,
                             projectId: props.project.id,
-                            newCol: null
+                            newList: null
                           })
                           deleteListExec({
                             variables: {

@@ -20,7 +20,7 @@
   "scripts": {
     "start": "nodemon",
     "fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'",
-    "gen": "graphql-codegen --config config.yml"
+    "graphql-gen": "graphql-codegen --config config.yml"
   },
   "author": "Conrad Kay",
   "license": "ISC",

@@ -24,9 +24,15 @@ type OwnProps = {
 type TProps = OwnProps
 
 export const ProjectCell = (props: TProps) => {
-  const tasks = props.list.taskIds
+  let tasks = props.list.taskIds
     .map(taskId => props.project.tasks[id(props.project.tasks, taskId)])
-    .filter(task => task.progress === props.progress)
+    .filter(task => {
+      return task.progress === props.progress
+    })
+
+  if (props.progress === 2) {
+    tasks = tasks
+  }
 
   const [creating, setCreating] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
@@ -46,11 +52,10 @@ export const ProjectCell = (props: TProps) => {
           props.progress === 0
             ? `1px ${props.progress ? 'dashed' : 'solid'} #aebacc`
             : undefined,
-        overflowY: 'scroll',
         width: '100%',
-        padding: 8,
-        paddingTop: props.progress ? 8 : 0,
-        paddingBottom: props.collapsedLists.includes(props.list.id) ? 0 : 8
+        padding: props.collapsedLists.includes(props.list.id) ? '0px 8px' : 8,
+        maxHeight: '75vh',
+        overflowY: 'auto'
       }}
     >
       {props.progress === 0 && (
@@ -152,6 +157,7 @@ export const ProjectCell = (props: TProps) => {
           )
         }}
       </Droppable>
+
       {props.progress === 0 && !props.collapsedLists.includes(props.list.id) && (
         <Button
           style={{ width: '100%', marginTop: 8 }}

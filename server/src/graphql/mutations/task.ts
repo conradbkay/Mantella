@@ -15,7 +15,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       points: obj.taskInfo.points || 0,
       timeWorkedOn: 0,
       color: obj.taskInfo.color || '#FFFFFF',
-      startDate: new Date(),
+      createdAt: new Date(),
       dueDate: obj.taskInfo.dueDate
         ? new Date(obj.taskInfo.dueDate)
         : undefined,

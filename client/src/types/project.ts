@@ -29,7 +29,7 @@ export interface TTask {
   timeWorkedOn: number
   color: string
   dueDate?: Date
-  startDate?: Date
+  createdAt: Date
 
   comments: Array<{
     id: string

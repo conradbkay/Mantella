@@ -1,14 +1,12 @@
-import { TList } from '../../types/project'
-
 export const setListA = (args: {
   id: string
   projectId: string
-  newCol: TList | null
+  newList: { taskIds?: string[]; name?: string } | null
 }) => ({
   type: 'SET_LIST',
   id: args.id,
   projectId: args.projectId,
-  newColumn: args.newCol
+  newList: args.newList
 })
 
 export type ListAction = ReturnType<typeof setListA>

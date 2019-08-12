@@ -233,7 +233,7 @@ export type Task = {
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
   dueDate?: Maybe<Scalars['Date']>
-  startDate?: Maybe<Scalars['Date']>
+  createdAt: Scalars['Date']
   comments: Array<Comment>
   subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
@@ -468,7 +468,7 @@ export namespace TaskResolvers {
 
     dueDate?: DueDateResolver<Maybe<Date>, TypeParent, TContext>
 
-    startDate?: StartDateResolver<Maybe<Date>, TypeParent, TContext>
+    createdAt?: CreatedAtResolver<Date, TypeParent, TContext>
 
     comments?: CommentsResolver<Comment[], TypeParent, TContext>
 
@@ -517,8 +517,8 @@ export namespace TaskResolvers {
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type StartDateResolver<
-    R = Maybe<Date>,
+  export type CreatedAtResolver<
+    R = Date,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -1119,7 +1119,7 @@ export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
   | 'progress'
   | 'id'
   | 'dueDate'
-  | 'startDate'
+  | 'createdAt'
   | 'color'
   | 'timeWorkedOn'
   | 'name'
