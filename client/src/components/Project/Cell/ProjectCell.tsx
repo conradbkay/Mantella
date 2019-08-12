@@ -94,7 +94,13 @@ export const ProjectCell = (props: TProps) => {
             >
               Toggle Collapsed
             </MenuItem>
-            <MenuItem onClick={() => setAnchorEl(null)}>Edit</MenuItem>
+            <MenuItem
+              onClick={() => {
+                setAnchorEl(null)
+              }}
+            >
+              Edit
+            </MenuItem>
             <MenuItem
               onClick={() => {
                 if (deletingList) {
@@ -129,10 +135,9 @@ export const ProjectCell = (props: TProps) => {
                 minHeight: props.collapsedLists.includes(props.list.id)
                   ? 0
                   : 78,
-                backgroundColor: dropSnapshot.isDraggingOver
-                  ? '#bae3ff'
-                  : 'white',
-                transition: 'background-color .2s ease'
+                height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
+                backgroundColor: 'white',
+                paddingBottom: 78 // needed for dragging to bottom of list
               }}
               {...dropProvided.droppableProps}
               ref={dropProvided.innerRef}

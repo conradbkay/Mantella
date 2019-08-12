@@ -1,7 +1,7 @@
 import React from 'react'
 import { Icon, Paper } from '@material-ui/core'
 
-const galeryOptions = [
+const galleryOptions = [
   {
     name: 'Dividers',
     description:
@@ -63,7 +63,7 @@ export const FeatureGallery = () => {
           flexWrap: 'wrap'
         }}
       >
-        {galeryOptions.map((galeryOption, i) => (
+        {galleryOptions.map((galleryOption, i) => (
           <div key={i} style={{ flex: 1, display: 'flex' }}>
             <div
               style={{
@@ -87,13 +87,13 @@ export const FeatureGallery = () => {
                 <Icon
                   style={{ fontSize: 36, marginRight: 4, color: '#224885' }}
                 >
-                  {galeryOption.icon}
+                  {galleryOption.icon}
                 </Icon>
                 <p style={{ fontWeight: 700, fontSize: 22, color: '#224885' }}>
-                  {galeryOption.name}
+                  {galleryOption.name}
                 </p>
               </div>
-              <div style={{ marginTop: 8 }}>{galeryOption.description}</div>
+              <div style={{ marginTop: 8 }}>{galleryOption.description}</div>
             </div>
           </div>
         ))}

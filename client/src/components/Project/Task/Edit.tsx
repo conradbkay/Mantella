@@ -12,18 +12,17 @@ import {
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
 import { id, getAllListsArr } from '../../../utils/utilities'
-import { GQL_EDIT_TASK } from '../../../graphql/mutations/task'
+import { GQL_EDIT_TASK, GQL_DRAG_TASK } from '../../../graphql/mutations/task'
 import { useMutation } from '@apollo/react-hooks'
 import {
   EditTaskMutation,
   EditTaskMutationVariables,
-  EditListMutation,
-  EditListMutationVariables
+  DragTaskMutation,
+  DragTaskMutationVariables
 } from '../../../graphql/types'
 import { setTaskA } from '../../../store/actions/task'
 import { ChooseColor } from '../../utils/chooseColor'
-import { GQL_EDIT_LIST } from '../../../graphql/mutations/list'
-import { setListA } from '../../../store/actions/list'
+import { setProjectA } from '../../../store/actions/project'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -36,7 +35,7 @@ const mapState = (state: TState, ownProps: OwnProps) => {
 
 const actionCreators = {
   setTask: setTaskA,
-  setList: setListA
+  setProject: setProjectA
 }
 
 type OwnProps = {
@@ -70,16 +69,12 @@ export const EditTaskModal = connect(
       projId: props.projectId
     }
   })
-  const [editListExec] = useMutation<
-    EditListMutation,
-    EditListMutationVariables
-  >(GQL_EDIT_LIST, {
-    onCompleted: ({ editList }) => {
-      props.setList({
-        id: editList.list!.id,
-        projectId: editList.project.id,
-        newList: { taskIds: editList.list!.taskIds }
-      })
+  const [dragTaskExec] = useMutation<
+    DragTaskMutation,
+    DragTaskMutationVariables
+  >(GQL_DRAG_TASK, {
+    onCompleted: ({ dragTask }) => {
+      props.setProject({ id: dragTask.project.id, newProj: dragTask.project })
     }
   })
 
@@ -101,30 +96,39 @@ export const EditTaskModal = connect(
               projectId: props.projectId,
               newTask: task
             })
+
+            console.log(ownerListId, listId)
+
             editTaskExec()
             if (listId !== ownerListId) {
-              // change from old to new listId
-              editListExec({
-                variables: {
-                  projectId: props.projectId,
-                  id: ownerListId,
-                  newList: {
-                    taskIds: project.lists[
-                      id(project.lists, ownerListId)
-                    ].taskIds.filter(tId => tId !== task.id)
-                  }
-                }
+              let newIndex = 0
+
+              const tasksInNewProgress = project.tasks.filter(filterTask => {
+                return (
+                  project.lists[id(project.lists, listId)].taskIds.includes(
+                    task.id
+                  ) && task.progress === filterTask.progress
+                )
               })
-              editListExec({
+
+              if (tasksInNewProgress.length) {
+                const indexesInList = tasksInNewProgress.map(tasko => {
+                  return project.lists[
+                    id(project.lists, listId)
+                  ].taskIds.indexOf(tasko.id)
+                })
+                const lowest = Math.min(...indexesInList)
+                newIndex = lowest
+              }
+
+              dragTaskExec({
                 variables: {
-                  projectId: props.projectId,
-                  id: listId,
-                  newList: {
-                    taskIds: [
-                      task.id,
-                      ...project.lists[id(project.lists, listId)].taskIds
-                    ]
-                  }
+                  oldListId: ownerListId,
+                  newListId: listId,
+                  newIndex, // this is only correct in first progress
+                  id: task.id,
+                  newProgress: task.progress,
+                  projectId: props.projectId
                 }
               })
             }
