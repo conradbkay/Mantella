@@ -155,7 +155,7 @@ export type MutationSetCommentArgs = {
 export type MutationSetSubtaskArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  subtaskId: Scalars['String']
+  subtaskId?: Maybe<Scalars['String']>
   info?: Maybe<SubtaskInfo>
 }
 

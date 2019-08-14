@@ -134,7 +134,7 @@ const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
         (subT) => subT.id === obj.subtaskId
       )!
 
-      if (obj.info) {
+      if (!obj.info) {
         (subTask as any).remove()
       } else {
         subTask.completed =

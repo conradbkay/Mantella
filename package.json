@@ -4,10 +4,9 @@
   "description": "Bugs: Editing a created task to have more points doesn't increase your current points Proposals:",
   "main": "./server/src/index.ts",
   "scripts": {
-    "dev": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm start\"",
+    "start": "concurrently --kill-others \"cd server && npm start\" \"cd client && npm start\"",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
-    "postinstall": "npm i --prefix server && npm run build --prefix client",
     "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
     "git-fix": "find .git/objects/ -type f -empty | xargs rm && git fetch -p && git fsck --full"
   },

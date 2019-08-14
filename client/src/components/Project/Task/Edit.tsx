@@ -7,23 +7,33 @@ import {
   FormControl,
   Select,
   MenuItem,
-  FormHelperText
+  FormHelperText,
+  Typography,
+  Checkbox,
+  IconButton
 } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
 import { id, getAllListsArr } from '../../../utils/utilities'
-import { GQL_EDIT_TASK, GQL_DRAG_TASK } from '../../../graphql/mutations/task'
+import {
+  GQL_EDIT_TASK,
+  GQL_DRAG_TASK,
+  GQL_SET_SUBTASK
+} from '../../../graphql/mutations/task'
 import { useMutation } from '@apollo/react-hooks'
 import {
   EditTaskMutation,
   EditTaskMutationVariables,
   DragTaskMutation,
-  DragTaskMutationVariables
+  DragTaskMutationVariables,
+  SetSubtaskMutation,
+  SetSubtaskMutationVariables
 } from '../../../graphql/types'
 import { setTaskA } from '../../../store/actions/task'
 import { ChooseColor } from '../../utils/chooseColor'
 import { setProjectA } from '../../../store/actions/project'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
+import { Add, Delete } from '@material-ui/icons'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -53,6 +63,22 @@ export const EditTaskModal = connect(
 )((props: TProps) => {
   // apply changes locally (not in store) immediately, then when submit do on store and server
   const [task, setTask] = useState(props.task)
+
+  const [setSubtaskExec] = useMutation<
+    SetSubtaskMutation,
+    SetSubtaskMutationVariables
+  >(GQL_SET_SUBTASK, {
+    onCompleted: ({ setSubtask }) => {
+      setTask({
+        ...setSubtask
+      })
+      props.setTask({
+        id: setSubtask.id,
+        projectId: props.projectId,
+        newTask: setSubtask
+      })
+    }
+  })
 
   const [editTaskExec] = useMutation<
     EditTaskMutation,
@@ -228,6 +254,119 @@ export const EditTaskModal = connect(
               }}
             />
           </div>
+
+          <Typography
+            style={{
+              marginTop: 12,
+              fontSize: 22
+            }}
+            variant="subtitle1"
+          >
+            Subtasks
+          </Typography>
+          {task.subTasks.map((subTask, i) => (
+            <div key={subTask.id} style={{ display: 'flex', marginTop: 8 }}>
+              <Checkbox
+                style={{ marginRight: 10, width: 32, height: 32 }}
+                disableRipple
+                checked={task.subTasks[i].completed}
+                onChange={e => {
+                  const subTasks = [...task.subTasks]
+                  const newCompleteStatus = !subTasks[i].completed
+                  subTasks[i].completed = newCompleteStatus
+                  setTask({ ...task, subTasks })
+
+                  setSubtaskExec({
+                    variables: {
+                      projId: props.projectId,
+                      taskId: props.task.id,
+                      subtaskId: subTask.id,
+                      info: {
+                        name: task.subTasks[i].name,
+                        completed: newCompleteStatus
+                      }
+                    }
+                  })
+                }}
+              />
+              <TextField
+                key={subTask.id}
+                margin="none"
+                required
+                fullWidth
+                label={`Subtask ${i}`}
+                value={task.subTasks[i].name}
+                onBlur={() => {
+                  setSubtaskExec({
+                    variables: {
+                      projId: props.projectId,
+                      taskId: props.task.id,
+                      subtaskId: subTask.id,
+                      info: {
+                        name: task.subTasks[i].name,
+                        completed: subTask.completed
+                      }
+                    }
+                  })
+                }}
+                onChange={e => {
+                  setTask({
+                    ...task,
+                    subTasks: [
+                      ...task.subTasks.slice(0, i),
+                      { ...task.subTasks[i], name: e.target.value },
+                      ...task.subTasks.slice(i + 1)
+                    ]
+                  })
+                }}
+              />
+              <IconButton
+                style={{
+                  marginLeft: 10,
+                  width: 48,
+                  height: 48,
+                  marginTop: 'auto'
+                }}
+                onClick={() => {
+                  setSubtaskExec({
+                    variables: {
+                      projId: props.projectId,
+                      taskId: props.task.id,
+                      subtaskId: subTask.id,
+                      info: null // means we are deleting
+                    }
+                  })
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </div>
+          ))}
+          <Button
+            variant="outlined"
+            style={{
+              marginTop: 8,
+              marginBottom: 8,
+              marginLeft: 'auto'
+            }}
+            onClick={() => {
+              setSubtaskExec({
+                variables: {
+                  projId: props.projectId,
+                  taskId: props.task.id,
+                  subtaskId: null,
+                  info: {
+                    name: 'Subtask Name',
+                    completed: false
+                  }
+                }
+              })
+            }}
+          >
+            <Add style={{ marginRight: 8 }} />
+            add subtask
+          </Button>
+
           <div
             style={{
               display: 'flex',

@@ -164,7 +164,7 @@ type Mutation {
   setSubtask(
     projId: String!
     taskId: String!
-    subtaskId: String!
-    info: SubtaskInfo
+    subtaskId: String # if null we are creating
+    info: SubtaskInfo # if null we are deleting
   ): Task!
 }

@@ -7,7 +7,7 @@ export const GQL_SET_SUBTASK = gql`
   mutation setSubtask(
     $projId: String!
     $taskId: String!
-    $subtaskId: String!
+    $subtaskId: String
     $info: SubtaskInfo
   ) {
     setSubtask(
