@@ -32,10 +32,10 @@ const CWeekDay = (props: TProps) => {
   const { day, tasks, index } = props
   // const hasPassed = index === 0
   const withDate = tasks.filter(
-    task => task.dueDate !== undefined && getDate(task.dueDate) === getDate(day)
+    task => task.dueDate !== undefined && getDate(task.dueDate!) === getDate(day)
   )
   if (withDate.length) {
-    withDate.sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime())
+    withDate.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
   }
 
   return (

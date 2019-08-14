@@ -194,4 +194,12 @@ export const Wrapper = () => {
   )
 }
 
+import Moment from 'moment'
+import 'react-widgets/dist/css/react-widgets.css'
+
+const momentLocalizer = require('react-widgets-moment')
+
+Moment.locale('en')
+momentLocalizer()
+
 render(<Wrapper />, document.getElementById('root'))

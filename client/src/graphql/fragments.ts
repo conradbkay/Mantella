@@ -17,10 +17,6 @@ export const taskFields = gql`
       completed
       id
     }
-    security {
-      public
-      assignedUsers
-    }
     recurrance {
       interval
       nextDue
@@ -58,7 +54,10 @@ export const projectFields = gql`
   ${taskFields}
   ${listFields}
   fragment projectFields on Project {
-    isPrivate
+    security {
+      public
+      assignedUsers
+    }
     ownerId
     lists {
       ...listFields

@@ -7,7 +7,6 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
-  Date: any
   objectId: String
 }
 
@@ -19,8 +18,8 @@ export type Auth = {
 export type Comment = {
   __typename?: 'Comment'
   comment: Scalars['String']
-  dateAdded: Scalars['Date']
-  lastEdited?: Maybe<Scalars['Date']>
+  dateAdded: Scalars['String']
+  lastEdited?: Maybe<Scalars['String']>
   id: Scalars['String']
 }
 
@@ -179,13 +178,13 @@ export type Profile = {
 
 export type Project = {
   __typename?: 'Project'
+  security?: Maybe<TaskSecurity>
   ownerId: Scalars['String']
   name: Scalars['String']
   id: Scalars['String']
   lists: Array<List>
   users: Array<Scalars['String']>
   tasks: Array<Task>
-  isPrivate: Scalars['Boolean']
 }
 
 export type ProjectInput = {
@@ -225,15 +224,14 @@ export type SubtaskInfo = {
 
 export type Task = {
   __typename?: 'Task'
-  security: TaskSecurity
   progress: Scalars['Int']
   id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
-  dueDate?: Maybe<Scalars['Date']>
-  createdAt: Scalars['Date']
+  dueDate?: Maybe<Scalars['String']>
+  createdAt: Scalars['String']
   comments: Array<Comment>
   subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
@@ -242,7 +240,7 @@ export type Task = {
 export type TaskInput = {
   name?: Maybe<Scalars['String']>
   points?: Maybe<Scalars['Int']>
-  dueDate?: Maybe<Scalars['Date']>
+  dueDate?: Maybe<Scalars['String']>
   recurrance?: Maybe<Scalars['String']>
   color?: Maybe<Scalars['String']>
 }
@@ -255,8 +253,8 @@ export type TaskMerge = {
 
 export type TaskRecurrance = {
   __typename?: 'TaskRecurrance'
-  interval: Scalars['Int']
-  nextDue: Scalars['Date']
+  interval?: Maybe<Scalars['Int']>
+  nextDue?: Maybe<Scalars['String']>
 }
 
 export type TaskSecurity = {
@@ -278,11 +276,7 @@ export type Void = {
   __typename?: 'Void'
   message: Scalars['String']
 }
-import {
-  GraphQLResolveInfo,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig
-} from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
 
 export type Resolver<Result, Parent = {}, TContext = {}, Args = {}> = (
   parent: Parent,
@@ -372,6 +366,8 @@ export namespace QueryResolvers {
 
 export namespace ProjectResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Project> {
+    security?: SecurityResolver<Maybe<TaskSecurity>, TypeParent, TContext>
+
     ownerId?: OwnerIdResolver<string, TypeParent, TContext>
 
     name?: NameResolver<string, TypeParent, TContext>
@@ -383,10 +379,13 @@ export namespace ProjectResolvers {
     users?: UsersResolver<string[], TypeParent, TContext>
 
     tasks?: TasksResolver<Task[], TypeParent, TContext>
-
-    isPrivate?: IsPrivateResolver<boolean, TypeParent, TContext>
   }
 
+  export type SecurityResolver<
+    R = Maybe<TaskSecurity>,
+    Parent = Project,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
   export type OwnerIdResolver<
     R = string,
     Parent = Project,
@@ -417,9 +416,23 @@ export namespace ProjectResolvers {
     Parent = Project,
     TContext = {}
   > = Resolver<R, Parent, TContext>
-  export type IsPrivateResolver<
+}
+
+export namespace TaskSecurityResolvers {
+  export interface Resolvers<TContext = {}, TypeParent = TaskSecurity> {
+    public?: PublicResolver<boolean, TypeParent, TContext>
+
+    assignedUsers?: AssignedUsersResolver<string[], TypeParent, TContext>
+  }
+
+  export type PublicResolver<
     R = boolean,
-    Parent = Project,
+    Parent = TaskSecurity,
+    TContext = {}
+  > = Resolver<R, Parent, TContext>
+  export type AssignedUsersResolver<
+    R = string[],
+    Parent = TaskSecurity,
     TContext = {}
   > = Resolver<R, Parent, TContext>
 }
@@ -452,8 +465,6 @@ export namespace ListResolvers {
 
 export namespace TaskResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Task> {
-    security?: SecurityResolver<TaskSecurity, TypeParent, TContext>
-
     progress?: ProgressResolver<number, TypeParent, TContext>
 
     id?: IdResolver<string, TypeParent, TContext>
@@ -466,9 +477,9 @@ export namespace TaskResolvers {
 
     color?: ColorResolver<string, TypeParent, TContext>
 
-    dueDate?: DueDateResolver<Maybe<Date>, TypeParent, TContext>
+    dueDate?: DueDateResolver<Maybe<string>, TypeParent, TContext>
 
-    createdAt?: CreatedAtResolver<Date, TypeParent, TContext>
+    createdAt?: CreatedAtResolver<string, TypeParent, TContext>
 
     comments?: CommentsResolver<Comment[], TypeParent, TContext>
 
@@ -477,11 +488,6 @@ export namespace TaskResolvers {
     recurrance?: RecurranceResolver<Maybe<TaskRecurrance>, TypeParent, TContext>
   }
 
-  export type SecurityResolver<
-    R = TaskSecurity,
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
   export type ProgressResolver<
     R = number,
     Parent = Task,
@@ -513,12 +519,12 @@ export namespace TaskResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type DueDateResolver<
-    R = Maybe<Date>,
+    R = Maybe<string>,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type CreatedAtResolver<
-    R = Date,
+    R = string,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -539,32 +545,13 @@ export namespace TaskResolvers {
   > = Resolver<R, Parent, TContext>
 }
 
-export namespace TaskSecurityResolvers {
-  export interface Resolvers<TContext = {}, TypeParent = TaskSecurity> {
-    public?: PublicResolver<boolean, TypeParent, TContext>
-
-    assignedUsers?: AssignedUsersResolver<string[], TypeParent, TContext>
-  }
-
-  export type PublicResolver<
-    R = boolean,
-    Parent = TaskSecurity,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type AssignedUsersResolver<
-    R = string[],
-    Parent = TaskSecurity,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-}
-
 export namespace CommentResolvers {
   export interface Resolvers<TContext = {}, TypeParent = Comment> {
     comment?: CommentResolver<string, TypeParent, TContext>
 
-    dateAdded?: DateAddedResolver<Date, TypeParent, TContext>
+    dateAdded?: DateAddedResolver<string, TypeParent, TContext>
 
-    lastEdited?: LastEditedResolver<Maybe<Date>, TypeParent, TContext>
+    lastEdited?: LastEditedResolver<Maybe<string>, TypeParent, TContext>
 
     id?: IdResolver<string, TypeParent, TContext>
   }
@@ -575,12 +562,12 @@ export namespace CommentResolvers {
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type DateAddedResolver<
-    R = Date,
+    R = string,
     Parent = Comment,
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type LastEditedResolver<
-    R = Maybe<Date>,
+    R = Maybe<string>,
     Parent = Comment,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -619,18 +606,18 @@ export namespace SubtaskResolvers {
 
 export namespace TaskRecurranceResolvers {
   export interface Resolvers<TContext = {}, TypeParent = TaskRecurrance> {
-    interval?: IntervalResolver<number, TypeParent, TContext>
+    interval?: IntervalResolver<Maybe<number>, TypeParent, TContext>
 
-    nextDue?: NextDueResolver<Date, TypeParent, TContext>
+    nextDue?: NextDueResolver<Maybe<string>, TypeParent, TContext>
   }
 
   export type IntervalResolver<
-    R = number,
+    R = Maybe<number>,
     Parent = TaskRecurrance,
     TContext = {}
   > = Resolver<R, Parent, TContext>
   export type NextDueResolver<
-    R = Date,
+    R = Maybe<string>,
     Parent = TaskRecurrance,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -1084,16 +1071,12 @@ export interface DeprecatedDirectiveArgs {
   reason?: string
 }
 
-export interface DateScalarConfig extends GraphQLScalarTypeConfig<Date, any> {
-  name: 'Date'
-}
-
 export type IResolvers<TContext = {}> = {
   Query?: QueryResolvers.Resolvers<TContext>
   Project?: ProjectResolvers.Resolvers<TContext>
+  TaskSecurity?: TaskSecurityResolvers.Resolvers<TContext>
   List?: ListResolvers.Resolvers<TContext>
   Task?: TaskResolvers.Resolvers<TContext>
-  TaskSecurity?: TaskSecurityResolvers.Resolvers<TContext>
   Comment?: CommentResolvers.Resolvers<TContext>
   Subtask?: SubtaskResolvers.Resolvers<TContext>
   TaskRecurrance?: TaskRecurranceResolvers.Resolvers<TContext>
@@ -1105,7 +1088,6 @@ export type IResolvers<TContext = {}> = {
   DeleteReturn?: DeleteReturnResolvers.Resolvers<TContext>
   ListMerge?: ListMergeResolvers.Resolvers<TContext>
   Profile?: ProfileResolvers.Resolvers<TContext>
-  Date?: GraphQLScalarType
 } & { [typeName: string]: never }
 
 export type IDirectiveResolvers<Result> = {
@@ -1126,10 +1108,6 @@ export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
 > & {
     subTasks: Array<
       { __typename?: 'Subtask' } & Pick<Subtask, 'name' | 'completed' | 'id'>
-    >
-    security: { __typename?: 'TaskSecurity' } & Pick<
-      TaskSecurity,
-      'public' | 'assignedUsers'
     >
     recurrance: Maybe<
       { __typename?: 'TaskRecurrance' } & Pick<
@@ -1157,8 +1135,14 @@ export type ListFieldsFragment = { __typename?: 'List' } & Pick<
 
 export type ProjectFieldsFragment = { __typename?: 'Project' } & Pick<
   Project,
-  'isPrivate' | 'ownerId' | 'users' | 'id' | 'name'
+  'ownerId' | 'users' | 'id' | 'name'
 > & {
+    security: Maybe<
+      { __typename?: 'TaskSecurity' } & Pick<
+        TaskSecurity,
+        'public' | 'assignedUsers'
+      >
+    >
     lists: Array<{ __typename?: 'List' } & ListFieldsFragment>
     tasks: Array<{ __typename?: 'Task' } & TaskFieldsFragment>
   }
@@ -1167,6 +1151,30 @@ export type UserFieldsFragment = { __typename?: 'User' } & Pick<
   User,
   'id' | 'profileImg' | 'username' | 'email'
 > & { projects: Array<{ __typename?: 'Project' } & ProjectFieldsFragment> }
+
+export type ProjectQueryVariables = {
+  id: Scalars['String']
+}
+
+export type ProjectQuery = { __typename?: 'Query' } & {
+  projectById: Maybe<{ __typename?: 'Project' } & ProjectFieldsFragment>
+}
+
+export type ProjectsQueryVariables = {
+  ids: Array<Scalars['String']>
+}
+
+export type ProjectsQuery = { __typename?: 'Query' } & {
+  projects: Array<Maybe<{ __typename?: 'Project' } & ProjectFieldsFragment>>
+}
+
+export type UserQueryVariables = {
+  id: Scalars['String']
+}
+
+export type UserQuery = { __typename?: 'Query' } & {
+  user: Maybe<{ __typename?: 'User' } & UserFieldsFragment>
+}
 
 export type LoginMutationVariables = {
   email: Scalars['String']
@@ -1337,28 +1345,4 @@ export type DragTaskMutation = { __typename?: 'Mutation' } & {
     task: Maybe<{ __typename?: 'Task' } & TaskFieldsFragment>
     project: { __typename?: 'Project' } & ProjectFieldsFragment
   }
-}
-
-export type ProjectQueryVariables = {
-  id: Scalars['String']
-}
-
-export type ProjectQuery = { __typename?: 'Query' } & {
-  projectById: Maybe<{ __typename?: 'Project' } & ProjectFieldsFragment>
-}
-
-export type ProjectsQueryVariables = {
-  ids: Array<Scalars['String']>
-}
-
-export type ProjectsQuery = { __typename?: 'Query' } & {
-  projects: Array<Maybe<{ __typename?: 'Project' } & ProjectFieldsFragment>>
-}
-
-export type UserQueryVariables = {
-  id: Scalars['String']
-}
-
-export type UserQuery = { __typename?: 'Query' } & {
-  user: Maybe<{ __typename?: 'User' } & UserFieldsFragment>
 }

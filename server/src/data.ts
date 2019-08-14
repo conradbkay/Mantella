@@ -7,14 +7,12 @@ export const defaultTask: TaskProps = {
   subTasks: [],
   timeWorkedOn: 0,
   comments: [],
-  createdAt: new Date(),
+  createdAt: new Date().toString(),
   id: undefined as any,
   color: '#FFFFFF',
-  security: {
-    public: true,
-    assignedUsers: []
-  },
-  progress: 0
+  progress: 0,
+  recurrance: null,
+  dueDate: null
 }
 
 export const tags = [
@@ -144,6 +142,6 @@ export const projectData = (
     id: projectId,
     tasks: tasks,
     users: [newUserId],
-    isPrivate: false
+    security: null
   }
 }

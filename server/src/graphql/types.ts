@@ -6,7 +6,6 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
-  Date: any
 }
 
 export type Auth = {
@@ -15,8 +14,8 @@ export type Auth = {
 
 export type Comment = {
   comment: Scalars['String']
-  dateAdded: Scalars['Date']
-  lastEdited?: Maybe<Scalars['Date']>
+  dateAdded: Scalars['String']
+  lastEdited?: Maybe<Scalars['String']>
   id: Scalars['String']
 }
 
@@ -169,13 +168,13 @@ export type Profile = {
 }
 
 export type Project = {
+  security?: Maybe<TaskSecurity>
   ownerId: Scalars['String']
   name: Scalars['String']
   id: Scalars['String']
   lists: Array<List>
   users: Array<Scalars['String']>
   tasks: Array<Task>
-  isPrivate: Scalars['Boolean']
 }
 
 export type ProjectInput = {
@@ -212,15 +211,14 @@ export type SubtaskInfo = {
 }
 
 export type Task = {
-  security: TaskSecurity
   progress: Scalars['Int']
   id: Scalars['String']
   name: Scalars['String']
   points: Scalars['Int']
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
-  dueDate?: Maybe<Scalars['Date']>
-  createdAt: Scalars['Date']
+  dueDate?: Maybe<Scalars['String']>
+  createdAt: Scalars['String']
   comments: Array<Comment>
   subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
@@ -229,7 +227,7 @@ export type Task = {
 export type TaskInput = {
   name?: Maybe<Scalars['String']>
   points?: Maybe<Scalars['Int']>
-  dueDate?: Maybe<Scalars['Date']>
+  dueDate?: Maybe<Scalars['String']>
   recurrance?: Maybe<Scalars['String']>
   color?: Maybe<Scalars['String']>
 }
@@ -240,8 +238,8 @@ export type TaskMerge = {
 }
 
 export type TaskRecurrance = {
-  interval: Scalars['Int']
-  nextDue: Scalars['Date']
+  interval?: Maybe<Scalars['Int']>
+  nextDue?: Maybe<Scalars['String']>
 }
 
 export type TaskSecurity = {
@@ -261,11 +259,7 @@ export type Void = {
   message: Scalars['String']
 }
 
-import {
-  GraphQLResolveInfo,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig
-} from 'graphql'
+import { GraphQLResolveInfo } from 'graphql'
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -341,12 +335,11 @@ export type ResolversTypes = {
   Query: {}
   String: Scalars['String']
   Project: Project
-  List: List
-  Task: Task
   TaskSecurity: TaskSecurity
   Boolean: Scalars['Boolean']
+  List: List
+  Task: Task
   Int: Scalars['Int']
-  Date: Scalars['Date']
   Comment: Comment
   Subtask: Subtask
   TaskRecurrance: TaskRecurrance
@@ -377,14 +370,13 @@ export type CommentResolvers<
   ParentType = ResolversTypes['Comment']
 > = {
   comment?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  dateAdded?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
-  lastEdited?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>
+  dateAdded?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  lastEdited?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-}
-
-export interface DateScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
-  name: 'Date'
 }
 
 export type DeleteReturnResolvers<
@@ -540,13 +532,17 @@ export type ProjectResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Project']
 > = {
+  security?: Resolver<
+    Maybe<ResolversTypes['TaskSecurity']>,
+    ParentType,
+    ContextType
+  >
   ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   lists?: Resolver<Array<ResolversTypes['List']>, ParentType, ContextType>
   users?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
   tasks?: Resolver<Array<ResolversTypes['Task']>, ParentType, ContextType>
-  isPrivate?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>
 }
 
 export type QueryResolvers<
@@ -586,15 +582,14 @@ export type TaskResolvers<
   ContextType = any,
   ParentType = ResolversTypes['Task']
 > = {
-  security?: Resolver<ResolversTypes['TaskSecurity'], ParentType, ContextType>
   progress?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   points?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   timeWorkedOn?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   color?: Resolver<ResolversTypes['String'], ParentType, ContextType>
-  dueDate?: Resolver<Maybe<ResolversTypes['Date']>, ParentType, ContextType>
-  createdAt?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  dueDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
+  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>
   subTasks?: Resolver<Array<ResolversTypes['Subtask']>, ParentType, ContextType>
   recurrance?: Resolver<
@@ -616,8 +611,8 @@ export type TaskRecurranceResolvers<
   ContextType = any,
   ParentType = ResolversTypes['TaskRecurrance']
 > = {
-  interval?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
-  nextDue?: Resolver<ResolversTypes['Date'], ParentType, ContextType>
+  interval?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>
+  nextDue?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type TaskSecurityResolvers<
@@ -657,7 +652,6 @@ export type VoidResolvers<
 export type Resolvers<ContextType = any> = {
   Auth?: AuthResolvers<ContextType>
   Comment?: CommentResolvers<ContextType>
-  Date?: GraphQLScalarType
   DeleteReturn?: DeleteReturnResolvers<ContextType>
   List?: ListResolvers<ContextType>
   ListMerge?: ListMergeResolvers<ContextType>

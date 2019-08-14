@@ -23,6 +23,7 @@ import {
 import { setTaskA } from '../../../store/actions/task'
 import { ChooseColor } from '../../utils/chooseColor'
 import { setProjectA } from '../../../store/actions/project'
+import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -97,7 +98,7 @@ export const EditTaskModal = connect(
               newTask: task
             })
 
-            console.log(ownerListId, listId)
+            console.log(task)
 
             editTaskExec()
             if (listId !== ownerListId) {
@@ -135,7 +136,12 @@ export const EditTaskModal = connect(
             e.preventDefault()
             props.onClose()
           }}
-          style={{ minWidth: 550, padding: '0px 16px', paddingBottom: 12 }}
+          style={{
+            minWidth: 550,
+            minHeight: 450,
+            padding: '0px 16px',
+            paddingBottom: 12
+          }}
         >
           <DialogTitle style={{ paddingLeft: '0px' }}>Edit Task</DialogTitle>
           <div
@@ -209,6 +215,18 @@ export const EditTaskModal = connect(
               </Select>
               <FormHelperText>Task's List</FormHelperText>
             </FormControl>
+          </div>
+          <div style={{ display: 'flex', marginTop: 8 }}>
+            <DateTimePicker
+              containerClassName="fullwidth"
+              value={task.dueDate ? new Date(task.dueDate) : undefined}
+              onChange={(date: Date | undefined) => {
+                setTask({
+                  ...task,
+                  dueDate: date ? date.toString() : null
+                })
+              }}
+            />
           </div>
           <div
             style={{

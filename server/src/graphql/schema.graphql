@@ -1,5 +1,3 @@
-scalar Date
-
 type Query {
   projects(ids: [String!]!): [Project]!
   projectById(id: String!): Project
@@ -14,8 +12,8 @@ type Subtask {
 
 type Comment {
   comment: String!
-  dateAdded: Date! # date string
-  lastEdited: Date # optional date string
+  dateAdded: String! # String string
+  lastEdited: String # optional String string
   id: String!
 }
 
@@ -26,12 +24,10 @@ type TaskSecurity {
 
 type TaskRecurrance {
   interval: Int
-  nextDue: Date
+  nextDue: String
 }
 
 type Task {
-  security: TaskSecurity!
-
   progress: Int!
 
   id: String!
@@ -39,8 +35,8 @@ type Task {
   points: Int!
   timeWorkedOn: Int!
   color: String!
-  dueDate: Date
-  createdAt: Date!
+  dueDate: String
+  createdAt: String!
   comments: [Comment!]!
   subTasks: [Subtask!]!
   recurrance: TaskRecurrance
@@ -63,13 +59,14 @@ type Profile {
 }
 
 type Project {
+  security: TaskSecurity
+
   ownerId: String!
   name: String!
   id: String!
   lists: [List!]!
   users: [String!]! # if null is a private project
   tasks: [Task!]!
-  isPrivate: Boolean! # defaults to false (public)
 }
 
 type List {
@@ -81,7 +78,7 @@ type List {
 input TaskInput {
   name: String
   points: Int
-  dueDate: Date # date string
+  dueDate: String # String string
   recurrance: String # daily | weekly | none
   color: String # hex
 }

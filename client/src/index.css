@@ -8,3 +8,11 @@ html * {
   margin: 0;
   padding: 0;
 }
+
+.fullwidth {
+  width: 100%;
+}
+
+.rw-datetime-picker {
+  width: 100%;
+}

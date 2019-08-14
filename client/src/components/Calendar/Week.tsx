@@ -57,12 +57,12 @@ const CWeek = withStyles(styles)((props: TProps) => {
 
     const task = allTasks[id(allTasks, draggableId)]
 
-    const findNewDate = (taskDueDate: Date) => {
+    const findNewDate = (taskDueDate: string) => {
       const newDay = new Date(parseInt(destination.droppableId))
 
       const diff = differenceInCalendarDays(newDay, taskDueDate)
 
-      return addDays(taskDueDate, diff)
+      return addDays(new Date(taskDueDate), diff).toString()
     }
 
     const newTask = {

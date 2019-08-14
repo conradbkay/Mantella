@@ -12,15 +12,13 @@ export interface TProject {
 
   users: string[]
 
-  isPrivate: boolean
-}
-
-export interface TTask {
   security?: {
     public: boolean
     assignedUsers: string[] // teams or users
   } | null
+}
 
+export interface TTask {
   progress: 0 | 1 | 2 | number
 
   id: string
@@ -28,14 +26,14 @@ export interface TTask {
   points: number
   timeWorkedOn: number
   color: string
-  dueDate?: Date
-  createdAt: Date
+  dueDate?: string | null // date
+  createdAt: string // date
 
   comments: Array<{
     id: string
     comment: string
     dateAdded: string
-    lastEdited?: Date
+    lastEdited?: string | null // date
   }>
   subTasks: Array<{
     name: string
@@ -43,8 +41,8 @@ export interface TTask {
     id: string
   }>
   recurrance?: {
-    interval?: number
-    nextDue?: Date
+    interval?: number | null
+    nextDue?: string | null // date
   } | null
 }
 

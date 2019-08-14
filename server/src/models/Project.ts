@@ -23,13 +23,13 @@ export const ProjectSchema = new Schema({
       points: { type: Number, required: true },
       timeWorkedOn: { type: Number, required: true },
       color: { type: String, required: true },
-      dueDate: Date,
-      createdAt: { type: Date, required: true },
+      dueDate: String,
+      createdAt: { type: String, required: true },
       comments: [
         {
           comment: { type: String, required: true },
-          dateAdded: { type: Date, required: true },
-          lastEdited: Date,
+          dateAdded: { type: String, required: true },
+          lastEdited: String,
           id: String
         }
       ],
@@ -42,20 +42,17 @@ export const ProjectSchema = new Schema({
       ],
       recurrance: {
         interval: Number,
-        nextDue: Date
+        nextDue: String
       }
     }
   ],
   users: [String],
-  isPrivate: Boolean
+  security: {
+    public: { type: Boolean, assignedUsers: { type: [String], required: true } }
+  }
 })
 
 export interface TaskProps {
-  security: {
-    public: boolean
-    assignedUsers: string[] // teams or users
-  }
-
   progress: 0 | 1 | 2
 
   id: string
@@ -63,14 +60,14 @@ export interface TaskProps {
   points: number
   timeWorkedOn: number
   color: string
-  dueDate?: Date
-  createdAt: Date
+  dueDate?: string | null
+  createdAt: string
 
   comments: Array<{
     id: string
     comment: string
     dateAdded: string
-    lastEdited?: Date
+    lastEdited?: string | null
   }>
   subTasks: Array<{
     name: string
@@ -79,8 +76,8 @@ export interface TaskProps {
   }>
   recurrance?: {
     interval: number
-    nextDue: Date
-  }
+    nextDue: string
+  } | null
 }
 
 export interface ProjectProps {
@@ -97,7 +94,10 @@ export interface ProjectProps {
 
   users: string[]
 
-  isPrivate: boolean
+  security?: {
+    public: boolean
+    assignedUsers: string[]
+  } | null
 }
 
 export const ProjectModel: Model<Document & ProjectProps> = model(
