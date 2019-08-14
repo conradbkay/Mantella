@@ -5,7 +5,7 @@
   "main": "./server/src/index.ts",
   "scripts": {
     "heroku-postbuild": "cd client && npm install && npm run build",
-    "start": "npm run server",
+    "start": "cd server && npm i && npm start",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
     "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
