@@ -36,7 +36,7 @@ type Task {
   timeWorkedOn: Int!
   color: String!
   dueDate: String
-  createdAt: String!
+  createdAt: String
   comments: [Comment!]!
   subTasks: [Subtask!]!
   recurrance: TaskRecurrance
