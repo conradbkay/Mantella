@@ -10,7 +10,6 @@ export const taskFields = gql`
 
     id
     dueDate
-    createdAt
     color
     subTasks {
       name
