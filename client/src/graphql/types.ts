@@ -231,7 +231,6 @@ export type Task = {
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
   dueDate?: Maybe<Scalars['String']>
-  createdAt: Scalars['String']
   comments: Array<Comment>
   subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
@@ -479,8 +478,6 @@ export namespace TaskResolvers {
 
     dueDate?: DueDateResolver<Maybe<string>, TypeParent, TContext>
 
-    createdAt?: CreatedAtResolver<string, TypeParent, TContext>
-
     comments?: CommentsResolver<Comment[], TypeParent, TContext>
 
     subTasks?: SubTasksResolver<Subtask[], TypeParent, TContext>
@@ -520,11 +517,6 @@ export namespace TaskResolvers {
   > = Resolver<R, Parent, TContext>
   export type DueDateResolver<
     R = Maybe<string>,
-    Parent = Task,
-    TContext = {}
-  > = Resolver<R, Parent, TContext>
-  export type CreatedAtResolver<
-    R = string,
     Parent = Task,
     TContext = {}
   > = Resolver<R, Parent, TContext>
@@ -1097,14 +1089,7 @@ export type IDirectiveResolvers<Result> = {
 } & { [directiveName: string]: never }
 export type TaskFieldsFragment = { __typename?: 'Task' } & Pick<
   Task,
-  | 'points'
-  | 'progress'
-  | 'id'
-  | 'dueDate'
-  | 'createdAt'
-  | 'color'
-  | 'timeWorkedOn'
-  | 'name'
+  'points' | 'progress' | 'id' | 'dueDate' | 'color' | 'timeWorkedOn' | 'name'
 > & {
     subTasks: Array<
       { __typename?: 'Subtask' } & Pick<Subtask, 'name' | 'completed' | 'id'>

@@ -27,7 +27,6 @@ export interface TTask {
   timeWorkedOn: number
   color: string
   dueDate?: string | null // date
-  createdAt: string // date
 
   comments: Array<{
     id: string

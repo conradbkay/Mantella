@@ -218,7 +218,6 @@ export type Task = {
   timeWorkedOn: Scalars['Int']
   color: Scalars['String']
   dueDate?: Maybe<Scalars['String']>
-  createdAt: Scalars['String']
   comments: Array<Comment>
   subTasks: Array<Subtask>
   recurrance?: Maybe<TaskRecurrance>
@@ -589,7 +588,6 @@ export type TaskResolvers<
   timeWorkedOn?: Resolver<ResolversTypes['Int'], ParentType, ContextType>
   color?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   dueDate?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>
-  createdAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   comments?: Resolver<Array<ResolversTypes['Comment']>, ParentType, ContextType>
   subTasks?: Resolver<Array<ResolversTypes['Subtask']>, ParentType, ContextType>
   recurrance?: Resolver<
