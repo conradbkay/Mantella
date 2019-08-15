@@ -6,6 +6,7 @@
   "scripts": {
     "start": "cd server && nodemon",
     "server": "npm start --prefix server",
+    "heroku-postbuild": "cd client && npm install --only=dev && npm install && npm run build",
     "client": "npm start --prefix client",
     "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
     "git-fix": "find .git/objects/ -type f -empty | xargs rm && git fetch -p && git fsck --full"
