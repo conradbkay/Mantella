@@ -4,7 +4,7 @@
   "description": "Bugs: Editing a created task to have more points doesn't increase your current points Proposals:",
   "main": "./server/src/index.ts",
   "scripts": {
-    "start": "cd server && npm i && node index.",
+    "start": "cd server && npm i && nodemon",
     "server": "npm start --prefix server",
     "build": "npm i --prefix server && cd client && npm install && npm run build",
     "client": "npm start --prefix client",
