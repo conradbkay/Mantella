@@ -4,8 +4,9 @@
   "description": "Bugs: Editing a created task to have more points doesn't increase your current points Proposals:",
   "main": "./server/src/index.ts",
   "scripts": {
-    "heroku-postbuild": "cd client && npm install && npm run build && cd ../server && npm i",
+    "heroku-postbuild": "cd ../server && npm i",
     "start": "cd server && nodemon",
+    "build": "cd client && npm i && npm run build",
     "server": "npm start --prefix server",
     "client": "npm start --prefix client",
     "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
