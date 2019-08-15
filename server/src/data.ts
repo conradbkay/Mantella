@@ -7,7 +7,6 @@ export const defaultTask: TaskProps = {
   subTasks: [],
   timeWorkedOn: 0,
   comments: [],
-  createdAt: new Date().toString(),
   id: undefined as any,
   color: '#FFFFFF',
   progress: 0,
