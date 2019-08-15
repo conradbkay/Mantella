@@ -1,16 +1,16 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 .env
 # dependencies
-/node_modules
+node_modules
 /.vscode
 # testing
 /coverage
 apollo.config.js
 # production
 /build
-/client/node_modules
-/server/node_modules
-/server/.env
+client/node_modules
+server/node_modules
+server/.env
 # misc
 .DS_Store
 .env
