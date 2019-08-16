@@ -26,7 +26,7 @@ export const GQL_SET_COMMENT = gql`
   mutation setComment(
     $projId: String!
     $taskId: String!
-    $commentId: String!
+    $commentId: String
     $description: String
   ) {
     setComment(

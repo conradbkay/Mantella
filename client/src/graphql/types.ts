@@ -156,7 +156,7 @@ export type MutationRemoveMemberFromProjectArgs = {
 export type MutationSetCommentArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId: Scalars['String']
+  commentId?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
 }
 
@@ -895,7 +895,7 @@ export namespace MutationResolvers {
 
     taskId: string
 
-    commentId: string
+    commentId?: Maybe<string>
 
     description?: Maybe<string>
   }
@@ -1271,7 +1271,7 @@ export type SetSubtaskMutation = { __typename?: 'Mutation' } & {
 export type SetCommentMutationVariables = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId: Scalars['String']
+  commentId?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
 }
 

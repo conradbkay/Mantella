@@ -148,7 +148,7 @@ export type MutationRemoveMemberFromProjectArgs = {
 export type MutationSetCommentArgs = {
   projId: Scalars['String']
   taskId: Scalars['String']
-  commentId: Scalars['String']
+  commentId?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
 }
 

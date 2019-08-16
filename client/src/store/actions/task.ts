@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash'
 import { TTask } from './../../types/project'
 
 export const setTaskA = (args: {
@@ -8,7 +9,7 @@ export const setTaskA = (args: {
   type: 'SET_TASK',
   id: args.id,
   projectId: args.projectId,
-  newTask: args.newTask
+  newTask: args.newTask ? cloneDeep({ ...args.newTask }) : null
 })
 
 export type TaskAction = ReturnType<typeof setTaskA>

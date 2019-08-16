@@ -18,7 +18,8 @@ import { id, getAllListsArr } from '../../../utils/utilities'
 import {
   GQL_EDIT_TASK,
   GQL_DRAG_TASK,
-  GQL_SET_SUBTASK
+  GQL_SET_SUBTASK,
+  GQL_SET_COMMENT
 } from '../../../graphql/mutations/task'
 import { useMutation } from '@apollo/react-hooks'
 import {
@@ -27,13 +28,17 @@ import {
   DragTaskMutation,
   DragTaskMutationVariables,
   SetSubtaskMutation,
-  SetSubtaskMutationVariables
+  SetSubtaskMutationVariables,
+  SetCommentMutation,
+  SetCommentMutationVariables
 } from '../../../graphql/types'
 import { setTaskA } from '../../../store/actions/task'
 import { ChooseColor } from '../../utils/chooseColor'
 import { setProjectA } from '../../../store/actions/project'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 import { Add, Delete } from '@material-ui/icons'
+import { formatDueDate } from '../../../utils/formatDueDate'
+import { cloneDeep } from 'lodash'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -62,7 +67,7 @@ export const EditTaskModal = connect(
   actionCreators
 )((props: TProps) => {
   // apply changes locally (not in store) immediately, then when submit do on store and server
-  const [task, setTask] = useState(props.task)
+  const [task, setTask] = useState(cloneDeep(props.task))
 
   const [setSubtaskExec] = useMutation<
     SetSubtaskMutation,
@@ -75,7 +80,24 @@ export const EditTaskModal = connect(
       props.setTask({
         id: setSubtask.id,
         projectId: props.projectId,
-        newTask: setSubtask
+        newTask: { ...setSubtask }
+      })
+    }
+  })
+
+  const [setCommentExec] = useMutation<
+    SetCommentMutation,
+    SetCommentMutationVariables
+  >(GQL_SET_COMMENT, {
+    onCompleted: ({ setComment }) => {
+      setTask({
+        ...setComment
+      })
+
+      props.setTask({
+        id: setComment.id,
+        projectId: props.projectId,
+        newTask: { ...setComment }
       })
     }
   })
@@ -296,7 +318,7 @@ export const EditTaskModal = connect(
                 fullWidth
                 label={`Subtask ${i}`}
                 value={task.subTasks[i].name}
-                onBlur={() => {
+                onBlur={e => {
                   setSubtaskExec({
                     variables: {
                       projId: props.projectId,
@@ -365,6 +387,87 @@ export const EditTaskModal = connect(
           >
             <Add style={{ marginRight: 8 }} />
             add subtask
+          </Button>
+
+          <Typography
+            style={{
+              marginTop: 12,
+              fontSize: 22
+            }}
+            variant="subtitle1"
+          >
+            Comments
+          </Typography>
+          {task.comments.map((comment, i) => (
+            <div key={comment.id} style={{ marginTop: 8, display: 'flex' }}>
+              <TextField
+                key={comment.id}
+                margin="dense"
+                onBlur={e => {
+                  setCommentExec({
+                    variables: {
+                      projId: props.projectId,
+                      taskId: props.task.id,
+                      commentId: comment.id,
+                      description: task.comments[i].comment
+                    }
+                  })
+                }}
+                required
+                placeholder="Comment Name"
+                fullWidth
+                value={task.comments[i].comment}
+                label={formatDueDate({
+                  ...task,
+                  dueDate: comment.dateAdded,
+                  recurrance: undefined
+                }).slice(4)}
+                onChange={e => {
+                  const newComments = [...task.comments]
+                  newComments[i].comment = e.target.value
+
+                  setTask({
+                    ...task,
+                    comments: newComments
+                  })
+                }}
+              />
+              <IconButton
+                style={{
+                  marginLeft: 10,
+                  marginTop: 'auto',
+                  width: 48,
+                  height: 48
+                }}
+                onClick={() => {
+                  setCommentExec({
+                    variables: {
+                      projId: props.projectId,
+                      taskId: props.task.id,
+                      commentId: comment.id
+                    }
+                  })
+                }}
+              >
+                <Delete />
+              </IconButton>
+            </div>
+          ))}
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setCommentExec({
+                variables: {
+                  projId: props.projectId,
+                  taskId: props.task.id,
+                  description: 'Comment'
+                }
+              })
+            }}
+            style={{ marginTop: 8 }}
+          >
+            <Add style={{ marginRight: 8 }} />
+            Add Comment
           </Button>
 
           <div
