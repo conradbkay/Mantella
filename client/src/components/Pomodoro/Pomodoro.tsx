@@ -19,6 +19,7 @@ import { Controls } from './Controls'
 import { Display } from './Display'
 import { Stopwatch } from './Stopwatch'
 import { TState } from '../../types/state'
+import { getProjectIdFromTaskId, getAllTasks } from '../../utils/utilities'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -64,11 +65,10 @@ const CPomodoro = (props: TProps) => {
         if (pomodoro.selectedTaskId && pomodoro.working) {
           props.tick({
             taskId: pomodoro.selectedTaskId,
-            projectId: '' // FIXME
-            /* projectId: getProjectIdFromTaskId(
+            projectId: getProjectIdFromTaskId(
               props.projects,
               pomodoro.selectedTaskId
-            ) */
+            )
           })
         } else {
           props.tick({})
@@ -122,9 +122,9 @@ const CPomodoro = (props: TProps) => {
 }
 
 const mapState = (state: TState) => ({
-  pomodoro: state.pomodoro
-  // projects: state.projects,
-  // tasks: getAllTasks(state.projects)
+  pomodoro: state.pomodoro,
+  projects: state.projects,
+  tasks: getAllTasks(state.projects)
 })
 
 const actionCreators = {

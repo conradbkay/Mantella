@@ -1,4 +1,4 @@
-export const toggleTimerA = () => ({ type: 'START_TIMER' })
+export const toggleTimerA = () => ({ type: 'TOGGLE_TIMER' })
 
 export const setLengthA = (args: {
   type: 'BREAK' | 'WORK'

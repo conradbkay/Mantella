@@ -7,6 +7,7 @@ import {
   toggleSelectingTaskA
 } from '../../store/actions/pomodoro'
 import { TState } from '../../types/state'
+import { getAllTasks, id } from '../../utils/utilities'
 
 type OwnProps = {
   toggleWorking: () => void
@@ -44,6 +45,8 @@ const CDisplay = (props: TProps) => {
           {pomodoro.selectingTask
             ? 'Selecting Task...'
             : pomodoro.selectedTaskId
+            ? props.tasks[id(props.tasks, pomodoro.selectedTaskId!)].name
+            : 'Select Task'
           /* ? tasks[pomodoro.selectedTaskId].name : 'No Task Selected'} */
           }
         </p>
@@ -81,8 +84,8 @@ const CDisplay = (props: TProps) => {
 }
 
 const mapState = (state: TState) => ({
-  pomodoro: state.pomodoro
-  // tasks: getAllTasks(state.projects)
+  pomodoro: state.pomodoro,
+  tasks: getAllTasks(state.projects)
 })
 
 const actionCreators = {
