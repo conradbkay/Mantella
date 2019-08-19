@@ -32,10 +32,14 @@ const CWeekDay = (props: TProps) => {
   const { day, tasks, index } = props
   // const hasPassed = index === 0
   const withDate = tasks.filter(
-    task => task.dueDate !== undefined && getDate(task.dueDate!) === getDate(day)
+    task =>
+      task.dueDate !== undefined &&
+      getDate(new Date(task.dueDate!)) === getDate(day)
   )
   if (withDate.length) {
-    withDate.sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+    withDate.sort(
+      (a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
+    )
   }
 
   return (
@@ -45,6 +49,18 @@ const CWeekDay = (props: TProps) => {
         flex: '1 0 calc(1200px / 7)'
       }}
     >
+      <div
+        style={{
+          fontSize: '3.2rem',
+          fontWeight: 300,
+          margin: '0 0 0 .8rem',
+          paddingBottom: '.4rem',
+          color: sameDay(day, new Date()) ? '#4285f4' : '#555'
+        }}
+      >
+        {day.getDate()}
+        <div style={{ fontSize: '1.3rem' }}>{names[getDay(day)]}</div>
+      </div>
       <Droppable
         isDropDisabled={/* hasPassed */ false}
         droppableId={day.getTime().toString()}
@@ -59,18 +75,6 @@ const CWeekDay = (props: TProps) => {
             {...provided.droppableProps}
             ref={provided.innerRef}
           >
-            <div
-              style={{
-                fontSize: '3.2rem',
-                fontWeight: 300,
-                margin: '0 0 0 .8rem',
-                paddingBottom: '.4rem',
-                color: sameDay(day, new Date()) ? '#4285f4' : '#555'
-              }}
-            >
-              {day.getDate()}
-              <div style={{ fontSize: '1.3rem' }}>{names[getDay(day)]}</div>
-            </div>
             {withDate.map((task, i) => (
               <Draggable
                 key={task.id}

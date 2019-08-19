@@ -1,13 +1,14 @@
-import { format, distanceInWordsToNow } from 'date-fns'
+import { format } from 'date-fns'
 import { hasPassed } from './hasPassed'
 import { TTask } from '../types/project'
 import { toDaysHHMMSS } from './convertToTime'
+import { differenceInDays } from 'date-fns'
 
 // Jan 1st 12:02 am
 const baseFormat = (date: Date): string => format(date, 'MMM do h:mm a')
 
 const overdueFormat = (date: Date): string => {
-  return 'Overdue by ' + distanceInWordsToNow(date)
+  return 'Overdue by ' + differenceInDays(date, new Date())
 }
 
 const god = (date: Date, hasOver?: boolean): string => {

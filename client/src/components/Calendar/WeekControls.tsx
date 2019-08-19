@@ -45,6 +45,8 @@ type TProps = OwnProps & WithStyles<typeof styles>
 
 const CWeekControls = (props: TProps) => {
   const { projects, toggleProject, currIds } = props
+
+  console.log(props)
   return (
     <div
       style={{
@@ -77,16 +79,16 @@ const CWeekControls = (props: TProps) => {
         ))}
       </Select>
       <div className={props.classes.nav}>
-        <IconButton onClick={() => props.setDate(subDays(props.startDay, 7))}>
+        <IconButton onClick={() => props.setDate(subDays(props.startDay, 6))}>
           <NavigateBefore />
         </IconButton>
         <span style={{ margin: '10px' }}>
           {`${format(props.startDay, 'MMM d')} - ${format(
-            addDays(props.startDay, 7),
+            addDays(props.startDay, 6),
             'MMM d'
           )}`}
         </span>
-        <IconButton onClick={() => props.setDate(addDays(props.startDay, 9))}>
+        <IconButton onClick={() => props.setDate(addDays(props.startDay, 8))}>
           <NavigateNext />
         </IconButton>
       </div>

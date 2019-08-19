@@ -21,8 +21,6 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { ProjectSettings } from './ProjectSettings'
-
-import { Mutation, MutationResult } from 'react-apollo'
 import {
   EditProjectMutation,
   EditProjectMutationVariables,
@@ -211,12 +209,25 @@ const CProject = (props: TProps) => {
     return
   }
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
   React.useEffect(() => {
-    window.addEventListener('resize', () => setIsMobile(getMobile(window)))
+    window.addEventListener('resize', () => {
+      setIsMobile(getMobile(window))
+      setWindowWidth(window.innerWidth)
+    })
 
     return () =>
-      window.removeEventListener('resize', () => setIsMobile(getMobile(window)))
+      window.removeEventListener('resize', () => {
+        setIsMobile(getMobile(window))
+        setWindowWidth(window.innerWidth)
+      })
   }, [])
+
+  const [editProjectExec] = useMutation<
+    EditProjectMutation,
+    EditProjectMutationVariables
+  >(GQL_EDIT_PROJECT, {})
 
   const { classes, project } = props
   if (project) {
@@ -231,98 +242,34 @@ const CProject = (props: TProps) => {
         </Helmet>
         <AppBar color="default" className={classes.appbar} position="static">
           <Toolbar>
-            <Mutation
-              onCompleted={({ editProject }: EditProjectMutation) => {
-                if (editProject) {
-                  props.setProject({
-                    id: editProject.id,
-                    newProj: {
-                      name: editProject.name,
-                      id: editProject.id,
-                      ...editProject
-                    }
-                  })
-                  setName(editProject.name)
-                }
-              }}
-              mutation={GQL_EDIT_PROJECT}
-            >
-              {(
-                editProject: (obj: {
-                  variables: EditProjectMutationVariables
-                }) => void,
-                result: MutationResult<EditProjectMutation>
-              ) => {
-                return (
-                  <div>
-                    <input
-                      className={classes.input}
-                      value={name}
-                      onBlur={() =>
-                        editProject({
-                          variables: {
-                            newProj: { name: name || 'newname' },
-                            id: project.id
-                          }
-                        })
-                      }
-                      onChange={(e: any) => setName(e.target.value)}
-                    />
-                  </div>
-                )
-              }}
-            </Mutation>
-            <div
-              style={{
-                display: 'flex',
-                marginLeft: 'auto'
-              }}
-            >
-              {/* Object.values(project.users).map((user, i) => {
-                return (
-                  <Tooltip key={user.id} title={user.username}>
-                    <ButtonBase
-                      onClick={() => {
-                        props.selectMember({
-                          id: user.id,
-                          projectId: project.id
-                        })
-                      }}
-                      style={{
-                        opacity:
-                          project.selectingMember === user.id ? 0.5 : undefined,
-                        filter:
-                          project.selectingMember === user.id
-                            ? 'alpha(opacity = 50)'
-                            : undefined,
-                        height: 48,
-                        width: 48,
-                        verticalAlign: 'middle',
-                        borderRadius: '50%',
-                        margin: '0px 8px',
-                        userSelect: 'none',
-                        backgroundImage: `url(${user.profileImg})`,
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: '50% 50%',
-                        backgroundSize: 'contain'
-                      }}
-                    />
-                  </Tooltip>
-                )
-              }) */}
+            <input
+              style={{ width: `${windowWidth - 240}px` }}
+              className={classes.input}
+              value={name}
+              onBlur={() =>
+                editProjectExec({
+                  variables: {
+                    newProj: { name: name || 'newname' },
+                    id: project.id
+                  }
+                })
+              }
+              onChange={(e: any) => setName(e.target.value)}
+            />
+            <div style={{ marginLeft: 'auto' }}>
+              <IconButton onClick={() => null}>
+                <FilterList />
+              </IconButton>
+              <IconButton
+                onClick={() => setSettings(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <Settings />
+              </IconButton>
+              <IconButton style={{ marginLeft: 8 }}>
+                <Equalizer />
+              </IconButton>
             </div>
-            <IconButton onClick={() => null}>
-              <FilterList />
-            </IconButton>
-            <IconButton
-              onClick={() => setSettings(true)}
-              style={{ marginLeft: 8 }}
-            >
-              <Settings />
-            </IconButton>
-            <IconButton style={{ marginLeft: 8 }}>
-              <Equalizer />
-            </IconButton>
           </Toolbar>
         </AppBar>
         <Paper
