@@ -29,7 +29,7 @@
     "apollo-link-error": "^1.1.11",
     "apollo-link-http": "^1.5.15",
     "apollo-logger": "^0.3.2",
-    "apollo-server": "^2.6.9",
+    "apollo-server": "^2.14.2",
     "apollo-server-express": "^2.4.8",
     "apollo-server-testing": "^2.6.3",
     "bcrypt-nodejs": "^0.0.3",
