@@ -54,7 +54,7 @@ export const ProjectCell = (props: TProps) => {
             : undefined,
         width: '100%',
         padding: props.collapsedLists.includes(props.list.id) ? '0px 8px' : 8,
-        maxHeight: '75vh',
+        maxHeight: props.collapsedLists.includes(props.list.id) ? 100 : '60vh',
         overflowY: 'auto'
       }}
     >
@@ -92,7 +92,7 @@ export const ProjectCell = (props: TProps) => {
                 props.collapseList(props.list.id)
               }}
             >
-              Toggle Collapsed
+              {props.collapsedLists.includes(props.list.id) ? 'Uncollapse' : 'Collapse'}
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -137,7 +137,7 @@ export const ProjectCell = (props: TProps) => {
                   : 78,
                 height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
                 backgroundColor: 'white',
-                paddingBottom: 78 // needed for dragging to bottom of list
+                paddingBottom: props.collapsedLists.includes(props.list.id) ? 0 : 78 // needed for dragging to bottom of list
               }}
               {...dropProvided.droppableProps}
               ref={dropProvided.innerRef}

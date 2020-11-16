@@ -16,10 +16,9 @@ import { Timer } from '@material-ui/icons'
 import { About } from './components/Landing/About'
 
 import { Header } from './components/Header'
-import { WelcomeDialog } from './components/Welcome/WelcomeDialog'
+// import { WelcomeDialog } from './components/Welcome/WelcomeDialog'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
 import { ApolloProvider } from 'react-apollo'
-import { ApolloProvider as ApolloHooksProvider } from '@apollo/react-hooks'
 import { print } from 'graphql'
 import { loginA } from './store/actions/auth'
 import { Mutation } from './graphql/types'
@@ -88,7 +87,7 @@ const Router = () => {
       <>
         <Header />
         <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
-        <WelcomeDialog />
+        {/* <WelcomeDialog /> */}
         {!open && (
           <>
             <Fab
@@ -183,12 +182,10 @@ export const Wrapper = () => {
   return (
     <Provider store={store}>
       <ApolloProvider client={client}>
-        <ApolloHooksProvider client={client}>
-          <MuiThemeProvider theme={theme}>
-            <SnackbarRoot />
-            <Router />
-          </MuiThemeProvider>
-        </ApolloHooksProvider>
+        <MuiThemeProvider theme={theme}>
+          <SnackbarRoot />
+          <Router />
+        </MuiThemeProvider>
       </ApolloProvider>
     </Provider>
   )

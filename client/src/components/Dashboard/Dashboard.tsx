@@ -61,7 +61,7 @@ export const Dashboard = () => {
         ],
         datasets: [
           {
-            label: 'Nice Graph Courtesy of Conrad Kay',
+            label: 'Nice Graph Courtesy of Austin Kay',
             data: genNums(7),
             fill: false,
             backgroundColor,

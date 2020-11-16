@@ -2,28 +2,24 @@ import React from 'react'
 import { withStyles, Theme, createStyles } from '@material-ui/core/styles'
 import { Typography, WithStyles, Button } from '@material-ui/core'
 import { FeatureTable } from './FeatureTable'
-import { Pricing } from './Pricing'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
 
 const styles = (theme: Theme) =>
   createStyles({
     heroContent: {
-      margin: '0 auto',
-      backgroundImage:
-        'url("http://tadalafilforsale.net/data/media/40/56168863.jpg")',
-      height: '48vh',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
+      minHeight: 180,
+      padding: 40,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: 'white',
       position: 'relative',
-      marginBottom: 20
+      flexDirection: 'column',
     },
     heroTitle: {
       fontSize: 64,
-      color: 'white',
       textAlign: 'center',
-      margin: 'auto 0px',
-      position: 'absolute'
     },
     kayLink: {
       marginLeft: 'auto',
@@ -56,27 +52,20 @@ export const About = withStyles(styles)((props: TProps) => {
         />
       </Helmet>
       <div className={classes.heroContent}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Typography variant="h2" className={classes.heroTitle}>
-            Mantella — It's Free
-          </Typography>
+        <Typography variant="h2" className={classes.heroTitle}>
+          Mantella — It's Free
+        </Typography>
+        <div style={{display:'flex'}}>
           <Button
             variant="contained"
             color="secondary"
             size="large"
             onClick={() => (location.hash = '#/register')}
-            style={{ marginTop: 'auto', marginBottom: 32 }}
+            style={{ marginTop: 'auto' }}
           >
             Sign up today
           </Button>
+          <a onClick={() => (location.hash = '#/login')} style={{height: '100%', fontSize: 18, color: 'blue', textDecoration: 'underline', margin: 'auto 12px', cursor: 'pointer' }}>Login instead?</a>
         </div>
       </div>
       <div style={{ margin: '20px 0' }}>
@@ -91,23 +80,18 @@ export const About = withStyles(styles)((props: TProps) => {
             data-locale="en_US"
             data-type="vertical"
             data-theme="dark"
-            data-vanity="conrad-kay-4a823b139"
+            data-vanity="austin-kay-4a823b139"
           >
             <a
               target="_blank"
               rel="noopener noreferrer"
               className="LI-simple-link"
-              href="https://www.linkedin.com/in/conrad-kay-4a823b139?trk=profile-badge"
+              href="https://www.linkedin.com/in/austin-kay-4a823b139?trk=profile-badge"
             >
-              Conrad Kay - I am the Techlead
+              Austin Kay - Builder
             </a>
           </div>
         </div>
-
-        <Typography variant="h4" align="center" gutterBottom>
-          Pricing
-        </Typography>
-        <Pricing />
         <Typography style={{ marginTop: 20 }} variant="h4" align="center">
           Features
         </Typography>

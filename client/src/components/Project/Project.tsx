@@ -35,7 +35,8 @@ import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
 import { cloneDeep } from 'apollo-utilities'
 import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo'
+
 import { EditTaskModal } from './Task/Edit'
 import { setListA } from '../../store/actions/list'
 import { GQL_DELETE_LIST } from '../../graphql/mutations/list'
@@ -243,7 +244,7 @@ const CProject = (props: TProps) => {
         <AppBar color="default" className={classes.appbar} position="static">
           <Toolbar>
             <input
-              style={{ width: `${windowWidth - 240}px` }}
+              style={{ width: `${windowWidth - 300}px` }}
               className={classes.input}
               value={name}
               onBlur={() =>

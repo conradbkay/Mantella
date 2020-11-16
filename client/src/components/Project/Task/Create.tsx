@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Dialog, DialogTitle, TextField } from '@material-ui/core'
+import { Button, Dialog, DialogTitle, TextField } from '@material-ui/core'
 import { setTaskA } from '../../../store/actions/task'
 import { connect } from 'react-redux'
 
@@ -19,7 +19,7 @@ export const CreateTask = connect(
   actionCreators
 )((props: TProps) => {
   const [name, setName] = useState('')
-  const [importance, setImportance] = useState(0)
+  // const [importance] = useState(0)
 
   return (
     <Dialog open onClose={() => props.onClose()}>
@@ -38,8 +38,10 @@ export const CreateTask = connect(
           fullWidth
           onChange={e => setName(e.target.value)}
         />
+        <Button>Cancel</Button>
+        <Button type="submit">Create</Button>
 
-        <TextField
+        {/* <TextField
           margin="dense"
           value={importance}
           onChange={e => setImportance(parseInt(e.target.value))}
@@ -54,8 +56,8 @@ export const CreateTask = connect(
           onChange={e => setImportance(parseInt(e.target.value))}
           variant="outlined"
           style={{ margin: '12px 0px 12px 6px', width: 'calc(50% - 6px)' }}
-          type="number"
-        />
+        type="number" 
+        /> */}
       </form>
     </Dialog>
   )

@@ -53,7 +53,7 @@ const CProjectSearch = (props: TProps) => {
   })
 
   return (
-    <div style={{ maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto' }}>
+    <div style={{ maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto', minWidth: 280 }}>
       {props.variant !== 'menu' && (
         <Typography align="center" style={{ marginBottom: 10 }} variant="h4">
           Projects

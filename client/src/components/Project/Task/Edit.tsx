@@ -21,7 +21,8 @@ import {
   GQL_SET_SUBTASK,
   GQL_SET_COMMENT
 } from '../../../graphql/mutations/task'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo'
+
 import {
   EditTaskMutation,
   EditTaskMutationVariables,

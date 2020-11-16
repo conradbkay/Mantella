@@ -16,7 +16,7 @@ import { Change } from '../../types/types'
 import { TState } from '../../types/state'
 import { useState } from 'react'
 import { openSnackbarA } from '../../store/actions/snackbar'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo'
 import {
   CreateProjectMutation,
   CreateProjectMutationVariables

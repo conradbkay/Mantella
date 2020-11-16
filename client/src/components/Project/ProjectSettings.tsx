@@ -19,7 +19,7 @@ import {
   DeleteProjectMutationVariables
 } from '../../graphql/types'
 import { GQL_DELETE_PROJECT } from '../../graphql/mutations/project'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo'
 
 type TProps = {
   onClose: () => void

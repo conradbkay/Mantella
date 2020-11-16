@@ -14,7 +14,7 @@ const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
 const features = [
   // first in array is feature name, second is for Mantella, third is trello, fourth is kanbanFlow
   ['Subtasks', 'CHECK', 'CHECK', 'CHECK'],
-  ['EPIC DESIGN', 'Material', 'Minimal', 'Nice'],
+  ['UI/UX', 'Material', 'Minimal', 'NO'],
   ['Multiple Projects', 'CHECK', 'CHECK', 'CHECK'],
   ['Filtering', 'CHECK', 'CHECK', 'CHECK'],
   ['Recurring Tasks', 'CHECK', 'CHECK', 'CHECK'],

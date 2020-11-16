@@ -24,7 +24,7 @@ import {
   CreateListMutationVariables
 } from '../../graphql/types'
 import { GQL_CREATE_LIST } from '../../graphql/mutations/list'
-import { useMutation } from '@apollo/react-hooks'
+import { useMutation } from 'react-apollo'
 
 interface OwnProps {
   project: TProject
