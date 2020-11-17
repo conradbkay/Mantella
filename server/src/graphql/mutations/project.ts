@@ -1,17 +1,22 @@
+import { Column } from '../../models/Project'
 import { ProjectProps } from './../../models/Project'
 import { AuthenticationError } from 'apollo-server-core'
 import { UserModel } from './../../models/User'
 import { MutationResolvers } from '../../graphql/types'
 import { ProjectModel } from '../../models/Project'
 import uuid from 'uuid'
+
+const generateColumn = (name: string, id: string, isInProgress: boolean): Column => ({
+  id, name, collapsedUsers: [], inProgress: isInProgress
+})
+
 const createProject: MutationResolvers['createProject'] = async (
   parent,
   args,
   context
 ) => {
   const creatingId = uuid()
-  const colId = uuid()
-
+  const listId = uuid()
   const user = await UserModel.findOne({ id: context.userId.id })
 
   if (user) {
@@ -23,16 +28,17 @@ const createProject: MutationResolvers['createProject'] = async (
         name: args.name,
         ownerId: user.id,
         users: [user.id],
+        columns: [generateColumn('Created', uuid(), false), generateColumn('In Progress', uuid(), true), generateColumn('Created', uuid(), false)],
         lists: [
           {
-            id: colId,
+            id: listId,
             name: 'Generic',
             taskIds: []
           }
         ],
         tasks: [],
         enrolledUsers: [],
-        columnOrder: [colId],
+        columnOrder: [listId],
         isPrivate: false
       } as ProjectProps),
       user.save()

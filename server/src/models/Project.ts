@@ -11,6 +11,14 @@ export const ProjectSchema = new Schema({
       id: { type: String, required: true }
     }
   ],
+  columns: [
+    {
+      id: {type: String, required: true},
+      name: {type: String, required: true},
+      collapsedUsers: [{type: String, required: true}],
+      inProgress: Boolean
+    }
+  ],
   tasks: [
     {
       progress: { type: Number, required: true }, // 0 for none, 1 for in-progress, 2 for complete
@@ -78,6 +86,12 @@ export interface TaskProps {
   } | null
 }
 
+export interface Column {
+  name: string
+  id: string
+  collapsedUsers: string[]
+  inProgress?: boolean
+}
 export interface ProjectProps {
   id: string
   name: string
@@ -87,6 +101,8 @@ export interface ProjectProps {
     name: string
     id: string
   }>
+
+  columns: Column[]
 
   tasks: TaskProps[]
 

@@ -27,6 +27,13 @@ type TaskRecurrance {
   nextDue: String
 }
 
+type Column {
+  name: String!
+  id: String!
+  collapsedUsers: [String!]!
+  inProgress: Boolean
+}
+
 type Task {
   progress: Int!
 
@@ -64,6 +71,7 @@ type Project {
   name: String!
   id: String!
   lists: [List!]!
+  columns: [Column!]!
   users: [String!]! # if null is a private project
   tasks: [Task!]!
 }
@@ -113,6 +121,11 @@ type ListMerge {
   list: List
 }
 
+type ColumnMerge {
+  project: Project!
+  column: Column
+}
+
 input ListInfo {
   name: String
   completed: Boolean
@@ -151,6 +164,10 @@ type Mutation {
   createList(projId: String!, name: String!): ListMerge!
   editList(listId: String!, projId: String!, newList: ListInput!): ListMerge!
   deleteList(projId: String!, id: String!): DeleteReturn!
+
+  createColumn(projId: String!, name: String!): ColumnMerge!
+  toggleCollapsed(projId: String!, colId: String!): ColumnMerge!
+  deleteColumn(projId: String!, colId: String!): DeleteReturn!
 
   removeMemberFromProject(projectId: String!, userId: String!): Project!
 

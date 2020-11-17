@@ -116,23 +116,25 @@ export const projectData = (
   newUserId: string,
   projectId: string
 ): ProjectProps => {
-  const columnIds = [uuid(), uuid(), uuid()]
+  const listIds = [uuid(), uuid(), uuid()]
+  // const columnIds = [uuid(), uuid(), uuid()]
 
   return {
     name: 'Tutorial Project',
+    columns: [],
     lists: [
       {
-        id: columnIds[0],
+        id: listIds[0],
         name: 'Fundementals',
         taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
       },
       {
-        id: columnIds[1],
+        id: listIds[1],
         name: 'Setting Up',
         taskIds: [ids[6], ids[7], ids[8], ids[9]]
       },
       {
-        id: columnIds[2],
+        id: listIds[2],
         name: 'Other Features',
         taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
       }

@@ -12,6 +12,18 @@ export type Auth = {
   user: User
 }
 
+export type Column = {
+  name: Scalars['String']
+  id: Scalars['String']
+  collapsedUsers: Array<Scalars['String']>
+  inProgress?: Maybe<Scalars['Boolean']>
+}
+
+export type ColumnMerge = {
+  project: Project
+  column?: Maybe<Column>
+}
+
 export type Comment = {
   comment: Scalars['String']
   dateAdded: Scalars['String']
@@ -61,6 +73,9 @@ export type Mutation = {
   createList: ListMerge
   editList: ListMerge
   deleteList: DeleteReturn
+  createColumn: ColumnMerge
+  toggleCollapsed: ColumnMerge
+  deleteColumn: DeleteReturn
   removeMemberFromProject: Project
   setComment: Task
   setSubtask: Task
@@ -140,6 +155,21 @@ export type MutationDeleteListArgs = {
   id: Scalars['String']
 }
 
+export type MutationCreateColumnArgs = {
+  projId: Scalars['String']
+  name: Scalars['String']
+}
+
+export type MutationToggleCollapsedArgs = {
+  projId: Scalars['String']
+  colId: Scalars['String']
+}
+
+export type MutationDeleteColumnArgs = {
+  projId: Scalars['String']
+  colId: Scalars['String']
+}
+
 export type MutationRemoveMemberFromProjectArgs = {
   projectId: Scalars['String']
   userId: Scalars['String']
@@ -173,6 +203,7 @@ export type Project = {
   name: Scalars['String']
   id: Scalars['String']
   lists: Array<List>
+  columns: Array<Column>
   users: Array<Scalars['String']>
   tasks: Array<Task>
 }
@@ -337,6 +368,7 @@ export type ResolversTypes = {
   TaskSecurity: TaskSecurity
   Boolean: Scalars['Boolean']
   List: List
+  Column: Column
   Task: Task
   Int: Scalars['Int']
   Comment: Comment
@@ -352,6 +384,7 @@ export type ResolversTypes = {
   DeleteReturn: DeleteReturn
   ListMerge: ListMerge
   ListInput: ListInput
+  ColumnMerge: ColumnMerge
   SubtaskInfo: SubtaskInfo
   Profile: Profile
   ListInfo: ListInfo
@@ -362,6 +395,32 @@ export type AuthResolvers<
   ParentType = ResolversTypes['Auth']
 > = {
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>
+}
+
+export type ColumnResolvers<
+  ContextType = any,
+  ParentType = ResolversTypes['Column']
+> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
+  collapsedUsers?: Resolver<
+    Array<ResolversTypes['String']>,
+    ParentType,
+    ContextType
+  >
+  inProgress?: Resolver<
+    Maybe<ResolversTypes['Boolean']>,
+    ParentType,
+    ContextType
+  >
+}
+
+export type ColumnMergeResolvers<
+  ContextType = any,
+  ParentType = ResolversTypes['ColumnMerge']
+> = {
+  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>
+  column?: Resolver<Maybe<ResolversTypes['Column']>, ParentType, ContextType>
 }
 
 export type CommentResolvers<
@@ -492,6 +551,24 @@ export type MutationResolvers<
     ContextType,
     MutationDeleteListArgs
   >
+  createColumn?: Resolver<
+    ResolversTypes['ColumnMerge'],
+    ParentType,
+    ContextType,
+    MutationCreateColumnArgs
+  >
+  toggleCollapsed?: Resolver<
+    ResolversTypes['ColumnMerge'],
+    ParentType,
+    ContextType,
+    MutationToggleCollapsedArgs
+  >
+  deleteColumn?: Resolver<
+    ResolversTypes['DeleteReturn'],
+    ParentType,
+    ContextType,
+    MutationDeleteColumnArgs
+  >
   removeMemberFromProject?: Resolver<
     ResolversTypes['Project'],
     ParentType,
@@ -540,6 +617,7 @@ export type ProjectResolvers<
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>
   lists?: Resolver<Array<ResolversTypes['List']>, ParentType, ContextType>
+  columns?: Resolver<Array<ResolversTypes['Column']>, ParentType, ContextType>
   users?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
   tasks?: Resolver<Array<ResolversTypes['Task']>, ParentType, ContextType>
 }
@@ -649,6 +727,8 @@ export type VoidResolvers<
 
 export type Resolvers<ContextType = any> = {
   Auth?: AuthResolvers<ContextType>
+  Column?: ColumnResolvers<ContextType>
+  ColumnMerge?: ColumnMergeResolvers<ContextType>
   Comment?: CommentResolvers<ContextType>
   DeleteReturn?: DeleteReturnResolvers<ContextType>
   List?: ListResolvers<ContextType>
