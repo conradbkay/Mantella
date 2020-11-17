@@ -2,13 +2,13 @@ import { format } from 'date-fns'
 import { hasPassed } from './hasPassed'
 import { TTask } from '../types/project'
 import { toDaysHHMMSS } from './convertToTime'
-import { differenceInDays } from 'date-fns'
+import { formatDistance } from 'date-fns'
 
 // Jan 1st 12:02 am
 const baseFormat = (date: Date): string => format(date, 'MMM do h:mm a')
 
 const overdueFormat = (date: Date): string => {
-  return 'Overdue by ' + differenceInDays(date, new Date())
+  return 'Overdue by ' + formatDistance( new Date(), date)
 }
 
 const god = (date: Date, hasOver?: boolean): string => {
@@ -33,5 +33,5 @@ export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
     )} next: ${god(new Date(task.dueDate), hasOverDue)}`
   }
 
-  return 'Due on the next big thonk?'
+  return god(new Date(task.dueDate), hasOverDue)
 }
