@@ -111,7 +111,7 @@ export const ProjectCell = (props: TProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                if (deletingList) {
+                if (deletingList && props.project.lists.length > 1) {
                   setAnchorEl(null)
                   props.deleteList(props.list.id)
                 } else {
@@ -173,7 +173,7 @@ export const ProjectCell = (props: TProps) => {
       {creating && (
         <CreateTask
           onClose={() => setCreating('')}
-          projectId={props.project.id}
+          project={props.project}
           listId={props.project.lists[0].id}
           columnId={creating}
         />

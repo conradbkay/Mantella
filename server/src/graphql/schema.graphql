@@ -82,13 +82,13 @@ type List {
   name: String!
   id: String!
 }
-
 input TaskInput {
   name: String
   points: Int
   dueDate: String # String string
   recurrance: String # daily | weekly | none
   color: String # hex
+  subTasks: [SubtaskInfo]
 }
 
 input ProjectInput {

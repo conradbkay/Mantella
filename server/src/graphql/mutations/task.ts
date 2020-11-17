@@ -18,7 +18,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       dueDate: obj.taskInfo.dueDate
         ? new Date(obj.taskInfo.dueDate).toString()
         : null,
-      subTasks: [],
+      subTasks: obj.taskInfo.subTasks ? obj.taskInfo.subTasks.map(subT => ({...subT, id: uuid()})) : [],
       comments: [],
       recurrance: null
     } as TaskProps)

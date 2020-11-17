@@ -261,6 +261,7 @@ export type TaskInput = {
   dueDate?: Maybe<Scalars['String']>
   recurrance?: Maybe<Scalars['String']>
   color?: Maybe<Scalars['String']>
+  subTasks?: Maybe<Array<Maybe<SubtaskInfo>>>
 }
 
 export type TaskMerge = {
@@ -378,6 +379,7 @@ export type ResolversTypes = {
   User: User
   Mutation: {}
   TaskInput: TaskInput
+  SubtaskInfo: SubtaskInfo
   TaskMerge: TaskMerge
   Auth: Auth
   Void: Void
@@ -386,7 +388,6 @@ export type ResolversTypes = {
   ListMerge: ListMerge
   ListInput: ListInput
   ColumnMerge: ColumnMerge
-  SubtaskInfo: SubtaskInfo
   Profile: Profile
   ListInfo: ListInfo
 }

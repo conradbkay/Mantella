@@ -1,20 +1,21 @@
 import React, { useState } from 'react'
-import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, TextField, Tooltip } from '@material-ui/core'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, IconButton, MenuItem, Select, TextField } from '@material-ui/core'
 import { connect } from 'react-redux'
 import { GQL_CREATE_TASK } from '../../../graphql/mutations/task'
 import { CreateTaskMutation, CreateTaskMutationVariables } from '../../../graphql/types'
 import {useMutation} from 'react-apollo'
 import { setProjectA } from '../../../store/actions/project'
 import { Close } from '@material-ui/icons'
-import { Change } from '../../../types/types'
 import { ChooseColor } from '../../utils/chooseColor'
+import { TProject } from '../../../types/project'
+import { DateTimePicker } from 'react-widgets'
 const actionCreators = {
   setProject: setProjectA
 }
 
 type OwnProps = {
   onClose: () => void
-  projectId: string
+  project: TProject
   columnId: string
   listId: string
 }
@@ -26,8 +27,10 @@ export const CreateTask = connect(
   actionCreators
 )((props: TProps) => {
   const [name, setName] = useState('')
-  const [hasDate, setHasDate] = useState(false)
   const [color, setColor] = useState('#FFFFFF')
+  const [points, setPoints] = useState(0)
+  const [listId, setListId] = useState(props.project.lists[0].id)
+  const [dueDate, setDueDate] = useState(undefined as undefined | Date)
   const [createTaskExec] = useMutation<
     CreateTaskMutation,
     CreateTaskMutationVariables
@@ -52,12 +55,13 @@ export const CreateTask = connect(
 
           createTaskExec({
             variables: {
-              projId: props.projectId,
-              listId: props.listId,
-              // columnId: props.columnId,
+              projId: props.project.id,
+              listId: listId,
               taskInfo: {
-                // color,
-                name
+                points,
+                color,
+                name,
+                dueDate: dueDate ? dueDate.toString() : undefined
               }
             }
           })
@@ -76,27 +80,85 @@ export const CreateTask = connect(
             For example, if you needed to create a Youtube thumbnail, the first
             task would be: "Create Title"
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Task Name"
-            value={name}
-            onChange={({ target }: Change) => setName(target.value)}
-            fullWidth
-          />
-          <div style={{ display: 'flex', margin: '16px 0px' }}>
-            <Tooltip title="Should Task enforce Due Date?">
-              <Checkbox
-                style={{ display: 'inline-block' }}
-                checked={hasDate}
-                onChange={e => setHasDate(e.target.checked)}
-              />
-            </Tooltip>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              flex: '0 0 auto',
+              marginTop: 12
+            }}
+          >
+            <TextField
+              style={{ margin: '0 4px' }}
+              required
+              autoFocus
+              variant="outlined"
+              color="secondary"
+              label="Title"
+              value={name}
+              onChange={({ target }) =>
+                setName(target.value)
+              }
+              fullWidth
+            />
+            <TextField
+              style={{ margin: '0 4px', width: '33%' }}
+              required
+              fullWidth
+              variant="outlined"
+              label="Points"
+              value={points}
+              type="number"
+              onChange={e => {
+                e.persist() // for some reason it unfocuses without this!
+                if (parseInt(e.target.value) >= 0) {
+                  setPoints(parseInt(e.target.value))
+                }
+              }}
+            />
           </div>
-          <ChooseColor
-            color={color}
-            onChange={(newColor: string) => setColor(newColor)}
-          />
+          <div style={{ display: 'flex', marginTop: 20 }}>
+            <ChooseColor
+              color={color || '#FFFFFF'}
+              onChange={(color: string) => {
+                setColor(color)
+              }}
+            />
+
+            <div style={{ width: 24 }} />
+
+            <FormControl fullWidth>
+              <Select
+                fullWidth
+                value={listId}
+                onChange={e => {
+                  setListId(e.target.value as any)
+                }}
+              >
+                {props.project.lists.map((list, i) => {
+                  return (
+                    <MenuItem key={list.id} value={list.id}>
+                      <pre>
+                        <em>{list.name}</em>
+                      </pre>
+                    </MenuItem>
+                  )
+                })}
+              </Select>
+              <FormHelperText>Task's List</FormHelperText>
+            </FormControl>
+          </div>
+          <div style={{ display: 'flex', marginTop: 20 }}>
+            <DateTimePicker
+            dropUp
+              containerClassName="fullwidth"
+              value={dueDate}
+              onChange={(date) => {
+                setDueDate(date)
+              }}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.onClose()} color="secondary">

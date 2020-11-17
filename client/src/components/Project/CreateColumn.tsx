@@ -60,11 +60,9 @@ const CCreateColumn = (props: CreateColumnProps) => {
         projectId: props.project.id,
         newList: {
           taskIds: [],
-          name: createList.list!.name
+          name: createList.list!.name || 'List'
         }
       })
-
-      onClose()
     }
   })
 
@@ -73,12 +71,15 @@ const CCreateColumn = (props: CreateColumnProps) => {
       <form
         onSubmit={e => {
           e.preventDefault()
+
           createListExec({
             variables: {
               name: name || 'List',
               projId: project.id
             }
           })
+    
+          onClose()
         }}
       >
         <DialogTitle>Create List</DialogTitle>
@@ -88,25 +89,24 @@ const CCreateColumn = (props: CreateColumnProps) => {
         <DialogContent>
           <DialogContentText>
             Lists should contain either a type or date of task. Ex: "Amanda",
-            "Completing", or "Writing"
+            "Expert Tasks", or "Writing"
           </DialogContentText>
           <TextField
             required
             autoFocus
             margin="dense"
-            label="Column Name"
+            label="List Name"
             value={name}
             onChange={({ target }: Change) => setName(target.value)}
             fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button fullWidth onClick={onClose} color="secondary">
+          <Button  onClick={onClose} color="secondary">
             Cancel
           </Button>
-
-          <Button fullWidth variant="contained" color="primary" type="submit">
-            Create Column
+          <Button  variant="contained" color="primary" type="submit">
+            Create
           </Button>
         </DialogActions>
       </form>

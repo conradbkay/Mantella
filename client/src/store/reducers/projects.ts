@@ -26,11 +26,11 @@ const SET_LIST = (
   const changing = projects[id(projects, action.projectId)].lists
 
   if (action.newList) {
-    changing[id(changing, action.id)] = {
-      ...action.newList,
-      name: action.newList.name || '',
-      id: action.id
-    } as any
+    changing.push({
+      taskIds: action.newList.taskIds || [],
+      name: action.newList.name || 'List',
+      id: action.id,
+    })
   } else {
     changing.splice(id(changing, action.id), 1)
   }
