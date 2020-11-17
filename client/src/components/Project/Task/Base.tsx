@@ -25,10 +25,15 @@ import {
   Comment,
   List
 } from '@material-ui/icons'
+// import {GQL_SET_SUBTASK} from '../../../graphql/mutations/task'
 import { hasPassed } from '../../../utils/hasPassed'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
+import { setSubtaskA } from '../../../store/actions/task'
+import { GQL_SET_SUBTASK } from '../../../graphql/mutations/task'
+import { useMutation } from 'react-apollo'
+import { SetSubtaskMutation, SetSubtaskMutationVariables } from '../../../graphql/types'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -58,7 +63,7 @@ export const SubtaskMap = ({
   show
 }: {
   subTasks: TSubtask[]
-  onCheckbox: (subId: string) => void
+  onCheckbox: (newSub: TSubtask) => void
   taskId: string
   show: boolean
 }) => (
@@ -66,12 +71,10 @@ export const SubtaskMap = ({
     <Transition
       initial={null}
       native
-      items={show ? subTasks.filter(subTask => !subTask.completed) : []}
+      items={show ? subTasks : []}
       keys={
         show
-          ? subTasks
-              .filter(subTask => !subTask.completed)
-              .map(subTask => subTask.id)
+          ? subTasks.map(subTask => subTask.id)
           : []
       }
       from={{ opacity: 1, height: 0, overflow: 'hidden' }}
@@ -95,14 +98,14 @@ export const SubtaskMap = ({
               <CheckBox
                 onClick={e => {
                   e.stopPropagation()
-                  onCheckbox(subTask.id)
+                  onCheckbox({...subTask, completed: false})
                 }}
               />
             ) : (
               <CheckBoxOutlineBlankOutlined
                 onClick={e => {
                   e.stopPropagation()
-                  onCheckbox(subTask.id)
+                  onCheckbox({...subTask, completed: true})
                 }}
               />
             )}
@@ -175,6 +178,18 @@ const CBaseTask = (props: TaskProps) => {
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
 
+  const [setSubtaskExec] = useMutation<SetSubtaskMutation, SetSubtaskMutationVariables>(GQL_SET_SUBTASK, {
+    onCompleted: ({setSubtask}) => {
+      if(setSubtask) {
+
+      }
+      else {
+        console.log('no subtask returned')
+      }
+    },
+    onError: () => {}
+  })
+
   return task ? (
     <div style={{ width: '100%' }}>
       <div
@@ -186,7 +201,7 @@ const CBaseTask = (props: TaskProps) => {
           minHeight: MIN_HEIGHT,
           backgroundColor: task.color ? task.color : 'white',
           border,
-          borderBottom: task.subTasks.length ? 'none' : 'border',
+          borderBottom: 'border',
           ...provided.draggableProps.style,
           color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
           outline: 'none'
@@ -231,6 +246,7 @@ const CBaseTask = (props: TaskProps) => {
                 id={task.id}
                 style={{
                   fontSize: 18,
+                  maxWidth: '94%',
                   color:
                     snapshot && snapshot.isDragging
                       ? 'gray'
@@ -252,9 +268,9 @@ const CBaseTask = (props: TaskProps) => {
               show={showSubTasks}
               subTasks={task.subTasks}
               taskId={task.id}
-              onCheckbox={(subId: string) => {
-                console.log('SUBTASK COMPLETE NOT IMPLEMENTED BY APOLLO YET')
-                // props.completeSubTask(task.id, project.id, subId)
+              onCheckbox={(newSub: TSubtask) => {
+                props.setSubtask({taskId: task.id, projectId: props.project.id, id: newSub.id, newSubtask: newSub})
+                setSubtaskExec({variables: {projId: props.project.id, taskId: task.id, subtaskId: newSub.id, info: {name: newSub.name, completed: newSub.completed}}})
               }}
             />
 
@@ -397,7 +413,8 @@ const actionCreators = {
   selectPomodoroTask: selectPomodoroTaskA,
   stopSelectingMember: selectMemberA,
   toggleTimer: toggleTimerA,
-  selectMember: selectMemberA
+  selectMember: selectMemberA,
+  setSubtask: setSubtaskA
 }
 
 export const BaseTask = withStyles(styles)(

@@ -3,14 +3,13 @@ import { TList, TProject } from '../../../types/project'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
 import {
-  Button,
   IconButton,
   Menu as MuiMenu,
   MenuItem
 } from '@material-ui/core'
 import { id } from '../../../utils/utilities'
 import { CreateTask } from '../Task/Create'
-import { Menu } from '@material-ui/icons'
+import { Menu, Add } from '@material-ui/icons'
 
 type OwnProps = {
   progress: number // 0, 1, or 2
@@ -34,7 +33,7 @@ export const ProjectCell = (props: TProps) => {
     tasks = tasks
   }
 
-  const [creating, setCreating] = useState(false)
+  const [creating, setCreating] = useState('')
   const [anchorEl, setAnchorEl] = useState(null as any)
   const [deletingList, setDeletingList] = useState(null as any)
 
@@ -76,10 +75,19 @@ export const ProjectCell = (props: TProps) => {
           </h2>
           <IconButton
             onClick={e => setAnchorEl(e.currentTarget)}
-            style={{ marginLeft: 8 }}
+            style={{ marginLeft: 'auto' }}
           >
             <Menu />
           </IconButton>
+          {!props.collapsedLists.includes(props.list.id) && (
+        <IconButton
+          color="primary"
+          style={{ marginLeft: 8}}
+          onClick={() => setCreating('string') /* TODO: add columns */}
+        >
+          <Add />
+        </IconButton>
+      )}
           <MuiMenu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -162,19 +170,12 @@ export const ProjectCell = (props: TProps) => {
           )
         }}
       </Droppable>
-
-      {props.progress === 0 && !props.collapsedLists.includes(props.list.id) && (
-        <Button
-          style={{ width: '100%', marginTop: 8 }}
-          onClick={() => setCreating(true)}
-        >
-          Create Task
-        </Button>
-      )}
       {creating && (
         <CreateTask
-          onClose={() => setCreating(false)}
+          onClose={() => setCreating('')}
           projectId={props.project.id}
+          listId={props.project.lists[0].id}
+          columnId={creating}
         />
       )}
     </td>

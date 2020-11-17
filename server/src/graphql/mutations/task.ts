@@ -26,6 +26,8 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
     const list = proj.lists.find((col) => col.id === obj.listId)!
     list.taskIds = [...list.taskIds, taskId]
 
+    proj.columns[0].taskIds.push(taskId)
+
     const newProj = await proj.save()
 
     const pure: ProjectProps = await newProj.toObject()
@@ -127,31 +129,30 @@ const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
   const proj = await ProjectModel.findOne({ id: obj.projId })
   if (proj) {
     const task: TaskProps = proj.tasks.find((tsk) => tsk.id === obj.taskId)!
-
-    if (obj.subtaskId) {
-      const subTask: TaskProps['subTasks'][0] = task.subTasks.find(
-        (subT) => subT.id === obj.subtaskId
-      )!
-
-      if (!obj.info) {
-        (subTask as any).remove()
-      } else {
-        subTask.completed =
-          obj.info!.completed !== null && obj.info!.completed !== undefined
-            ? obj.info!.completed
-            : subTask.completed
-
-        subTask.name =
-          obj.info!.name !== null && obj.info!.name !== undefined
-            ? obj.info!.name
-            : subTask.name
-      }
-    } else {
+    const subTask: TaskProps['subTasks'][0] = task.subTasks.find(
+      (subT) => subT.id === obj.subtaskId
+    )!
+    
+    if(!subTask) {
       task.subTasks.push({
         completed: false,
         name: obj.info!.name || 'Subtask',
-        id: uuid()
+        id: obj.subtaskId!
       })
+    }
+
+    else if (!obj.info) {
+      task.subTasks = task.subTasks.filter((sub) => sub.id !== obj.subtaskId)
+    } else {
+      subTask.completed =
+        obj.info!.completed !== null && obj.info!.completed !== undefined
+          ? obj.info!.completed
+          : subTask.completed
+
+      subTask.name =
+        obj.info!.name !== null && obj.info!.name !== undefined
+          ? obj.info!.name
+          : subTask.name
     }
 
     const newProj = await proj.save()

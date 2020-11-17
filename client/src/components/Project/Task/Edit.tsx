@@ -12,6 +12,7 @@ import {
   Checkbox,
   IconButton
 } from '@material-ui/core'
+import uuid from 'uuid'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
 import { id, getAllListsArr } from '../../../utils/utilities'
@@ -75,9 +76,6 @@ export const EditTaskModal = connect(
     SetSubtaskMutationVariables
   >(GQL_SET_SUBTASK, {
     onCompleted: ({ setSubtask }) => {
-      setTask({
-        ...setSubtask
-      })
       props.setTask({
         id: setSubtask.id,
         projectId: props.projectId,
@@ -351,6 +349,10 @@ export const EditTaskModal = connect(
                   marginTop: 'auto'
                 }}
                 onClick={() => {
+                  setTask({
+                    ...task,
+                    subTasks: task.subTasks.filter((sub) => sub.id !== task.subTasks[i].id)
+                  })
                   setSubtaskExec({
                     variables: {
                       projId: props.projectId,
@@ -373,11 +375,17 @@ export const EditTaskModal = connect(
               marginLeft: 'auto'
             }}
             onClick={() => {
+              const subTaskId = uuid()
+              setTask({
+                ...task,
+                subTasks: [...task.subTasks, {id: subTaskId, completed: false, name: 'Subtask Name' }]
+              })
+
               setSubtaskExec({
                 variables: {
                   projId: props.projectId,
                   taskId: props.task.id,
-                  subtaskId: null,
+                  subtaskId: subTaskId,
                   info: {
                     name: 'Subtask Name',
                     completed: false

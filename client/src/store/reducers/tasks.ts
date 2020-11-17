@@ -1,5 +1,5 @@
 import { ReducerCases } from '../actions/types'
-import { setTaskA } from '../actions/task'
+import { setSubtaskA, setTaskA } from '../actions/task'
 import { tickA } from '../actions/pomodoro'
 import { TProject } from '../../types/project'
 import { id } from '../../utils/utilities'
@@ -27,7 +27,13 @@ const SET_TASK = (
   }
 }
 
-// const SET_SUBTASK = (projects: TProjects, action) => {}
+const SET_SUBTASK = (projects: TProject[], action: ReturnType<typeof setSubtaskA>) => {
+  const project = projects[id(projects, action.projectId)]
+  const task = project.tasks[id(project.tasks, action.taskId)]
+
+  task.subTasks[id(task.subTasks, action.id)] = action.newSubtask
+  project.tasks[id(project.tasks, action.taskId)] = task
+}
 // const SET_COLUMN = () => {}
 
 const TICK = (projects: TProject[], action: ReturnType<typeof tickA>) => {
@@ -39,5 +45,6 @@ const TICK = (projects: TProject[], action: ReturnType<typeof tickA>) => {
 
 export const taskCases = {
   TICK,
-  SET_TASK
+  SET_TASK,
+  SET_SUBTASK
 } as ReducerCases<TProject[]>

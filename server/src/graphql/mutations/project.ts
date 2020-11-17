@@ -7,7 +7,7 @@ import { ProjectModel } from '../../models/Project'
 import uuid from 'uuid'
 
 const generateColumn = (name: string, id: string, isInProgress: boolean): Column => ({
-  id, name, collapsedUsers: [], inProgress: isInProgress
+  id, name, collapsedUsers: [], inProgress: isInProgress, taskIds: []
 })
 
 const createProject: MutationResolvers['createProject'] = async (

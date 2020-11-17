@@ -1,7 +1,7 @@
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { getDate, getDay } from 'date-fns'
+import { getDate, getDay, isPast, addHours } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
 // import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
@@ -30,7 +30,7 @@ type TProps = OwnProps & ReturnType<typeof mapState> & WithStyles<typeof styles>
 
 const CWeekDay = (props: TProps) => {
   const { day, tasks, index } = props
-  // const hasPassed = index === 0
+  const hasPassed = isPast(addHours(day, 20))
   const withDate = tasks.filter(
     task =>
       task.dueDate !== undefined &&
@@ -46,7 +46,7 @@ const CWeekDay = (props: TProps) => {
     <div
       style={{
         borderRight: index !== 6 ? '1px solid #e0e0e0' : undefined,
-        flex: '1 0 calc(1000px / 7)'
+        flex: '1 0 calc(1000px / 7)',
       }}
     >
       <div
@@ -63,7 +63,7 @@ const CWeekDay = (props: TProps) => {
         <div style={{ fontSize: '1.3rem' }}>{names[getDay(day)]}</div>
       </div>
       <Droppable
-        isDropDisabled={/* hasPassed */ false}
+        isDropDisabled={hasPassed}
         droppableId={day.getTime().toString()}
       >
         {(provided, snapshot) => (
@@ -83,6 +83,7 @@ const CWeekDay = (props: TProps) => {
                 draggableId={task.id.toString()}
               >
                 {(prov, snap) => (
+                  <div style={{paddingTop: i ? 0 : 93}}>
                   <BaseTask
                     project={
                       props.projects[
@@ -97,6 +98,7 @@ const CWeekDay = (props: TProps) => {
                     snapshot={snap}
                     task={task}
                   />
+                  </div>
                 )}
               </Draggable>
             ))}

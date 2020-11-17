@@ -32,6 +32,7 @@ type Column {
   id: String!
   collapsedUsers: [String!]!
   inProgress: Boolean
+  taskIds: [String!]!
 }
 
 type Task {

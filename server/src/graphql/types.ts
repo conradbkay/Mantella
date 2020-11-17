@@ -17,6 +17,7 @@ export type Column = {
   id: Scalars['String']
   collapsedUsers: Array<Scalars['String']>
   inProgress?: Maybe<Scalars['Boolean']>
+  taskIds: Array<Scalars['String']>
 }
 
 export type ColumnMerge = {
@@ -413,6 +414,7 @@ export type ColumnResolvers<
     ParentType,
     ContextType
   >
+  taskIds?: Resolver<Array<ResolversTypes['String']>, ParentType, ContextType>
 }
 
 export type ColumnMergeResolvers<
