@@ -48,6 +48,8 @@ const CWeek = withStyles(styles)((props: TProps) => {
     return [...tasks, ...project.tasks]
   }, [])
 
+  const weekEmpty = Boolean(allTasks.filter((task) => task.dueDate !== undefined).length)
+
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
 
@@ -105,6 +107,9 @@ const CWeek = withStyles(styles)((props: TProps) => {
           </div>
         </DragDropContext>
       </div>
+      {weekEmpty && (
+        <h1 style={{margin: '20px auto', textAlign: 'center'}}>You have no tasks with due dates</h1>
+      )}
     </>
   )
 })

@@ -46,11 +46,12 @@ const CWeekDay = (props: TProps) => {
     <div
       style={{
         borderRight: index !== 6 ? '1px solid #e0e0e0' : undefined,
-        flex: '1 0 calc(1200px / 7)'
+        flex: '1 0 calc(1000px / 7)'
       }}
     >
       <div
         style={{
+          position: 'absolute',
           fontSize: '3.2rem',
           fontWeight: 300,
           margin: '0 0 0 .8rem',
