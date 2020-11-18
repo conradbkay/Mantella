@@ -18,7 +18,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       dueDate: obj.taskInfo.dueDate
         ? new Date(obj.taskInfo.dueDate).toString()
         : null,
-      subTasks: obj.taskInfo.subTasks ? obj.taskInfo.subTasks.map(subT => ({...subT, id: uuid()})) : [],
+      subTasks: obj.taskInfo.subTasks ? obj.taskInfo.subTasks.map(subT => ({...subT, id: uuid()})) :  [],
       comments: [],
       recurrance: null
     } as TaskProps)
@@ -26,7 +26,7 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
     const list = proj.lists.find((col) => col.id === obj.listId)!
     list.taskIds = [...list.taskIds, taskId]
 
-    proj.columns[0].taskIds.push(taskId)
+    // proj.columns[0].taskIds.push(taskId)
 
     const newProj = await proj.save()
 
