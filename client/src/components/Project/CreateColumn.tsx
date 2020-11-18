@@ -117,7 +117,7 @@ const CCreateColumn = (props: CreateColumnProps) => {
 const actionCreators = {
   setList: setListA
 }
-
+// rename
 export const CreateColumn = connect(
   null,
   actionCreators
