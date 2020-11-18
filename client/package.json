@@ -61,19 +61,7 @@
     "sweetalert": "^2.1.2",
     "tslint-config-prettier": "^1.18.0",
     "typed-graphqlify": "^2.4.5",
-    "uuid": "^3.4.0"
-  },
-  "scripts": {
-    "fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --watch --no-cache --env=node",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "graphql-gen": "graphql-codegen --config config.yml"
-  },
-  "devDependencies": {
+    "uuid": "^3.4.0",
     "@graphql-codegen/add": "^1.17.7",
     "@graphql-codegen/cli": "^1.19.1",
     "@graphql-codegen/typescript-operations": "^1.17.9",
@@ -94,7 +82,19 @@
     "@types/react-redux": "^6.0.9",
     "@types/react-router-dom": "^4.3.5",
     "@types/redux-immutable-state-invariant": "^2.1.1",
-    "@types/uuid": "^3.4.9",
+    "@types/uuid": "^3.4.9"
+  },
+  "scripts": {
+    "fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --watch --no-cache --env=node",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "graphql-gen": "graphql-codegen --config config.yml"
+  },
+  "devDependencies": {
     "gh-pages": "^2.2.0",
     "graphql-codegen-typescript-common": "^0.18.1",
     "graphql-codegen-typescript-resolvers": "^0.18.1",
