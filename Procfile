@@ -1,1 +1,1 @@
-worker: npm start --prefix server
+web: npm start --prefix server
