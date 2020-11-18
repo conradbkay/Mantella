@@ -43,6 +43,8 @@ mongoose.connection.on('connected', () => {
   console.log('Mongo Connected')
 })
 
+console.log(process.env)
+
 if (!process.env.PRIVATE) {
   throw new Error('Private env key not set')
 }
