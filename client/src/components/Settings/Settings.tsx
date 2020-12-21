@@ -46,7 +46,7 @@ const CSettings = (props: TProps) => {
         >
           <ListItem>
             <ListItemText
-              primary="Signout"
+              primary="Log Out"
               secondary="This action cannot be undone"
             />
             <Mutation
@@ -72,7 +72,7 @@ const CSettings = (props: TProps) => {
                       marginLeft: 'auto'
                     }}
                   >
-                    Signout
+                    Log Out
                   </Button>
                 )
               }}

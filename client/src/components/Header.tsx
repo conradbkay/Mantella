@@ -26,7 +26,6 @@ import {
 import { Trail } from 'react-spring/renderprops'
 import {
   HowToReg,
-  PieChart,
   CalendarToday,
   Help,
   Settings
@@ -61,11 +60,6 @@ const noAuthItems = [
 
 const authItems = [
   { label: 'Settings', pathname: '/settings', menuIcon: Settings },
-  {
-    label: 'Dashboard',
-    pathname: '/dashboard',
-    menuIcon: PieChart
-  },
   {
     label: 'Calendar',
     pathname: '/calendar',

@@ -126,4 +126,48 @@ const logout: MutationResolvers['logout'] = async (parent, obj, context) => {
   return { message: 'logged out' }
 }
 
-export const authMutations = { login, register, logout, loginWithCookie }
+const loginAsGuest: MutationResolvers['loginAsGuest'] = async(parent, obj, context) => {
+  const projectId = uuid()
+  const userId = uuid()
+
+  const ids: string[] = []
+
+  for (let i = 0; i < 16; i += 1) {
+    ids.push(uuid())
+  }
+
+  await ProjectModel.create(
+    projectData(ids, taskObjects(ids), userId, projectId)
+  )
+
+  let newUser = await UserModel.create({
+    id: userId,
+    email: uuid() + '.gmail.com',
+    username: "Guest",
+    projects: [projectId],
+    profileImg:
+      'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+  })
+
+  
+  if (newUser) {
+    let projects: any = await ProjectModel.find({
+      id: { $in: newUser.projects }
+    })
+
+    projects = projects.map((proje: any) => proje.toObject())
+
+    return {
+      user: {
+        ...newUser.toObject(),
+        projects: projects
+      }
+    }
+  } 
+  
+  else {
+    throw new Error('Could not create guest, try signing in or registering, sorry')
+  }
+}
+
+export const authMutations = { login, register, logout, loginWithCookie, loginAsGuest }

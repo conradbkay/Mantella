@@ -40,3 +40,14 @@ export const GQL_LOGOUT = gql`
     }
   }
 `
+
+export const GQL_LOGIN_AS_GUEST = gql`
+  ${userFields}
+  mutation loginAsGuest {
+    loginAsGuest {
+      user {
+        ...userFields
+      }
+    }
+  }
+`

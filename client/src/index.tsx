@@ -55,7 +55,6 @@ import { client } from './apollo'
 import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
 import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings/Settings'
-import { Dashboard } from './components/Dashboard/Dashboard'
 import { CalendarWeek } from './components/Calendar/Week'
 
 const Router = () => {
@@ -135,12 +134,6 @@ const Router = () => {
               exact
               path="/project/:id"
               component={Project}
-              componentProps={{}}
-            />
-            <PrivateRoute
-              exact
-              path="/dashboard"
-              component={Dashboard}
               componentProps={{}}
             />
             <PublicOnlyRoute

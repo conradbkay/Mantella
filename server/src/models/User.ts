@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs'
 import { Schema, model, Model, Document } from 'mongoose'
 
 export const UserSchema = new Schema({
-  email: { type: String, unique: true, required: true },
-  password: { type: String, required: true },
+  email: { type: String, unique: true },
+  password: { type: String },
   username: { type: String, required: true },
   profileImg: String,
   projects: [String],

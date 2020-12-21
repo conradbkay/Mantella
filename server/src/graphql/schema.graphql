@@ -154,6 +154,7 @@ type Mutation {
   register(username: String!, password: String!, email: String!): Auth!
   login(email: String!, password: String!): Auth!
   loginWithCookie: Auth!
+  loginAsGuest: Auth!
   logout: Void!
 
   createProject(name: String!): Project!

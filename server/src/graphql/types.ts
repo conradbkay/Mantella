@@ -65,6 +65,7 @@ export type Mutation = {
   register: Auth
   login: Auth
   loginWithCookie: Auth
+  loginAsGuest: Auth
   logout: Void
   createProject: Project
   editProject: Project
@@ -505,6 +506,7 @@ export type MutationResolvers<
     MutationLoginArgs
   >
   loginWithCookie?: Resolver<ResolversTypes['Auth'], ParentType, ContextType>
+  loginAsGuest?: Resolver<ResolversTypes['Auth'], ParentType, ContextType>
   logout?: Resolver<ResolversTypes['Void'], ParentType, ContextType>
   createProject?: Resolver<
     ResolversTypes['Project'],

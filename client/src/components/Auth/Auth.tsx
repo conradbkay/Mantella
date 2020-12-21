@@ -58,7 +58,8 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                 registerData.register.user
               ) {
                 register(registerData.register.user)
-                window.location.hash = '#/dashboard'
+                window.location.hash =
+                  '#/project/' + registerData.register.user.projects[0].id
               } else {
                 openSnackbar(
                   'User with that Email already exists, Sorry!',
@@ -68,7 +69,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
             } else if (authType === 'Login') {
               if (data && data.login && data.login.user) {
                 login(data.login.user)
-                window.location.hash = '#/dashboard'
+                window.location.hash = '#/calendar'
               } else {
                 openSnackbar('Could not login, oopsie!', 'error')
               }
@@ -90,7 +91,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
             return (
               <form
                 autoComplete="on"
-                onSubmit={e => {
+                onSubmit={(e) => {
                   e.preventDefault()
                   if (authType === 'Register') {
                     auth({ variables: { username, password, email } })
@@ -121,7 +122,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                       fullWidth
                       required
                       autoComplete="off"
-                      onChange={e => setUsername(e.target.value)}
+                      onChange={(e) => setUsername(e.target.value)}
                       value={username}
                       label="Full Name"
                     />
@@ -133,7 +134,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                     required
                     autoComplete="on"
                     value={email}
-                    onChange={e => {
+                    onChange={(e) => {
                       setEmail(e.target.value)
                     }}
                     label="Email"
@@ -150,7 +151,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                     type="password"
                     id="password"
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   {/* confirm password */}
                   {authType === 'Register' && (
@@ -163,7 +164,7 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                       label="Confirm Password"
                       error={confirmText !== password}
                       value={confirmText}
-                      onChange={e => setConfirmText(e.target.value)}
+                      onChange={(e) => setConfirmText(e.target.value)}
                     />
                   )}
                   {/* submit button */}
@@ -240,8 +241,5 @@ const actionCreators = {
 }
 
 export const AuthRender = withStyles(formStyles)(
-  connect(
-    null,
-    actionCreators
-  )(Auth)
+  connect(null, actionCreators)(Auth)
 )
