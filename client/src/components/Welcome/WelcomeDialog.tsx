@@ -43,7 +43,7 @@ export const WelcomeDialog = () => {
         >
           {/* put icon between each section man */}
           Greetings, Welcome to Mantella, hello
-          <a href="https://github.com/conradkay/Mantella">Github Page</a>
+          <a href="https://github.com/austin-UW/Mantella">Github Page</a>
         </p>
       </div>
       <div style={{ margin: 8, display: 'flex', justifyContent: 'flex-end' }}>

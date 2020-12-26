@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/conradkay/KanbanBrawn.git"
+    "url": "git+https://github.com/austin-UW/KanbanBrawn.git"
   },
   "author": "ak",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/conradkay/KanbanBrawn/issues"
+    "url": "https://github.com/austin-UW/KanbanBrawn/issues"
   },
   "homepage": "https://mantella.herokuapp.com",
   "dependencies": {

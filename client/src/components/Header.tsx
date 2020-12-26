@@ -173,7 +173,7 @@ const Topbar = (props: TProps) => {
                     {item => trailProps => (
                       <a
                         target="_blank"
-                        href="https://github.com/conradkay/Mantella"
+                        href="https://github.com/austin-UW/Mantella"
                         style={{
                           ...trailProps,
                           color: 'black',
