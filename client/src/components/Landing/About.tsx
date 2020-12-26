@@ -1,11 +1,6 @@
 import React from 'react'
 import { withStyles, Theme, createStyles } from '@material-ui/core/styles'
-import {
-  Typography,
-  WithStyles,
-  Button,
-  CircularProgress
-} from '@material-ui/core'
+import { Typography, WithStyles, Button } from '@material-ui/core'
 import { FeatureTable } from './FeatureTable'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
@@ -97,9 +92,6 @@ export const About = withStyles(styles)(
                 result: MutationResult<LoginAsGuestMutation>
               ) => (
                 <>
-                  {result.loading && (
-                    <CircularProgress style={{ margin: '4px auto' }} />
-                  )}
                   <Button
                     variant="contained"
                     color="primary"
