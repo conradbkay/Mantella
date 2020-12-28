@@ -7,7 +7,8 @@ import {
   Typography,
   Button,
   TextField,
-  CircularProgress
+  CircularProgress,
+  Paper
 } from '@material-ui/core'
 import { formStyles } from '../styles/formStyles'
 import { CalendarTodayRounded } from '@material-ui/icons'
@@ -23,6 +24,7 @@ import {
 } from '../../graphql/types'
 import { GQL_CREATE_PROJECT } from '../../graphql/mutations/project'
 import { setProjectA } from '../../store/actions/project'
+import Helmet from 'react-helmet'
 
 type CreateProjectProps = WithStyles<typeof formStyles> &
   typeof actionCreators &
@@ -57,9 +59,15 @@ const CCreateProject = (props: CreateProjectProps) => {
 
   return (
     <>
-      <main style={{ margin: 'auto' }} className={classes.layout}>
+      <Helmet>
+        <style type="text/css">{` body { background-color: #1d364c; }`}</style>
+      </Helmet>
+      <main
+        style={{ margin: 'auto', marginTop: 64 }}
+        className={classes.layout}
+      >
         <form
-          onSubmit={e => {
+          onSubmit={(e) => {
             e.preventDefault()
 
             if (props.user) {
@@ -73,7 +81,7 @@ const CCreateProject = (props: CreateProjectProps) => {
             }
           }}
         >
-          <div className={classes.paper}>
+          <Paper className={classes.paper}>
             <Avatar className={classes.avatar}>
               <CalendarTodayRounded />
             </Avatar>
@@ -99,7 +107,7 @@ const CCreateProject = (props: CreateProjectProps) => {
                 </Button>
               </div>
             </div>
-          </div>
+          </Paper>
         </form>
       </main>
     </>

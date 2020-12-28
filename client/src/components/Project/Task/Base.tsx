@@ -33,7 +33,10 @@ import { selectMemberA } from '../../../store/actions/project'
 import { setSubtaskA } from '../../../store/actions/task'
 import { GQL_SET_SUBTASK } from '../../../graphql/mutations/task'
 import { useMutation } from 'react-apollo'
-import { SetSubtaskMutation, SetSubtaskMutationVariables } from '../../../graphql/types'
+import {
+  SetSubtaskMutation,
+  SetSubtaskMutationVariables
+} from '../../../graphql/types'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -72,16 +75,12 @@ export const SubtaskMap = ({
       initial={null}
       native
       items={show ? subTasks : []}
-      keys={
-        show
-          ? subTasks.map(subTask => subTask.id)
-          : []
-      }
+      keys={show ? subTasks.map((subTask) => subTask.id) : []}
       from={{ opacity: 1, height: 0, overflow: 'hidden' }}
       enter={{ opacity: 1, height: 'auto' }}
       leave={{ opacity: 0, height: 0, overflow: 'hidden' }}
     >
-      {subTask => props => (
+      {(subTask) => (props) => (
         <animated.div
           style={{
             display: 'flex',
@@ -96,16 +95,16 @@ export const SubtaskMap = ({
           >
             {subTask.completed ? (
               <CheckBox
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation()
-                  onCheckbox({...subTask, completed: false})
+                  onCheckbox({ ...subTask, completed: false })
                 }}
               />
             ) : (
               <CheckBoxOutlineBlankOutlined
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation()
-                  onCheckbox({...subTask, completed: true})
+                  onCheckbox({ ...subTask, completed: true })
                 }}
               />
             )}
@@ -178,12 +177,13 @@ const CBaseTask = (props: TaskProps) => {
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
 
-  const [setSubtaskExec] = useMutation<SetSubtaskMutation, SetSubtaskMutationVariables>(GQL_SET_SUBTASK, {
-    onCompleted: ({setSubtask}) => {
-      if(setSubtask) {
-
-      }
-      else {
+  const [setSubtaskExec] = useMutation<
+    SetSubtaskMutation,
+    SetSubtaskMutationVariables
+  >(GQL_SET_SUBTASK, {
+    onCompleted: ({ setSubtask }) => {
+      if (setSubtask) {
+      } else {
         console.log('no subtask returned')
       }
     },
@@ -269,8 +269,20 @@ const CBaseTask = (props: TaskProps) => {
               subTasks={task.subTasks}
               taskId={task.id}
               onCheckbox={(newSub: TSubtask) => {
-                props.setSubtask({taskId: task.id, projectId: props.project.id, id: newSub.id, newSubtask: newSub})
-                setSubtaskExec({variables: {projId: props.project.id, taskId: task.id, subtaskId: newSub.id, info: {name: newSub.name, completed: newSub.completed}}})
+                props.setSubtask({
+                  taskId: task.id,
+                  projectId: props.project.id,
+                  id: newSub.id,
+                  newSubtask: newSub
+                })
+                setSubtaskExec({
+                  variables: {
+                    projId: props.project.id,
+                    taskId: task.id,
+                    subtaskId: newSub.id,
+                    info: { name: newSub.name, completed: newSub.completed }
+                  }
+                })
               }}
             />
 
@@ -282,9 +294,9 @@ const CBaseTask = (props: TaskProps) => {
                 enter={{ height: 'auto' }}
                 leave={{ height: 0, overflow: 'hidden' }}
               >
-                {show =>
+                {(show) =>
                   show &&
-                  (style => (
+                  ((style) => (
                     <animated.div style={{ marginLeft: 6, ...style }}>
                       <div
                         style={{
@@ -293,7 +305,7 @@ const CBaseTask = (props: TaskProps) => {
                           borderRadius: '.8rem'
                         }}
                       >
-                        {task.comments.map(comment => (
+                        {task.comments.map((comment) => (
                           <div key={comment.id} style={{ color: 'black' }}>
                             <span style={{ color: 'rgba(0, 0, 0, 0.70)' }}>
                               {
@@ -332,7 +344,7 @@ const CBaseTask = (props: TaskProps) => {
               {Object.values(task.comments).length !== 0 && (
                 <IconButton
                   className={props.classes.play}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     setShowComments(!showComments)
                   }}
@@ -344,7 +356,7 @@ const CBaseTask = (props: TaskProps) => {
                 <IconButton
                   style={{ marginRight: 8 }}
                   className={props.classes.play}
-                  onClick={e => {
+                  onClick={(e) => {
                     // eventually have it toggle icon based on current showSubtasks(same with comments)
                     e.stopPropagation()
                     setShowSubTasks(!showSubTasks)
@@ -362,7 +374,7 @@ const CBaseTask = (props: TaskProps) => {
                 <PlayArrow
                   style={{ marginLeft: 'auto' }}
                   className={props.classes.play}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     props.selectPomodoroTask(task.id)
                     props.toggleTimer()
@@ -372,7 +384,7 @@ const CBaseTask = (props: TaskProps) => {
                 <Pause
                   style={{ marginLeft: 'auto' }}
                   className={props.classes.play}
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     props.selectPomodoroTask(task.id)
                     props.toggleTimer()
@@ -392,7 +404,7 @@ const CBaseTask = (props: TaskProps) => {
             value={
               task.progress === 2
                 ? 100
-                : (task.subTasks.filter(subTask => subTask.completed).length /
+                : (task.subTasks.filter((subTask) => subTask.completed).length /
                     task.subTasks.length) *
                   100
             }
@@ -418,8 +430,5 @@ const actionCreators = {
 }
 
 export const BaseTask = withStyles(styles)(
-  connect(
-    mapState,
-    actionCreators
-  )(CBaseTask)
+  connect(mapState, actionCreators)(CBaseTask)
 )

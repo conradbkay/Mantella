@@ -1,11 +1,6 @@
 import React, { useState } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import Grid from '@material-ui/core/Grid'
-import Typography from '@material-ui/core/Typography'
-import Toolbar from '@material-ui/core/Toolbar'
-import AppBar from '@material-ui/core/AppBar'
-import Tabs from '@material-ui/core/Tabs'
 import MenuIcon from '@material-ui/icons/Menu'
 import {
   Theme,
@@ -21,14 +16,20 @@ import {
   Avatar,
   Tooltip,
   Button,
-  Menu
+  Menu,
+  Typography,
+  Grid,
+  Toolbar,
+  AppBar,
+  Tabs
 } from '@material-ui/core'
 import { Trail } from 'react-spring/renderprops'
 import {
   HowToReg,
   CalendarToday,
   Help,
-  Settings
+  Settings,
+  Home
 } from '@material-ui/icons'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -37,7 +38,6 @@ import { ProjectFinder } from './ProjectFinder/ProjectFinder'
 
 /**
  * @todo Refresh changing tab is kinda slow
- * @todo make it have a Drawer for the Header with all the different links on mobile (have a button as well as being swipable)
  */
 
 const noAuthItems = [
@@ -59,6 +59,7 @@ const noAuthItems = [
 ]
 
 const authItems = [
+  { label: 'Home', pathname: '/dashboard', menuIcon: Home },
   { label: 'Settings', pathname: '/settings', menuIcon: Settings },
   {
     label: 'Calendar',
@@ -122,7 +123,7 @@ const Topbar = (props: TProps) => {
 
   const MenuItems = props.authenticated !== null ? authItems : noAuthItems
 
-  const value = MenuItems.map(menuItem => menuItem.pathname).indexOf(
+  const value = MenuItems.map((menuItem) => menuItem.pathname).indexOf(
     props.location.pathname
   )
 
@@ -147,7 +148,7 @@ const Topbar = (props: TProps) => {
                     }}
                     color="primary"
                     variant="outlined"
-                    onClick={e => setAnchorEl(e.currentTarget)}
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
                   >
                     <MenuIcon />
                     <span style={{ marginLeft: 5 }}>Projects</span>
@@ -170,7 +171,7 @@ const Topbar = (props: TProps) => {
                     from={{ transform: 'translate3d(0,-40px,0)' }}
                     to={{ transform: 'translate3d(0,0px,0)' }}
                   >
-                    {item => trailProps => (
+                    {(item) => (trailProps) => (
                       <a
                         target="_blank"
                         href="https://github.com/austin-UW/Mantella"

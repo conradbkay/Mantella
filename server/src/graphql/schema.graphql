@@ -47,6 +47,7 @@ type Task {
   comments: [Comment!]!
   subTasks: [Subtask!]!
   recurrance: TaskRecurrance
+  description: String
 }
 
 type User {
@@ -89,6 +90,7 @@ input TaskInput {
   recurrance: String # daily | weekly | none
   color: String # hex
   subTasks: [SubtaskInfo]
+  description: String
 }
 
 input ProjectInput {

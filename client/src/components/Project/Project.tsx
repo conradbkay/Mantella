@@ -171,7 +171,7 @@ const CProject = (props: TProps) => {
     ) {
       const addingLater =
         actualIndex >
-        fromList.taskIds.findIndex(taskId => taskId === result.draggableId)
+        fromList.taskIds.findIndex((taskId) => taskId === result.draggableId)
 
       if (addingLater) {
         actualIndex -= 1
@@ -184,7 +184,7 @@ const CProject = (props: TProps) => {
 
     // remove old taskId instance
     fromList.taskIds = fromList.taskIds.filter(
-      taskId => taskId !== result.draggableId
+      (taskId) => taskId !== result.draggableId
     )
 
     // add new taskId instance
@@ -236,10 +236,6 @@ const CProject = (props: TProps) => {
       <div>
         <Helmet>
           <style type="text/css">{` body { background-color: #1d364c; }`}</style>
-          <meta
-            name={'description'}
-            content={'Projects help you become stronk'}
-          />
         </Helmet>
         <AppBar color="default" className={classes.appbar} position="static">
           <Toolbar>
@@ -291,7 +287,7 @@ const CProject = (props: TProps) => {
             >
               <TableBody>
                 <tr style={{ display: 'flex' }}>
-                  {[0, 1, 2].map(col => (
+                  {[0, 1, 2].map((col) => (
                     <td
                       key={col}
                       style={{
@@ -313,7 +309,7 @@ const CProject = (props: TProps) => {
                     </td>
                   ))}
                 </tr>
-                {project.lists.map(list => (
+                {project.lists.map((list) => (
                   <tr
                     style={{
                       verticalAlign: 'top',
@@ -323,7 +319,7 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
-                        deleteList={listId => {
+                        deleteList={(listId) => {
                           props.setList({
                             id: listId,
                             projectId: props.project.id,
@@ -336,10 +332,10 @@ const CProject = (props: TProps) => {
                             }
                           })
                         }}
-                        collapseList={listId => {
+                        collapseList={(listId) => {
                           if (collapsedLists.includes(listId)) {
                             setCollapsedLists(
-                              collapsedLists.filter(lId => listId !== lId)
+                              collapsedLists.filter((lId) => listId !== lId)
                             )
                           } else {
                             setCollapsedLists([...collapsedLists, listId])
@@ -413,8 +409,5 @@ const actionCreators = {
 }
 
 export const Project = withStyles(styles)(
-  connect(
-    mapState,
-    actionCreators
-  )(CProject)
+  connect(mapState, actionCreators)(CProject)
 )

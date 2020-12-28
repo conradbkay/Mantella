@@ -26,6 +26,24 @@ import {
 } from '../../graphql/types'
 import { GQL_REGISTER, GQL_LOGIN } from '../../graphql/mutations/auth'
 
+import { default as SocialLogin, Props, Provider } from 'react-social-login'
+
+type SocialButtonProps = {
+  children: React.ReactNode
+  triggerLogin: () => void
+  imageUrl: string
+} & Props
+
+const SocialButtonComponent = (props: SocialButtonProps) => {
+  return (
+    <IconButton onClick={props.triggerLogin} {...props}>
+      <img src={props.imageUrl} style={{ height: 50, width: 50 }} />
+    </IconButton>
+  )
+}
+
+const SocialButton = SocialLogin(SocialButtonComponent)
+
 type OwnProps = {
   authType: 'Register' | 'Login'
 }
@@ -199,30 +217,37 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
                     style={{ marginTop: 15 }}
                     alignContent="space-between"
                   >
-                    <IconButton>
-                      <img
-                        src="https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png"
-                        style={{ height: 50, width: 50 }}
+                    {[
+                      {
+                        imageUrl:
+                          'https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png',
+                        provider: 'google',
+                        appId: 'AIzaSyDaxgICy9wGwo98I3QGFvAy4s1gBbqJmsY'
+                      },
+                      {
+                        imageUrl:
+                          'https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png',
+                        provider: 'facebook',
+                        appId: '1232255530509893'
+                      },
+                      {
+                        imageUrl:
+                          'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png',
+                        provider: 'github',
+                        appId: '373e2991118f9d8e97b1c8717ec9dd863df71461'
+                      },
+                      {
+                        imageUrl:
+                          'https://cdn0.iconfinder.com/data/icons/most-usable-logos/120/Amazon-512.png',
+                        provider: 'amazon',
+                        appId: '1d526f19eb4b402d9be7c21ed04c55e5'
+                      }
+                    ].map((media) => (
+                      <SocialButton
+                        {...media}
+                        provider={media.provider as Provider}
                       />
-                    </IconButton>
-                    <IconButton style={{ marginLeft: 8 }}>
-                      <img
-                        src="https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png"
-                        style={{ height: 50, width: 50 }}
-                      />
-                    </IconButton>
-                    <IconButton style={{ marginLeft: 8 }}>
-                      <img
-                        src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png"
-                        style={{ height: 50, width: 50 }}
-                      />
-                    </IconButton>
-                    <IconButton style={{ marginLeft: 8 }}>
-                      <img
-                        src="https://cdn3.iconfinder.com/data/icons/social-icons-5/607/Twitterbird.png"
-                        style={{ height: 50, width: 50 }}
-                      />
-                    </IconButton>
+                    ))}
                   </Grid>
                 </Paper>
               </form>

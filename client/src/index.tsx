@@ -23,6 +23,7 @@ import { print } from 'graphql'
 import { loginA } from './store/actions/auth'
 import { Mutation } from './graphql/types'
 import { fetchQuery } from './API/initialize'
+import { Dashboard } from './components/Dashboard/Dashboard'
 
 const secondary = '#0336FF'
 const primary = '#00838f'
@@ -83,90 +84,90 @@ const Router = () => {
 
   return (
     <HashRouter>
-      <>
-        <Header />
-        <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
-        {/* <WelcomeDialog /> */}
-        {!open && (
-          <>
-            <Fab
-              style={fabStyle}
-              color="secondary"
-              onClick={() => setOpen(true)}
-            >
-              <Timer />
-            </Fab>
-          </>
-        )}
-        {loaded ? (
-          <Switch>
-            <PrivateRoute
-              exact
-              path="/settings"
-              component={Settings}
-              componentProps={{}}
-            />
-            <PrivateRoute
-              exact
-              path="/calendar"
-              component={CalendarWeek}
-              componentProps={{}}
-            />
-            <PublicOnlyRoute
-              exact
-              path="/login"
-              component={AuthRender}
-              componentProps={{ authType: 'Login' }}
-            />
-            <PublicOnlyRoute
-              exact
-              path="/register"
-              component={AuthRender}
-              componentProps={{ authType: 'Register' }}
-            />
-            <PrivateRoute
-              exact
-              path="/create-project"
-              component={CreateProject}
-              componentProps={{}}
-            />
-            <PrivateRoute
-              exact
-              path="/project/:id"
-              component={Project}
-              componentProps={{}}
-            />
-            <PublicOnlyRoute
-              exact
-              path="/"
-              component={About}
-              componentProps={() => ({})}
-            />
-            <Route component={NoMatch} />
-          </Switch>
-        ) : (
-          <div
+      <Header />
+      <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
+      {/* <WelcomeDialog /> */}
+      {!open && (
+        <>
+          <Fab style={fabStyle} color="secondary" onClick={() => setOpen(true)}>
+            <Timer />
+          </Fab>
+        </>
+      )}
+      {loaded ? (
+        <Switch>
+          <PrivateRoute
+            exact
+            path="/settings"
+            component={Settings}
+            componentProps={{}}
+          />
+          <PrivateRoute
+            exact
+            path="/calendar"
+            component={CalendarWeek}
+            componentProps={{}}
+          />
+          <PublicOnlyRoute
+            exact
+            path="/login"
+            component={AuthRender}
+            componentProps={{ authType: 'Login' }}
+          />
+          <PublicOnlyRoute
+            exact
+            path="/register"
+            component={AuthRender}
+            componentProps={{ authType: 'Register' }}
+          />
+          <PrivateRoute
+            exact
+            path="/create-project"
+            component={CreateProject}
+            componentProps={{}}
+          />
+          <PrivateRoute
+            exact
+            path="/project/:id"
+            component={Project}
+            componentProps={{}}
+          />
+          <PrivateRoute
+            exact
+            path="/dashboard"
+            component={Dashboard}
+            componentProps={{}}
+          />
+          <PublicOnlyRoute
+            exact
+            path="/"
+            component={About}
+            componentProps={() => ({})}
+          />
+          <Route component={NoMatch} />
+        </Switch>
+      ) : (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'space-around'
+          }}
+        >
+          <CircularProgress
             style={{
-              position: 'absolute',
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'space-around'
+              width: '128px',
+              height: '128px',
+              marginRight: 64,
+              marginTop: 100
             }}
-          >
-            <CircularProgress
-              style={{
-                width: '128px',
-                height: '128px',
-                marginRight: 64,
-                marginTop: 100
-              }}
-            />
-          </div>
-        )}
-      </>
+          />
+        </div>
+      )}
     </HashRouter>
   )
 }

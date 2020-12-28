@@ -51,7 +51,8 @@ export const ProjectSchema = new Schema({
       recurrance: {
         interval: Number,
         nextDue: String
-      }
+      },
+      description: String
     }
   ],
   users: [String],
