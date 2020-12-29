@@ -69,28 +69,102 @@ const editProject: MutationResolvers['editProject'] = async (parent, args) => {
 
 const deleteProject: MutationResolvers['deleteProject'] = async (
   parent,
-  obj
+  obj,
+  context
 ) => {
-  const deleted = await ProjectModel.findByIdAndDelete(obj.id)
+  const user = await UserModel.findOne({ id: context.userId.id })
+
+  if(user) {
+    user.projects = user.projects.filter((proj: any) => proj !== obj.id)
+    if(!user.projects.length) {
+      throw new Error('cannot delete only project')
+    }
+    await user.save()
+  }
+
+  const deleted = await ProjectModel.findOneAndDelete({id: obj.id })
 
   if (deleted) {
     return {
-      id: deleted._id
+      id: deleted.id
     }
   }
   throw new Error('proj not found')
 }
 
-const joinProject: MutationResolvers['joinProject'] = async () => {
-  throw new Error('proj not found')
+const joinProject: MutationResolvers['joinProject'] = async (parent, obj, context) => {
+  const id = context.userId
+  if(id.id) {
+    const project = await ProjectModel.findOne({id: obj.projectId})
+    if(!project) {
+      throw new Error('Project does not exist')
+    }
+    const user = await UserModel.findOneAndUpdate({ id: id.id }, {
+      '$push': {
+        "projects": project.id
+      }
+    })
+
+    if(user) {
+      return project.toObject()
+    }
+    throw new Error("could not join project")
+  }
+  throw new Error('User not signed in')
 }
 
-const leaveProject: MutationResolvers['leaveProject'] = async () => {
-  throw new Error('proj not found')
+const leaveProject: MutationResolvers['leaveProject'] = async (parent, obj, context) => {
+  const id = context.userId
+  if(id.id) {
+    const project = await ProjectModel.findOne({id: obj.projectId})
+    if(!project) {
+      throw new Error('Project does not exist')
+    }
+    const user = await UserModel.findOneAndUpdate({ id: id.id }, {
+      '$pull': {
+        "projects": project.id
+      }
+    })
+
+    if(user) {
+      return project.toObject()
+    }
+    throw new Error("could not join project")
+  }
+  throw new Error('User not signed in')
 }
 
-const removeMemberFromProject: MutationResolvers['removeMemberFromProject'] = async () => {
-  throw new Error('proj not found')
+const removeMemberFromProject: MutationResolvers['removeMemberFromProject'] = async (parent, obj, context) => {
+  const id = context.userId
+  if(id.id) {
+    const project = await ProjectModel.findOne({id: obj.projectId})
+    if(!project) {
+      throw new Error('Project does not exist')
+    }
+    const user = await UserModel.findOneAndUpdate({ id: id.id }, {
+      '$push': {
+        "projects": project
+      }
+    })
+
+    if(!user) {
+      throw new Error('Session expired')
+    }
+    if(project.ownerId !== user.id) {
+      throw new Error('You cannot kick members from this project')
+    }
+
+    project.users.splice(project.users.indexOf(obj.userId), 1)
+    const deletingUser = await UserModel.findOne({id: obj.userId})
+    if(!deletingUser) {
+      throw new Error('user being kicked does not exist')
+    }
+    deletingUser.projects = deletingUser.projects.filter((proj: any) => proj !== project.id)
+    await deletingUser.save()
+
+    return project.toObject()
+  }
+  throw new Error('User not signed in')
 }
 
 export const projectMutations = {

@@ -292,6 +292,7 @@ export type Task = {
   comments: Array<Comment>;
   subTasks: Array<Subtask>;
   recurrance?: Maybe<TaskRecurrance>;
+  description?: Maybe<Scalars['String']>;
 };
 
 export type TaskInput = {
@@ -301,6 +302,7 @@ export type TaskInput = {
   recurrance?: Maybe<Scalars['String']>;
   color?: Maybe<Scalars['String']>;
   subTasks?: Maybe<Array<Maybe<SubtaskInfo>>>;
+  description?: Maybe<Scalars['String']>;
 };
 
 export type TaskMerge = {
@@ -522,6 +524,8 @@ export namespace TaskResolvers {
     subTasks?: SubTasksResolver<Subtask[], TypeParent, TContext>;
     
     recurrance?: RecurranceResolver<Maybe<TaskRecurrance>, TypeParent, TContext>;
+    
+    description?: DescriptionResolver<Maybe<string>, TypeParent, TContext>;
   }
 
 
@@ -535,6 +539,7 @@ export namespace TaskResolvers {
   export type CommentsResolver<R = Comment[], Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
   export type SubTasksResolver<R = Subtask[], Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
   export type RecurranceResolver<R = Maybe<TaskRecurrance>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
+  export type DescriptionResolver<R = Maybe<string>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
 }
 
 export namespace CommentResolvers {

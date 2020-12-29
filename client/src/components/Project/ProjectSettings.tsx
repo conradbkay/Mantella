@@ -20,6 +20,7 @@ import {
 } from '../../graphql/types'
 import { GQL_DELETE_PROJECT } from '../../graphql/mutations/project'
 import { useMutation } from 'react-apollo'
+import { openSnackbarA } from '../../store/actions/snackbar'
 
 type TProps = {
   onClose: () => void
@@ -35,8 +36,12 @@ const CProjectSettings = (props: TProps) => {
   >(GQL_DELETE_PROJECT, {
     onCompleted: ({ deleteProject }) => {
       if (deleteProject && deleteProject.id) {
+        location.hash = '/dashboard'
         props.setProject({ id: deleteProject.id, newProj: null })
       }
+    },
+    onError: () => {
+      props.openSnackbar('Could not delete project', 'error')
     }
   })
 
@@ -97,10 +102,8 @@ const CProjectSettings = (props: TProps) => {
 }
 
 const actionCreators = {
-  setProject: setProjectA
+  setProject: setProjectA,
+  openSnackbar: openSnackbarA
 }
 
-export const ProjectSettings = connect(
-  null,
-  actionCreators
-)(CProjectSettings)
+export const ProjectSettings = connect(null, actionCreators)(CProjectSettings)

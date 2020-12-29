@@ -74,9 +74,7 @@ const CPomodoro = (props: TProps) => {
           props.tick({})
         }
       }
-
       // set tab title
-
       document.title = pomodoro.paused
         ? 'Mantella'
         : `${pomodoro.working ? 'Work ' : 'Break '} ${toDaysHHMMSS(
