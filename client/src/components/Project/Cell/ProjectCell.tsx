@@ -3,13 +3,22 @@ import { TList, TProject } from '../../../types/project'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
 import {
+  createStyles,
   IconButton,
   Menu as MuiMenu,
-  MenuItem
+  MenuItem,
+  Theme,
+  WithStyles,
+  withStyles
 } from '@material-ui/core'
 import { id } from '../../../utils/utilities'
-import { CreateTask } from '../Task/Create'
 import { Menu, Add } from '@material-ui/icons'
+import { input } from '../Project'
+
+const styles = (theme: Theme) =>
+  createStyles({
+    input: input
+  })
 
 type OwnProps = {
   progress: number // 0, 1, or 2
@@ -19,13 +28,17 @@ type OwnProps = {
   collapsedLists: string[]
   openFunc: (id: string) => void
   deleteList: (id: string) => void
+  setCreating: (id: string) => void
+  editingName: string
+  setEditingList: (id: [string, string]) => void
+  confirmEditingList: () => void
 }
-type TProps = OwnProps
+type TProps = OwnProps & WithStyles<typeof styles>
 
-export const ProjectCell = (props: TProps) => {
+export const ProjectCell = withStyles(styles)((props: TProps) => {
   let tasks = props.list.taskIds
-    .map(taskId => props.project.tasks[id(props.project.tasks, taskId)])
-    .filter(task => {
+    .map((taskId) => props.project.tasks[id(props.project.tasks, taskId)])
+    .filter((task) => {
       return task.progress === props.progress
     })
 
@@ -33,7 +46,6 @@ export const ProjectCell = (props: TProps) => {
     tasks = tasks
   }
 
-  const [creating, setCreating] = useState('')
   const [anchorEl, setAnchorEl] = useState(null as any)
   const [deletingList, setDeletingList] = useState(null as any)
 
@@ -42,7 +54,7 @@ export const ProjectCell = (props: TProps) => {
       style={{
         borderRight: `1px ${props.progress !== 2 ? 'dashed' : 'solid'} #aebacc`,
         borderBottom:
-          props.project.lists.findIndex(list => props.list.id === list.id) ===
+          props.project.lists.findIndex((list) => props.list.id === list.id) ===
           props.project.lists.length - 1
             ? '1px solid #aebacc'
             : undefined,
@@ -70,24 +82,38 @@ export const ProjectCell = (props: TProps) => {
               [Collapsed]
             </h2>
           )}
-          <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>
-            {props.list.name}
-          </h2>
+          {props.editingName ? (
+            <input
+              style={{ width: '100%' }}
+              className={props.classes.input}
+              value={props.editingName}
+              onBlur={() => props.confirmEditingList()}
+              onChange={(e: any) =>
+                props.setEditingList([props.list.id, e.target.value])
+              }
+            />
+          ) : (
+            <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>
+              {props.list.name}
+            </h2>
+          )}
           <IconButton
-            onClick={e => setAnchorEl(e.currentTarget)}
+            onClick={(e) => setAnchorEl(e.currentTarget)}
             style={{ marginLeft: 'auto' }}
           >
             <Menu />
           </IconButton>
           {!props.collapsedLists.includes(props.list.id) && (
-        <IconButton
-          color="primary"
-          style={{ marginLeft: 8}}
-          onClick={() => setCreating('string') /* TODO: add columns */}
-        >
-          <Add />
-        </IconButton>
-      )}
+            <IconButton
+              color="primary"
+              style={{ marginLeft: 8 }}
+              onClick={
+                () => props.setCreating('string') /* TODO: add columns */
+              }
+            >
+              <Add />
+            </IconButton>
+          )}
           <MuiMenu
             id="simple-menu"
             anchorEl={anchorEl}
@@ -100,10 +126,13 @@ export const ProjectCell = (props: TProps) => {
                 props.collapseList(props.list.id)
               }}
             >
-              {props.collapsedLists.includes(props.list.id) ? 'Uncollapse' : 'Collapse'}
+              {props.collapsedLists.includes(props.list.id)
+                ? 'Uncollapse'
+                : 'Collapse'}
             </MenuItem>
             <MenuItem
               onClick={() => {
+                props.setEditingList([props.list.id, props.list.name])
                 setAnchorEl(null)
               }}
             >
@@ -145,7 +174,9 @@ export const ProjectCell = (props: TProps) => {
                   : 78,
                 height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
                 backgroundColor: 'white',
-                paddingBottom: props.collapsedLists.includes(props.list.id) ? 0 : 78 // needed for dragging to bottom of list
+                paddingBottom: props.collapsedLists.includes(props.list.id)
+                  ? 0
+                  : 78 // needed for dragging to bottom of list
               }}
               {...dropProvided.droppableProps}
               ref={dropProvided.innerRef}
@@ -170,14 +201,6 @@ export const ProjectCell = (props: TProps) => {
           )
         }}
       </Droppable>
-      {creating && (
-        <CreateTask
-          onClose={() => setCreating('')}
-          project={props.project}
-          listId={props.project.lists[0].id}
-          columnId={creating}
-        />
-      )}
     </td>
   )
-}
+})

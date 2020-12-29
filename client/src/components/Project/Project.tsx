@@ -10,13 +10,18 @@ import {
   AppBar,
   Toolbar,
   IconButton,
-  Fab,
   TableBody
 } from '@material-ui/core'
 import { TState } from '../../types/state'
 import { selectMemberA, setProjectA } from '../../store/actions/project'
 import { CreateColumn } from './CreateColumn'
-import { Add, FilterList, Settings, Equalizer } from '@material-ui/icons'
+import {
+  Add,
+  FilterList,
+  Settings,
+  Equalizer,
+  Create
+} from '@material-ui/icons'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
@@ -27,7 +32,8 @@ import {
   DragTaskMutation,
   DragTaskMutationVariables,
   DeleteListMutation,
-  DeleteListMutationVariables
+  DeleteListMutationVariables,
+  EditListMutationVariables
 } from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
@@ -36,10 +42,12 @@ import { ProjectCell } from './Cell/ProjectCell'
 import { cloneDeep } from 'apollo-utilities'
 import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
 import { useMutation } from 'react-apollo'
-
+import { CreateTask } from './Task/Create'
 import { EditTaskModal } from './Task/Edit'
 import { setListA } from '../../store/actions/list'
 import { GQL_DELETE_LIST } from '../../graphql/mutations/list'
+import SpeedDial from '@material-ui/lab/SpeedDial'
+import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -48,6 +56,26 @@ import { GQL_DELETE_LIST } from '../../graphql/mutations/list'
 type OwnProps = {
   params: {
     id: string
+  }
+}
+
+export const input: any = {
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  minWidth: '20%',
+  fontSize: 18,
+  outline: 'none',
+  backgroundColor: '#f5f5f5',
+  borderRadius: 4,
+  width: 'auto',
+  padding: 8,
+  border: '1px solid transparent',
+  '&:hover': {
+    backgroundColor: 'white'
+  },
+  '&:focus': {
+    borderColor: '#27b6ba'
   }
 }
 
@@ -62,25 +90,7 @@ const styles = (theme: Theme) =>
       fontSize: 18
     },
     appbar: {},
-    input: {
-      overflow: 'hidden',
-      whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
-      minWidth: '20%',
-      fontSize: 18,
-      outline: 'none',
-      backgroundColor: '#f5f5f5',
-      borderRadius: 4,
-      width: 'auto',
-      padding: 8,
-      border: '1px solid transparent',
-      '&:hover': {
-        backgroundColor: 'white'
-      },
-      '&:focus': {
-        borderColor: '#27b6ba'
-      }
-    }
+    input: input
   })
 
 type TProps = ReturnType<typeof mapState> &
@@ -107,6 +117,7 @@ const CProject = (props: TProps) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(getMobile(window))
   const [collapsedLists, setCollapsedLists] = useState([] as string[])
+  const [editingList, setEditingList] = useState(['', ''])
 
   if (isMobile) {
   }
@@ -114,6 +125,9 @@ const CProject = (props: TProps) => {
   const [name, setName] = useState(
     props.project ? props.project.name : undefined
   )
+
+  const [creating, setCreating] = useState('')
+  const [fab, setFab] = useState(false)
 
   const [deleteListExec] = useMutation<
     DeleteListMutation,
@@ -230,6 +244,13 @@ const CProject = (props: TProps) => {
     EditProjectMutationVariables
   >(GQL_EDIT_PROJECT, {})
 
+  const [editTaskExec] = useMutation<
+    EditListMutation,
+    EditListMutationVariables
+  >(GQL_EDIT_LIST, {
+    onCompleted: () => {}
+  })
+
   const { classes, project } = props
   if (project) {
     return (
@@ -319,6 +340,18 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
+                        confirmEditingList={() =>
+                          editListExec({ variables: { listId: list.id } })
+                        }
+                        setEditingList={(id) => setEditingList(id)}
+                        editingName={
+                          progress === 0
+                            ? list.id === editingList[0]
+                              ? editingList[1]
+                              : ''
+                            : ''
+                        }
+                        setCreating={(id) => setCreating(id)}
                         deleteList={(listId) => {
                           props.setList({
                             id: listId,
@@ -354,7 +387,14 @@ const CProject = (props: TProps) => {
               </TableBody>
             </table>
           </DragDropContext>
-
+          {creating && (
+            <CreateTask
+              onClose={() => setCreating('')}
+              project={props.project}
+              listId={props.project.lists[0].id}
+              columnId={creating}
+            />
+          )}
           {dialogOpen && (
             <CreateColumn
               onClose={() => setDialogOpen(false)}
@@ -368,13 +408,26 @@ const CProject = (props: TProps) => {
           classes={{ tooltip: classes.tooltip }}
           title="Add List"
         >
-          <Fab
+          <SpeedDial
+            open={fab}
+            ariaLabel="create list/create task"
             onClick={() => setDialogOpen(true)}
+            onClose={() => setFab(false)}
+            onOpen={() => setFab(true)}
             color="primary"
             className={classes.fab}
+            direction="up"
+            icon={<Add />}
           >
-            <Add />
-          </Fab>
+            <SpeedDialAction
+              icon={<Create />}
+              tooltipTitle="Create Task"
+              onClick={(e) => {
+                e.stopPropagation()
+                setCreating(project.lists[0].id)
+              }}
+            />
+          </SpeedDial>
         </Tooltip>
         {settings && (
           <ProjectSettings
