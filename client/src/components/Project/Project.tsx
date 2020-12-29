@@ -33,7 +33,8 @@ import {
   DragTaskMutationVariables,
   DeleteListMutation,
   DeleteListMutationVariables,
-  EditListMutationVariables
+  EditListMutationVariables,
+  EditListMutation
 } from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
@@ -45,7 +46,7 @@ import { useMutation } from 'react-apollo'
 import { CreateTask } from './Task/Create'
 import { EditTaskModal } from './Task/Edit'
 import { setListA } from '../../store/actions/list'
-import { GQL_DELETE_LIST } from '../../graphql/mutations/list'
+import { GQL_DELETE_LIST, GQL_EDIT_LIST } from '../../graphql/mutations/list'
 import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 
