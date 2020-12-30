@@ -245,11 +245,18 @@ const CProject = (props: TProps) => {
     EditProjectMutationVariables
   >(GQL_EDIT_PROJECT, {})
 
-  const [editTaskExec] = useMutation<
+  const [editListExec] = useMutation<
     EditListMutation,
     EditListMutationVariables
   >(GQL_EDIT_LIST, {
-    onCompleted: () => {}
+    onCompleted: () => {
+      props.setList({
+        id: editingList[0],
+        projectId: props.project.id,
+        newList: { name: editingList[1] }
+      })
+      setEditingList(['', ''])
+    }
   })
 
   const { classes, project } = props
@@ -342,7 +349,13 @@ const CProject = (props: TProps) => {
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
                         confirmEditingList={() =>
-                          editListExec({ variables: { listId: list.id } })
+                          editListExec({
+                            variables: {
+                              id: list.id,
+                              projectId: project.id,
+                              newList: { name: editingList[1] }
+                            }
+                          })
                         }
                         setEditingList={(id) => setEditingList(id)}
                         editingName={

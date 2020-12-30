@@ -172,7 +172,7 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
                 minHeight: props.collapsedLists.includes(props.list.id)
                   ? 0
                   : 78,
-                height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
+                // height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
                 backgroundColor: 'white',
                 paddingBottom: props.collapsedLists.includes(props.list.id)
                   ? 0

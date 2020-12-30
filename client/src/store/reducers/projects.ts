@@ -23,14 +23,22 @@ const SET_LIST = (
   projects: TProject[],
   action: ReturnType<typeof setListA>
 ) => {
-  const changing = projects[id(projects, action.projectId)].lists
+  let changing = projects[id(projects, action.projectId)].lists
 
   if (action.newList) {
-    changing.push({
-      taskIds: action.newList.taskIds || [],
-      name: action.newList.name || 'List',
-      id: action.id,
-    })
+    if(changing.filter(list => list.id === action.id).length) {
+      changing[id(changing, action.id)] = {
+        ...changing[id(changing, action.id)], 
+        ...action.newList
+      }
+    }
+    else {
+      changing.push({
+        taskIds: action.newList.taskIds || [],
+        name: action.newList.name || 'List',
+        id: action.id,
+      })
+    }
   } else {
     changing.splice(id(changing, action.id), 1)
   }
