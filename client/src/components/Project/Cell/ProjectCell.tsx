@@ -14,7 +14,7 @@ import {
 import { id } from '../../../utils/utilities'
 import { Menu, Add } from '@material-ui/icons'
 import { input, TFilterData } from '../Project'
-import {filterTask} from '../../../utils/filterTasks'
+import { filterTask, filterTasks } from '../../../utils/filterTasks'
 const styles = (theme: Theme) =>
   createStyles({
     input: input
@@ -49,6 +49,8 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
 
   const [anchorEl, setAnchorEl] = useState(null as any)
   const [deletingList, setDeletingList] = useState(null as any)
+
+  const disableDrag = tasks.length !== filterTasks(tasks, props.filter).length
 
   return (
     <td
@@ -184,7 +186,12 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
             >
               {!props.collapsedLists.includes(props.list.id)
                 ? tasks.map((task, i) => (
-                    <Draggable draggableId={task.id} index={i} key={task.id}>
+                    <Draggable
+                      isDragDisabled={disableDrag}
+                      draggableId={task.id}
+                      index={i}
+                      key={task.id}
+                    >
                       {(dragProvided, dragSnapshot) => (
                         <BaseTask
                           hidden={!filterTask(task, props.filter)}

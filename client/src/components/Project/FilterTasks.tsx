@@ -13,12 +13,14 @@ import {
   Select,
   MenuItem,
   FormControlLabel,
-  Switch
+  Switch,
+  Slider
 } from '@material-ui/core'
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
 import { DateTimePicker } from 'react-widgets'
+import { isArray } from 'lodash'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -53,7 +55,22 @@ const CFilterTasks = (props: TProps) => {
         open={open}
         onClose={() => handleClose()}
       >
-        <List style={{ minWidth: 250 }}>
+        <List style={{ minWidth: 250, marginTop: 32 }}>
+          <ListItem style={{ padding: '0px 32px' }}>
+            <Slider
+              min={0}
+              max={50}
+              onChange={(e, val: any) => {
+                changeFilter({
+                  ...filterData,
+                  points: val
+                })
+              }}
+              value={props.filterData.points}
+              valueLabelDisplay="auto"
+              aria-labelledby="range-slider"
+            />
+          </ListItem>
           <ListItem>
             <ChooseColor
               hasAllOption
@@ -61,7 +78,11 @@ const CFilterTasks = (props: TProps) => {
               onChange={(color: any) => {
                 changeFilter({
                   ...filterData,
-                  color
+                  color: color.length
+                    ? color.includes('all') && color.length > 1
+                      ? color.filter((c: any) => c !== 'all')
+                      : color
+                    : ['all']
                 })
               }}
             />
@@ -73,7 +94,13 @@ const CFilterTasks = (props: TProps) => {
                 disableRipple
                 disableTouchRipple
                 checked={custom}
-                onChange={() => setCustom(!custom)}
+                onChange={() => {
+                  props.changeFilter({
+                    ...filterData,
+                    dueDate: [null, null]
+                  })
+                  setCustom(!custom)
+                }}
                 color="primary"
               />
             }
@@ -109,35 +136,69 @@ const CFilterTasks = (props: TProps) => {
                 </Select>
               </FormControl>
             ) : (
-              <div style={{ display: 'block' }}>
-                <DateTimePicker
-                  containerClassName="fullwidth"
-                  value={(filterData.dueDate[0] as any) || undefined}
-                  onChange={(date: Date | undefined) => {
-                    if (!date) {
-                      changeFilter({
-                        ...filterData,
-                        dueDate: [null, filterData.dueDate[1] as any]
-                      })
-                    } else if (
-                      !isBefore(
-                        date,
-                        (filterData.dueDate[1] as any) || new Date()
-                      )
-                    ) {
-                      changeFilter({
-                        ...filterData,
-                        dueDate: [
-                          date,
-                          isDate(filterData.dueDate[1])
-                            ? (filterData.dueDate[1] as Date)
-                            : addDays(new Date(), 1)
-                        ]
-                      })
-                    }
+              isArray(filterData.dueDate) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column'
                   }}
-                />
-              </div>
+                >
+                  <DateTimePicker
+                    containerClassName="fullwidth gap"
+                    value={(filterData.dueDate[0] as any) || undefined}
+                    onChange={(date: Date | undefined) => {
+                      if (!date) {
+                        changeFilter({
+                          ...filterData,
+                          dueDate: [null, filterData.dueDate[1] as any]
+                        })
+                      } else if (
+                        !isBefore(
+                          date,
+                          (filterData.dueDate[1] as any) || new Date()
+                        )
+                      ) {
+                        changeFilter({
+                          ...filterData,
+                          dueDate: [
+                            date,
+                            isDate(filterData.dueDate[1])
+                              ? (filterData.dueDate[1] as Date)
+                              : addDays(new Date(), 1)
+                          ]
+                        })
+                      }
+                    }}
+                  />
+                  <DateTimePicker
+                    containerClassName="fullwidth"
+                    value={(filterData.dueDate[1] as any) || undefined}
+                    onChange={(date: Date | undefined) => {
+                      if (!date) {
+                        changeFilter({
+                          ...filterData,
+                          dueDate: [filterData.dueDate[0] as any, null]
+                        })
+                      } else if (
+                        !isBefore(
+                          (filterData.dueDate[0] as any) || new Date(),
+                          date
+                        )
+                      ) {
+                        changeFilter({
+                          ...filterData,
+                          dueDate: [
+                            isDate(filterData.dueDate[0])
+                              ? (filterData.dueDate[0] as Date)
+                              : addDays(new Date(), 1),
+                            date
+                          ]
+                        })
+                      }
+                    }}
+                  />
+                </div>
+              )
             )}
           </ListItem>
         </List>

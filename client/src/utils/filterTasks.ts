@@ -29,9 +29,11 @@ const filterByDate = (task: TTask, filterData: TFilterData['dueDate']): boolean 
 
       const time = new Date(task.dueDate).getTime()
 
+
+
       if (
-        (filterData[0] && time > filterData[0].getTime()) ||
-        (filterData[1] && time < filterData[1].getTime())
+        (filterData[0] && time < filterData[0].getTime()) ||
+        (filterData[1] && time > filterData[1].getTime())
       ) {
         return false 
       }
@@ -41,7 +43,7 @@ const filterByDate = (task: TTask, filterData: TFilterData['dueDate']): boolean 
 }
 
 const filterByPoints = (task: TTask, filterData: TFilterData['points']): boolean => {
-  return !filterData || (task.points >= filterData[0] && task.points <= filterData[1])
+  return !filterData || (task.points >= filterData[0] && task.points <= (filterData[1] === 50 ? Infinity : filterData[1]))
 }
 
 const filterByColor = (task: TTask, filterData: TFilterData['color']): boolean => {
@@ -57,4 +59,8 @@ export const filterTask = (
     filterByPoints(task, filterData.points) &&
     filterByDate(task, filterData.dueDate)
   )
+}
+
+export const filterTasks = (tasks: TTask[], filter: TFilterData): TTask[] => {
+  return tasks.filter(task => filterTask(task, filter))
 }
