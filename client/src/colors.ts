@@ -1,6 +1,6 @@
 export const colors = {
   White: '#FFFFFF',
-  Blue: '#c3ddff', // RUSSIA #1, or is this Merica?
+  Blue: '#c3ddff', 
   Red: '#ffccd6',
   Yellow: '#ffffe0',
   Orange: '#ffe7b6',

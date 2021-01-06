@@ -6,7 +6,8 @@ import { BaseTask } from '../Project/Task/Base'
 // import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
-import React from 'react'
+import React, { useState } from 'react'
+import { EditTaskModal } from '../Project/Task/Edit'
 
 type OwnProps = {
   day: Date
@@ -31,8 +32,10 @@ type TProps = OwnProps & ReturnType<typeof mapState> & WithStyles<typeof styles>
 const CWeekDay = (props: TProps) => {
   const { day, tasks, index } = props
   const hasPassed = isPast(addHours(day, 20))
+  const [editingTaskId, setEditingTaskId] = useState('')
+
   const withDate = tasks.filter(
-    task =>
+    (task) =>
       task.dueDate !== undefined &&
       getDate(new Date(task.dueDate!)) === getDate(day)
   )
@@ -46,7 +49,7 @@ const CWeekDay = (props: TProps) => {
     <div
       style={{
         borderRight: index !== 6 ? '1px solid #e0e0e0' : undefined,
-        flex: '1 0 calc(1000px / 7)',
+        flex: '1 0 calc(1000px / 7)'
       }}
     >
       <div
@@ -71,6 +74,7 @@ const CWeekDay = (props: TProps) => {
             style={{
               backgroundColor: snapshot.isDraggingOver ? '#bae3ff' : 'white',
               transition: 'background-color .2s ease',
+              marginTop: 93,
               height: '100%'
             }}
             {...provided.droppableProps}
@@ -83,7 +87,6 @@ const CWeekDay = (props: TProps) => {
                 draggableId={task.id.toString()}
               >
                 {(prov, snap) => (
-                  <div style={{paddingTop: i ? 0 : 93}}>
                   <BaseTask
                     project={
                       props.projects[
@@ -93,12 +96,11 @@ const CWeekDay = (props: TProps) => {
                         )
                       ]
                     }
-                    openFunc={() => null}
+                    openFunc={() => setEditingTaskId(task.id)}
                     provided={prov}
                     snapshot={snap}
                     task={task}
                   />
-                  </div>
                 )}
               </Draggable>
             ))}
@@ -106,6 +108,13 @@ const CWeekDay = (props: TProps) => {
           </div>
         )}
       </Droppable>
+      {editingTaskId && (
+        <EditTaskModal
+          taskId={editingTaskId}
+          onClose={() => setEditingTaskId('')}
+          projectId={getProjectIdFromTaskId(props.projects, editingTaskId)}
+        />
+      )}
     </div>
   )
 }

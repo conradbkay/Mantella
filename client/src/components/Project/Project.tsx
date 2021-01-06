@@ -49,6 +49,8 @@ import { setListA } from '../../store/actions/list'
 import { GQL_DELETE_LIST, GQL_EDIT_LIST } from '../../graphql/mutations/list'
 import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
+import { FilterTasks } from './FilterTasks'
+import { setFilterA } from '../../store/actions/filter'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -104,12 +106,9 @@ export const getMobile = (window: Window) => {
 }
 
 export type TFilterData = {
-  dueDate: {
-    start: Date
-    end: Date
-  }
-  color?: string // what if we have a multiselect? string is the key of colors object
-  points?: number
+  dueDate: 'all' | 'none' | 'today' | 'tomorrow' | [Date | null, Date | null]
+  color: string[]
+  points?: [number, number]
 }
 
 const CProject = (props: TProps) => {
@@ -127,6 +126,7 @@ const CProject = (props: TProps) => {
     props.project ? props.project.name : undefined
   )
 
+  const [filtering, setFiltering] = useState(false)
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
@@ -283,7 +283,7 @@ const CProject = (props: TProps) => {
               onChange={(e: any) => setName(e.target.value)}
             />
             <div style={{ marginLeft: 'auto' }}>
-              <IconButton onClick={() => null}>
+              <IconButton onClick={() => setFiltering(true)}>
                 <FilterList />
               </IconButton>
               <IconButton
@@ -348,6 +348,7 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
+                        filter={props.filterData}
                         confirmEditingList={() =>
                           editListExec({
                             variables: {
@@ -456,6 +457,12 @@ const CProject = (props: TProps) => {
             projectId={props.project.id}
           />
         )}
+        <FilterTasks
+          open={filtering}
+          filterData={props.filterData}
+          changeFilter={(newFilter) => props.setFilter(newFilter)}
+          handleClose={() => setFiltering(false)}
+        />
       </div>
     )
   }
@@ -464,7 +471,8 @@ const CProject = (props: TProps) => {
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   return {
-    project: state.projects[id(state.projects, ownProps.params.id)]
+    project: state.projects[id(state.projects, ownProps.params.id)],
+    filterData: state.filter
   }
 }
 
@@ -472,7 +480,8 @@ const actionCreators = {
   setProject: setProjectA,
   selectMember: selectMemberA,
   openSnackbar: openSnackbarA,
-  setList: setListA
+  setList: setListA,
+  setFilter: setFilterA
 }
 
 export const Project = withStyles(styles)(

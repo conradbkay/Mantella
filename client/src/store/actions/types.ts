@@ -1,3 +1,4 @@
+import { FilterAction } from './filter'
 import { UserAction } from './auth'
 import { ProjectAction } from './project'
 import { SnackbarAction } from './snackbar'
@@ -14,6 +15,7 @@ export type TAction = Readonly<
   | ListAction
   | PomodoroAction
   | UserAction
+  | FilterAction
 >
 
 export type ActionTypes = TAction['type']

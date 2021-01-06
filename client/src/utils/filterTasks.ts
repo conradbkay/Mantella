@@ -1,108 +1,60 @@
-export const meme = 'meme'
+  
+import { TTask } from '../types/project'
+import { isSameDay } from 'date-fns/fp'
+import { addDays } from 'date-fns'
+import { TFilterData } from '../components/Project/Project'
 
-/*
-const filterByDate = (task: TTask, filterData: TFilterData): boolean => {
-  if (filterData.dueDate === 'all') {
+const filterByDate = (task: TTask, filterData: TFilterData['dueDate']): boolean => {
+  if(filterData && !filterData[0] && !filterData[1]) {
     return true
   }
+  switch(filterData) {
+    case 'all':
+      return true
+    case 'none':
+      return !Boolean(task.dueDate)
+    case 'has':
+      return  Boolean(task.dueDate)
+    case 'today':
+    case 'tomorrow':
+      if(!task.dueDate) {
+        return false
+      }
+      const amount = filterData === 'today' ? 0 : 1
+      return isSameDay(addDays(new Date(), amount), new Date(task.dueDate))
+    default: 
+      if(!task.dueDate) {
+        return false
+      }
 
-  if (filterData.dueDate === 'none' && !task.dueDate) {
-    return true
+      const time = new Date(task.dueDate).getTime()
+
+      if (
+        (filterData[0] && time > filterData[0].getTime()) ||
+        (filterData[1] && time < filterData[1].getTime())
+      ) {
+        return false 
+      }
+
+      return true
   }
-
-  if (!task.dueDate) {
-    return false // tasks should have a due date
-  }
-
-  if (filterData.dueDate === 'has') {
-    return isDate(task.dueDate) // include tasks that have a due date
-  }
-
-  if (isArray(filterData.dueDate) && task.dueDate) {
-    const epoch = task.dueDate.getTime()
-    // they want to know if task dueDate
-    if (
-      epoch <= filterData.dueDate[0].getTime() ||
-      epoch >= filterData.dueDate[1].getTime()
-    ) {
-      return false // if the
-    }
-  }
-
-  if (filterData.dueDate === 'today' || filterData.dueDate === 'tomorrow') {
-    const amount = filterData.dueDate === 'today' ? 0 : 1
-    if (!isSameDay(addDays(new Date(), amount), task.dueDate)) {
-      return false
-    }
-  }
-
-  return true
 }
 
-const filterByMember = (task: TTask, filterData: TFilterData): boolean => {
-  if (filterData.members.includes('all')) {
-    return true
-  }
-  let result = false
-
-  task.assignedUsers.map(assignedUser => {
-    if (filterData.members.includes(assignedUser)) {
-      result = true
-    }
-  })
-
-  return result
+const filterByPoints = (task: TTask, filterData: TFilterData['points']): boolean => {
+  return !filterData || (task.points >= filterData[0] && task.points <= filterData[1])
 }
 
-const filterByPoints = (task: TTask, filterData: TFilterData): boolean => {
-  // minimum points, 0 if include all tasks
-  return filterData.points === 0 ? true : task.points >= filterData.points
+const filterByColor = (task: TTask, filterData: TFilterData['color']): boolean => {
+  return !filterData || filterData.includes('all') || filterData.includes(task.color)
 }
 
-const filterByColor = (task: TTask, filterData: TFilterData): boolean => {
-  if (filterData.color === 'all') {
-    return true
-  }
-
-  if (
-    filterData.color !== 'all' &&
-    task.color &&
-    task.color === filterData.color
-  ) {
-    return true
-  }
-
-  return false
-}
-
-const filterByTag = (task: TTask, filterData: TFilterData): boolean => {
-  if (filterData.tags.includes('all')) {
-    return true
-  }
-  let result = false
-
-  task.tags.map(tagId => {
-    if (filterData.tags.includes(tagId)) {
-      result = true
-    }
-  })
-
-  return result
-}
-
-export const filterTasks = (
-  tasks: TTask[],
+export const filterTask = (
+  task: TTask,
   filterData: TFilterData
-): TTask[] => {
-  return tasks.filter(task => {
-    return (
-      filterByMember(task, filterData) &&
-      filterByColor(task, filterData) &&
-      filterByPoints(task, filterData) &&
-      filterByDate(task, filterData) &&
-      filterByTag(task, filterData)
-    )
-  })
+): boolean => {
+  return (
+    filterByColor(task, filterData.color) &&
+    filterByPoints(task, filterData.points) &&
+    filterByDate(task, filterData.dueDate)
+  )
 }
-
-*/

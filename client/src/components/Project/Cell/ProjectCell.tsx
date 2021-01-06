@@ -13,8 +13,8 @@ import {
 } from '@material-ui/core'
 import { id } from '../../../utils/utilities'
 import { Menu, Add } from '@material-ui/icons'
-import { input } from '../Project'
-
+import { input, TFilterData } from '../Project'
+import {filterTask} from '../../../utils/filterTasks'
 const styles = (theme: Theme) =>
   createStyles({
     input: input
@@ -24,6 +24,7 @@ type OwnProps = {
   progress: number // 0, 1, or 2
   list: TList
   project: TProject
+  filter: TFilterData
   collapseList: (id: string) => void
   collapsedLists: string[]
   openFunc: (id: string) => void
@@ -186,6 +187,7 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
                     <Draggable draggableId={task.id} index={i} key={task.id}>
                       {(dragProvided, dragSnapshot) => (
                         <BaseTask
+                          hidden={!filterTask(task, props.filter)}
                           openFunc={() => props.openFunc(task.id)}
                           project={props.project}
                           task={task}

@@ -10,5 +10,3 @@ export const setListA = (args: {
 })
 
 export type ListAction = ReturnType<typeof setListA>
-
-// lol

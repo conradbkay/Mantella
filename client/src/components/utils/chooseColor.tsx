@@ -4,16 +4,15 @@ import {
   FormControl,
   FormHelperText
 } from '@material-ui/core'
-
 import React from 'react'
 
 import { colors } from '../../colors'
 import uuidv1 from 'uuid/v1'
 
 type OwnProps = {
-  color: string
+  color?: string[] | string
   hasAllOption?: boolean
-  onChange(color: string): void
+  onChange(color: string | string[]): void
 }
 
 export const ChooseColor = (props: OwnProps) => {
@@ -25,6 +24,7 @@ export const ChooseColor = (props: OwnProps) => {
   return (
     <FormControl fullWidth>
       <Select
+        multiple={props.hasAllOption}
         fullWidth
         value={props.color}
         onChange={(e: any) => props.onChange(e.target.value)}
@@ -32,7 +32,6 @@ export const ChooseColor = (props: OwnProps) => {
         {hasAllOption && (
           <MenuItem
             value="all"
-            selected={false}
             style={{
               background: gradientNames
             }}
@@ -42,7 +41,6 @@ export const ChooseColor = (props: OwnProps) => {
         )}
         {Object.keys(colors).map((key: any, i) => (
           <MenuItem
-            selected={false}
             style={{ backgroundColor: (colors as any)[key] || 'white' }}
             key={uuidv1()}
             value={(colors as any)[key]}

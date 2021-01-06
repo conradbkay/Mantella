@@ -36,7 +36,8 @@ const styles = (theme: Theme) =>
       minHeight: 200,
       overflowX: 'auto',
       display: 'flex',
-      flex: '1 1 auto'
+      flex: '1 1 auto',
+      overflowY: 'hidden' // TODO: actually make scrolling work
     }
   })
 
@@ -48,7 +49,7 @@ const CWeek = withStyles(styles)((props: TProps) => {
     return [...tasks, ...project.tasks]
   }, [])
 
-  const weekEmpty = Boolean(allTasks.filter((task) => task.dueDate !== undefined).length)
+  const weekEmpty = allTasks.filter((task) => task.dueDate).length
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination, draggableId } = result
@@ -108,7 +109,9 @@ const CWeek = withStyles(styles)((props: TProps) => {
         </DragDropContext>
       </div>
       {weekEmpty && (
-        <h1 style={{margin: '20px auto', textAlign: 'center'}}>You have no tasks with due dates</h1>
+        <h1 style={{ margin: '20px auto', textAlign: 'center' }}>
+          You have no tasks with due dates
+        </h1>
       )}
     </>
   )
@@ -122,7 +125,4 @@ const actionCreators = {
   setTask: setTaskA
 }
 
-export const CalendarWeek = connect(
-  mapState,
-  actionCreators
-)(CWeek)
+export const CalendarWeek = connect(mapState, actionCreators)(CWeek)

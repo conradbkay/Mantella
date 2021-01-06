@@ -27,5 +27,10 @@ export const defaultState: TState = {
   },
   snackbar: defaultSnackbar,
   isLoading: false,
-  projects: []
+  projects: [],
+  filter: {
+    dueDate: [null, null],
+    color: ['all'],
+    points: undefined
+  }
 }

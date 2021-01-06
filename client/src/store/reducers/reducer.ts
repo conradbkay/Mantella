@@ -9,7 +9,7 @@ import { TStartLoading, TStopLoading } from '../actions/loading'
 import { TOpenSnackbar } from '../actions/snackbar'
 import { defaultState } from '../defaultState'
 import { userReducer } from './user'
-
+import {filterReducer} from './filter'
 const snackbarReducers: ReducerCases<TState['snackbar']> = {
   OPEN_SNACKBAR: (state, action: TOpenSnackbar) => {
     state.open = true
@@ -38,5 +38,6 @@ export const reducer: Reducer<TState, TAction> = combineReducers({
   snackbar: snackbarReducer,
   projects: projectsReducer,
   pomodoro: pomodoroReducer,
-  user: userReducer
+  user: userReducer,
+  filter: filterReducer
 })

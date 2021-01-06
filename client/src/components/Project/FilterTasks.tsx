@@ -1,4 +1,25 @@
-/*
+import React from 'react'
+import { TFilterData } from './Project'
+import {
+  Drawer,
+  List,
+  ListItem,
+  WithStyles,
+  Theme,
+  createStyles,
+  withStyles,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Switch
+} from '@material-ui/core'
+import { ChooseColor } from '../utils/chooseColor'
+import { isDate, addDays } from 'date-fns'
+import isBefore from 'date-fns/esm/fp/isBefore/index.js'
+import { DateTimePicker } from 'react-widgets'
+
 const styles = (theme: Theme) =>
   createStyles({
     appBarShift: {},
@@ -6,22 +27,23 @@ const styles = (theme: Theme) =>
       marginLeft: 12,
       marginRight: 20
     },
-    drawer: {},
+    drawer: {
+      minWidth: 400
+    },
     drawerPaper: {},
     toolbar: theme.mixins.toolbar
   })
 
 type TProps = {
+  filterData: TFilterData
   open: boolean
-  setFilterData: (newTasks: TTask[]) => void
+  changeFilter: (newFilter: TFilterData) => void
   handleClose: () => void
-  project: TProject
 } & WithStyles<typeof styles>
 
 const CFilterTasks = (props: TProps) => {
-  const [custom, setCustom] = useState(false)
-
-  const { open, classes, handleClose, project, setTasks } = props
+  const [custom, setCustom] = React.useState(false)
+  const { open, classes, handleClose, filterData, changeFilter } = props
   return (
     <div>
       <Drawer
@@ -31,17 +53,19 @@ const CFilterTasks = (props: TProps) => {
         open={open}
         onClose={() => handleClose()}
       >
-        <List style={{ minWidth: 250, maxWidth: 350 }}>
+        <List style={{ minWidth: 250 }}>
           <ListItem>
             <ChooseColor
               hasAllOption
               color={props.filterData.color}
-              onChange={(color: string) =>
-                changeFilter({ ...filterData, color })
-              }
+              onChange={(color: any) => {
+                changeFilter({
+                  ...filterData,
+                  color
+                })
+              }}
             />
           </ListItem>
-
           <FormControlLabel
             style={{ margin: '0px auto' }}
             control={
@@ -49,21 +73,11 @@ const CFilterTasks = (props: TProps) => {
                 disableRipple
                 disableTouchRipple
                 checked={custom}
-                onChange={() => {
-                  if (custom) {
-                    changeFilter({ ...filterData, dueDate: 'all' })
-                  } else {
-                    changeFilter({
-                      ...filterData,
-                      dueDate: [new Date(), addDays(new Date(), 1)]
-                    })
-                  }
-                  setCustom(!custom)
-                }}
+                onChange={() => setCustom(!custom)}
                 color="primary"
               />
             }
-            label="Custom"
+            label="Customized Date Range"
           />
           <ListItem>
             {!custom ? (
@@ -72,7 +86,7 @@ const CFilterTasks = (props: TProps) => {
                 <Select
                   fullWidth
                   value={filterData.dueDate}
-                  onChange={e =>
+                  onChange={(e) =>
                     props.changeFilter({
                       ...filterData,
                       dueDate: e.target.value as any
@@ -96,36 +110,33 @@ const CFilterTasks = (props: TProps) => {
               </FormControl>
             ) : (
               <div style={{ display: 'block' }}>
-                <div></div>
-                <div style={{ marginTop: 5 }}>
-                  {/*
-                  <DatePicker
-                    fullWidth
-                    leftArrowIcon={<KeyboardArrowLeft />}
-                    rightArrowIcon={<KeyboardArrowRight />}
-                    disablePast
-                    label="End Date"
-                    value={filterData.dueDate[1]}
-                    onChange={(date: Date) => {
-                      if (
-                        isAfter(
+                <DateTimePicker
+                  containerClassName="fullwidth"
+                  value={(filterData.dueDate[0] as any) || undefined}
+                  onChange={(date: Date | undefined) => {
+                    if (!date) {
+                      changeFilter({
+                        ...filterData,
+                        dueDate: [null, filterData.dueDate[1] as any]
+                      })
+                    } else if (
+                      !isBefore(
+                        date,
+                        (filterData.dueDate[1] as any) || new Date()
+                      )
+                    ) {
+                      changeFilter({
+                        ...filterData,
+                        dueDate: [
                           date,
-                          (filterData as any).dueDate[0] || new Date()
-                        )
-                      ) {
-                        changeFilter({
-                          ...filterData,
-                          dueDate: [
-                            isDate(filterData.dueDate[0])
-                              ? (filterData.dueDate[0] as Date)
-                              : subDays(new Date(), 1),
-                            date
-                          ]
-                        })
-                      }
-                    }}
-                  />
-                </div>
+                          isDate(filterData.dueDate[1])
+                            ? (filterData.dueDate[1] as Date)
+                            : addDays(new Date(), 1)
+                        ]
+                      })
+                    }
+                  }}
+                />
               </div>
             )}
           </ListItem>
@@ -136,6 +147,3 @@ const CFilterTasks = (props: TProps) => {
 }
 
 export const FilterTasks = withStyles(styles)(CFilterTasks)
-*/
-
-export default ''

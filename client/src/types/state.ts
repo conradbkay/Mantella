@@ -1,3 +1,4 @@
+import { TFilterData } from '../components/Project/Project'
 import { TProject } from './project'
 
 export type TStopWatch = {
@@ -46,4 +47,5 @@ export type TState = {
   pomodoro: TPomodoro
   user: TAuthUser | null
   projects: TProject[]
+  filter: TFilterData
 }

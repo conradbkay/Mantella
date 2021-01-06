@@ -119,6 +119,7 @@ export const SubtaskMap = ({
 interface OwnProps {
   project: TProject
   task: TTask
+  hidden?: boolean
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
   openFunc(): void
@@ -198,6 +199,7 @@ const CBaseTask = (props: TaskProps) => {
         {...provided.draggableProps}
         {...provided.dragHandleProps}
         style={{
+          display: props.hidden ? 'none' : undefined,
           minHeight: MIN_HEIGHT,
           backgroundColor: task.color ? task.color : 'white',
           border,
