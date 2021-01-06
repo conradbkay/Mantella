@@ -107,7 +107,7 @@ export const About = withStyles(styles)(
           </div>
         </div>
         <div style={{ margin: '20px 0' }}>
-          <Typography variant="h4" align="center" gutterBottom>
+          {/*<Typography variant="h4" align="center" gutterBottom>
             The Team
           </Typography>
           <div className={classes.kayLink}>
@@ -129,7 +129,7 @@ export const About = withStyles(styles)(
                 Austin Kay - Builder
               </a>
             </div>
-          </div>
+              </div> */}
           <Typography style={{ marginTop: 20 }} variant="h4" align="center">
             Features
           </Typography>
