@@ -293,6 +293,8 @@ export type Task = {
   subTasks: Array<Subtask>;
   recurrance?: Maybe<TaskRecurrance>;
   description?: Maybe<Scalars['String']>;
+  labels?: Maybe<Array<Scalars['String']>>;
+  timeEstimate?: Maybe<Scalars['Int']>;
 };
 
 export type TaskInput = {
@@ -526,6 +528,10 @@ export namespace TaskResolvers {
     recurrance?: RecurranceResolver<Maybe<TaskRecurrance>, TypeParent, TContext>;
     
     description?: DescriptionResolver<Maybe<string>, TypeParent, TContext>;
+    
+    labels?: LabelsResolver<Maybe<string[]>, TypeParent, TContext>;
+    
+    timeEstimate?: TimeEstimateResolver<Maybe<number>, TypeParent, TContext>;
   }
 
 
@@ -540,6 +546,8 @@ export namespace TaskResolvers {
   export type SubTasksResolver<R = Subtask[], Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
   export type RecurranceResolver<R = Maybe<TaskRecurrance>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
   export type DescriptionResolver<R = Maybe<string>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
+  export type LabelsResolver<R = Maybe<string[]>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
+  export type TimeEstimateResolver<R = Maybe<number>, Parent = Task, TContext = {}> = Resolver<R, Parent, TContext>;
 }
 
 export namespace CommentResolvers {
@@ -1009,7 +1017,7 @@ export type IDirectiveResolvers<Result> = {
 
 export type TaskFieldsFragment = (
   { __typename?: 'Task' }
-  & Pick<Task, 'points' | 'progress' | 'id' | 'dueDate' | 'color' | 'timeWorkedOn' | 'name'>
+  & Pick<Task, 'points' | 'description' | 'progress' | 'labels' | 'timeEstimate' | 'id' | 'dueDate' | 'color' | 'timeWorkedOn' | 'name'>
   & { subTasks: Array<(
     { __typename?: 'Subtask' }
     & Pick<Subtask, 'name' | 'completed' | 'id'>

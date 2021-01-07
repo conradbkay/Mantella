@@ -152,7 +152,6 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
                 }
               }}
             >
-              {/* TODO:  when they click, make text red and say confirm */}
               {deletingList ? (
                 <div style={{ color: 'red', fontWeight: 500 }}>Confirm</div>
               ) : (

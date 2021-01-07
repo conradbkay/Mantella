@@ -37,7 +37,7 @@ const styles = (theme: Theme) =>
       overflowX: 'auto',
       display: 'flex',
       flex: '1 1 auto',
-      overflowY: 'hidden' // TODO: actually make scrolling work
+      overflowY: 'hidden'
     }
   })
 

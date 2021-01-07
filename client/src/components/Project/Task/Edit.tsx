@@ -111,8 +111,8 @@ export const EditTaskModal = connect(
         name: task.name,
         points: task.points,
         dueDate: task.dueDate,
-        // recurrance: task.recurrance,
-        color: task.color
+        color: task.color,
+        description: task.description
       },
       projId: props.projectId
     }
@@ -128,7 +128,7 @@ export const EditTaskModal = connect(
 
   const project = props.projects[id(props.projects, props.projectId)]
 
-  const ownerListId = project.lists.find(list =>
+  const ownerListId = project.lists.find((list) =>
     list.taskIds.includes(task.id)
   )!.id
 
@@ -138,7 +138,7 @@ export const EditTaskModal = connect(
     <div>
       <Dialog open onClose={() => props.onClose()}>
         <form
-          onSubmit={e => {
+          onSubmit={(e) => {
             props.setTask({
               id: props.task.id,
               projectId: props.projectId,
@@ -151,7 +151,7 @@ export const EditTaskModal = connect(
             if (listId !== ownerListId) {
               let newIndex = 0
 
-              const tasksInNewProgress = project.tasks.filter(filterTask => {
+              const tasksInNewProgress = project.tasks.filter((filterTask) => {
                 return (
                   project.lists[id(project.lists, listId)].taskIds.includes(
                     task.id
@@ -160,7 +160,7 @@ export const EditTaskModal = connect(
               })
 
               if (tasksInNewProgress.length) {
-                const indexesInList = tasksInNewProgress.map(tasko => {
+                const indexesInList = tasksInNewProgress.map((tasko) => {
                   return project.lists[
                     id(project.lists, listId)
                   ].taskIds.indexOf(tasko.id)
@@ -220,12 +220,29 @@ export const EditTaskModal = connect(
               label="Points"
               value={task.points}
               type="number"
-              onChange={e => {
+              onChange={(e) => {
                 e.persist() // for some reason it unfocuses without this!
                 if (parseInt(e.target.value) >= 0) {
                   setTask({ ...task, points: parseInt(e.target.value) })
                 }
               }}
+            />
+          </div>
+          <div>
+            <TextField
+              style={{ margin: '12px 4px' }}
+              required
+              autoFocus
+              variant="outlined"
+              color="secondary"
+              label="Description"
+              value={task.description}
+              onChange={({ target }) =>
+                setTask({ ...task, description: target.value })
+              }
+              fullWidth
+              multiline
+              rows={3}
             />
           </div>
           <div style={{ display: 'flex', marginTop: 8 }}>
@@ -242,7 +259,7 @@ export const EditTaskModal = connect(
               <Select
                 fullWidth
                 value={listId}
-                onChange={e => {
+                onChange={(e) => {
                   setListId(e.target.value as any)
                 }}
               >
@@ -291,7 +308,7 @@ export const EditTaskModal = connect(
                 style={{ marginRight: 10, width: 32, height: 32 }}
                 disableRipple
                 checked={task.subTasks[i].completed}
-                onChange={e => {
+                onChange={(e) => {
                   const subTasks = [...task.subTasks]
                   const newCompleteStatus = !subTasks[i].completed
                   subTasks[i].completed = newCompleteStatus
@@ -317,7 +334,7 @@ export const EditTaskModal = connect(
                 fullWidth
                 label={`Subtask ${i}`}
                 value={task.subTasks[i].name}
-                onBlur={e => {
+                onBlur={(e) => {
                   setSubtaskExec({
                     variables: {
                       projId: props.projectId,
@@ -330,7 +347,7 @@ export const EditTaskModal = connect(
                     }
                   })
                 }}
-                onChange={e => {
+                onChange={(e) => {
                   setTask({
                     ...task,
                     subTasks: [
@@ -351,7 +368,9 @@ export const EditTaskModal = connect(
                 onClick={() => {
                   setTask({
                     ...task,
-                    subTasks: task.subTasks.filter((sub) => sub.id !== task.subTasks[i].id)
+                    subTasks: task.subTasks.filter(
+                      (sub) => sub.id !== task.subTasks[i].id
+                    )
                   })
                   setSubtaskExec({
                     variables: {
@@ -378,7 +397,10 @@ export const EditTaskModal = connect(
               const subTaskId = uuid()
               setTask({
                 ...task,
-                subTasks: [...task.subTasks, {id: subTaskId, completed: false, name: 'Subtask Name' }]
+                subTasks: [
+                  ...task.subTasks,
+                  { id: subTaskId, completed: false, name: 'Subtask Name' }
+                ]
               })
 
               setSubtaskExec({
@@ -412,7 +434,7 @@ export const EditTaskModal = connect(
               <TextField
                 key={comment.id}
                 margin="dense"
-                onBlur={e => {
+                onBlur={(e) => {
                   setCommentExec({
                     variables: {
                       projId: props.projectId,
@@ -431,7 +453,7 @@ export const EditTaskModal = connect(
                   dueDate: comment.dateAdded,
                   recurrance: undefined
                 }).slice(4)}
-                onChange={e => {
+                onChange={(e) => {
                   const newComments = [...task.comments]
                   newComments[i].comment = e.target.value
 

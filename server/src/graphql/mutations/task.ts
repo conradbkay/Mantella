@@ -20,7 +20,8 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
         : null,
       subTasks: obj.taskInfo.subTasks ? obj.taskInfo.subTasks.map(subT => ({...subT, id: uuid()})) :  [],
       comments: [],
-      recurrance: null
+      recurrance: null,
+      description: obj.taskInfo.description
     } as TaskProps)
 
     const list = proj.lists.find((col) => col.id === obj.listId)!
@@ -51,10 +52,9 @@ const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
     task.name = obj.task.name || task.name
     task.points = obj.task.points || task.points
     task.dueDate = obj.task.dueDate || task.dueDate
-    // dueDate
-    // task.lastEdited = new Date()
     // task.recurrance = obj.task.recurrance || task.recurrance
     task.color = obj.task.color || task.color
+    task.description = obj.task.description
 
     const newProj = await project.save()
     const pure = await newProj.toObject()

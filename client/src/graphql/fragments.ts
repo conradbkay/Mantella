@@ -5,9 +5,10 @@ export type GQLExec = <T>(variables: T) => any
 export const taskFields = gql`
   fragment taskFields on Task {
     points
-
+    description
     progress
-
+    labels
+    timeEstimate
     id
     dueDate
     color

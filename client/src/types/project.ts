@@ -20,7 +20,7 @@ export interface TProject {
 
 export interface TTask {
   progress: 0 | 1 | 2 | number
-
+  description?: string | null
   id: string
   name: string
   points: number

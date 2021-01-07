@@ -70,6 +70,7 @@ export interface TaskProps {
   timeWorkedOn: number
   color: string
   dueDate?: string | null
+  description?: string | null
 
   comments: Array<{
     id: string

@@ -37,7 +37,6 @@ type Column {
 
 type Task {
   progress: Int!
-
   id: String!
   name: String!
   points: Int!
@@ -48,6 +47,8 @@ type Task {
   subTasks: [Subtask!]!
   recurrance: TaskRecurrance
   description: String
+  labels: [String!]
+  timeEstimate: Int
 }
 
 type User {

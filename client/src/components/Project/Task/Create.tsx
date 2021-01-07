@@ -1,9 +1,25 @@
 import React, { useState } from 'react'
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, FormHelperText, IconButton, MenuItem, Select, TextField } from '@material-ui/core'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  MenuItem,
+  Select,
+  TextField
+} from '@material-ui/core'
 import { connect } from 'react-redux'
 import { GQL_CREATE_TASK } from '../../../graphql/mutations/task'
-import { CreateTaskMutation, CreateTaskMutationVariables } from '../../../graphql/types'
-import {useMutation} from 'react-apollo'
+import {
+  CreateTaskMutation,
+  CreateTaskMutationVariables
+} from '../../../graphql/types'
+import { useMutation } from 'react-apollo'
 import { setProjectA } from '../../../store/actions/project'
 import { Close } from '@material-ui/icons'
 import { ChooseColor } from '../../utils/chooseColor'
@@ -27,6 +43,7 @@ export const CreateTask = connect(
   actionCreators
 )((props: TProps) => {
   const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
   const [color, setColor] = useState('#FFFFFF')
   const [points, setPoints] = useState(0)
   const [listId, setListId] = useState(props.project.lists[0].id)
@@ -50,7 +67,7 @@ export const CreateTask = connect(
   return (
     <Dialog open={true} onClose={() => props.onClose()}>
       <form
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
 
           createTaskExec({
@@ -61,24 +78,25 @@ export const CreateTask = connect(
                 points,
                 color,
                 name,
-                dueDate: dueDate ? dueDate.toString() : undefined
+                dueDate: dueDate ? dueDate.toString() : undefined,
+                description
               }
             }
           })
         }}
       >
         <DialogTitle>Create Task</DialogTitle>
-        <IconButton style={{ position: 'absolute',
-      right: 8,
-      top: 8,
-      color: 'gray' }} onClick={() => props.onClose()}>
+        <IconButton
+          style={{ position: 'absolute', right: 8, top: 8, color: 'gray' }}
+          onClick={() => props.onClose()}
+        >
           <Close />
         </IconButton>
         <DialogContent>
           <DialogContentText>
-            Tasks should be a small chunk of what you need to do.
-            For example, if you needed to create a Youtube thumbnail, the first
-            task would be: "Create Title"
+            Tasks should be a small chunk of what you need to do. For example,
+            if you needed to create a Youtube video, a task could be: "Create
+            Thumbnail"
           </DialogContentText>
           <div
             style={{
@@ -97,9 +115,7 @@ export const CreateTask = connect(
               color="secondary"
               label="Title"
               value={name}
-              onChange={({ target }) =>
-                setName(target.value)
-              }
+              onChange={({ target }) => setName(target.value)}
               fullWidth
             />
             <TextField
@@ -110,12 +126,27 @@ export const CreateTask = connect(
               label="Points"
               value={points}
               type="number"
-              onChange={e => {
+              onChange={(e) => {
                 e.persist() // for some reason it unfocuses without this!
                 if (parseInt(e.target.value) >= 0) {
                   setPoints(parseInt(e.target.value))
                 }
               }}
+            />
+          </div>
+          <div>
+            <TextField
+              style={{ margin: '12px 4px' }}
+              required
+              autoFocus
+              variant="outlined"
+              color="secondary"
+              label="Description"
+              value={description}
+              onChange={({ target }) => setDescription(target.value)}
+              fullWidth
+              multiline
+              rows={3}
             />
           </div>
           <div style={{ display: 'flex', marginTop: 20 }}>
@@ -132,7 +163,7 @@ export const CreateTask = connect(
               <Select
                 fullWidth
                 value={listId}
-                onChange={e => {
+                onChange={(e) => {
                   setListId(e.target.value as any)
                 }}
               >
@@ -151,7 +182,7 @@ export const CreateTask = connect(
           </div>
           <div style={{ display: 'flex', marginTop: 20 }}>
             <DateTimePicker
-            dropUp
+              dropUp
               containerClassName="fullwidth"
               value={dueDate}
               onChange={(date) => {
@@ -170,6 +201,5 @@ export const CreateTask = connect(
         </DialogActions>
       </form>
     </Dialog>
-    
   )
 })

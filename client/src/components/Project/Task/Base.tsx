@@ -266,6 +266,9 @@ const CBaseTask = (props: TaskProps) => {
                 </div>
               </span>
             </div>
+            <div style={{ marginTop: 4, marginLeft: 4 }}>
+              {task.description}
+            </div>
             <SubtaskMap
               show={showSubTasks}
               subTasks={task.subTasks}

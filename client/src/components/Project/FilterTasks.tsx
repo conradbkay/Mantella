@@ -14,7 +14,8 @@ import {
   MenuItem,
   FormControlLabel,
   Switch,
-  Slider
+  Slider,
+  ListItemText
 } from '@material-ui/core'
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
@@ -55,8 +56,19 @@ const CFilterTasks = (props: TProps) => {
         open={open}
         onClose={() => handleClose()}
       >
-        <List style={{ minWidth: 250, marginTop: 32 }}>
-          <ListItem style={{ padding: '0px 32px' }}>
+        <List style={{ minWidth: 250, marginTop: 8 }}>
+          <ListItem>
+            <ListItemText
+              style={{
+                borderRadius: 8,
+                backgroundColor: '#FFFEAF',
+                padding: 8
+              }}
+            >
+              Sorted or Filtered Tasks cannot be dragged
+            </ListItemText>
+          </ListItem>
+          <ListItem style={{ padding: '0px 32px', marginTop: 32 }}>
             <Slider
               min={0}
               max={50}
