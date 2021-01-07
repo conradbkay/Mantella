@@ -19,7 +19,7 @@ const SET_TASK = (
       }
     })
 
-    project.tasks.splice(project.tasks.findIndex(tsk => tsk.id === action.id))
+    project.tasks.splice(project.tasks.findIndex(tsk => tsk.id === action.id), 1)
   } else {
     tasks[id(tasks, action.id)] = {
       ...action.newTask

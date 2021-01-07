@@ -20,7 +20,8 @@ import {
   GQL_EDIT_TASK,
   GQL_DRAG_TASK,
   GQL_SET_SUBTASK,
-  GQL_SET_COMMENT
+  GQL_SET_COMMENT,
+  GQL_DELETE_TASK
 } from '../../../graphql/mutations/task'
 import { useMutation } from 'react-apollo'
 
@@ -32,7 +33,9 @@ import {
   SetSubtaskMutation,
   SetSubtaskMutationVariables,
   SetCommentMutation,
-  SetCommentMutationVariables
+  SetCommentMutationVariables,
+  DeleteTaskMutation,
+  DeleteTaskMutationVariables
 } from '../../../graphql/types'
 import { setTaskA } from '../../../store/actions/task'
 import { ChooseColor } from '../../utils/chooseColor'
@@ -117,6 +120,16 @@ export const EditTaskModal = connect(
       projId: props.projectId
     }
   })
+
+  const [deleteTaskExec] = useMutation<
+    DeleteTaskMutation,
+    DeleteTaskMutationVariables
+  >(GQL_DELETE_TASK, {
+    onCompleted: ({ deleteTask }) => {
+      props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
+    }
+  })
+
   const [dragTaskExec] = useMutation<
     DragTaskMutation,
     DragTaskMutationVariables
@@ -232,7 +245,6 @@ export const EditTaskModal = connect(
             <TextField
               style={{ margin: '12px 4px' }}
               required
-              autoFocus
               variant="outlined"
               color="secondary"
               label="Description"
@@ -508,6 +520,18 @@ export const EditTaskModal = connect(
               justifyContent: 'flex-end'
             }}
           >
+            <Button
+              onClick={() => {
+                props.onClose()
+                deleteTaskExec({
+                  variables: { projId: props.projectId, taskId: task.id }
+                })
+              }}
+              style={{ backgroundColor: 'red', color: 'white', marginRight: 8 }}
+            >
+              Delete
+              <Delete style={{ marginLeft: 'auto' }} />
+            </Button>
             <Button color="secondary" type="submit" variant="contained">
               Save
             </Button>
