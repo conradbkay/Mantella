@@ -137,8 +137,6 @@ export const CreateTask = connect(
           <div>
             <TextField
               style={{ margin: '12px 4px' }}
-              required
-              autoFocus
               variant="outlined"
               color="secondary"
               label="Description"
