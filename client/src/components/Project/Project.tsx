@@ -51,6 +51,7 @@ import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
+import { ProjStats } from './Statistics'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -118,6 +119,7 @@ const CProject = (props: TProps) => {
   const [isMobile, setIsMobile] = useState(getMobile(window))
   const [collapsedLists, setCollapsedLists] = useState([] as string[])
   const [editingList, setEditingList] = useState(['', ''])
+  const [stats, setStats] = useState(false)
 
   if (isMobile) {
   }
@@ -292,7 +294,10 @@ const CProject = (props: TProps) => {
               >
                 <Settings />
               </IconButton>
-              <IconButton style={{ marginLeft: 8 }}>
+              <IconButton
+                onClick={() => setStats(true)}
+                style={{ marginLeft: 8 }}
+              >
                 <Equalizer />
               </IconButton>
             </div>
@@ -462,6 +467,11 @@ const CProject = (props: TProps) => {
           filterData={props.filterData}
           changeFilter={(newFilter) => props.setFilter(newFilter)}
           handleClose={() => setFiltering(false)}
+        />
+        <ProjStats
+          projectId={project.id}
+          open={stats}
+          handleClose={() => setStats(false)}
         />
       </div>
     )
