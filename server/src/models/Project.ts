@@ -13,11 +13,11 @@ export const ProjectSchema = new Schema({
   ],
   columns: [
     {
-      id: {type: String, required: true},
-      name: {type: String, required: true},
-      collapsedUsers: [{type: String, required: true}],
+      id: { type: String, required: true },
+      name: { type: String, required: true },
+      collapsedUsers: [{ type: String, required: true }],
       inProgress: Boolean,
-      taskIds: [{type: String, required: true}]
+      taskIds: [{ type: String, required: true }]
     }
   ],
   tasks: [

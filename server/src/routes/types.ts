@@ -1,3 +1,13 @@
-import { getUser } from './routes'
+import { Request, Response } from 'express'
 
-export type GetUserReturn = ReturnType<typeof getUser>
+interface Req<body = {}> extends Request {
+  body: body
+}
+
+export type getUserReq = Req<{ id: string }>
+export type getUserRes = Response<{ user: any }>
+
+export type loginWithCookieReq = Req<{}>
+export type loginWithCookieRes = Response<{
+  user: any
+}>

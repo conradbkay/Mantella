@@ -3,7 +3,7 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./build/",
-    "module": "commonjs",
+    "module": "ESNext",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,

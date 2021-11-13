@@ -1,5 +1,5 @@
-import { ProjectModel, TaskProps, ProjectProps } from './../../models/Project'
-import { MutationResolvers } from '../../graphql/types'
+import { ProjectModel, TaskProps, ProjectProps } from '../models/Project'
+import { MutationResolvers } from '../graphql/types'
 import uuid from 'uuid'
 
 const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
@@ -18,7 +18,9 @@ const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
       dueDate: obj.taskInfo.dueDate
         ? new Date(obj.taskInfo.dueDate).toString()
         : null,
-      subTasks: obj.taskInfo.subTasks ? obj.taskInfo.subTasks.map(subT => ({...subT, id: uuid()})) :  [],
+      subTasks: obj.taskInfo.subTasks
+        ? obj.taskInfo.subTasks.map((subT) => ({ ...subT, id: uuid() }))
+        : [],
       comments: [],
       recurrance: null,
       description: obj.taskInfo.description
@@ -75,7 +77,7 @@ const deleteTask: MutationResolvers['deleteTask'] = async (parent, obj) => {
   const proj = await ProjectModel.findOne({ id: obj.projId })
 
   if (proj) {
-    (proj.tasks.find((tsk) => tsk.id === obj.id) as any).remove()
+    ;(proj.tasks.find((tsk) => tsk.id === obj.id) as any).remove()
 
     proj.lists.map((list) => {
       list.taskIds.splice(list.taskIds.indexOf(obj.id), 1)
@@ -96,12 +98,10 @@ const dragTask: MutationResolvers['dragTask'] = async (
   const proj = await ProjectModel.findOne({ id: obj.projectId })
 
   if (proj) {
-    const oldList = proj.lists[
-      proj.lists.findIndex((list) => list.id === obj.oldListId)
-    ]!
-    const newList = proj.lists[
-      proj.lists.findIndex((list) => list.id === obj.newListId)
-    ]!
+    const oldList =
+      proj.lists[proj.lists.findIndex((list) => list.id === obj.oldListId)]!
+    const newList =
+      proj.lists[proj.lists.findIndex((list) => list.id === obj.newListId)]!
 
     const task = proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === obj.id)]
 
@@ -132,16 +132,14 @@ const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
     const subTask: TaskProps['subTasks'][0] = task.subTasks.find(
       (subT) => subT.id === obj.subtaskId
     )!
-    
-    if(!subTask) {
+
+    if (!subTask) {
       task.subTasks.push({
         completed: false,
         name: obj.info!.name || 'Subtask',
         id: obj.subtaskId!
       })
-    }
-
-    else if (!obj.info) {
+    } else if (!obj.info) {
       task.subTasks = task.subTasks.filter((sub) => sub.id !== obj.subtaskId)
     } else {
       subTask.completed =
@@ -174,7 +172,7 @@ const setComment: MutationResolvers['setComment'] = async (parent, obj) => {
       )!
 
       if (!obj.description) {
-        (comment as any).remove()
+        ;(comment as any).remove()
       } else {
         comment.comment = obj.description
       }

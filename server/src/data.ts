@@ -1,6 +1,10 @@
 import { TaskProps, ProjectProps } from './models/Project'
 import uuid from 'uuid'
 
+/**
+ * Default data that is used to add an example project when a user signs up
+ */
+
 export const defaultTask: TaskProps = {
   name: 'Task',
   points: 0,
@@ -46,8 +50,7 @@ export const taskObjects = (ids: any[]): TaskProps[] => [
   {
     ...defaultTask,
     id: ids[4],
-    name:
-      'Projects can be created at any time, you can have as many projects as you want!'
+    name: 'Projects can be created at any time, you can have as many projects as you want!'
   },
   {
     ...defaultTask,
@@ -105,8 +108,7 @@ export const taskObjects = (ids: any[]): TaskProps[] => [
   {
     ...defaultTask,
     id: ids[15],
-    name:
-      'I hope you enjoy Mantella, email me with feature requests or bugs, I appreciate all feedback!'
+    name: 'I hope you enjoy Mantella, email me with feature requests or bugs, I appreciate all feedback!'
   }
 ]
 
@@ -117,7 +119,6 @@ export const projectData = (
   projectId: string
 ): ProjectProps => {
   const listIds = [uuid(), uuid(), uuid()]
-  // const columnIds = [uuid(), uuid(), uuid()]
 
   return {
     name: 'Tutorial Project',

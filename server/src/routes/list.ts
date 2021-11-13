@@ -1,6 +1,6 @@
-import { ProjectProps } from '../../models/Project'
-import { MutationResolvers } from '../types'
-import { ProjectModel } from '../../models/Project'
+import { ProjectProps } from '../models/Project'
+import { MutationResolvers } from '../graphql/types'
+import { ProjectModel } from '../models/Project'
 import uuid from 'uuid'
 
 const editList: MutationResolvers['editList'] = async (parent, obj) => {
@@ -32,7 +32,7 @@ const deleteList: MutationResolvers['deleteList'] = async (parent, obj) => {
   const project = await ProjectModel.findOne({ id: obj.projId })
 
   if (project && project.lists.length > 1) {
-    (project.lists.find((l) => l.id === obj.id) as any).remove()
+    ;(project.lists.find((l) => l.id === obj.id) as any).remove()
 
     await project.save()
 

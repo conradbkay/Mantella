@@ -1,20 +1,24 @@
-import { UserProps, comparePassword } from './../../models/User'
+import { UserProps, comparePassword } from '../models/User'
 import bcrypt from 'bcryptjs'
-import { MutationResolvers } from '../../graphql/types'
-import { UserModel } from '../../models/User'
-import { ProjectModel } from '../../models/Project'
-import { taskObjects, projectData } from '../../data'
+import { UserModel } from '../models/User'
+import { ProjectModel } from '../models/Project'
+import { taskObjects, projectData } from '../data'
 import jsonwebtoken from 'jsonwebtoken'
-import { AuthenticationError } from 'apollo-server-core'
 import uuid from 'uuid'
+import { NextFunction } from 'express'
+import {
+  getUserReq,
+  getUserRes,
+  loginWithCookieReq,
+  loginWithCookieRes
+} from './types'
 
-const loginWithCookie: MutationResolvers['loginWithCookie'] = async (
-  parent,
-  obj,
-  context
+const loginWithCookieHandler = async (
+  req: loginWithCookieReq,
+  res: loginWithCookieRes
 ) => {
   if (!context.userId) {
-    throw new AuthenticationError('no token man')
+    throw new Error('Unauthenticated user')
   }
 
   const user: UserProps | null = await UserModel.findOne({
@@ -22,7 +26,7 @@ const loginWithCookie: MutationResolvers['loginWithCookie'] = async (
   })
 
   if (!user) {
-    throw new AuthenticationError('Token Corrupt!')
+    throw new Error('Token Corrupt!')
   }
 
   const projects = await ProjectModel.find({ id: user.projects })
@@ -35,7 +39,7 @@ const loginWithCookie: MutationResolvers['loginWithCookie'] = async (
   }
 }
 
-const login: MutationResolvers['login'] = async (parent, obj, context) => {
+const login = async (parent, obj, context) => {
   const user = await UserModel.findOne({ email: obj.email })
   if (user) {
     const passwordMatch = await comparePassword(obj.password, user.password)
@@ -61,11 +65,7 @@ const login: MutationResolvers['login'] = async (parent, obj, context) => {
   throw new AuthenticationError('User with Email does not exist!')
 }
 
-const register: MutationResolvers['register'] = async (
-  parent,
-  obj,
-  context
-) => {
+const register = async (parent, obj, context) => {
   const salt = await bcrypt.genSalt(10)
   const password = await bcrypt.hash(obj.password, salt)
 
@@ -121,12 +121,12 @@ const register: MutationResolvers['register'] = async (
   }
 }
 
-const logout: MutationResolvers['logout'] = async (parent, obj, context) => {
+const logout: MutationResolvers['logout'] = async (parent, obj) => {
   context.res.clearCookie('auth-token')
   return { message: 'logged out' }
 }
 
-const loginAsGuest: MutationResolvers['loginAsGuest'] = async(parent, obj, context) => {
+const loginAsGuest = async (parent, obj, context) => {
   const projectId = uuid()
   const userId = uuid()
 
@@ -143,13 +143,12 @@ const loginAsGuest: MutationResolvers['loginAsGuest'] = async(parent, obj, conte
   let newUser = await UserModel.create({
     id: userId,
     email: uuid() + '.gmail.com',
-    username: "Guest",
+    username: 'Guest',
     projects: [projectId],
     profileImg:
       'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
   })
 
-  
   if (newUser) {
     let projects: any = await ProjectModel.find({
       id: { $in: newUser.projects }
@@ -163,11 +162,17 @@ const loginAsGuest: MutationResolvers['loginAsGuest'] = async(parent, obj, conte
         projects: projects
       }
     }
-  } 
-  
-  else {
-    throw new Error('Could not create guest, try signing in or registering, sorry')
+  } else {
+    throw new Error(
+      'Could not create guest, try signing in or registering, sorry'
+    )
   }
 }
 
-export const authMutations = { login, register, logout, loginWithCookie, loginAsGuest }
+export const authMutations = {
+  login,
+  register,
+  logout,
+  loginWithCookieHandler,
+  loginAsGuest
+}

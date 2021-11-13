@@ -1,7 +1,7 @@
-import { QueryResolvers } from '../../graphql/types'
-import { ProjectModel } from '../../models/Project'
+import { QueryResolvers } from './graphql/types'
+import { ProjectModel } from '../models/Project'
 
-import { UserModel } from '../../models/User'
+import { UserModel } from '../models/User'
 
 export const queries: QueryResolvers = {
   projects: async (obj, args, context, info) => {

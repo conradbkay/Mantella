@@ -5,16 +5,13 @@ import Server from './server'
 import 'reflect-metadata'
 debug('ts-express:server')
 
-/* set port */
-
 Server.set('port', process.env.PORT || 4000)
 
 Server.use((err: Error, req: any, res: any, next: any) => {
-  console.error('Throwing an Error: ', err.message) // Log error message in our server's console
+  console.error('Throwing an Error: ', err.message)
   res.status((err as any).statusCode || 500).json({ error: err.message })
 })
 
-/* create server */
 const server = http.createServer(Server)
 
 server.listen(process.env.PORT || 4000, onListening)
@@ -30,12 +27,8 @@ process.on('exit', (code) => {
 })
 
 function onListening(): void {
-  console.log(
-    `🚀  Server ready, listening on port ${process.env.PORT || 4000}`
-  )
+  console.log(`🚀  Server ready, listening on port ${process.env.PORT || 4000}`)
 }
-
-/** error handling :) */
 
 function onError(error: NodeJS.ErrnoException): void {
   if (error.syscall !== 'listen') {
