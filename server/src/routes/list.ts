@@ -1,76 +1,80 @@
-import { ProjectProps } from '../models/Project'
-import { MutationResolvers } from '../graphql/types'
 import { ProjectModel } from '../models/Project'
 import uuid from 'uuid'
+import { router } from './router'
+import {
+  createListReq,
+  createListRes,
+  deleteListReq,
+  deleteListRes,
+  editListReq,
+  editListRes
+} from './types'
 
-const editList: MutationResolvers['editList'] = async (parent, obj) => {
-  const project = await ProjectModel.findOne({ id: obj.projId })
+export const editList = async (req: editListReq, res: editListRes) => {
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project) {
     const list = project.lists.find((l) => {
-      return l.id === obj.listId
+      return l.id === req.body.listId
     })!
 
-    list.name = obj.newList.name || list.name
-    list.taskIds = obj.newList.taskIds || list.taskIds
+    list.name = req.body.newList.name || list.name
+    list.taskIds = req.body.newList.taskIds || list.taskIds
 
     const newProj = await project.save()
 
     const pure = newProj.toObject()
 
-    if (pure) {
-      return {
-        project: pure,
-        list: newProj.lists.find((l) => l.id === obj.listId)!
-      }
-    }
+    res.json({
+      project: pure,
+      list: newProj.lists.find((l) => l.id === req.body.listId)!
+    })
+  } else {
+    throw new Error('proj not found')
   }
-
-  throw new Error('proj not found')
 }
-const deleteList: MutationResolvers['deleteList'] = async (parent, obj) => {
-  const project = await ProjectModel.findOne({ id: obj.projId })
+
+router.post('/editList', editList)
+
+export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project && project.lists.length > 1) {
-    ;(project.lists.find((l) => l.id === obj.id) as any).remove()
+    ;(project.lists.find((l) => l.id === req.body.id) as any).remove()
 
     await project.save()
 
-    return { id: obj.id }
+    res.json({ id: req.body.id })
   } else {
-    throw new Error('cant delete last list!')
+    throw new Error('cant delete final list!')
   }
 }
 
-const createList: MutationResolvers['createList'] = async (parent, obj) => {
+router.post('/deleteList', deleteList)
+
+export const createList = async (req: createListReq, res: createListRes) => {
   const newId = uuid()
 
-  const project = await ProjectModel.findOne({ id: obj.projId })
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project) {
     project.lists.push({
       id: newId,
-      name: obj.name || 'new list',
+      name: req.body.name || 'new list',
       taskIds: []
-    } as ProjectProps['lists'][0])
+    })
 
     const newProj = await project.save()
 
     const pure = newProj.toObject()
 
-    if (pure) {
-      return {
-        project: pure,
-        list: (newProj.lists.find((l) => l.id === newId) as any).toObject()
-      }
-    }
+    res.json({
+      project: pure,
+      list: (newProj.lists.find((l) => l.id === newId) as any).toObject()
+    })
+  } else {
+    throw new Error('proj not found')
   }
-
-  throw new Error('proj not found')
 }
 
-export const listMutations = {
-  editList,
-  deleteList,
-  createList
-}
+router.post('/createList', createList)

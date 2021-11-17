@@ -56,7 +56,7 @@ const CWeekControls = (props: TProps) => {
       <Select
         style={{ maxWidth: '30%', ...boxStyle }}
         value={currIds.length === 0 ? ['-1'] : currIds}
-        onChange={e => {
+        onChange={(e) => {
           const withoutAllProjects = (e.target.value as any).filter(
             (num: string) => num !== '-1'
           )
@@ -72,7 +72,7 @@ const CWeekControls = (props: TProps) => {
         multiple
       >
         <MenuItem value={-1}>All Projects</MenuItem>
-        {Object.values(projects).map(project => (
+        {Object.values(projects).map((project) => (
           <MenuItem key={project.id} value={project.id}>
             {project.name}
           </MenuItem>

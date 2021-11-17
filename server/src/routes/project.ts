@@ -1,16 +1,23 @@
-import { Column } from '../models/Project'
-import { ProjectProps } from '../models/Project'
-import { AuthenticationError } from 'apollo-server-core'
 import { UserModel } from '../models/User'
-import { MutationResolvers } from '../graphql/types'
 import { ProjectModel } from '../models/Project'
 import uuid from 'uuid'
+import {
+  createProjectReq,
+  createProjectRes,
+  deleteProjectReq,
+  deleteProjectRes,
+  editProjectReq,
+  editProjectRes,
+  joinProjectReq,
+  joinProjectRes,
+  leaveProjectReq,
+  leaveProjectRes,
+  removeMemberFromProjectReq,
+  removeMemberFromProjectRes
+} from './types'
+import { Request, Response } from 'express'
 
-const generateColumn = (
-  name: string,
-  id: string,
-  isInProgress: boolean
-): Column => ({
+const generateColumn = (name: string, id: string, isInProgress: boolean) => ({
   id,
   name,
   collapsedUsers: [],
@@ -18,14 +25,13 @@ const generateColumn = (
   taskIds: []
 })
 
-const createProject: MutationResolvers['createProject'] = async (
-  parent,
-  args,
-  context
+export const createProject = async (
+  req: createProjectReq,
+  res: createProjectRes
 ) => {
   const creatingId = uuid()
   const listId = uuid()
-  const user = await UserModel.findOne({ id: context.userId.id })
+  const user = await UserModel.findOne({ id: req.body.userId })
 
   if (user) {
     user.projects.push(creatingId)
@@ -33,7 +39,7 @@ const createProject: MutationResolvers['createProject'] = async (
     const [created] = await Promise.all([
       ProjectModel.create({
         id: creatingId,
-        name: args.name,
+        name: req.body.name,
         ownerId: user.id,
         users: [user.id],
         columns: [
@@ -52,71 +58,70 @@ const createProject: MutationResolvers['createProject'] = async (
         enrolledUsers: [],
         columnOrder: [listId],
         isPrivate: false
-      } as ProjectProps),
+      }),
       user.save()
     ])
     if (created) {
-      return created.toObject()
+      res.json({ project: created.toObject() })
     }
+  } else {
+    throw new Error('user id not provided in token')
   }
-
-  throw new AuthenticationError('user id not provided in token')
 }
 
-const editProject: MutationResolvers['editProject'] = async (parent, args) => {
-  if (args.id) {
-    const project = await ProjectModel.findOne({ id: args.id })
+export const editProject = async (req: editProjectReq, res: editProjectRes) => {
+  if (req.body.id) {
+    const project = await ProjectModel.findOne({ id: req.body.id })
     if (project) {
-      project.name = args.newProj.name ? args.newProj.name : project.name
+      project.name = req.body.newProj.name
+        ? req.body.newProj.name
+        : project.name
 
       const newProj = await project.save()
 
       if (newProj) {
-        return newProj.toObject()
+        res.json({ project: newProj.toObject() })
       }
     }
+  } else {
+    throw new Error('not signed in')
   }
-  return null
 }
 
-const deleteProject: MutationResolvers['deleteProject'] = async (
-  parent,
-  obj,
-  context
+export const deleteProject = async (
+  req: deleteProjectReq,
+  res: deleteProjectRes
 ) => {
-  const user = await UserModel.findOne({ id: context.userId.id })
+  const user = await UserModel.findOne({ id: req.body.userId })
 
   if (user) {
-    user.projects = user.projects.filter((proj: any) => proj !== obj.id)
+    user.projects = user.projects.filter((proj: any) => proj !== req.body.id)
     if (!user.projects.length) {
       throw new Error('cannot delete only project')
     }
     await user.save()
   }
 
-  const deleted = await ProjectModel.findOneAndDelete({ id: obj.id })
+  const deleted = await ProjectModel.findOneAndDelete({ id: req.body.id })
 
   if (deleted) {
-    return {
+    res.json({
       id: deleted.id
-    }
+    })
+  } else {
+    throw new Error('proj not found')
   }
-  throw new Error('proj not found')
 }
 
-const joinProject: MutationResolvers['joinProject'] = async (
-  parent,
-  obj,
-  context
-) => {
-  const id = context.userId
-  if (id.id) {
-    const project = await ProjectModel.findOne({ id: obj.projectId })
+export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
+  const id = req.body.userId
+  if (id) {
+    const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
       throw new Error('Project does not exist')
     }
     const user = await UserModel.findOneAndUpdate(
-      { id: id.id },
+      { id: id },
       {
         $push: {
           projects: project.id
@@ -125,26 +130,26 @@ const joinProject: MutationResolvers['joinProject'] = async (
     )
 
     if (user) {
-      return project.toObject()
+      res.json({ project: project.toObject() })
     }
     throw new Error('could not join project')
+  } else {
+    throw new Error('User not signed in')
   }
-  throw new Error('User not signed in')
 }
 
-const leaveProject: MutationResolvers['leaveProject'] = async (
-  parent,
-  obj,
-  context
+export const leaveProject = async (
+  req: leaveProjectReq,
+  res: leaveProjectRes
 ) => {
-  const id = context.userId
-  if (id.id) {
-    const project = await ProjectModel.findOne({ id: obj.projectId })
+  const id = req.body.userId
+  if (id) {
+    const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
       throw new Error('Project does not exist')
     }
     const user = await UserModel.findOneAndUpdate(
-      { id: id.id },
+      { id: id },
       {
         $pull: {
           projects: project.id
@@ -153,57 +158,72 @@ const leaveProject: MutationResolvers['leaveProject'] = async (
     )
 
     if (user) {
-      return project.toObject()
+      res.json({ project: project.toObject() })
+    } else {
+      throw new Error('could not join project')
     }
-    throw new Error('could not join project')
-  }
-  throw new Error('User not signed in')
-}
-
-const removeMemberFromProject: MutationResolvers['removeMemberFromProject'] =
-  async (parent, obj, context) => {
-    const id = context.userId
-    if (id.id) {
-      const project = await ProjectModel.findOne({ id: obj.projectId })
-      if (!project) {
-        throw new Error('Project does not exist')
-      }
-      const user = await UserModel.findOneAndUpdate(
-        { id: id.id },
-        {
-          $push: {
-            projects: project
-          }
-        }
-      )
-
-      if (!user) {
-        throw new Error('Session expired')
-      }
-      if (project.ownerId !== user.id) {
-        throw new Error('You cannot kick members from this project')
-      }
-
-      project.users.splice(project.users.indexOf(obj.userId), 1)
-      const deletingUser = await UserModel.findOne({ id: obj.userId })
-      if (!deletingUser) {
-        throw new Error('user being kicked does not exist')
-      }
-      deletingUser.projects = deletingUser.projects.filter(
-        (proj: any) => proj !== project.id
-      )
-      await deletingUser.save()
-
-      return project.toObject()
-    }
+  } else {
     throw new Error('User not signed in')
   }
+}
 
-export const projectMutations = {
-  createProject,
-  editProject,
-  deleteProject,
-  joinProject,
-  leaveProject,
-  removeMemberFromProject
+export const removeMemberFromProject = async (
+  req: removeMemberFromProjectReq,
+  res: removeMemberFromProjectRes
+) => {
+  const id = req.body.userId
+  if (id) {
+    const project = await ProjectModel.findOne({ id: req.body.projectId })
+    if (!project) {
+      throw new Error('Project does not exist')
+    }
+    const user = await UserModel.findOneAndUpdate(
+      { id: id },
+      {
+        $push: {
+          projects: project
+        }
+      }
+    )
+
+    if (!user) {
+      throw new Error('Session expired')
+    }
+    if (project.ownerId !== user.id) {
+      throw new Error('You cannot kick members from this project')
+    }
+
+    project.users.splice(project.users.indexOf(req.body.userId), 1)
+    const deletingUser = await UserModel.findOne({ id: req.body.userId })
+    if (!deletingUser) {
+      throw new Error('user being kicked does not exist')
+    }
+    deletingUser.projects = deletingUser.projects.filter(
+      (proj: any) => proj !== project.id
+    )
+    await deletingUser.save()
+
+    res.json({ project: project.toObject() })
+  } else {
+    throw new Error('User not signed in')
+  }
+}
+
+export const getProjects = async (req: Request, res: Response) => {
+  const projects = await ProjectModel.find({
+    _id: {
+      $in: req.body.ids
+    }
+  })
+
+  res.json({ projects: projects.map((proj) => proj.toObject()) || [] })
+}
+export const getProjectById = async (req: Request, res: Response) => {
+  const proj = await ProjectModel.findOne({ id: req.body.id })
+
+  if (proj) {
+    return proj.toObject()
+  } else {
+    throw new Error('proj not found')
+  }
 }

@@ -54,9 +54,7 @@ export const Dashboard = connect(mapState)(
       const { source, destination } = result
 
       if (destination) {
-        setTasks(
-          moveInArray(tasks, source.index, destination.index - source.index)
-        )
+        setTasks(moveInArray(tasks, source.index, destination.index))
       }
     }
 

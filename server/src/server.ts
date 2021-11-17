@@ -5,8 +5,8 @@ const morgan = require('morgan')
 import path from 'path'
 import jwt from 'express-jwt'
 import cors from 'cors'
-import router from './routes/router'
-import { connect } from './db'
+import { router } from './routes/router'
+import { connect } from 'mongoose'
 
 require('dotenv').config()
 const app: Express = express()
@@ -22,14 +22,14 @@ app.use(
 
 app.use(morgan(':method :status :response-time ms'))
 app.use(bodyParser.json())
-app.use(cookieParser())
+app.use(cookieParser(process.env.PRIVATE))
 app.use(bodyParser.urlencoded({ extended: false }))
-
-await connect(process.env.DB_CONNECT as string)
+;(async () => await connect(process.env.DB_CONNECT as string))()
 
 const auth = jwt({
   secret: process.env.PRIVATE as string,
-  credentialsRequired: false
+  credentialsRequired: false,
+  algorithms: ['RS256']
 })
 
 app.use(auth)

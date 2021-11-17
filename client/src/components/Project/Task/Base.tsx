@@ -26,7 +26,6 @@ import {
   List
 } from '@material-ui/icons'
 // import {GQL_SET_SUBTASK} from '../../../graphql/mutations/task'
-import { hasPassed } from '../../../utils/hasPassed'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
@@ -37,6 +36,7 @@ import {
   SetSubtaskMutation,
   SetSubtaskMutationVariables
 } from '../../../graphql/types'
+import { isBefore } from 'date-fns'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -80,38 +80,39 @@ export const SubtaskMap = ({
       enter={{ opacity: 1, height: 'auto' }}
       leave={{ opacity: 0, height: 0, overflow: 'hidden' }}
     >
-      {(subTask) => (props) => (
-        <animated.div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            ...props
-          }}
-        >
-          <div
+      {(subTask) => (props) =>
+        (
+          <animated.div
             style={{
-              marginTop: 6
+              display: 'flex',
+              alignItems: 'center',
+              ...props
             }}
           >
-            {subTask.completed ? (
-              <CheckBox
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onCheckbox({ ...subTask, completed: false })
-                }}
-              />
-            ) : (
-              <CheckBoxOutlineBlankOutlined
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onCheckbox({ ...subTask, completed: true })
-                }}
-              />
-            )}
-          </div>
-          <span style={{ marginLeft: 8 }}>{subTask.name}</span>
-        </animated.div>
-      )}
+            <div
+              style={{
+                marginTop: 6
+              }}
+            >
+              {subTask.completed ? (
+                <CheckBox
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onCheckbox({ ...subTask, completed: false })
+                  }}
+                />
+              ) : (
+                <CheckBoxOutlineBlankOutlined
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onCheckbox({ ...subTask, completed: true })
+                  }}
+                />
+              )}
+            </div>
+            <span style={{ marginLeft: 8 }}>{subTask.name}</span>
+          </animated.div>
+        )}
     </Transition>
   </div>
 )
@@ -214,9 +215,7 @@ const CBaseTask = (props: TaskProps) => {
               id: project.selectingMember,
               projectId: project.id
             })
-          } else */ if (
-            isSelectingTask
-          ) {
+          } else */ if (isSelectingTask) {
             props.selectPomodoroTask(task.id.toString())
           } else {
             openFunc()
@@ -252,9 +251,9 @@ const CBaseTask = (props: TaskProps) => {
                   color:
                     snapshot && snapshot.isDragging
                       ? 'gray'
-                      : hasPassed(
-                          task.dueDate ? new Date(task.dueDate) : undefined
-                        ) && task.progress !== 2
+                      : task.dueDate &&
+                        isBefore(new Date(), new Date(task.dueDate)) &&
+                        task.progress !== 2
                       ? '#d32f24'
                       : 'black',
                   marginLeft: 4,

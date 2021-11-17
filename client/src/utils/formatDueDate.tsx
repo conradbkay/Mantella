@@ -1,7 +1,7 @@
 import { format } from 'date-fns'
-import { hasPassed } from './hasPassed'
+import { hasPassed } from './utilities'
 import { TTask } from '../types/project'
-import { toDaysHHMMSS } from './convertToTime'
+import { toDaysHHMMSS } from './utilities'
 import { formatDistance } from 'date-fns'
 
 // Jan 1st 12:02 am

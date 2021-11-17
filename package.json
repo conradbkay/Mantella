@@ -1,42 +1,33 @@
 {
   "name": "kanbanbrawn-master",
   "version": "1.0.0",
-  "description": "Bugs: Editing a created task to have more points doesn't increase your current points Proposals:",
+  "description": "Fully-fledged task manager",
   "main": "./server/src/index.ts",
   "scripts": {
     "start": "cd server && npm i && nodemon",
     "server": "npm start --prefix server",
     "build": "npm i --prefix server && cd client && npm install && npm run build",
-    "client": "npm start --prefix client",
-    "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
-    "git-fix": "find .git/objects/ -type f -empty | xargs rm && git fetch -p && git fsck --full"
+    "client": "npm start --prefix client"
   },
   "engines": {
-    "node": "10.16.1",
-    "npm": "6.9.0"
+    "node": "16.13.0",
+    "npm": "8.1.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/austin-UW/KanbanBrawn.git"
+    "url": "git+https://github.com/austin-UW/Mantella.git"
   },
   "author": "ak",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/austin-UW/KanbanBrawn/issues"
+    "url": "https://github.com/austin-UW/Mantella/issues"
   },
   "homepage": "https://mantella.herokuapp.com",
   "dependencies": {
-    "@playlyfe/gql": "^2.6.1",
     "@types/node": "^12.6.9",
-    "apollo": "^2.15.0",
-    "concurrently": "^4.1.0",
+    "concurrently": "^6.4.0",
     "copyfiles": "^2.1.0",
-    "moment": "^2.24.0",
-    "nodemon": "^1.19.1",
-    "react-scripts": "^2.1.8",
-    "typescript": "^3.5.3"
-  },
-  "devDependencies": {
-    "gh-pages": "^3.1.0"
+    "nodemon": "^2.0.15",
+    "prettier": "^2.4.1"
   }
 }

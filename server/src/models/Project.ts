@@ -1,125 +1,46 @@
-import { Schema, model, Model, Document } from 'mongoose'
+import { getModelForClass, prop } from '@typegoose/typegoose'
 
-export const ProjectSchema = new Schema({
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  ownerId: String,
-  lists: [
-    {
-      taskIds: [String],
-      name: { type: String, required: true },
-      id: { type: String, required: true }
-    }
-  ],
-  columns: [
-    {
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      collapsedUsers: [{ type: String, required: true }],
-      inProgress: Boolean,
-      taskIds: [{ type: String, required: true }]
-    }
-  ],
-  tasks: [
-    {
-      progress: { type: Number, required: true }, // 0 for none, 1 for in-progress, 2 for complete
-      security: {
-        public: Boolean,
-        assignedUsers: [String]
-      },
-      id: { type: String, required: true },
-      name: { type: String, required: true },
-      points: { type: Number, required: true },
-      timeWorkedOn: { type: Number, required: true },
-      color: { type: String, required: true },
-      dueDate: String,
-      comments: [
-        {
-          comment: { type: String, required: true },
-          dateAdded: { type: String, required: true },
-          lastEdited: String,
-          id: String
-        }
-      ],
-      subTasks: [
-        {
-          name: { type: String, required: true },
-          completed: { type: Boolean, required: true },
-          id: { type: String, required: true }
-        }
-      ],
-      recurrance: {
-        interval: Number,
-        nextDue: String
-      },
-      description: String
-    }
-  ],
-  users: [String],
-  security: {
-    public: { type: Boolean, assignedUsers: { type: [String], required: true } }
-  }
-})
-
-export interface TaskProps {
-  progress: 0 | 1 | 2
-
-  id: string
-  name: string
-  points: number
-  timeWorkedOn: number
-  color: string
-  dueDate?: string | null
-  description?: string | null
-
-  comments: Array<{
+class ProjectClass {
+  @prop()
+  public id!: string
+  @prop()
+  public name!: string
+  @prop()
+  public ownerId?: string
+  @prop()
+  public lists!: Array<{ taskIds: string[]; name: string; id: string }>
+  @prop()
+  public columns!: Array<{
     id: string
-    comment: string
-    dateAdded: string
-    lastEdited?: string | null
-  }>
-  subTasks: Array<{
     name: string
-    completed: boolean
-    id: string
-  }>
-  recurrance?: {
-    interval: number
-    nextDue: string
-  } | null
-}
-
-export interface Column {
-  name: string
-  id: string
-  collapsedUsers: string[]
-  inProgress?: boolean
-  taskIds: string[]
-}
-export interface ProjectProps {
-  id: string
-  name: string
-  ownerId: string
-  lists: Array<{
+    collapsedUsers: string[]
+    inProgress?: boolean
     taskIds: string[]
-    name: string
-    id: string
   }>
-
-  columns: Column[]
-
-  tasks: TaskProps[]
-
-  users: string[]
-
-  security?: {
-    public: boolean
-    assignedUsers: string[]
-  } | null
+  @prop()
+  public tasks!: Array<{
+    progress?: 0 | 1 | 2
+    security?: { public: boolean; assignedUsers: string[] }
+    id: string
+    name: string
+    points: number
+    timeWorkedOn: number
+    color: string
+    dueDate?: string
+    comments: Array<{
+      comment: string
+      dateAdded: string
+      lastEdited?: string
+      id: string
+    }>
+    subTasks: Array<{ name: string; completed: boolean; id: string }>
+    recurrance?: { interval?: number; nextDue?: string }
+    description: string
+  }>
+  @prop()
+  users!: string[]
+  @prop()
+  security?: { public: boolean; assignedUsers: string[] }
 }
 
-export const ProjectModel: Model<Document & ProjectProps> = model(
-  'Project',
-  ProjectSchema,
-  'Projects'
-)
+export const ProjectModel = getModelForClass(ProjectClass)

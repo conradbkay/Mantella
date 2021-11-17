@@ -1,28 +1,39 @@
-import { UserProps, comparePassword } from '../models/User'
+import { comparePassword } from '../models/User'
 import bcrypt from 'bcryptjs'
 import { UserModel } from '../models/User'
 import { ProjectModel } from '../models/Project'
 import { taskObjects, projectData } from '../data'
 import jsonwebtoken from 'jsonwebtoken'
 import uuid from 'uuid'
-import { NextFunction } from 'express'
 import {
-  getUserReq,
-  getUserRes,
+  guestLoginReq,
+  guestLoginRes,
+  loginReq,
+  loginRes,
   loginWithCookieReq,
-  loginWithCookieRes
+  loginWithCookieRes,
+  registerReq,
+  registerRes
 } from './types'
+import { Request, Response } from 'express'
+import { router } from './router'
 
-const loginWithCookieHandler = async (
+const generateCookieToken = (id: string) => {
+  return jsonwebtoken.sign({ id }, process.env.PRIVATE!, {
+    expiresIn: '1d'
+  })
+}
+
+export const cookieLogin = async (
   req: loginWithCookieReq,
   res: loginWithCookieRes
 ) => {
-  if (!context.userId) {
+  if (!req.signedCookies.userId) {
     throw new Error('Unauthenticated user')
   }
 
-  const user: UserProps | null = await UserModel.findOne({
-    id: context.userId.id
+  const user = await UserModel.findOne({
+    id: req.signedCookies.userId.id
   })
 
   if (!user) {
@@ -31,43 +42,49 @@ const loginWithCookieHandler = async (
 
   const projects = await ProjectModel.find({ id: user.projects })
 
-  return {
+  res.json({
     user: {
       ...(user as any).toObject(),
       projects: projects.map((proj) => proj.toObject())
     }
-  }
+  })
 }
 
-const login = async (parent, obj, context) => {
-  const user = await UserModel.findOne({ email: obj.email })
+router.post('/cookieLogin', cookieLogin)
+
+export const login = async (req: loginReq, res: loginRes) => {
+  const user = await UserModel.findOne({ email: req.body.email })
   if (user) {
-    const passwordMatch = await comparePassword(obj.password, user.password)
+    const passwordMatch = await comparePassword(
+      req.body.password,
+      user.password! // user always has a password since they are not a guest
+    )
 
     if (passwordMatch) {
-      const token = jsonwebtoken.sign({ id: user.id }, process.env.PRIVATE!, {
-        expiresIn: '1d'
-      })
+      const token = generateCookieToken(user.id)
 
-      context.res.cookie('auth-token', token, { httpOnly: true })
+      res.cookie('auth-token', token, { signed: true, httpOnly: true })
 
       const projects = await ProjectModel.find({ id: user.projects })
 
-      return {
+      res.json({
         user: {
           ...(user as any).toObject(),
           projects: projects.map((proj) => proj.toObject())
         }
-      }
+      })
     }
-    throw new AuthenticationError('Incorrect Password')
+    throw new Error('Incorrect Password')
+  } else {
+    throw new Error('User with Email does not exist!')
   }
-  throw new AuthenticationError('User with Email does not exist!')
 }
 
-const register = async (parent, obj, context) => {
+router.post('/login', login)
+
+export const register = async (req: registerReq, res: registerRes) => {
   const salt = await bcrypt.genSalt(10)
-  const password = await bcrypt.hash(obj.password, salt)
+  const password = await bcrypt.hash(req.body.password, salt)
 
   const projectId = uuid()
   const userId = uuid()
@@ -85,22 +102,18 @@ const register = async (parent, obj, context) => {
   let newUser = await UserModel.create({
     password,
     id: userId,
-    email: obj.email,
-    username: obj.username,
+    email: req.body.email,
+    username: req.body.username,
     projects: [projectId],
     profileImg:
       'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
   })
 
-  newUser = newUser.toObject()
+  newUser = newUser.toObject() as any
 
-  if (context.res) {
-    const token = jsonwebtoken.sign({ id: newUser.id }, process.env.PRIVATE!, {
-      expiresIn: '1d'
-    })
-
-    context.res.cookie('auth-token', token, { httpOnly: true })
-  }
+  // TODO: Allow users to opt out of being remembered
+  const token = generateCookieToken(newUser.id)
+  res.cookie('auth-token', token, { httpOnly: true })
 
   if (newUser) {
     let projects: any = await ProjectModel.find({
@@ -109,24 +122,27 @@ const register = async (parent, obj, context) => {
 
     projects = projects.map((proje: any) => proje.toObject())
 
-    return {
+    res.json({
       user: {
         ...newUser,
         projects: projects
       }
-    }
+    })
   } else {
-    console.log('wtf the fuck')
     throw new Error('email already in use')
   }
 }
 
-const logout: MutationResolvers['logout'] = async (parent, obj) => {
-  context.res.clearCookie('auth-token')
-  return { message: 'logged out' }
+router.post('/register', register)
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('auth-token')
+  res.json({ message: 'logged out' })
 }
 
-const loginAsGuest = async (parent, obj, context) => {
+router.post('/logout', logout)
+
+export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
   const projectId = uuid()
   const userId = uuid()
 
@@ -156,12 +172,12 @@ const loginAsGuest = async (parent, obj, context) => {
 
     projects = projects.map((proje: any) => proje.toObject())
 
-    return {
+    res.json({
       user: {
         ...newUser.toObject(),
         projects: projects
       }
-    }
+    })
   } else {
     throw new Error(
       'Could not create guest, try signing in or registering, sorry'
@@ -169,10 +185,4 @@ const loginAsGuest = async (parent, obj, context) => {
   }
 }
 
-export const authMutations = {
-  login,
-  register,
-  logout,
-  loginWithCookieHandler,
-  loginAsGuest
-}
+router.post('/guestLogin', guestLogin)

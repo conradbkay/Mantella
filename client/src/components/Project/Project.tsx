@@ -52,6 +52,7 @@ import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
+import { CSSProperties } from '@material-ui/styles'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -63,8 +64,8 @@ type OwnProps = {
   }
 }
 
-export const input: any = {
-  overflow: 'hidden',
+export const input: CSSProperties = {
+  overflow: 'hiddejn',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   minWidth: '20%',

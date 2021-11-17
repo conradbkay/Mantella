@@ -1,3 +1,0 @@
-All features need to be LOCKED until they are authenticated
-
-Turn database into {[key: ObjectId]: {_Id: ObjectId}}

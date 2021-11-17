@@ -10,8 +10,14 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "noEmitHelpers": true,
-    "jsx": "preserve",
-    "lib": ["dom", "es6", "es2016", "es2017", "esnext.asynciterable"],
+    "jsx": "react",
+    "lib": [
+      "dom",
+      "es6",
+      "es2016",
+      "es2017",
+      "esnext.asynciterable"
+    ],
     "rootDir": "src",
     "target": "es6",
     "module": "esnext",
@@ -40,5 +46,7 @@
     "webpack",
     "src/graphql/types.ts"
   ],
-  "include": ["src", "../server/src/__tests__"]
+  "include": [
+    "src"
+  ]
 }
