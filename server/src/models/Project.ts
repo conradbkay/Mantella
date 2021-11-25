@@ -1,6 +1,6 @@
-import { getModelForClass, prop } from '@typegoose/typegoose'
-
-class ProjectClass {
+import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
+@modelOptions({ options: { allowMixed: 0 } })
+export class Project {
   @prop()
   public id!: string
   @prop()
@@ -35,12 +35,15 @@ class ProjectClass {
     }>
     subTasks: Array<{ name: string; completed: boolean; id: string }>
     recurrance?: { interval?: number; nextDue?: string }
-    description: string
+    description?: string
   }>
   @prop()
-  users!: string[]
+  public users!: Array<string>
   @prop()
-  security?: { public: boolean; assignedUsers: string[] }
+  public security?: { public: boolean; assignedUsers: Array<string> }
 }
 
-export const ProjectModel = getModelForClass(ProjectClass)
+export type Task = Project['tasks'][0]
+export type Column = Project['columns'][0]
+
+export const ProjectModel = getModelForClass(Project)

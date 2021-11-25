@@ -1,7 +1,7 @@
 import React, { CSSProperties, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../utils/utilities'
 import {
   tickStopwatchA,
   toggleStopwatchA,
@@ -46,7 +46,7 @@ const CStopwatch = (props: TProps) => {
         enter={{ opacity: 1 }}
         leave={{ opacity: 0 }}
       >
-        {show => {
+        {(show) => {
           const style: CSSProperties = {
             fontSize: 28,
             color: '#444',
@@ -54,7 +54,7 @@ const CStopwatch = (props: TProps) => {
           }
           return (
             show &&
-            (transitionStyles => (
+            ((transitionStyles) => (
               <div style={{ ...style, ...transitionStyles, ...centerChildren }}>
                 Best: {toDaysHHMMSS(stopWatch.highest)}
               </div>
@@ -89,7 +89,4 @@ const actionCreators = {
   reset: resetStopwatchA
 }
 
-export const Stopwatch = connect(
-  mapState,
-  actionCreators
-)(CStopwatch)
+export const Stopwatch = connect(mapState, actionCreators)(CStopwatch)

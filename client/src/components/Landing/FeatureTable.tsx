@@ -10,22 +10,18 @@ import {
 import { Check, Close, Traffic } from '@material-ui/icons'
 
 const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
-
 const features = [
-  // first in array is feature name, second is for Mantella, third is trello, fourth is kanbanFlow
+  ['Swimlanes', 'CHECK', 'NO', 'PRO'],
+  ['Pomodoro Timer', 'CHECK', 'NO', 'Extensions'],
+  ['Time Management Integration', 'CHECK', 'NO', 'Extensions'],
   ['Subtasks', 'CHECK', 'CHECK', 'CHECK'],
-  ['UI/UX', 'Material', 'Minimal', 'Simple'],
-  ['Multiple Projects', 'CHECK', 'CHECK', 'CHECK'],
   ['Filtering', 'CHECK', 'CHECK', 'CHECK'],
   ['Recurring Tasks', 'WIP', 'CHECK', 'CHECK'],
   ['Collapse Columns', 'CHECK', 'CHECK', 'NO'],
   ['Mobile Friendly', 'WIP', 'CHECK', 'CHECK'],
   ['Attach Photos', 'WIP', 'PRO', 'CHECK'],
   ['Comments', 'CHECK', 'NO', 'CHECK'],
-  ['Links', 'WIP', 'NO', 'CHECK'],
-  ['Swimlanes', 'CHECK', 'NO', 'PRO'],
-  ['Pomodoro Timer', 'CHECK', 'NO', 'Extensions'],
-  ['Time Management Integration', 'CHECK', 'NO', 'Extensions']
+  ['Links', 'WIP', 'NO', 'CHECK']
 ]
 
 const styles = {

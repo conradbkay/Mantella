@@ -20,10 +20,6 @@ import { TVariant } from '../../types/state'
 import { TState } from '../../types/state'
 import { Info } from '@material-ui/icons'
 
-/**
- * @description used in snackbarRoot to determine how to display snackbar based on state.snackbar.variant
- * @returns {JSX inline style} whether or not to load an error icon with red or success + green etc.
- */
 type Classes = {
   success: string
   warning: string

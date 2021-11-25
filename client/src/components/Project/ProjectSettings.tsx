@@ -14,12 +14,6 @@ import { connect } from 'react-redux'
 import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
 import { Delete } from '@material-ui/icons'
-import {
-  DeleteProjectMutation,
-  DeleteProjectMutationVariables
-} from '../../graphql/types'
-import { GQL_DELETE_PROJECT } from '../../graphql/mutations/project'
-import { useMutation } from 'react-apollo'
 import { openSnackbarA } from '../../store/actions/snackbar'
 
 type TProps = {
@@ -30,20 +24,10 @@ type TProps = {
 const CProjectSettings = (props: TProps) => {
   const [hasClicked, setClicked] = React.useState(false)
 
-  const [deleteProjectExec] = useMutation<
-    DeleteProjectMutation,
-    DeleteProjectMutationVariables
-  >(GQL_DELETE_PROJECT, {
-    onCompleted: ({ deleteProject }) => {
-      if (deleteProject && deleteProject.id) {
-        location.hash = '/dashboard'
-        props.setProject({ id: deleteProject.id, newProj: null })
-      }
-    },
-    onError: () => {
-      props.openSnackbar('Could not delete project', 'error')
-    }
-  })
+  const deleteProject = () => {
+    location.hash = '/dashboard'
+    props.setProject({ id: props.project.id, newProj: null })
+  }
 
   /*
   const [setCommentExec] = useMutation<
@@ -81,7 +65,7 @@ const CProjectSettings = (props: TProps) => {
             size="medium"
             onClick={() => {
               if (hasClicked) {
-                deleteProjectExec({ variables: { id: props.project.id } })
+                deleteProject()
               } else {
                 setClicked(true)
               }

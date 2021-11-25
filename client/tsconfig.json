@@ -43,8 +43,7 @@
     "node_modules",
     "build",
     "scripts",
-    "webpack",
-    "src/graphql/types.ts"
+    "webpack"
   ],
   "include": [
     "src"

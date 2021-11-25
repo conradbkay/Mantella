@@ -14,17 +14,12 @@ import {
   TextField
 } from '@material-ui/core'
 import { connect } from 'react-redux'
-import { GQL_CREATE_TASK } from '../../../graphql/mutations/task'
-import {
-  CreateTaskMutation,
-  CreateTaskMutationVariables
-} from '../../../graphql/types'
-import { useMutation } from 'react-apollo'
 import { setProjectA } from '../../../store/actions/project'
 import { Close } from '@material-ui/icons'
 import { ChooseColor } from '../../utils/chooseColor'
 import { TProject } from '../../../types/project'
 import { DateTimePicker } from 'react-widgets'
+import { APICreateTask } from '../../../API/task'
 const actionCreators = {
   setProject: setProjectA
 }
@@ -48,41 +43,36 @@ export const CreateTask = connect(
   const [points, setPoints] = useState(0)
   const [listId, setListId] = useState(props.project.lists[0].id)
   const [dueDate, setDueDate] = useState(undefined as undefined | Date)
-  const [createTaskExec] = useMutation<
-    CreateTaskMutation,
-    CreateTaskMutationVariables
-  >(GQL_CREATE_TASK, {
-    onCompleted: ({ createTask }) => {
-      if (createTask && createTask.task && createTask.project) {
+
+  const createTaskExec = async () => {
+    try {
+      const res = await APICreateTask(props.project.id, listId, {
+        points,
+        color,
+        name,
+        description,
+        dueDate: dueDate ? dueDate.toString() : undefined
+      })
+      if (res && res.project) {
         props.setProject({
-          id: createTask.project.id,
-          newProj: createTask.project
+          id: res.project.id,
+          newProj: res.project
         })
       }
+    } catch (err) {
+      console.error(err)
+    } finally {
       props.onClose()
-    },
-    onError: () => props.onClose()
-  })
+    }
+  }
 
   return (
     <Dialog open={true} onClose={() => props.onClose()}>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
 
-          createTaskExec({
-            variables: {
-              projId: props.project.id,
-              listId: listId,
-              taskInfo: {
-                points,
-                color,
-                name,
-                dueDate: dueDate ? dueDate.toString() : undefined,
-                description
-              }
-            }
-          })
+          await createTaskExec()
         }}
       >
         <DialogTitle>Create Task</DialogTitle>

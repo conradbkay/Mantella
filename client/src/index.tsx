@@ -14,23 +14,23 @@ import { NoMatch } from './components/NoMatch/NoMatch'
 import { Fab, CircularProgress } from '@material-ui/core'
 import { Timer } from '@material-ui/icons'
 import { About } from './components/Landing/About'
-
 import { Header } from './components/Header'
-// import { WelcomeDialog } from './components/Welcome/WelcomeDialog'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
-import { ApolloProvider } from 'react-apollo'
-import { print } from 'graphql'
 import { loginA } from './store/actions/auth'
-import { Mutation } from './graphql/types'
-import { fetchQuery } from './API/initialize'
 import { Dashboard } from './components/Dashboard/Dashboard'
+import { openSnackbarA } from './store/actions/snackbar'
+import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
+import { Project } from './components/Project/Project'
+import { Settings } from './components/Settings/Settings'
+import { CalendarWeek } from './components/Calendar/Week'
+import Moment from 'moment'
+import 'react-widgets/dist/css/react-widgets.css'
+import { APILogin } from './API/auth'
+
+const momentLocalizer = require('react-widgets-moment')
 
 const secondary = '#0336FF'
 const primary = '#00838f'
-// const primary = '#f4511e'
-// const secondary = '#3f51b5'
-
-/** @description Material ui theme, used in wrapper.tsx */
 
 const theme = createMuiTheme({
   palette: {
@@ -50,28 +50,16 @@ export const fabStyle: CSSProperties = {
   zIndex: 999
 }
 
-import { openSnackbarA } from './store/actions/snackbar'
-import { GQL_LOGIN_WITH_COOKIE } from './graphql/mutations/auth'
-import { client } from './apollo'
-import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
-import { Project } from './components/Project/Project'
-import { Settings } from './components/Settings/Settings'
-import { CalendarWeek } from './components/Calendar/Week'
-
 const Router = () => {
   const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   window.onload = async () => {
     try {
-      const {
-        loginWithCookie
-      }: { loginWithCookie: Mutation['loginWithCookie'] } = await fetchQuery(
-        print(GQL_LOGIN_WITH_COOKIE)
-      )
+      const loginRes = await APILogin()
 
-      if (loginWithCookie && loginWithCookie.user) {
-        store.dispatch(loginA(loginWithCookie.user as any) as any)
+      if (loginRes) {
+        store.dispatch(loginA(loginRes) as any)
       } else {
         store.dispatch(openSnackbarA('Hey there, Welcome!', 'standard'))
       }
@@ -175,20 +163,13 @@ const Router = () => {
 export const Wrapper = () => {
   return (
     <Provider store={store}>
-      <ApolloProvider client={client}>
-        <MuiThemeProvider theme={theme}>
-          <SnackbarRoot />
-          <Router />
-        </MuiThemeProvider>
-      </ApolloProvider>
+      <MuiThemeProvider theme={theme}>
+        <SnackbarRoot />
+        <Router />
+      </MuiThemeProvider>
     </Provider>
   )
 }
-
-import Moment from 'moment'
-import 'react-widgets/dist/css/react-widgets.css'
-
-const momentLocalizer = require('react-widgets-moment')
 
 Moment.locale('en')
 momentLocalizer()

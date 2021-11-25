@@ -1,30 +1,37 @@
 import { Request, Response } from 'express'
+import { UserWithProjects } from '../models/User'
 
 interface Req<body = {}> extends Request {
   body: body
 }
 
 // AUTH
-export type loginWithCookieReq = Req<{}>
-export type loginWithCookieRes = Response<{
-  user: any
-}>
-
-export type loginReq = Req<{
+export type loginReqObj = {
   email: string
   password: string
-}>
-export type loginRes = Response<{}>
+}
+export type loginReq = Req<loginReqObj>
+export type loginResObj = {
+  user: UserWithProjects
+}
+export type loginRes = Response<loginResObj>
 
-export type registerReq = Req<{
+export type registerReqObj = {
   email: string
   username: string
   password: string
-}>
-export type registerRes = Response<{}>
+}
+export type registerReq = Req<registerReqObj>
+export type registerResObj = {
+  user: UserWithProjects
+}
+export type registerRes = Response<registerResObj>
 
 export type guestLoginReq = Req<{}>
-export type guestLoginRes = Response<{}>
+export type guestLoginResObj = {
+  user: UserWithProjects
+}
+export type guestLoginRes = Response<guestLoginResObj>
 
 // COLUMN
 export type createColumnReq = Req<{
@@ -77,12 +84,13 @@ export type createProjectReq = Req<{
 }>
 export type createProjectRes = Response<{}>
 
-export type editProjectReq = Req<{
+export type editProjectReqObj = {
   id: string
   newProj: {
     name: string
   }
-}>
+}
+export type editProjectReq = Req<editProjectReqObj>
 export type editProjectRes = Response<{}>
 
 export type deleteProjectReq = Req<{

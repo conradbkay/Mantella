@@ -44,7 +44,8 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
     })
 
   if (props.progress === 2) {
-    tasks = tasks
+    // eslint-disable-next-line
+    tasks = tasks // TODO: This shouldn't do anything but i'm too afraid to delete it
   }
 
   const [anchorEl, setAnchorEl] = useState(null as any)
@@ -163,7 +164,9 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
       )}
       <Droppable
         isDropDisabled={props.collapsedLists.includes(props.list.id)}
-        droppableId={`${props.list.id}DIVIDER${props.progress}`}
+        droppableId={
+          `${props.list.id}DIVIDER${props.progress}` /* can only be a string*/
+        }
       >
         {(dropProvided, dropSnapshot) => {
           return (

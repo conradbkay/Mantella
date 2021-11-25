@@ -19,12 +19,7 @@ import { Change } from '../../types/types'
 import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
-import {
-  CreateListMutation,
-  CreateListMutationVariables
-} from '../../graphql/types'
-import { GQL_CREATE_LIST } from '../../graphql/mutations/list'
-import { useMutation } from 'react-apollo'
+import uuid from 'uuid'
 
 interface OwnProps {
   project: TProject
@@ -50,35 +45,21 @@ const CCreateColumn = (props: CreateColumnProps) => {
 
   const [name, setName] = useState('')
 
-  const [createListExec] = useMutation<
-    CreateListMutation,
-    CreateListMutationVariables
-  >(GQL_CREATE_LIST, {
-    onCompleted: ({ createList }) => {
-      props.setList({
-        id: createList.list!.id,
-        projectId: props.project.id,
-        newList: {
-          taskIds: [],
-          name: createList.list!.name || 'List'
-        }
-      })
-    }
-  })
-
   return (
     <Dialog open={true} onClose={onClose}>
       <form
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
 
-          createListExec({
-            variables: {
+          props.setList({
+            id: uuid(),
+            projectId: project.id,
+            newList: {
               name: name || 'List',
-              projId: project.id
+              taskIds: []
             }
           })
-    
+
           onClose()
         }}
       >
@@ -102,10 +83,10 @@ const CCreateColumn = (props: CreateColumnProps) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button  onClick={onClose} color="secondary">
+          <Button onClick={onClose} color="secondary">
             Cancel
           </Button>
-          <Button  variant="contained" color="primary" type="submit">
+          <Button variant="contained" color="primary" type="submit">
             Create
           </Button>
         </DialogActions>

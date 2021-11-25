@@ -1,5 +1,5 @@
 {
-  "name": "Mantella",
+  "name": "mantella",
   "version": "3.0.0",
   "tasks": [
     {
@@ -15,6 +15,9 @@
   "homepage": "https://mantella.herokuapp.com/",
   "private": true,
   "dependencies": {
+    "@testing-library/jest-dom": "^5.15.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
@@ -29,6 +32,8 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.32",
     "node-fetch": "^2.6.1",
+    "typescript": "^4.5.2",
+    "web-vitals": "^1.1.2",
     "prettier": "^2.4.1",
     "pretty-ms": "^4.0.0",
     "react": "^16.14.0",
@@ -41,7 +46,6 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.3",
-    "react-social-login": "^3.4.10",
     "react-spring": "^8.0.7",
     "react-widgets": "^4.6.1",
     "react-widgets-moment": "^4.0.30",
@@ -66,13 +70,13 @@
     "@types/chart.js": "^2.9.28",
     "@types/color": "^3.0.1",
     "@types/date-fns": "^2.6.0",
-    "@types/jest": "^23.3.14",
+    "@types/jest": "^26.0.24",
     "@types/lodash": "^4.14.165",
-    "@types/node": "^10.17.44",
+    "@types/node": "^12.20.37",
     "@types/node-fetch": "^2.5.7",
-    "@types/react": "^16.9.56",
     "@types/react-beautiful-dnd": "^10.0.0",
-    "@types/react-dom": "^16.9.9",
+    "@types/react": "^17.0.37",
+    "@types/react-dom": "^17.0.11",
     "@types/react-helmet": "^5.0.16",
     "@types/react-redux": "^7.1.14",
     "@types/react-router-dom": "^4.3.5",
@@ -96,5 +100,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "rules": {
+      "no-restricted-globals": "off"
+    }
   }
 }

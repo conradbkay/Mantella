@@ -14,6 +14,8 @@ import {
   setSubtaskReq,
   setSubtaskRes
 } from './types'
+import { router } from './router'
+import passport from 'passport'
 
 export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   const taskId = uuid()
@@ -62,6 +64,8 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   }
 }
 
+router.post('/createTask', passport.authenticate('local'), createTask)
+
 export const editTask = async (req: editTaskReq, res: editTaskRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
 
@@ -92,13 +96,15 @@ export const editTask = async (req: editTaskReq, res: editTaskRes) => {
   }
 }
 
+router.post('/editTask', passport.authenticate('local'), editTask)
+
 export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
 
   if (proj) {
     ;(proj.tasks.find((tsk) => tsk.id === req.body.id) as any).remove()
 
-    proj.lists.map((list) => {
+    proj.lists.forEach((list) => {
       list.taskIds.splice(list.taskIds.indexOf(req.body.id), 1)
     })
 
@@ -108,6 +114,8 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
     throw new Error('project not defined')
   }
 }
+
+router.post('/deleteTask', passport.authenticate('local'), deleteTask)
 
 export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projectId })
@@ -144,6 +152,8 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
     throw new Error('project not defined')
   }
 }
+
+router.post('/dragTask', passport.authenticate('local'), dragTask)
 
 export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
@@ -184,6 +194,8 @@ export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
   }
 }
 
+router.post('/setSubtask', passport.authenticate('local'), setSubtask)
+
 export const setComment = async (req: setCommentReq, res: setCommentRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
   if (proj) {
@@ -213,3 +225,5 @@ export const setComment = async (req: setCommentReq, res: setCommentRes) => {
     throw new Error('project not defined')
   }
 }
+
+router.post('/setComment', passport.authenticate('local'), setComment)

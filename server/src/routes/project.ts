@@ -16,6 +16,8 @@ import {
   removeMemberFromProjectRes
 } from './types'
 import { Request, Response } from 'express'
+import passport from 'passport'
+import { router } from './router'
 
 const generateColumn = (name: string, id: string, isInProgress: boolean) => ({
   id,
@@ -32,7 +34,6 @@ export const createProject = async (
   const creatingId = uuid()
   const listId = uuid()
   const user = await UserModel.findOne({ id: req.body.userId })
-
   if (user) {
     user.projects.push(creatingId)
 
@@ -61,13 +62,13 @@ export const createProject = async (
       }),
       user.save()
     ])
-    if (created) {
-      res.json({ project: created.toObject() })
-    }
+    res.json({ project: created.toObject() })
   } else {
     throw new Error('user id not provided in token')
   }
 }
+
+router.post('/createProject', passport.authenticate('local'), createProject)
 
 export const editProject = async (req: editProjectReq, res: editProjectRes) => {
   if (req.body.id) {
@@ -87,6 +88,8 @@ export const editProject = async (req: editProjectReq, res: editProjectRes) => {
     throw new Error('not signed in')
   }
 }
+
+router.post('/editProject', passport.authenticate('local'), editProject)
 
 export const deleteProject = async (
   req: deleteProjectReq,
@@ -113,6 +116,8 @@ export const deleteProject = async (
   }
 }
 
+router.post('/deleteProject', passport.authenticate('local'), deleteProject)
+
 export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
   const id = req.body.userId
   if (id) {
@@ -137,6 +142,8 @@ export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
     throw new Error('User not signed in')
   }
 }
+
+router.post('/joinProject', passport.authenticate('local'), joinProject)
 
 export const leaveProject = async (
   req: leaveProjectReq,
@@ -167,7 +174,9 @@ export const leaveProject = async (
   }
 }
 
-export const removeMemberFromProject = async (
+router.post('/leaveProject', passport.authenticate('local'), leaveProject)
+
+export const kickUserFromProject = async (
   req: removeMemberFromProjectReq,
   res: removeMemberFromProjectRes
 ) => {
@@ -209,15 +218,8 @@ export const removeMemberFromProject = async (
   }
 }
 
-export const getProjects = async (req: Request, res: Response) => {
-  const projects = await ProjectModel.find({
-    _id: {
-      $in: req.body.ids
-    }
-  })
+router.post('/kickUser', passport.authenticate('local'), kickUserFromProject)
 
-  res.json({ projects: projects.map((proj) => proj.toObject()) || [] })
-}
 export const getProjectById = async (req: Request, res: Response) => {
   const proj = await ProjectModel.findOne({ id: req.body.id })
 
@@ -227,3 +229,5 @@ export const getProjectById = async (req: Request, res: Response) => {
     throw new Error('proj not found')
   }
 }
+
+router.get('/getProjectById', passport.authenticate('local'), getProjectById)

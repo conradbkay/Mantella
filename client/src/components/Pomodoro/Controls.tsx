@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { Button } from '@material-ui/core'
 import { Add, Remove } from '@material-ui/icons'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../utils/utilities'
 
 type TProps = ReturnType<typeof mapState> & typeof actionCreators
 
@@ -72,7 +72,4 @@ const actionCreators = {
   setLengthA
 }
 
-export const Controls = connect(
-  mapState,
-  actionCreators
-)(CControls)
+export const Controls = connect(mapState, actionCreators)(CControls)

@@ -17,14 +17,9 @@ import { Change } from '../../types/types'
 import { TState } from '../../types/state'
 import { useState } from 'react'
 import { openSnackbarA } from '../../store/actions/snackbar'
-import { useMutation } from 'react-apollo'
-import {
-  CreateProjectMutation,
-  CreateProjectMutationVariables
-} from '../../graphql/types'
-import { GQL_CREATE_PROJECT } from '../../graphql/mutations/project'
 import { setProjectA } from '../../store/actions/project'
 import Helmet from 'react-helmet'
+import { APICreateProject } from '../../API/project'
 
 type CreateProjectProps = WithStyles<typeof formStyles> &
   typeof actionCreators &
@@ -32,28 +27,23 @@ type CreateProjectProps = WithStyles<typeof formStyles> &
 
 const CCreateProject = (props: CreateProjectProps) => {
   const [name, setName] = useState('')
+  const [loading, setLoading] = useState(false)
+  const onCompleted = async () => {
+    setLoading(true)
+    const res = await APICreateProject(name || 'Untitled Project')
+    if (res && res.id) {
+      props.setProject({
+        id: res.id,
+        newProj: res
+      })
 
-  const [createProjectExec, { loading }] = useMutation<
-    CreateProjectMutation,
-    CreateProjectMutationVariables
-  >(GQL_CREATE_PROJECT, {
-    onCompleted: ({ createProject }) => {
-      if (createProject && createProject.id) {
-        props.setProject({
-          id: createProject.id,
-          newProj: createProject
-        })
-
-        window.location.hash = '#/project/' + createProject!.id
-        props.openSnackbar('Project Created Successfully', 'success')
-      } else {
-        props.openSnackbar('Project Could Not Be Created', 'warning')
-      }
-    },
-    onError: (error: any) => {
-      props.openSnackbar('Error when creating project', 'error')
+      window.location.hash = '#/project/' + res.id
+      props.openSnackbar('Project Created Successfully', 'success')
+    } else {
+      props.openSnackbar('Project Could Not Be Created', 'warning')
     }
-  })
+    setLoading(false)
+  }
 
   const { classes } = props
 
@@ -71,11 +61,7 @@ const CCreateProject = (props: CreateProjectProps) => {
             e.preventDefault()
 
             if (props.user) {
-              createProjectExec({
-                variables: {
-                  name: name || 'Unnamed Project'
-                }
-              })
+              onCompleted()
             } else {
               props.openSnackbar("You havn't logged in, silly goose", 'warning')
             }

@@ -1,19 +1,24 @@
 import bcrypt from 'bcryptjs'
-import { prop, getModelForClass } from '@typegoose/typegoose'
-
-class UserClass {
+import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose'
+import { Project } from './Project'
+@modelOptions({ options: { allowMixed: 0 } })
+export class User {
+  @prop()
+  public password?: string
+  @prop()
+  public username!: string
+  @prop()
+  public profileImg?: string
+  @prop()
+  public projects!: string[]
+  @prop()
+  public id!: string
   @prop({ unique: true })
-  email?: string
-  @prop()
-  password?: string
-  @prop()
-  username!: string
-  @prop()
-  profileImg?: string
-  @prop()
-  projects!: string[]
-  @prop()
-  id!: string
+  public email!: string
+}
+
+export type UserWithProjects = Omit<User, 'projects'> & {
+  projects: Project[]
 }
 
 export const getUserByEmail = async (email: string) => {
@@ -31,4 +36,4 @@ export const comparePassword = async (
   return await bcrypt.compare(candidatePassword, hash)
 }
 
-export const UserModel = getModelForClass(UserClass)
+export const UserModel = getModelForClass(User)

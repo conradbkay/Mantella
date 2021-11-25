@@ -26,33 +26,19 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { ProjectSettings } from './ProjectSettings'
-import {
-  EditProjectMutation,
-  EditProjectMutationVariables,
-  DragTaskMutation,
-  DragTaskMutationVariables,
-  DeleteListMutation,
-  DeleteListMutationVariables,
-  EditListMutationVariables,
-  EditListMutation
-} from '../../graphql/types'
 import { openSnackbarA } from '../../store/actions/snackbar'
-import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
-import { cloneDeep } from 'apollo-utilities'
-import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
-import { useMutation } from 'react-apollo'
 import { CreateTask } from './Task/Create'
-import { EditTaskModal } from './Task/Edit'
+import { EditTaskModal } from './Task/Edit/Edit'
 import { setListA } from '../../store/actions/list'
-import { GQL_DELETE_LIST, GQL_EDIT_LIST } from '../../graphql/mutations/list'
 import SpeedDial from '@material-ui/lab/SpeedDial'
 import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
 import { CSSProperties } from '@material-ui/styles'
+import { cloneDeep } from 'lodash'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -133,20 +119,6 @@ const CProject = (props: TProps) => {
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const [deleteListExec] = useMutation<
-    DeleteListMutation,
-    DeleteListMutationVariables
-  >(GQL_DELETE_LIST, {})
-
-  const [dragTaskExec] = useMutation<
-    DragTaskMutation,
-    DragTaskMutationVariables
-  >(GQL_DRAG_TASK, {})
-
-  const draggo = (vars: DragTaskMutationVariables) => {
-    dragTaskExec({ variables: vars })
-  }
-
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) {
       return
@@ -189,7 +161,9 @@ const CProject = (props: TProps) => {
     ) {
       const addingLater =
         actualIndex >
-        fromList.taskIds.findIndex((taskId) => taskId === result.draggableId)
+        fromList.taskIds.findIndex(
+          (taskId: string) => taskId === result.draggableId
+        )
 
       if (addingLater) {
         actualIndex -= 1
@@ -209,21 +183,10 @@ const CProject = (props: TProps) => {
     toList.taskIds.splice(actualIndex, 0, result.draggableId)
 
     // change tasks column
-    editProject.tasks[
-      id(editProject.tasks, result.draggableId)
-    ].progress = parseInt(toProgress, 10)
+    editProject.tasks[id(editProject.tasks, result.draggableId)].progress =
+      parseInt(toProgress, 10)
 
-    // mutate store to save changes
     props.setProject({ id: props.project.id, newProj: editProject })
-
-    draggo({
-      id: result.draggableId,
-      newIndex: actualIndex,
-      oldListId: fromListId,
-      newListId: toListId,
-      newProgress: parseInt(toProgress),
-      projectId: props.project.id
-    })
 
     return
   }
@@ -243,24 +206,14 @@ const CProject = (props: TProps) => {
       })
   }, [])
 
-  const [editProjectExec] = useMutation<
-    EditProjectMutation,
-    EditProjectMutationVariables
-  >(GQL_EDIT_PROJECT, {})
-
-  const [editListExec] = useMutation<
-    EditListMutation,
-    EditListMutationVariables
-  >(GQL_EDIT_LIST, {
-    onCompleted: () => {
-      props.setList({
-        id: editingList[0],
-        projectId: props.project.id,
-        newList: { name: editingList[1] }
-      })
-      setEditingList(['', ''])
-    }
-  })
+  const editList = () => {
+    props.setList({
+      id: editingList[0],
+      projectId: props.project.id,
+      newList: { name: editingList[1] }
+    })
+    setEditingList(['', ''])
+  }
 
   const { classes, project } = props
   if (project) {
@@ -276,11 +229,9 @@ const CProject = (props: TProps) => {
               className={classes.input}
               value={name}
               onBlur={() =>
-                editProjectExec({
-                  variables: {
-                    newProj: { name: name || 'newname' },
-                    id: project.id
-                  }
+                props.setProject({
+                  id: project.id,
+                  newProj: { ...project, name: name || 'newname' }
                 })
               }
               onChange={(e: any) => setName(e.target.value)}
@@ -355,15 +306,7 @@ const CProject = (props: TProps) => {
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
                         filter={props.filterData}
-                        confirmEditingList={() =>
-                          editListExec({
-                            variables: {
-                              id: list.id,
-                              projectId: project.id,
-                              newList: { name: editingList[1] }
-                            }
-                          })
-                        }
+                        confirmEditingList={() => editList()}
                         setEditingList={(id) => setEditingList(id)}
                         editingName={
                           progress === 0
@@ -378,12 +321,6 @@ const CProject = (props: TProps) => {
                             id: listId,
                             projectId: props.project.id,
                             newList: null
-                          })
-                          deleteListExec({
-                            variables: {
-                              projectId: props.project.id,
-                              id: list.id
-                            }
                           })
                         }}
                         collapseList={(listId) => {

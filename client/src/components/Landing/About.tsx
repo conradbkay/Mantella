@@ -4,14 +4,9 @@ import { Typography, WithStyles, Button } from '@material-ui/core'
 import { FeatureTable } from './FeatureTable'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
-import { Mutation, MutationResult } from 'react-apollo'
-import { GQL_LOGIN_AS_GUEST } from '../../graphql/mutations/auth'
-import {
-  LoginAsGuestMutationVariables,
-  LoginAsGuestMutation
-} from '../../graphql/types'
 import { loginA } from '../../store/actions/auth'
 import { connect } from 'react-redux'
+import { APIGuestLogin } from '../../API/auth'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -56,6 +51,13 @@ export const About = withStyles(styles)(
   connect(null, { login: loginA })((props: TProps) => {
     const { classes } = props
 
+    const loginAsGuest = async () => {
+      const res = await APIGuestLogin()
+      if (res) {
+        window.location.hash = '#/project/' + res.projects[0].id
+      }
+    }
+
     return (
       <div>
         <Helmet>
@@ -77,33 +79,15 @@ export const About = withStyles(styles)(
             Elegant Project Management and Time Tracking
           </div>
           <div style={{ display: 'flex' }}>
-            <Mutation
-              mutation={GQL_LOGIN_AS_GUEST}
-              onCompleted={(data: LoginAsGuestMutation) => {
-                props.login(data.loginAsGuest.user)
-                window.location.hash =
-                  '#/project/' + data.loginAsGuest.user.projects[0].id
-              }}
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={() => loginAsGuest()}
+              style={{ marginTop: 'auto' }}
             >
-              {(
-                auth: (args: {
-                  variables: LoginAsGuestMutationVariables
-                }) => void,
-                result: MutationResult<LoginAsGuestMutation>
-              ) => (
-                <>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    onClick={() => auth({ variables: {} })}
-                    style={{ marginTop: 'auto' }}
-                  >
-                    Continue as Guest
-                  </Button>
-                </>
-              )}
-            </Mutation>
+              Continue as Guest
+            </Button>
           </div>
         </div>
         <div style={{ margin: '20px 0' }}>

@@ -1,6 +1,6 @@
-import { UserModel } from 'src/models/User'
+import { UserModel } from '../models/User'
 import uuid from 'uuid'
-import { ProjectModel } from 'src/models/Project'
+import { ProjectModel } from '../models/Project'
 import {
   createColummRes,
   createColumnReq,
@@ -10,6 +10,7 @@ import {
   toggleCollapsedRes
 } from './types'
 import { router } from './router'
+import passport from 'passport'
 
 export const createColumn = async (
   req: createColumnReq,
@@ -22,25 +23,25 @@ export const createColumn = async (
     ProjectModel.findOne({ id: req.body.projId })
   ])
 
-  if (user && project) {
-    project.columns.push({
-      inProgress: false,
-      id: creatingId,
-      name: req.body.name,
-      collapsedUsers: [],
-      taskIds: []
-    })
-    const newProj = await project.save()
-    res.json({
-      project: newProj,
-      column: newProj.columns.find((col) => col.id === creatingId)
-    })
-  } else {
-    throw new Error('user id not provided')
+  if (!user || !project) {
+    throw new Error('Error creating column')
   }
+
+  project.columns.push({
+    inProgress: false,
+    id: creatingId,
+    name: req.body.name,
+    collapsedUsers: [],
+    taskIds: []
+  })
+  const newProject = await project.save()
+  res.json({
+    project: newProject,
+    column: newProject.columns.find((col) => col.id === creatingId)
+  })
 }
 
-router.post('/createColumn', createColumn)
+router.post('/createColumn', passport.authenticate('local'), createColumn)
 
 export const toggleCollapsed = async (
   req: toggleCollapsedReq,
@@ -71,7 +72,7 @@ export const toggleCollapsed = async (
   }
 }
 
-router.post('/toggleCollapsed', toggleCollapsed)
+router.post('/toggleCollapsed', passport.authenticate('local'), toggleCollapsed)
 
 export const deleteColumn = async (
   req: deleteColumnReq,
@@ -93,4 +94,4 @@ export const deleteColumn = async (
   }
 }
 
-router.post('/deleteColumn', deleteColumn)
+router.post('/deleteColumn', passport.authenticate('local'), deleteColumn)

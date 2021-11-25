@@ -67,9 +67,8 @@ export const filterItemsFromIds = <T = any>(
 export const getAllTasks = (projects: TProject[]): TTask[] => {
   let tasks: TTask[] = []
 
-  projects.map((project) => {
+  projects.forEach((project) => {
     tasks = [...tasks, ...project.tasks]
-    return
   })
 
   return tasks
@@ -78,7 +77,7 @@ export const getAllTasks = (projects: TProject[]): TTask[] => {
 export const getAllListsArr = (projects: TProject[]): TList[] => {
   let lists: TList[] = []
 
-  projects.map((project) => {
+  projects.forEach((project) => {
     lists = [...lists, ...project.lists]
   })
 
@@ -91,12 +90,11 @@ export const getProjectIdFromTaskId = (
 ): string => {
   let result = ''
 
-  Object.values(projects).map((proj) => {
-    Object.values(proj.tasks).map((task) => {
+  Object.values(projects).forEach((proj) => {
+    Object.values(proj.tasks).forEach((task) => {
       if (task.id === taskId) {
         result = proj.id
       }
-      return
     })
   })
 

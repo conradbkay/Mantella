@@ -23,7 +23,7 @@ import {
   moveInArray
 } from '../../utils/utilities'
 import { BaseTask } from '../Project/Task/Base'
-import { EditTaskModal } from '../Project/Task/Edit'
+import { EditTaskModal } from '../Project/Task/Edit/Edit'
 import { Link } from 'react-router-dom'
 import { Add } from '@material-ui/icons'
 
@@ -117,7 +117,7 @@ export const Dashboard = connect(mapState)(
           <div style={{ margin: '0px 40px' }}>
             {props.projects.map((project, i) => {
               const cols = [0, 0, 0]
-              project.tasks.map((task) => {
+              project.tasks.forEach((task) => {
                 cols[task.progress]++
               })
 

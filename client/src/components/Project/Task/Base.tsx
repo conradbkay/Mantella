@@ -16,7 +16,7 @@ import {
 } from '@material-ui/core'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
-import { toDaysHHMMSS } from '../../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../../utils/utilities'
 import {
   CheckBox,
   CheckBoxOutlineBlankOutlined,
@@ -25,18 +25,12 @@ import {
   Comment,
   List
 } from '@material-ui/icons'
-// import {GQL_SET_SUBTASK} from '../../../graphql/mutations/task'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
 import { setSubtaskA } from '../../../store/actions/task'
-import { GQL_SET_SUBTASK } from '../../../graphql/mutations/task'
-import { useMutation } from 'react-apollo'
-import {
-  SetSubtaskMutation,
-  SetSubtaskMutationVariables
-} from '../../../graphql/types'
 import { isBefore } from 'date-fns'
+import { APISetSubtask } from '../../../API/project'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -179,19 +173,6 @@ const CBaseTask = (props: TaskProps) => {
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
 
-  const [setSubtaskExec] = useMutation<
-    SetSubtaskMutation,
-    SetSubtaskMutationVariables
-  >(GQL_SET_SUBTASK, {
-    onCompleted: ({ setSubtask }) => {
-      if (setSubtask) {
-      } else {
-        console.log('no subtask returned')
-      }
-    },
-    onError: () => {}
-  })
-
   return task ? (
     <div style={{ width: '100%' }}>
       <div
@@ -279,13 +260,11 @@ const CBaseTask = (props: TaskProps) => {
                   id: newSub.id,
                   newSubtask: newSub
                 })
-                setSubtaskExec({
-                  variables: {
-                    projId: props.project.id,
-                    taskId: task.id,
-                    subtaskId: newSub.id,
-                    info: { name: newSub.name, completed: newSub.completed }
-                  }
+                APISetSubtask({
+                  projId: props.project.id,
+                  taskId: task.id,
+                  subtaskId: newSub.id,
+                  info: { name: newSub.name, completed: newSub.completed }
                 })
               }}
             />

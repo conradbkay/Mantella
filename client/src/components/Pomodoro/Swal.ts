@@ -1,10 +1,8 @@
 import { TPomodoro } from '../../types/state'
 import Dialog from 'sweetalert'
 
-const WORK_DONE_MESSAGE =
-  'Take a break! Make some chili! Good job kiddo, really proud of you man <3'
-const BREAK_DONE_MESSAGE =
-  'You fat, obese, loser, good people do not need breaks, they are more productive than you. I mean, what the heck were you even doing? Watching a dumb movie, a youtube video about how container ships work, come on man.'
+const WORK_DONE_MESSAGE = 'Good job!'
+const BREAK_DONE_MESSAGE = 'Good try! Make the next of your next session.'
 
 export const Swal = (
   pomodoro: TPomodoro,
@@ -20,7 +18,6 @@ export const Swal = (
       title,
       text,
       icon,
-      // value is passed to .then
       buttons: {
         stop: { text: 'Stop Pomodoro', value: 'stop' },
         toggle: {
@@ -28,7 +25,6 @@ export const Swal = (
           value: 'toggle'
         }
       }
-      // .then will return what button they clicked
     }).then((value: 'stop' | 'toggle') => {
       switch (value) {
         case 'stop':

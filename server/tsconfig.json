@@ -3,7 +3,7 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "outDir": "./build/",
-    "module": "commonjs",
+    "module": "CommonJS",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -39,8 +39,7 @@
     "baseUrl": ".",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "noEmit": true
   },
   "exclude": [
     "node_modules",

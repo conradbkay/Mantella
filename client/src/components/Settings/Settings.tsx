@@ -13,10 +13,7 @@ import { List } from '@material-ui/core'
 
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-import { Mutation, MutationResult } from 'react-apollo'
 import { openSnackbarA } from '../../store/actions/snackbar'
-import { LogoutMutation, LogoutMutationVariables } from '../../graphql/types'
-import { GQL_LOGOUT } from '../../graphql/mutations/auth'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -49,34 +46,20 @@ const CSettings = (props: TProps) => {
               primary="Log Out"
               secondary="This action cannot be undone"
             />
-            <Mutation
-              mutation={GQL_LOGOUT}
-              onCompleted={() => {
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
                 location.href = '#/'
                 location.reload()
+                // TODO: actually implement logout
               }}
-              onError={() => {
-                props.openSnackbar('You are stuck here forever, oops!', 'error')
+              style={{
+                marginLeft: 'auto'
               }}
             >
-              {(
-                logout: (args: { variables: LogoutMutationVariables }) => any,
-                result: MutationResult<LogoutMutation>
-              ) => {
-                return (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => logout({ variables: {} })}
-                    style={{
-                      marginLeft: 'auto'
-                    }}
-                  >
-                    Log Out
-                  </Button>
-                )
-              }}
-            </Mutation>
+              Log Out
+            </Button>
           </ListItem>
         </List>
       </div>
@@ -88,7 +71,6 @@ const actionCreators = {
   openSnackbar: openSnackbarA
 }
 
-export const Settings = connect(
-  null,
-  { ...actionCreators }
-)(withStyles(styles)(CSettings))
+export const Settings = connect(null, { ...actionCreators })(
+  withStyles(styles)(CSettings)
+)

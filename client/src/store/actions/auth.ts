@@ -1,20 +1,19 @@
-import { UserFieldsFragment } from './../../graphql/types'
 import { RTDispatch } from '../../types/types'
 import { TState, TAuthUser } from '../../types/state'
 import { openSnackbarA } from './snackbar'
 import { initializeAuthState } from '../../API/initialize'
 
-export const transformUser = (user: UserFieldsFragment): TAuthUser => ({
+export const transformUser = (user: any): TAuthUser => ({
   username: user.username,
   profileImg: user.profileImg || '',
-  joinedIds: user.projects.map(proj =>
+  joinedIds: user.projects.map((proj: any) =>
     typeof proj === 'string' ? proj : (proj.id as string)
   ),
   id: user.id as string,
   email: user.email
 })
 
-export const registerA = (user: UserFieldsFragment) => {
+export const registerA = (user: any) => {
   return (dispatch: RTDispatch, getState: () => TState) => {
     if (user) {
       const authUser = transformUser(user)
@@ -30,7 +29,7 @@ export const registerA = (user: UserFieldsFragment) => {
   }
 }
 
-export const loginA = (user: UserFieldsFragment) => {
+export const loginA = (user: any) => {
   return (dispatch: RTDispatch, getState: () => TState) => {
     if (user) {
       const authUser = transformUser(user)

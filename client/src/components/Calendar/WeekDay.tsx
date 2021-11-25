@@ -7,7 +7,7 @@ import { BaseTask } from '../Project/Task/Base'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import React, { useState } from 'react'
-import { EditTaskModal } from '../Project/Task/Edit'
+import { EditTaskModal } from '../Project/Task/Edit/Edit'
 
 type OwnProps = {
   day: Date

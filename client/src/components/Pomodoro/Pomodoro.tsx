@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core'
 import { Close, Settings } from '@material-ui/icons'
 import { toggleTimerA, tickA } from '../../store/actions/pomodoro'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../utils/utilities'
 import { Swal } from './Swal'
 import { Controls } from './Controls'
 import { Display } from './Display'

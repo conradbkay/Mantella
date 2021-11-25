@@ -171,21 +171,23 @@ const Topbar = (props: TProps) => {
                     from={{ transform: 'translate3d(0,-40px,0)' }}
                     to={{ transform: 'translate3d(0,0px,0)' }}
                   >
-                    {(item) => (trailProps) => (
-                      <a
-                        target="_blank"
-                        href="https://github.com/austin-UW/Mantella"
-                        style={{
-                          ...trailProps,
-                          color: 'black',
-                          textDecoration: 'none',
-                          paddingRight: 5
-                        }}
-                        className={classes.tagline}
-                      >
-                        Mantella
-                      </a>
-                    )}
+                    {(item) => (trailProps) =>
+                      (
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://github.com/austin-UW/Mantella"
+                          style={{
+                            ...trailProps,
+                            color: 'black',
+                            textDecoration: 'none',
+                            paddingRight: 5
+                          }}
+                          className={classes.tagline}
+                        >
+                          Mantella
+                        </a>
+                      )}
                   </Trail>
                 </Typography>
               </div>

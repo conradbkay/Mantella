@@ -9,41 +9,21 @@ import {
   MenuItem,
   FormHelperText,
   Typography,
-  Checkbox,
   IconButton
 } from '@material-ui/core'
 import uuid from 'uuid'
 import { connect } from 'react-redux'
-import { TState } from '../../../types/state'
-import { id, getAllListsArr } from '../../../utils/utilities'
-import {
-  GQL_EDIT_TASK,
-  GQL_DRAG_TASK,
-  GQL_SET_SUBTASK,
-  GQL_SET_COMMENT,
-  GQL_DELETE_TASK
-} from '../../../graphql/mutations/task'
-import { useMutation } from 'react-apollo'
-
-import {
-  EditTaskMutation,
-  EditTaskMutationVariables,
-  DragTaskMutation,
-  DragTaskMutationVariables,
-  SetSubtaskMutation,
-  SetSubtaskMutationVariables,
-  SetCommentMutation,
-  SetCommentMutationVariables,
-  DeleteTaskMutation,
-  DeleteTaskMutationVariables
-} from '../../../graphql/types'
-import { setTaskA } from '../../../store/actions/task'
-import { ChooseColor } from '../../utils/chooseColor'
-import { setProjectA } from '../../../store/actions/project'
+import { TState } from '../../../../types/state'
+import { id, getAllListsArr } from '../../../../utils/utilities'
+import { setTaskA } from '../../../../store/actions/task'
+import { ChooseColor } from '../../../utils/chooseColor'
+import { setProjectA } from '../../../../store/actions/project'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
 import { Add, Delete } from '@material-ui/icons'
-import { formatDueDate } from '../../../utils/formatDueDate'
+import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
+import { EditSubtask } from './Subtask'
+import { TComment, TSubtask } from '../../../../types/project'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -71,73 +51,7 @@ export const EditTaskModal = connect(
   mapState,
   actionCreators
 )((props: TProps) => {
-  // apply changes locally (not in store) immediately, then when submit do on store and server
   const [task, setTask] = useState(cloneDeep(props.task))
-
-  const [setSubtaskExec] = useMutation<
-    SetSubtaskMutation,
-    SetSubtaskMutationVariables
-  >(GQL_SET_SUBTASK, {
-    onCompleted: ({ setSubtask }) => {
-      props.setTask({
-        id: setSubtask.id,
-        projectId: props.projectId,
-        newTask: { ...setSubtask }
-      })
-    }
-  })
-
-  const [setCommentExec] = useMutation<
-    SetCommentMutation,
-    SetCommentMutationVariables
-  >(GQL_SET_COMMENT, {
-    onCompleted: ({ setComment }) => {
-      setTask({
-        ...setComment
-      })
-
-      props.setTask({
-        id: setComment.id,
-        projectId: props.projectId,
-        newTask: { ...setComment }
-      })
-    }
-  })
-
-  const [editTaskExec] = useMutation<
-    EditTaskMutation,
-    EditTaskMutationVariables
-  >(GQL_EDIT_TASK, {
-    variables: {
-      taskId: props.taskId,
-      newTask: {
-        name: task.name,
-        points: task.points,
-        dueDate: task.dueDate,
-        color: task.color,
-        description: task.description
-      },
-      projId: props.projectId
-    }
-  })
-
-  const [deleteTaskExec] = useMutation<
-    DeleteTaskMutation,
-    DeleteTaskMutationVariables
-  >(GQL_DELETE_TASK, {
-    onCompleted: ({ deleteTask }) => {
-      props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
-    }
-  })
-
-  const [dragTaskExec] = useMutation<
-    DragTaskMutation,
-    DragTaskMutationVariables
-  >(GQL_DRAG_TASK, {
-    onCompleted: ({ dragTask }) => {
-      props.setProject({ id: dragTask.project.id, newProj: dragTask.project })
-    }
-  })
 
   const project = props.projects[id(props.projects, props.projectId)]
 
@@ -146,6 +60,38 @@ export const EditTaskModal = connect(
   )!.id
 
   const [listId, setListId] = useState(ownerListId)
+
+  const setSubtask = (
+    id: string,
+    toMergeSubtask?: Partial<Exclude<TSubtask, 'id'>>
+  ) => {
+    const newTask = cloneDeep(task)
+    const subtaskIndex = newTask.subTasks.findIndex((sub) => {
+      return sub.id === id
+    })
+    if (toMergeSubtask) {
+      newTask.subTasks[subtaskIndex] = {
+        ...newTask.subTasks[subtaskIndex],
+        ...toMergeSubtask
+      }
+    } else {
+      newTask.subTasks.filter((sub) => sub.id !== id)
+    }
+    setTask(newTask)
+
+    return newTask
+  }
+
+  const setComment = (id: string, newComment: Partial<TComment> | null) => {}
+
+  const deleteTask = () => {
+    props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
+  }
+
+  const dragTask = (taskId: string, info: any) => {
+    // TODO: fix
+    props.setProject({ id: project.id, newProj: project })
+  }
 
   return (
     <div>
@@ -158,9 +104,6 @@ export const EditTaskModal = connect(
               newTask: task
             })
 
-            console.log(task)
-
-            editTaskExec()
             if (listId !== ownerListId) {
               let newIndex = 0
 
@@ -182,15 +125,12 @@ export const EditTaskModal = connect(
                 newIndex = lowest
               }
 
-              dragTaskExec({
-                variables: {
-                  oldListId: ownerListId,
-                  newListId: listId,
-                  newIndex, // this is only correct in first progress
-                  id: task.id,
-                  newProgress: task.progress,
-                  projectId: props.projectId
-                }
+              dragTask(task.id, {
+                oldListId: ownerListId,
+                newListId: listId,
+                newIndex,
+                newProgress: task.progress,
+                projectId: props.projectId
               })
             }
             e.preventDefault()
@@ -314,89 +254,8 @@ export const EditTaskModal = connect(
           >
             Subtasks
           </Typography>
-          {task.subTasks.map((subTask, i) => (
-            <div key={subTask.id} style={{ display: 'flex', marginTop: 8 }}>
-              <Checkbox
-                style={{ marginRight: 10, width: 32, height: 32 }}
-                disableRipple
-                checked={task.subTasks[i].completed}
-                onChange={(e) => {
-                  const subTasks = [...task.subTasks]
-                  const newCompleteStatus = !subTasks[i].completed
-                  subTasks[i].completed = newCompleteStatus
-                  setTask({ ...task, subTasks })
-
-                  setSubtaskExec({
-                    variables: {
-                      projId: props.projectId,
-                      taskId: props.task.id,
-                      subtaskId: subTask.id,
-                      info: {
-                        name: task.subTasks[i].name,
-                        completed: newCompleteStatus
-                      }
-                    }
-                  })
-                }}
-              />
-              <TextField
-                key={subTask.id}
-                margin="none"
-                required
-                fullWidth
-                label={`Subtask ${i}`}
-                value={task.subTasks[i].name}
-                onBlur={(e) => {
-                  setSubtaskExec({
-                    variables: {
-                      projId: props.projectId,
-                      taskId: props.task.id,
-                      subtaskId: subTask.id,
-                      info: {
-                        name: task.subTasks[i].name,
-                        completed: subTask.completed
-                      }
-                    }
-                  })
-                }}
-                onChange={(e) => {
-                  setTask({
-                    ...task,
-                    subTasks: [
-                      ...task.subTasks.slice(0, i),
-                      { ...task.subTasks[i], name: e.target.value },
-                      ...task.subTasks.slice(i + 1)
-                    ]
-                  })
-                }}
-              />
-              <IconButton
-                style={{
-                  marginLeft: 10,
-                  width: 48,
-                  height: 48,
-                  marginTop: 'auto'
-                }}
-                onClick={() => {
-                  setTask({
-                    ...task,
-                    subTasks: task.subTasks.filter(
-                      (sub) => sub.id !== task.subTasks[i].id
-                    )
-                  })
-                  setSubtaskExec({
-                    variables: {
-                      projId: props.projectId,
-                      taskId: props.task.id,
-                      subtaskId: subTask.id,
-                      info: null // means we are deleting
-                    }
-                  })
-                }}
-              >
-                <Delete />
-              </IconButton>
-            </div>
+          {task.subTasks.map((subtask, i) => (
+            <EditSubtask setSubtask={setSubtask} subtask={subtask} />
           ))}
           <Button
             variant="outlined"
@@ -407,24 +266,10 @@ export const EditTaskModal = connect(
             }}
             onClick={() => {
               const subTaskId = uuid()
-              setTask({
-                ...task,
-                subTasks: [
-                  ...task.subTasks,
-                  { id: subTaskId, completed: false, name: 'Subtask Name' }
-                ]
-              })
-
-              setSubtaskExec({
-                variables: {
-                  projId: props.projectId,
-                  taskId: props.task.id,
-                  subtaskId: subTaskId,
-                  info: {
-                    name: 'Subtask Name',
-                    completed: false
-                  }
-                }
+              setSubtask(subTaskId, {
+                id: subTaskId,
+                completed: false,
+                name: 'Subtask Name'
               })
             }}
           >
@@ -447,13 +292,9 @@ export const EditTaskModal = connect(
                 key={comment.id}
                 margin="dense"
                 onBlur={(e) => {
-                  setCommentExec({
-                    variables: {
-                      projId: props.projectId,
-                      taskId: props.task.id,
-                      commentId: comment.id,
-                      description: task.comments[i].comment
-                    }
+                  setComment(comment.id, {
+                    comment: task.comments[i].comment,
+                    lastEdited: new Date().toString()
                   })
                 }}
                 required
@@ -483,13 +324,7 @@ export const EditTaskModal = connect(
                   height: 48
                 }}
                 onClick={() => {
-                  setCommentExec({
-                    variables: {
-                      projId: props.projectId,
-                      taskId: props.task.id,
-                      commentId: comment.id
-                    }
-                  })
+                  setComment(comment.id, null)
                 }}
               >
                 <Delete />
@@ -499,12 +334,11 @@ export const EditTaskModal = connect(
           <Button
             variant="outlined"
             onClick={() => {
-              setCommentExec({
-                variables: {
-                  projId: props.projectId,
-                  taskId: props.task.id,
-                  description: 'Comment'
-                }
+              const newCommentId = uuid()
+              setComment(newCommentId, {
+                id: newCommentId,
+                comment: 'Comment',
+                dateAdded: new Date().toString()
               })
             }}
             style={{ marginTop: 8 }}
@@ -523,9 +357,7 @@ export const EditTaskModal = connect(
             <Button
               onClick={() => {
                 props.onClose()
-                deleteTaskExec({
-                  variables: { projId: props.projectId, taskId: task.id }
-                })
+                deleteTask()
               }}
               style={{ backgroundColor: 'red', color: 'white', marginRight: 8 }}
             >
