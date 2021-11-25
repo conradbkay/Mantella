@@ -1,10 +1,10 @@
 {
-  "name": "kanbanbrawn-master",
+  "name": "mantella",
   "version": "1.0.0",
   "description": "Fully-fledged task manager",
   "main": "./server/src/index.ts",
   "scripts": {
-    "start": "cd server && npm i && nodemon",
+    "start": "npm run server && npm run client",
     "server": "npm start --prefix server",
     "build": "npm i --prefix server && cd client && npm install && npm run build",
     "client": "npm start --prefix client"
@@ -24,10 +24,6 @@
   },
   "homepage": "https://mantella.herokuapp.com",
   "dependencies": {
-    "@types/node": "^12.6.9",
-    "concurrently": "^6.4.0",
-    "copyfiles": "^2.1.0",
-    "nodemon": "^2.0.15",
-    "prettier": "^2.4.1"
+    "nodemon": "^2.0.15"
   }
 }
