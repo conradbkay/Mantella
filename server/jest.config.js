@@ -9,4 +9,7 @@ module.exports = {
   testMatch: [
     '**/*.test.ts'
   ],
+  transform: {
+    "^.+\\.tsx?$": ["@swc/jest"],
+  },
 };

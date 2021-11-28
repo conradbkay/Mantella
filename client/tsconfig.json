@@ -18,6 +18,10 @@
       "es2017",
       "esnext.asynciterable"
     ],
+    "types": [
+      "node",
+      "jest"
+    ],
     "rootDir": "src",
     "target": "es6",
     "module": "esnext",
@@ -35,17 +39,17 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "noEmit": true,
     "skipDefaultLibCheck": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noEmit": true
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "webpack"
-  ],
   "include": [
     "src"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/.*/",
+    "build",
+    "scripts"
   ]
 }
