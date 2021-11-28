@@ -31,22 +31,6 @@ const CProjectSettings = (props: Props) => {
     props.setProject({ id: props.project.id, newProj: null })
   }
 
-  /*
-  const [setCommentExec] = useMutation<
-    SetCommentMutation,
-    SetCommentMutationVariables
-  >(GQL_SET_COMMENT, {
-    onCompleted: ({ setComment }) => {}
-  })
-
-  const [setSubtaskExec] = useMutation<
-    SetSubtaskMutation,
-    SetSubtaskMutationVariables
-  >(GQL_SET_SUBTASK, {
-    onCompleted: ({ setSubtask }) => {}
-  })
-  */
-
   return (
     <Dialog onClose={props.onClose} open={true}>
       <div style={{ minWidth: '500px' }} />

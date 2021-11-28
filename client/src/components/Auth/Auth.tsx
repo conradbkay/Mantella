@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { ComponentProps, useState } from 'react'
 import { connect } from 'react-redux'
 import {
   Paper,
@@ -19,19 +19,32 @@ import Helmet from 'react-helmet'
 import { registerA, loginA } from '../../store/actions/auth'
 import { APILogin, APIRegister } from '../../API/auth'
 
-type SocialButtonProps = {
-  imageUrl: string
-  provider: string
-  appId: string
-}
-
-const SocialButton = (props: SocialButtonProps) => {
-  return (
-    <IconButton>
-      <img src={props.imageUrl} style={{ height: 50, width: 50 }} alt="" />
-    </IconButton>
-  )
-}
+const socialProviders = [
+  {
+    imageUrl:
+      'https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png',
+    provider: 'google',
+    appId: 'AIzaSyDaxgICy9wGwo98I3QGFvAy4s1gBbqJmsY'
+  },
+  {
+    imageUrl:
+      'https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png',
+    provider: 'facebook',
+    appId: '1232255530509893'
+  },
+  {
+    imageUrl:
+      'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png',
+    provider: 'github',
+    appId: '373e2991118f9d8e97b1c8717ec9dd863df71461'
+  },
+  {
+    imageUrl:
+      'https://cdn0.iconfinder.com/data/icons/most-usable-logos/120/Amazon-512.png',
+    provider: 'amazon',
+    appId: '1d526f19eb4b402d9be7c21ed04c55e5'
+  }
+]
 
 type ActionCreators = typeof actionCreators
 
@@ -44,6 +57,19 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
   const [password, setPassword] = useState('')
   const [confirmText, setConfirmText] = useState('')
   const [username, setUsername] = useState('')
+
+  const AuthInput = (inputProps: ComponentProps<any>) => {
+    return (
+      <TextField
+        margin="dense"
+        fullWidth
+        required
+        value={username}
+        label="Full Name"
+        {...inputProps}
+      />
+    )
+  }
 
   return (
     <div style={{ margin: 20 }}>
@@ -97,52 +123,40 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
               </Button>
             )}
             {authType === 'Register' && (
-              <TextField
-                margin="dense"
-                fullWidth
-                required
+              <AuthInput
+                onChange={(e: any) => setUsername(e.target.value)}
                 autoComplete="off"
-                onChange={(e) => setUsername(e.target.value)}
                 value={username}
                 label="Full Name"
               />
             )}
-            <TextField
-              margin="dense"
-              fullWidth
+            <AuthInput
               name="email"
-              required
               autoComplete="on"
               value={email}
-              onChange={(e) => {
+              onChange={(e: any) => {
                 setEmail(e.target.value)
               }}
               label="Email"
               type="email"
             />
-            <TextField
-              margin="dense"
-              fullWidth
-              required
+            <AuthInput
               autoComplete="on"
               label="Password"
               name="password"
               type="password"
               id="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: any) => setPassword(e.target.value)}
             />
             {authType === 'Register' && (
-              <TextField
+              <AuthInput
                 type="password"
-                margin="dense"
-                fullWidth
-                required
                 autoComplete="off"
                 label="Confirm Password"
                 error={confirmText !== password}
                 value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
+                onChange={(e: any) => setConfirmText(e.target.value)}
               />
             )}
             <Grid container justify="center" style={{ marginTop: '10px' }}>
@@ -168,33 +182,14 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
               style={{ marginTop: 15 }}
               alignContent="space-between"
             >
-              {[
-                {
-                  imageUrl:
-                    'https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png',
-                  provider: 'google',
-                  appId: 'AIzaSyDaxgICy9wGwo98I3QGFvAy4s1gBbqJmsY'
-                },
-                {
-                  imageUrl:
-                    'https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png',
-                  provider: 'facebook',
-                  appId: '1232255530509893'
-                },
-                {
-                  imageUrl:
-                    'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png',
-                  provider: 'github',
-                  appId: '373e2991118f9d8e97b1c8717ec9dd863df71461'
-                },
-                {
-                  imageUrl:
-                    'https://cdn0.iconfinder.com/data/icons/most-usable-logos/120/Amazon-512.png',
-                  provider: 'amazon',
-                  appId: '1d526f19eb4b402d9be7c21ed04c55e5'
-                }
-              ].map((media, i) => (
-                <SocialButton key={i} {...media} provider={media.provider} />
+              {socialProviders.map((media, i) => (
+                <IconButton onClick={() => null}>
+                  <img
+                    src={media.imageUrl}
+                    style={{ height: 50, width: 50 }}
+                    alt=""
+                  />
+                </IconButton>
               ))}
             </Grid>
           </Paper>

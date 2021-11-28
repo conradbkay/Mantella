@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { toDaysHHMMSS } from '../../utils/utilities'
@@ -8,8 +8,6 @@ import {
   resetStopwatchA
 } from '../../store/actions/pomodoro'
 import { Button } from '@material-ui/core'
-import { Transition } from 'react-spring/renderprops'
-import { centerChildren } from '../styles/utils'
 import { PlayArrow, Pause } from '@material-ui/icons'
 
 type ActionCreators = typeof actionCreators
@@ -36,34 +34,11 @@ const CStopwatch = (props: Props) => {
         style={{
           textAlign: 'center',
           fontSize: 28,
-          marginBottom: 10,
-          color: stopWatch.time >= stopWatch.highest ? '#FFD700' : 'black'
+          marginBottom: 10
         }}
       >
         {toDaysHHMMSS(stopWatch.time)}
       </div>
-      <Transition
-        items={stopWatch.time < stopWatch.highest}
-        from={{ opacity: 0 }}
-        enter={{ opacity: 1 }}
-        leave={{ opacity: 0 }}
-      >
-        {(show) => {
-          const style: CSSProperties = {
-            fontSize: 28,
-            color: '#444',
-            marginBottom: 10
-          }
-          return (
-            show &&
-            ((transitionStyles) => (
-              <div style={{ ...style, ...transitionStyles, ...centerChildren }}>
-                Best: {toDaysHHMMSS(stopWatch.highest)}
-              </div>
-            ))
-          )
-        }}
-      </Transition>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button onClick={() => reset()} style={{ marginRight: 4 }}>
           Reset

@@ -92,7 +92,8 @@
       "react-app/jest"
     ],
     "rules": {
-      "no-restricted-globals": "off"
+      "no-restricted-globals": "off",
+      "jest/valid-title": "off"
     }
   }
 }
