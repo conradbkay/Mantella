@@ -74,11 +74,10 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
                   'error'
                 )
               }
-            } else if (authType === 'Login') {
-              await APILogin(email, password)
-              window.location.hash = '#/calendar'
             } else {
-              openSnackbar('Could not login, oopsie!', 'error')
+              const user = await APILogin(email, password)
+              login(user)
+              window.location.hash = '#/calendar'
             }
           }}
         >

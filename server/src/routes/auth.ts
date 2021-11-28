@@ -40,7 +40,8 @@ export const login = async (
   }
 }
 
-router.post('/login', passport.authenticate('local'), login)
+/* for some reason session: true is required for persistent login */
+router.post('/login', passport.authenticate('local', { session: true }), login)
 router.post('/cookieLogin', isAuthenticated, login)
 
 const SALT_LENGTH = process.env.NODE_ENV === 'production' ? 10 : 4

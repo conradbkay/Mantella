@@ -73,7 +73,7 @@ export const Dashboard = connect(mapState)(
             Your Tasks
           </Typography>
           <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="dashboard">
+            <Droppable isDropDisabled={true} droppableId="dashboard">
               {(provided, snapshot) => (
                 <div {...provided.droppableProps} ref={provided.innerRef}>
                   {tasks.map((task, i) => (
