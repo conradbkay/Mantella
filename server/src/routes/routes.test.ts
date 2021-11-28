@@ -1,4 +1,10 @@
 import passport from 'passport'
+import request from 'supertest'
+import mongoose from 'mongoose'
+import { MongoMemoryServer } from 'mongodb-memory-server'
+import app from '../app'
+import { editProjectReqObj, loginReqObj, registerReqObj } from './types'
+
 // ids must be mocked to access
 jest.mock('uuid', () => {
   return () => 'MOCK_ID'
@@ -10,12 +16,7 @@ jest.mock('passport')
   (type: any) => (req: any, res: any, next: any) => next()
 )
 
-import request from 'supertest'
-import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 let mongoServer: any
-import app from '../app'
-import { editProjectReqObj, loginReqObj, registerReqObj } from './types'
 
 const connect = async () => {
   await mongoose.disconnect()
@@ -23,7 +24,6 @@ const connect = async () => {
   mongoServer = await MongoMemoryServer.create()
 
   const mongoUri = await mongoServer.getUri()
-  console.log(mongoUri)
   await mongoose.connect(mongoUri, {}, (err) => {
     if (err) {
       console.error(err)

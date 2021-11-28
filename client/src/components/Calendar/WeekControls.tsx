@@ -44,7 +44,6 @@ interface Props extends WithStyles<typeof styles> {
 const CWeekControls = (props: Props) => {
   const { projects, toggleProject, currIds } = props
 
-  console.log(props)
   return (
     <div
       style={{

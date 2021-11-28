@@ -1,7 +1,6 @@
 import { comparePassword, UserModel } from './models/User'
 
 export const isAuthenticated = (req: any, res: any, next: any) => {
-  console.log('checking ', req.user)
   if (req.user) return next()
   else
     return res.status(401).json({
@@ -15,7 +14,6 @@ export const passportStrategy = async (
   done: Function
 ) => {
   try {
-    console.log('passportStrategy ', email, password)
     const user = await UserModel.findOne({ email })
     if (!user) {
       return done(null, false, { message: 'Incorrect username.' })
@@ -31,13 +29,11 @@ export const passportStrategy = async (
 }
 
 export const serializeUser = (user: any, done: any) => {
-  console.log('serializing ', user.id)
   done(null, user.id)
 }
 
 export const deserializeUser = async (id: string, done: any) => {
   try {
-    console.log('deserializing ', id)
     const user = await UserModel.findOne({ id })
     done(null, user?.toObject())
   } catch (err) {
