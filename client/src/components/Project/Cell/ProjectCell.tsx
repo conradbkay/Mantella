@@ -1,81 +1,87 @@
-import React, { useState } from 'react'
-import { TList, TProject } from '../../../types/project'
+import React, { ChangeEvent, CSSProperties, useState } from 'react'
+import { TList, TProject, TTask } from '../../../types/project'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
-import {
-  createStyles,
-  IconButton,
-  Menu as MuiMenu,
-  MenuItem,
-  Theme,
-  WithStyles,
-  withStyles
-} from '@material-ui/core'
+import { IconButton, Menu as MuiMenu, MenuItem } from '@material-ui/core'
 import { id } from '../../../utils/utilities'
 import { Menu, Add } from '@material-ui/icons'
 import { input, TFilterData } from '../Project'
 import { filterTask, filterTasks } from '../../../utils/filterTasks'
-const styles = (theme: Theme) =>
-  createStyles({
-    input: input
-  })
 
-type OwnProps = {
-  progress: number // 0, 1, or 2
-  list: TList
+interface Props {
   project: TProject
+  list: TList
+  progress: 0 | 1 | 2
   filter: TFilterData
-  collapseList: (id: string) => void
   collapsedLists: string[]
+  editingName: string
+  collapseList: (id: string) => void
   openFunc: (id: string) => void
   deleteList: (id: string) => void
   setCreating: (id: string) => void
-  editingName: string
   setEditingList: (id: [string, string]) => void
   confirmEditingList: () => void
 }
-type TProps = OwnProps & WithStyles<typeof styles>
 
-export const ProjectCell = withStyles(styles)((props: TProps) => {
-  let tasks = props.list.taskIds
-    .map((taskId) => props.project.tasks[id(props.project.tasks, taskId)])
-    .filter((task) => {
-      return task.progress === props.progress
+export const ProjectCell = ({
+  project,
+  list,
+  progress,
+  filter,
+  collapsedLists,
+  editingName,
+  collapseList,
+  openFunc,
+  deleteList,
+  setCreating,
+  setEditingList,
+  confirmEditingList
+}: Props) => {
+  const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
+  const [deletingList, setDeletingList] = useState(false)
+
+  const getCellTasks = (
+    tasks: TTask[],
+    taskIds: string[],
+    progress: 0 | 1 | 2
+  ): TTask[] => {
+    const listTasks = taskIds.map((taskId) => tasks[id(tasks, taskId)])
+
+    const cellTasks = listTasks.filter((task) => {
+      return task.progress === progress
     })
-
-  if (props.progress === 2) {
-    // eslint-disable-next-line
-    tasks = tasks // TODO: This shouldn't do anything but i'm too afraid to delete it
+    return cellTasks
   }
 
-  const [anchorEl, setAnchorEl] = useState(null as any)
-  const [deletingList, setDeletingList] = useState(null as any)
+  const getCellStyles = (): CSSProperties => {
+    const isLastColumn = progress === 2
+    const isFirstColumn = progress === 0
+    const isFinalRow =
+      project.lists.findIndex((projList) => projList.id === list.id) ===
+      project.lists.length - 1
+    const borderColor = '#aebacc' // light grey
+    return {
+      borderTop: '1px solid ' + borderColor,
+      borderRight: `1px ${isLastColumn ? 'solid' : 'dashed'} ${borderColor}`,
+      borderBottom: isFinalRow ? '1px solid ' + borderColor : undefined,
+      borderLeft: isFirstColumn ? '1px solid ' + borderColor : undefined,
+      width: '100%',
+      padding: isCollapsed ? '0px 8px' : 8,
+      maxHeight: isCollapsed ? 100 : '60vh',
+      overflowY: 'auto'
+    }
+  }
 
-  const disableDrag = tasks.length !== filterTasks(tasks, props.filter).length
+  let tasks = getCellTasks(project.tasks, list.taskIds, progress)
+  // TODO: For now tasks cannot be dragged if tasks are filtered out
+  const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
+  const isCollapsed = collapsedLists.includes(list.id)
 
   return (
-    <td
-      style={{
-        borderRight: `1px ${props.progress !== 2 ? 'dashed' : 'solid'} #aebacc`,
-        borderBottom:
-          props.project.lists.findIndex((list) => props.list.id === list.id) ===
-          props.project.lists.length - 1
-            ? '1px solid #aebacc'
-            : undefined,
-        borderTop: '1px solid #aebacc',
-        borderLeft:
-          props.progress === 0
-            ? `1px ${props.progress ? 'dashed' : 'solid'} #aebacc`
-            : undefined,
-        width: '100%',
-        padding: props.collapsedLists.includes(props.list.id) ? '0px 8px' : 8,
-        maxHeight: props.collapsedLists.includes(props.list.id) ? 100 : '60vh',
-        overflowY: 'auto'
-      }}
-    >
-      {props.progress === 0 && (
+    <td style={getCellStyles()}>
+      {progress === 0 && (
         <div style={{ display: 'flex', margin: 4 }}>
-          {props.collapsedLists.includes(props.list.id) && (
+          {isCollapsed && (
             <h2
               style={{
                 fontSize: 16,
@@ -86,20 +92,17 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
               [Collapsed]
             </h2>
           )}
-          {props.editingName ? (
+          {editingName ? (
             <input
-              style={{ width: '100%' }}
-              className={props.classes.input}
-              value={props.editingName}
-              onBlur={() => props.confirmEditingList()}
-              onChange={(e: any) =>
-                props.setEditingList([props.list.id, e.target.value])
+              style={{ width: '100%', ...input }}
+              value={editingName}
+              onBlur={() => confirmEditingList()}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setEditingList([list.id, e.target.value])
               }
             />
           ) : (
-            <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>
-              {props.list.name}
-            </h2>
+            <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>{list.name}</h2>
           )}
           <IconButton
             onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -107,13 +110,11 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
           >
             <Menu />
           </IconButton>
-          {!props.collapsedLists.includes(props.list.id) && (
+          {!isCollapsed && (
             <IconButton
               color="primary"
               style={{ marginLeft: 8 }}
-              onClick={
-                () => props.setCreating('string') /* TODO: add columns */
-              }
+              onClick={() => setCreating('string')}
             >
               <Add />
             </IconButton>
@@ -127,16 +128,14 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
             <MenuItem
               onClick={() => {
                 setAnchorEl(null)
-                props.collapseList(props.list.id)
+                collapseList(list.id)
               }}
             >
-              {props.collapsedLists.includes(props.list.id)
-                ? 'Uncollapse'
-                : 'Collapse'}
+              {isCollapsed ? 'Uncollapse' : 'Collapse'}
             </MenuItem>
             <MenuItem
               onClick={() => {
-                props.setEditingList([props.list.id, props.list.name])
+                setEditingList([list.id, list.name])
                 setAnchorEl(null)
               }}
             >
@@ -144,12 +143,13 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                if (deletingList && props.project.lists.length > 1) {
+                if (deletingList && project.lists.length > 1) {
                   setAnchorEl(null)
-                  props.deleteList(props.list.id)
+                  deleteList(list.id)
                 } else {
+                  const DOUBLE_CLICK_TIMEOUT = 4000
                   setDeletingList(true)
-                  setTimeout(() => setDeletingList(false), 4000) // dont have confirm message forever
+                  setTimeout(() => setDeletingList(false), DOUBLE_CLICK_TIMEOUT)
                 }
               }}
             >
@@ -163,10 +163,8 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
         </div>
       )}
       <Droppable
-        isDropDisabled={props.collapsedLists.includes(props.list.id)}
-        droppableId={
-          `${props.list.id}DIVIDER${props.progress}` /* can only be a string*/
-        }
+        isDropDisabled={isCollapsed}
+        droppableId={`${list.id}DIVIDER${progress}` /* can only be a string*/}
       >
         {(dropProvided, dropSnapshot) => {
           return (
@@ -174,31 +172,26 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
               style={{
                 flexDirection: 'column',
                 display: 'flex',
-                minHeight: props.collapsedLists.includes(props.list.id)
-                  ? 0
-                  : 78,
-                // height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
+                minHeight: isCollapsed ? 0 : 78,
                 backgroundColor: 'white',
-                paddingBottom: props.collapsedLists.includes(props.list.id)
-                  ? 0
-                  : 78 // needed for dragging to bottom of list
+                paddingBottom: isCollapsed ? 0 : 78 // needed for dragging to bottom of list
               }}
               {...dropProvided.droppableProps}
               ref={dropProvided.innerRef}
             >
-              {!props.collapsedLists.includes(props.list.id)
+              {!isCollapsed
                 ? tasks.map((task, i) => (
                     <Draggable
-                      isDragDisabled={disableDrag}
+                      isDragDisabled={isDragDisabled}
                       draggableId={task.id}
                       index={i}
                       key={task.id}
                     >
                       {(dragProvided, dragSnapshot) => (
                         <BaseTask
-                          hidden={!filterTask(task, props.filter)}
-                          openFunc={() => props.openFunc(task.id)}
-                          project={props.project}
+                          hidden={!filterTask(task, filter)}
+                          openFunc={() => openFunc(task.id)}
+                          project={project}
                           task={task}
                           provided={dragProvided}
                           snapshot={dragSnapshot}
@@ -214,4 +207,4 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
       </Droppable>
     </td>
   )
-})
+}

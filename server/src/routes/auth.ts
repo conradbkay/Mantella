@@ -1,4 +1,3 @@
-import { comparePassword } from '../models/User'
 import bcrypt from 'bcryptjs'
 import { UserModel } from '../models/User'
 import { ProjectModel } from '../models/Project'
@@ -16,6 +15,8 @@ import {
 } from './types'
 import { NextFunction, Request, Response } from 'express'
 import { router } from './router'
+import passport from 'passport'
+import { isAuthenticated } from '../passport'
 
 export const login = async (
   req: loginReq,
@@ -23,48 +24,24 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
-    if (req.user) {
-      const [user, projects] = await Promise.all([
-        UserModel.findOne({ email: req.user.email }),
-        ProjectModel.find({ id: req.user.projects })
-      ])
+    const [user, projects] = await Promise.all([
+      UserModel.findOne({ email: req.user.email }).lean(),
+      ProjectModel.find({ id: req.user.projects }).lean()
+    ])
 
-      res.json({
-        user: {
-          ...user,
-          projects: projects
-        }
-      } as loginResObj)
-    } else if (req.body && req.body.email) {
-      const user = await UserModel.findOne({ email: req.body.email })
-      if (!user) {
-        throw new Error('That user does not exist')
+    res.json({
+      user: {
+        ...user,
+        projects: projects
       }
-      const passwordMatch = await comparePassword(
-        req.body.password,
-        user.password! // user always has a password since they are not a guest
-      )
-      if (!passwordMatch) {
-        throw new Error('Incorrect Password')
-      }
-
-      const projects = await ProjectModel.find({ id: user.projects })
-
-      res.json({
-        user: {
-          ...user,
-          projects: projects
-        }
-      } as loginResObj)
-    } else {
-      res.end()
-    }
+    } as loginResObj)
   } catch (err) {
     next(err)
   }
 }
 
-router.post('/login', login)
+router.post('/login', passport.authenticate('local'), login)
+router.post('/cookieLogin', isAuthenticated, login)
 
 const SALT_LENGTH = process.env.NODE_ENV === 'production' ? 10 : 4
 
@@ -87,8 +64,8 @@ export const register = async (req: registerReq, res: registerRes) => {
 
     res.json({
       user: {
-        ...newUser,
-        projects: [project]
+        ...newUser.toObject(),
+        projects: [project.toObject()]
       }
     } as registerResObj)
   } catch (err) {
@@ -116,8 +93,8 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
 
     res.json({
       user: {
-        ...user,
-        projects: [project]
+        ...user.toObject(),
+        projects: [project.toObject()]
       }
     } as guestLoginResObj)
   } catch (err) {

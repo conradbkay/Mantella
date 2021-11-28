@@ -10,7 +10,7 @@ import {
   toggleCollapsedRes
 } from './types'
 import { router } from './router'
-import passport from 'passport'
+import { isAuthenticated } from '../passport'
 
 export const createColumn = async (
   req: createColumnReq,
@@ -41,7 +41,7 @@ export const createColumn = async (
   })
 }
 
-router.post('/createColumn', passport.authenticate('local'), createColumn)
+router.post('/createColumn', isAuthenticated, createColumn)
 
 export const toggleCollapsed = async (
   req: toggleCollapsedReq,
@@ -72,7 +72,7 @@ export const toggleCollapsed = async (
   }
 }
 
-router.post('/toggleCollapsed', passport.authenticate('local'), toggleCollapsed)
+router.post('/toggleCollapsed', isAuthenticated, toggleCollapsed)
 
 export const deleteColumn = async (
   req: deleteColumnReq,
@@ -94,4 +94,4 @@ export const deleteColumn = async (
   }
 }
 
-router.post('/deleteColumn', passport.authenticate('local'), deleteColumn)
+router.post('/deleteColumn', isAuthenticated, deleteColumn)

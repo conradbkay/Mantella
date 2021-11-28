@@ -9,7 +9,7 @@ import {
   editListReq,
   editListRes
 } from './types'
-import passport from 'passport'
+import { isAuthenticated } from '../passport'
 
 export const editList = async (req: editListReq, res: editListRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
@@ -35,7 +35,7 @@ export const editList = async (req: editListReq, res: editListRes) => {
   }
 }
 
-router.post('/editList', passport.authenticate('local'), editList)
+router.post('/editList', isAuthenticated, editList)
 
 export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
@@ -51,7 +51,7 @@ export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
   }
 }
 
-router.post('/deleteList', passport.authenticate('local'), deleteList)
+router.post('/deleteList', isAuthenticated, deleteList)
 
 export const createList = async (req: createListReq, res: createListRes) => {
   const newId = uuid()
@@ -78,4 +78,4 @@ export const createList = async (req: createListReq, res: createListRes) => {
   }
 }
 
-router.post('/createList', passport.authenticate('local'), createList)
+router.post('/createList', isAuthenticated, createList)

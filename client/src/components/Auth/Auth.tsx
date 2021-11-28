@@ -60,15 +60,14 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
           onSubmit={async (e) => {
             e.preventDefault()
             if (authType === 'Register') {
-              const registerData = await APIRegister({
+              const user = await APIRegister({
                 email,
                 password,
                 username
               })
-              if (registerData) {
-                register(registerData.register.user)
-                window.location.hash =
-                  '#/project/' + registerData.register.user.projects[0].id
+              if (user) {
+                register(user)
+                window.location.hash = '#/project/' + user.projects[0].id
               } else {
                 openSnackbar(
                   'User with that Email already exists, Sorry!',

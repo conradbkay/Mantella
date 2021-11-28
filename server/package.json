@@ -64,6 +64,7 @@
     "@types/express-session": "^1.15.12",
     "@types/jest": "^27.0.2",
     "@types/jsonwebtoken": "^8.3.2",
+    "@types/morgan": "^1.9.3",
     "@types/node": "^12.6.9",
     "@types/node-fetch": "^2.3.7",
     "@types/passport": "^1.0.0",

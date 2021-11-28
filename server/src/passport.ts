@@ -1,12 +1,20 @@
 import { comparePassword, UserModel } from './models/User'
 
+export const isAuthenticated = (req: any, res: any, next: any) => {
+  if (req.user) return next()
+  else
+    return res.status(401).json({
+      error: 'User not authenticated'
+    })
+}
+
 export const passportStrategy = async (
   username: string,
   password: string,
   done: Function
 ) => {
   try {
-    const user = UserModel.findOne({ username: username })
+    const user = await UserModel.findOne({ username: username })
     if (!user) {
       return done(null, false, { message: 'Incorrect username.' })
     }

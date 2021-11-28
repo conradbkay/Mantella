@@ -1,8 +1,15 @@
 import axios from 'axios'
 
-export const APILogin = async (email?: string, password?: string) => {
+export const APILogin = async (
+  email?: string,
+  password?: string,
+  isCookie?: boolean
+) => {
   try {
-    const res = await axios.post('/login', { email, password })
+    const res = await axios.post(isCookie ? '/cookieLogin' : '/login', {
+      email,
+      password
+    })
     return res.data.user
   } catch (err) {
     console.error(err)

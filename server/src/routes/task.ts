@@ -15,7 +15,7 @@ import {
   setSubtaskRes
 } from './types'
 import { router } from './router'
-import passport from 'passport'
+import { isAuthenticated } from '../passport'
 
 export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   const taskId = uuid()
@@ -64,7 +64,7 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   }
 }
 
-router.post('/createTask', passport.authenticate('local'), createTask)
+router.post('/createTask', isAuthenticated, createTask)
 
 export const editTask = async (req: editTaskReq, res: editTaskRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
@@ -96,7 +96,7 @@ export const editTask = async (req: editTaskReq, res: editTaskRes) => {
   }
 }
 
-router.post('/editTask', passport.authenticate('local'), editTask)
+router.post('/editTask', isAuthenticated, editTask)
 
 export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
@@ -115,7 +115,7 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
   }
 }
 
-router.post('/deleteTask', passport.authenticate('local'), deleteTask)
+router.post('/deleteTask', isAuthenticated, deleteTask)
 
 export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projectId })
@@ -153,7 +153,7 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
   }
 }
 
-router.post('/dragTask', passport.authenticate('local'), dragTask)
+router.post('/dragTask', isAuthenticated, dragTask)
 
 export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
@@ -194,7 +194,7 @@ export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
   }
 }
 
-router.post('/setSubtask', passport.authenticate('local'), setSubtask)
+router.post('/setSubtask', isAuthenticated, setSubtask)
 
 export const setComment = async (req: setCommentReq, res: setCommentRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
@@ -226,4 +226,4 @@ export const setComment = async (req: setCommentReq, res: setCommentRes) => {
   }
 }
 
-router.post('/setComment', passport.authenticate('local'), setComment)
+router.post('/setComment', isAuthenticated, setComment)

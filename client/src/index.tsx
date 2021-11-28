@@ -56,7 +56,7 @@ const Router = () => {
 
   window.onload = async () => {
     try {
-      const loginRes = await APILogin()
+      const loginRes = await APILogin(undefined, undefined, true)
 
       if (loginRes) {
         store.dispatch(loginA(loginRes) as any)

@@ -16,8 +16,8 @@ import {
   removeMemberFromProjectRes
 } from './types'
 import { Request, Response } from 'express'
-import passport from 'passport'
 import { router } from './router'
+import { isAuthenticated } from '../passport'
 
 const generateColumn = (name: string, id: string, isInProgress: boolean) => ({
   id,
@@ -68,7 +68,7 @@ export const createProject = async (
   }
 }
 
-router.post('/createProject', passport.authenticate('local'), createProject)
+router.post('/createProject', isAuthenticated, createProject)
 
 export const editProject = async (req: editProjectReq, res: editProjectRes) => {
   if (req.body.id) {
@@ -89,7 +89,7 @@ export const editProject = async (req: editProjectReq, res: editProjectRes) => {
   }
 }
 
-router.post('/editProject', passport.authenticate('local'), editProject)
+router.post('/editProject', isAuthenticated, editProject)
 
 export const deleteProject = async (
   req: deleteProjectReq,
@@ -116,7 +116,7 @@ export const deleteProject = async (
   }
 }
 
-router.post('/deleteProject', passport.authenticate('local'), deleteProject)
+router.post('/deleteProject', isAuthenticated, deleteProject)
 
 export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
   const id = req.body.userId
@@ -143,7 +143,7 @@ export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
   }
 }
 
-router.post('/joinProject', passport.authenticate('local'), joinProject)
+router.post('/joinProject', isAuthenticated, joinProject)
 
 export const leaveProject = async (
   req: leaveProjectReq,
@@ -174,7 +174,7 @@ export const leaveProject = async (
   }
 }
 
-router.post('/leaveProject', passport.authenticate('local'), leaveProject)
+router.post('/leaveProject', isAuthenticated, leaveProject)
 
 export const kickUserFromProject = async (
   req: removeMemberFromProjectReq,
@@ -218,7 +218,7 @@ export const kickUserFromProject = async (
   }
 }
 
-router.post('/kickUser', passport.authenticate('local'), kickUserFromProject)
+router.post('/kickUser', isAuthenticated, kickUserFromProject)
 
 export const getProjectById = async (req: Request, res: Response) => {
   const proj = await ProjectModel.findOne({ id: req.body.id })
@@ -230,4 +230,4 @@ export const getProjectById = async (req: Request, res: Response) => {
   }
 }
 
-router.get('/getProjectById', passport.authenticate('local'), getProjectById)
+router.get('/getProjectById', isAuthenticated, getProjectById)
