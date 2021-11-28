@@ -27,16 +27,14 @@ const styles = (theme: Theme) =>
     }
   })
 
-type OwnProps = {
+interface TProps
+  extends ReturnType<typeof mapState>,
+    WithStyles<typeof styles>,
+    RouteComponentProps {
   variant?: 'menu'
   noButton?: true
   onClick?(): void
 }
-
-type TProps = ReturnType<typeof mapState> &
-  WithStyles<typeof styles> &
-  OwnProps &
-  RouteComponentProps
 
 const CProjectSearch = (props: TProps) => {
   const [search, setSearch] = useState('')
@@ -45,7 +43,7 @@ const CProjectSearch = (props: TProps) => {
 
   let projects = [...Object.values(props.projects)]
 
-  projects = projects.filter(project => {
+  projects = projects.filter((project) => {
     const myString: string = formalize(project.name)
     const searchInput = formalize(search)
 
@@ -53,7 +51,14 @@ const CProjectSearch = (props: TProps) => {
   })
 
   return (
-    <div style={{ maxWidth: 1000, marginLeft: 'auto', marginRight: 'auto', minWidth: 280 }}>
+    <div
+      style={{
+        maxWidth: 1000,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        minWidth: 280
+      }}
+    >
       {props.variant !== 'menu' && (
         <Typography align="center" style={{ marginBottom: 10 }} variant="h4">
           Projects
@@ -66,7 +71,7 @@ const CProjectSearch = (props: TProps) => {
         label="Filter by Name or Category"
         variant={props.variant === 'menu' ? ('standard' as any) : 'outlined'}
         value={search}
-        onChange={e => setSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
       />
       <List
         className={classes.list}

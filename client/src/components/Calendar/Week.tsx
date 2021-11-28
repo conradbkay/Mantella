@@ -10,9 +10,12 @@ import { WeekControls } from './WeekControls'
 import { differenceInCalendarDays } from 'date-fns'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 
-type TProps = ReturnType<typeof mapState> &
-  typeof actionCreators &
-  WithStyles<typeof styles>
+type ActionCreators = typeof actionCreators
+
+interface TProps
+  extends ReturnType<typeof mapState>,
+    ActionCreators,
+    WithStyles<typeof styles> {}
 
 /** Gets the day behind the passed date, the passed date, and the 5 dates after passed date */
 const getDays = (start: Date): Date[] => {

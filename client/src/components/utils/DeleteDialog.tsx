@@ -15,9 +15,7 @@ import {
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 
-type TProps = OwnProps & WithStyles<typeof styles>
-
-interface OwnProps {
+interface Props extends WithStyles<typeof styles> {
   id: string
   name: 'Project' | 'Column' | 'Content'
   inputName?: string
@@ -35,7 +33,7 @@ const styles = (theme: Theme) =>
     }
   })
 
-const CDeleteColumnDialog = (props: TProps) => {
+const DeleteColumnDialogComponent = (props: Props) => {
   const [confirm, setConfirm] = React.useState('')
 
   const onSubmit = () => {
@@ -66,7 +64,7 @@ const CDeleteColumnDialog = (props: TProps) => {
             style={{ margin: 4, marginBottom: 20 }}
             fullWidth
             value={confirm}
-            onChange={e => setConfirm(e.target.value)}
+            onChange={(e) => setConfirm(e.target.value)}
             label={`Please type in the name of the ${name} to confirm.`}
           />
         )}
@@ -93,4 +91,4 @@ const CDeleteColumnDialog = (props: TProps) => {
   )
 }
 
-export const DeleteDialog = withStyles(styles)(CDeleteColumnDialog)
+export const DeleteDialog = withStyles(styles)(DeleteColumnDialogComponent)

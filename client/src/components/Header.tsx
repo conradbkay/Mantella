@@ -111,11 +111,12 @@ const styles = (theme: Theme) =>
     iconButton: {}
   })
 
-type TProps = WithStyles<typeof styles> &
-  RouteComponentProps &
-  ReturnType<typeof mapState>
+interface Props
+  extends WithStyles<typeof styles>,
+    RouteComponentProps,
+    ReturnType<typeof mapState> {}
 
-const Topbar = (props: TProps) => {
+const Topbar = (props: Props) => {
   const [drawer, setDrawer] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
 

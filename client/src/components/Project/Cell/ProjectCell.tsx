@@ -23,6 +23,48 @@ interface Props {
   confirmEditingList: () => void
 }
 
+const getCellTasks = (
+  tasks: TTask[],
+  taskIds: string[],
+  progress: 0 | 1 | 2
+): TTask[] => {
+  const listTasks = taskIds.map((taskId) => tasks[id(tasks, taskId)])
+
+  const cellTasks = listTasks.filter((task) => {
+    return task.progress === progress
+  })
+  return cellTasks
+}
+
+const getCellStyles = ({
+  project,
+  list,
+  progress,
+  isCollapsed
+}: {
+  project: TProject
+  list: TList
+  progress: number
+  isCollapsed: boolean
+}): CSSProperties => {
+  const isLastColumn = progress === 2
+  const isFirstColumn = progress === 0
+  const isFinalRow =
+    project.lists.findIndex((projList) => projList.id === list.id) ===
+    project.lists.length - 1
+  const borderColor = '#aebacc' // light grey
+  return {
+    borderTop: '1px solid ' + borderColor,
+    borderRight: `1px ${isLastColumn ? 'solid' : 'dashed'} ${borderColor}`,
+    borderBottom: isFinalRow ? '1px solid ' + borderColor : undefined,
+    borderLeft: isFirstColumn ? '1px solid ' + borderColor : undefined,
+    width: '100%',
+    padding: isCollapsed ? '0px 8px' : 8,
+    maxHeight: isCollapsed ? 100 : '60vh',
+    overflowY: 'auto'
+  }
+}
+
 export const ProjectCell = ({
   project,
   list,
@@ -40,45 +82,13 @@ export const ProjectCell = ({
   const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
   const [deletingList, setDeletingList] = useState(false)
 
-  const getCellTasks = (
-    tasks: TTask[],
-    taskIds: string[],
-    progress: 0 | 1 | 2
-  ): TTask[] => {
-    const listTasks = taskIds.map((taskId) => tasks[id(tasks, taskId)])
-
-    const cellTasks = listTasks.filter((task) => {
-      return task.progress === progress
-    })
-    return cellTasks
-  }
-
-  const getCellStyles = (): CSSProperties => {
-    const isLastColumn = progress === 2
-    const isFirstColumn = progress === 0
-    const isFinalRow =
-      project.lists.findIndex((projList) => projList.id === list.id) ===
-      project.lists.length - 1
-    const borderColor = '#aebacc' // light grey
-    return {
-      borderTop: '1px solid ' + borderColor,
-      borderRight: `1px ${isLastColumn ? 'solid' : 'dashed'} ${borderColor}`,
-      borderBottom: isFinalRow ? '1px solid ' + borderColor : undefined,
-      borderLeft: isFirstColumn ? '1px solid ' + borderColor : undefined,
-      width: '100%',
-      padding: isCollapsed ? '0px 8px' : 8,
-      maxHeight: isCollapsed ? 100 : '60vh',
-      overflowY: 'auto'
-    }
-  }
-
   let tasks = getCellTasks(project.tasks, list.taskIds, progress)
   // TODO: For now tasks cannot be dragged if tasks are filtered out
   const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
   const isCollapsed = collapsedLists.includes(list.id)
 
   return (
-    <td style={getCellStyles()}>
+    <td style={getCellStyles({ project, isCollapsed, list, progress })}>
       {progress === 0 && (
         <div style={{ display: 'flex', margin: 4 }}>
           {isCollapsed && (

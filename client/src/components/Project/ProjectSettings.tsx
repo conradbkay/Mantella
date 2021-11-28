@@ -16,12 +16,14 @@ import { setProjectA } from '../../store/actions/project'
 import { Delete } from '@material-ui/icons'
 import { openSnackbarA } from '../../store/actions/snackbar'
 
-type TProps = {
+type ActionCreators = typeof actionCreators
+
+interface Props extends ActionCreators {
   onClose: () => void
   project: TProject
-} & typeof actionCreators
+}
 
-const CProjectSettings = (props: TProps) => {
+const CProjectSettings = (props: Props) => {
   const [hasClicked, setClicked] = React.useState(false)
 
   const deleteProject = () => {

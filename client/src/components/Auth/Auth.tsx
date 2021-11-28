@@ -33,13 +33,13 @@ const SocialButton = (props: SocialButtonProps) => {
   )
 }
 
-type OwnProps = {
+type ActionCreators = typeof actionCreators
+
+interface Props extends WithStyles<typeof formStyles>, ActionCreators {
   authType: 'Register' | 'Login'
 }
-// I <3 Mantella
-type TProps = WithStyles<typeof formStyles> & typeof actionCreators & OwnProps
 
-const Auth = ({ authType, openSnackbar, classes, register, login }: TProps) => {
+const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmText, setConfirmText] = useState('')

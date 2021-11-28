@@ -31,7 +31,9 @@ type OwnProps = {
   listId: string
 }
 
-type TProps = OwnProps & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface TProps extends OwnProps, ActionCreators {}
 
 export const CreateTask = connect(
   null,

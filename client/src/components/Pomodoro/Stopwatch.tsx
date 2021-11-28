@@ -12,11 +12,13 @@ import { Transition } from 'react-spring/renderprops'
 import { centerChildren } from '../styles/utils'
 import { PlayArrow, Pause } from '@material-ui/icons'
 
-type TProps = ReturnType<typeof mapState> & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface Props extends ReturnType<typeof mapState>, ActionCreators {}
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
-const CStopwatch = (props: TProps) => {
+const CStopwatch = (props: Props) => {
   useEffect(() => {
     clearInterval(interval)
 

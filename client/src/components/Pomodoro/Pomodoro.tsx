@@ -40,15 +40,16 @@ const styles = (theme: Theme) =>
       color: theme.palette.grey[500]
     }
   })
-// i do not
-interface OwnProps {
+
+type ActionCreators = typeof actionCreators
+
+interface TProps
+  extends ReturnType<typeof mapState>,
+    ActionCreators,
+    WithStyles<typeof styles> {
   open: boolean
   stateFunc(next: boolean): void
 }
-type TProps = ReturnType<typeof mapState> &
-  typeof actionCreators &
-  OwnProps &
-  WithStyles<typeof styles>
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 

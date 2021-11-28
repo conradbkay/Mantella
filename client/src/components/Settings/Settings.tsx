@@ -27,7 +27,9 @@ const styles = (theme: Theme) =>
     }
   })
 
-type TProps = WithStyles<typeof styles> & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface TProps extends WithStyles<typeof styles>, ActionCreators {}
 
 const CSettings = (props: TProps) => {
   const { classes } = props

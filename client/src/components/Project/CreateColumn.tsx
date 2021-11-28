@@ -21,14 +21,12 @@ import { TProject } from '../../types/project'
 import { useState } from 'react'
 import uuid from 'uuid'
 
-interface OwnProps {
+type ActionCreators = typeof actionCreators
+
+interface Props extends ActionCreators, WithStyles<typeof styles> {
   project: TProject
   onClose(): void
 }
-
-type CreateColumnProps = typeof actionCreators &
-  OwnProps &
-  WithStyles<typeof styles>
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -40,7 +38,7 @@ const styles = (theme: Theme) =>
     }
   })
 
-const CCreateColumn = (props: CreateColumnProps) => {
+const CCreateColumn = (props: Props) => {
   const { project, onClose, classes } = props
 
   const [name, setName] = useState('')

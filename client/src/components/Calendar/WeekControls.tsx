@@ -26,14 +26,6 @@ const styles = (theme: Theme) =>
     }
   })
 
-type OwnProps = {
-  projects: TProject[]
-  toggleProject: (id: string[]) => void
-  currIds: string[]
-  startDay: Date
-  setDate: (newDay: Date) => void
-}
-
 const boxStyle: CSSProperties = {
   alignItems: 'center',
   flex: 1,
@@ -41,9 +33,15 @@ const boxStyle: CSSProperties = {
   justifyContent: 'center'
 }
 
-type TProps = OwnProps & WithStyles<typeof styles>
+interface Props extends WithStyles<typeof styles> {
+  projects: TProject[]
+  toggleProject: (id: string[]) => void
+  currIds: string[]
+  startDay: Date
+  setDate: (newDay: Date) => void
+}
 
-const CWeekControls = (props: TProps) => {
+const CWeekControls = (props: Props) => {
   const { projects, toggleProject, currIds } = props
 
   console.log(props)

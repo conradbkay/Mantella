@@ -45,10 +45,21 @@ const styles = (theme: Theme) =>
     }
   })
 
-type TProps = WithStyles<typeof styles> & { login: typeof loginA }
+const actionCreators = {
+  login: loginA
+}
+
+type ActionCreators = typeof actionCreators
+
+interface Props extends WithStyles<typeof styles>, ActionCreators {
+  showLinkedIn?: boolean
+}
 
 export const About = withStyles(styles)(
-  connect(null, { login: loginA })((props: TProps) => {
+  connect(
+    null,
+    actionCreators
+  )((props: Props) => {
     const { classes } = props
 
     const loginAsGuest = async () => {
@@ -91,29 +102,33 @@ export const About = withStyles(styles)(
           </div>
         </div>
         <div style={{ margin: '20px 0' }}>
-          {/*<Typography variant="h4" align="center" gutterBottom>
-            The Team
-          </Typography>
-          <div className={classes.kayLink}>
-            <div
-              className="LI-profile-badge"
-              data-version="v1"
-              data-size="large"
-              data-locale="en_US"
-              data-type="vertical"
-              data-theme="dark"
-              data-vanity="austin-kay-4a823b139"
-            >
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                className="LI-simple-link"
-                href="https://www.linkedin.com/in/austin-kay-4a823b139?trk=profile-badge"
-              >
-                Austin Kay - Builder
-              </a>
-            </div>
-              </div> */}
+          {props.showLinkedIn && (
+            <>
+              <Typography variant="h4" align="center" gutterBottom>
+                The Team
+              </Typography>
+              <div className={classes.kayLink}>
+                <div
+                  className="LI-profile-badge"
+                  data-version="v1"
+                  data-size="large"
+                  data-locale="en_US"
+                  data-type="vertical"
+                  data-theme="dark"
+                  data-vanity="austin-kay-4a823b139"
+                >
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="LI-simple-link"
+                    href="https://www.linkedin.com/in/austin-kay-4a823b139?trk=profile-badge"
+                  >
+                    Austin Kay - Builder
+                  </a>
+                </div>
+              </div>{' '}
+            </>
+          )}
           <Typography style={{ marginTop: 20 }} variant="h4" align="center">
             Features
           </Typography>

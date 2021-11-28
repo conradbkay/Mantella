@@ -1,6 +1,4 @@
-import { TSnackbar } from '../types/state'
-
-import { TState } from '../types/state'
+import { TSnackbar, TState } from '../types/state'
 
 export const defaultSnackbar: TSnackbar = {
   open: false,

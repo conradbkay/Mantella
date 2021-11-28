@@ -7,21 +7,21 @@ const mapState = (state: TState) => ({
   user: state.user
 })
 
-type TProps = ReturnType<typeof mapState> & {
+interface TProps extends ReturnType<typeof mapState>, RouteProps {
   component: any
   componentProps: any
-} & RouteProps
+}
 
 export const PrivateRoute = connect(mapState)(
   ({ component: PropComponent, componentProps, user, ...rest }: TProps) => {
     return (
       <Route
         {...rest}
-        render={props =>
+        render={(props) =>
           user !== null ? (
             <PropComponent
               params={props.match.params}
-              {...(componentProps as (typeof PropComponent)['props'])}
+              {...(componentProps as typeof PropComponent['props'])}
             />
           ) : (
             <Redirect to="/login" />
@@ -36,7 +36,7 @@ export const PublicOnlyRoute = connect(mapState)(
     return (
       <Route
         {...rest}
-        render={props =>
+        render={(props) =>
           user === null ? (
             <PropComponent
               {...componentProps}

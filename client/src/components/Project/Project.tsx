@@ -44,12 +44,6 @@ import { cloneDeep } from 'lodash'
  * @todo add a filter menu with color, column, due date, label
  */
 
-type OwnProps = {
-  params: {
-    id: string
-  }
-}
-
 export const input: CSSProperties = {
   overflow: 'hiddejn',
   whiteSpace: 'nowrap',
@@ -84,10 +78,19 @@ const styles = (theme: Theme) =>
     input: input
   })
 
-type TProps = ReturnType<typeof mapState> &
-  typeof actionCreators &
-  OwnProps &
-  WithStyles<typeof styles>
+type ActionCreators = typeof actionCreators
+
+type OwnProps = {
+  params: {
+    id: string
+  }
+}
+
+interface TProps
+  extends ReturnType<typeof mapState>,
+    ActionCreators,
+    OwnProps,
+    WithStyles<typeof styles> {}
 
 export const getMobile = (window: Window) => {
   return window.innerWidth <= 1000
@@ -335,7 +338,7 @@ const CProject = (props: TProps) => {
                         collapsedLists={collapsedLists}
                         openFunc={(tId: string) => setEditingTaskId(tId)}
                         key={i}
-                        progress={progress}
+                        progress={progress as 0 | 1 | 2}
                         list={list}
                         project={project}
                       />

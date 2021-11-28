@@ -57,9 +57,11 @@ const styles = (theme: Theme) =>
     }
   })
 
-type TProps = WithStyles<typeof styles> &
-  ReturnType<typeof mapState> &
-  typeof actionCreators
+type ActionCreators = typeof actionCreators
+interface TProps
+  extends WithStyles<typeof styles>,
+    ReturnType<typeof mapState>,
+    ActionCreators {}
 
 const SnackbarComponent = (props: TProps) => {
   // Find what Icon to use for snackbar by variant

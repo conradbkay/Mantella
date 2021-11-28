@@ -6,9 +6,11 @@ import { Button } from '@material-ui/core'
 import { Add, Remove } from '@material-ui/icons'
 import { toDaysHHMMSS } from '../../utils/utilities'
 
-type TProps = ReturnType<typeof mapState> & typeof actionCreators
+type ActionCreators = typeof actionCreators
 
-const CControls = (props: TProps) => {
+interface Props extends ReturnType<typeof mapState>, ActionCreators {}
+
+const CControls = (props: Props) => {
   const { workTime, breakTime } = props
 
   return (

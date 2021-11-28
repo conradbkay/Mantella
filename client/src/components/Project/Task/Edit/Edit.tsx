@@ -45,7 +45,12 @@ type OwnProps = {
   projectId: string
 }
 
-type TProps = OwnProps & ReturnType<typeof mapState> & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface TProps
+  extends OwnProps,
+    ReturnType<typeof mapState>,
+    ActionCreators {}
 
 export const EditTaskModal = connect(
   mapState,

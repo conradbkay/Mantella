@@ -37,14 +37,14 @@ const styles = (theme: Theme) =>
     toolbar: theme.mixins.toolbar
   })
 
-type TProps = {
+interface Props extends WithStyles<typeof styles> {
   filterData: TFilterData
   open: boolean
   changeFilter: (newFilter: TFilterData) => void
   handleClose: () => void
-} & WithStyles<typeof styles>
+}
 
-const CFilterTasks = (props: TProps) => {
+const FilterTasksComponent = (props: Props) => {
   const [custom, setCustom] = React.useState(false)
   const { open, classes, handleClose, filterData, changeFilter } = props
   return (
@@ -219,4 +219,4 @@ const CFilterTasks = (props: TProps) => {
   )
 }
 
-export const FilterTasks = withStyles(styles)(CFilterTasks)
+export const FilterTasks = withStyles(styles)(FilterTasksComponent)

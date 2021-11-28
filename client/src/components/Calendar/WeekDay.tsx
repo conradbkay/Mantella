@@ -3,17 +3,10 @@ import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { getDate, getDay, isPast, addHours } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
-// import { TaskModal } from '../TaskModal/TaskModal'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import React, { useState } from 'react'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
-
-type OwnProps = {
-  day: Date
-  index: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  filteringProjects: string[]
-}
 
 function sameDay(d1: Date, d2: Date) {
   return (
@@ -27,9 +20,13 @@ const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 const styles = (theme: Theme) => ({})
 
-type TProps = OwnProps & ReturnType<typeof mapState> & WithStyles<typeof styles>
+interface Props extends ReturnType<typeof mapState>, WithStyles<typeof styles> {
+  day: Date
+  index: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  filteringProjects: string[]
+}
 
-const CWeekDay = (props: TProps) => {
+const CWeekDay = (props: Props) => {
   const { day, tasks, index } = props
   const hasPassed = isPast(addHours(day, 20))
   const [editingTaskId, setEditingTaskId] = useState('')
@@ -119,7 +116,7 @@ const CWeekDay = (props: TProps) => {
   )
 }
 
-const mapState = (state: TState, ownProps: OwnProps) => ({
+const mapState = (state: TState) => ({
   tasks: state.projects.reduce((accum, proj) => {
     return [...accum, ...proj.tasks]
   }, []),

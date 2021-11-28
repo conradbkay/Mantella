@@ -148,10 +148,12 @@ const styles = () =>
     }
   })
 
-type TaskProps = OwnProps &
-  ReturnType<typeof mapState> &
-  typeof actionCreators &
-  WithStyles<typeof styles>
+type ActionCreators = typeof actionCreators
+interface TaskProps
+  extends OwnProps,
+    ReturnType<typeof mapState>,
+    ActionCreators,
+    WithStyles<typeof styles> {}
 
 const CBaseTask = (props: TaskProps) => {
   const [showComments, setShowComments] = useState(false)
