@@ -39,6 +39,7 @@ import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
 import { CSSProperties } from '@material-ui/styles'
 import { cloneDeep } from 'lodash'
+import { APIDragTask } from '../../API/task'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -189,6 +190,14 @@ const CProject = (props: TProps) => {
     editProject.tasks[id(editProject.tasks, result.draggableId)].progress =
       parseInt(toProgress, 10)
 
+    APIDragTask({
+      projectId: props.project.id,
+      oldListId: fromListId,
+      newListId: toListId,
+      id: result.draggableId,
+      newProgress: parseInt(toProgress, 10),
+      newIndex: actualIndex
+    })
     props.setProject({ id: props.project.id, newProj: editProject })
 
     return
