@@ -9,3 +9,18 @@ export const APICreateTask = async (
 
   return res.data
 }
+
+export type DragTaskInfo = {
+  projectId: string
+  oldListId: string
+  newListId: string
+  id: string
+  newProgress: number
+  newIndex: number
+}
+
+export const APIDragTask = async (info: DragTaskInfo) => {
+  const res = await axios.post('/dragTask', info)
+  console.log(res.data)
+  return res.data
+}

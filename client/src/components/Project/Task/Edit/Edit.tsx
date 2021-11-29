@@ -24,6 +24,7 @@ import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
 import { TComment, TSubtask } from '../../../../types/project'
+import { APIDragTask, DragTaskInfo } from '../../../../API/task'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -93,9 +94,9 @@ export const EditTaskModal = connect(
     props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
   }
 
-  const dragTask = (taskId: string, info: any) => {
-    // TODO: fix
+  const dragTask = async (info: DragTaskInfo) => {
     props.setProject({ id: project.id, newProj: project })
+    await APIDragTask(info)
   }
 
   return (
@@ -130,12 +131,13 @@ export const EditTaskModal = connect(
                 newIndex = lowest
               }
 
-              dragTask(task.id, {
+              dragTask({
                 oldListId: ownerListId,
                 newListId: listId,
                 newIndex,
                 newProgress: task.progress,
-                projectId: props.projectId
+                projectId: props.projectId,
+                id: task.id
               })
             }
             e.preventDefault()
@@ -189,7 +191,6 @@ export const EditTaskModal = connect(
           <div>
             <TextField
               style={{ margin: '12px 4px' }}
-              required
               variant="outlined"
               color="secondary"
               label="Description"

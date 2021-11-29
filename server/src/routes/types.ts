@@ -152,7 +152,10 @@ export type setSubtaskReq = Req<{
   projId: string
   taskId: string
   subtaskId: string
-  info?: any // TODO
+  info?: {
+    name?: string
+    completed?: boolean
+  }
 }>
 export type setSubtaskRes = Response<{}>
 

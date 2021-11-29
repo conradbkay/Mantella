@@ -11,3 +11,4 @@ server/.env
 # misc
 .DS_Store
 npm-debug.log*
+server/sessions

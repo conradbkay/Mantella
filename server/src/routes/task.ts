@@ -121,14 +121,12 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projectId })
 
   if (proj) {
-    const oldList =
-      proj.lists[
-        proj.lists.findIndex((list) => list.id === req.body.oldListId)
-      ]!
-    const newList =
-      proj.lists[
-        proj.lists.findIndex((list) => list.id === req.body.newListId)
-      ]!
+    const oldListIdx = proj.lists.findIndex(
+      (list) => list.id === req.body.oldListId
+    )
+    const newListIdx = proj.lists.findIndex(
+      (list) => list.id === req.body.newListId
+    )
 
     const task =
       proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === req.body.id)]
@@ -137,16 +135,17 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
       task.progress = req.body.newProgress as 0 | 1 | 2
     }
 
-    oldList.taskIds = oldList.taskIds.filter((taskId) => taskId !== req.body.id)
-    newList.taskIds.splice(req.body.newIndex, 0, req.body.id)
+    proj.lists[oldListIdx].taskIds = proj.lists[oldListIdx].taskIds.filter(
+      (taskId) => taskId !== req.body.id
+    )
+    proj.lists[newListIdx].taskIds.splice(req.body.newIndex, 0, req.body.id)
+
+    proj.markModified('lists') // mongoose does not watch subarrays this deep
 
     const newProj = await proj.save()
 
-    const pure = await newProj.toObject()
-
     res.json({
-      project: pure,
-      task: pure.tasks.find((tsk: any) => tsk.id === req.body.id) as any
+      project: newProj.toObject()
     })
   } else {
     throw new Error('project not defined')
