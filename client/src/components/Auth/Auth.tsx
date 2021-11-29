@@ -19,12 +19,25 @@ import Helmet from 'react-helmet'
 import { registerA, loginA } from '../../store/actions/auth'
 import { APILogin, APIRegister } from '../../API/auth'
 
+const AuthInput = (inputProps: ComponentProps<any>) => {
+  return (
+    <TextField
+      margin="dense"
+      fullWidth
+      required
+      label="Full Name"
+      {...inputProps}
+    />
+  )
+}
+
 const socialProviders = [
   {
     imageUrl:
       'https://cdn4.iconfinder.com/data/icons/new-google-logo-2015/400/new-google-favicon-512.png',
     provider: 'google',
-    appId: 'AIzaSyDaxgICy9wGwo98I3QGFvAy4s1gBbqJmsY'
+    appId:
+      '139302918576-dhtoscrt1uh3kg2s1p54e5rj9c8rus4a.apps.googleusercontent.com'
   },
   {
     imageUrl:
@@ -37,12 +50,6 @@ const socialProviders = [
       'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png',
     provider: 'github',
     appId: '373e2991118f9d8e97b1c8717ec9dd863df71461'
-  },
-  {
-    imageUrl:
-      'https://cdn0.iconfinder.com/data/icons/most-usable-logos/120/Amazon-512.png',
-    provider: 'amazon',
-    appId: '1d526f19eb4b402d9be7c21ed04c55e5'
   }
 ]
 
@@ -57,19 +64,6 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
   const [password, setPassword] = useState('')
   const [confirmText, setConfirmText] = useState('')
   const [username, setUsername] = useState('')
-
-  const AuthInput = (inputProps: ComponentProps<any>) => {
-    return (
-      <TextField
-        margin="dense"
-        fullWidth
-        required
-        value={username}
-        label="Full Name"
-        {...inputProps}
-      />
-    )
-  }
 
   return (
     <div style={{ margin: 20 }}>
@@ -182,15 +176,16 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
               style={{ marginTop: 15 }}
               alignContent="space-between"
             >
-              {socialProviders.map((media, i) => (
-                <IconButton onClick={() => null}>
-                  <img
-                    src={media.imageUrl}
-                    style={{ height: 50, width: 50 }}
-                    alt=""
-                  />
-                </IconButton>
-              ))}
+              {false &&
+                socialProviders.map((media, i) => (
+                  <IconButton onClick={() => null}>
+                    <img
+                      src={media.imageUrl}
+                      style={{ height: 50, width: 50 }}
+                      alt=""
+                    />
+                  </IconButton>
+                ))}
             </Grid>
           </Paper>
         </form>

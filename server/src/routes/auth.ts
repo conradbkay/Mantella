@@ -76,9 +76,11 @@ export const register = async (req: registerReq, res: registerRes) => {
 
 router.post('/register', register)
 
+// TODO: login doesn't work
 export const logout = async (req: Request, res: Response) => {
-  req.logout()
-  res.redirect('/')
+  req.session!.destroy((err) => {
+    res.redirect('/')
+  })
 }
 
 router.post('/logout', logout)

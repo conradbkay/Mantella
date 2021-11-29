@@ -10,6 +10,7 @@ import { deserializeUser, passportStrategy, serializeUser } from './passport'
 import { Strategy } from 'passport-local'
 import session from 'express-session'
 import uuid from 'uuid'
+const FileStore = require('session-file-store')(session)
 
 require('dotenv').config() // Injects .env variables into process.env object
 const app: Express = express()
@@ -29,12 +30,13 @@ app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
 app.use(
   session({
-    secret: process.env.SECRET || 'test',
+    secret: process.env.PRIVATE || 'test',
     resave: true,
     saveUninitialized: true,
     genid: () => {
       return uuid()
-    }
+    },
+    store: new FileStore({})
   })
 )
 

@@ -5,12 +5,12 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 import app from '../app'
 import { editProjectReqObj, loginReqObj, registerReqObj } from './types'
 
-// ids must be mocked to access
+// ids must be mocked for snapshot testing
 jest.mock('uuid', () => {
   return () => 'MOCK_ID'
 })
 
-// TODO: for now
+// users will always be authenticated
 jest.mock('passport')
 ;(passport.authenticate as any).mockImplementation(
   (type: any) => (req: any, res: any, next: any) => next()

@@ -36,10 +36,6 @@ import { connect } from 'react-redux'
 import { TState } from '../types/state'
 import { ProjectFinder } from './ProjectFinder/ProjectFinder'
 
-/**
- * @todo Refresh changing tab is kinda slow
- */
-
 const noAuthItems = [
   {
     label: 'About',
