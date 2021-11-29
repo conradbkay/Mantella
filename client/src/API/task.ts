@@ -21,6 +21,5 @@ export type DragTaskInfo = {
 
 export const APIDragTask = async (info: DragTaskInfo) => {
   const res = await axios.post('/dragTask', info)
-  console.log(res.data)
   return res.data
 }
