@@ -141,6 +141,7 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
     proj.lists[newListIdx].taskIds.splice(req.body.newIndex, 0, req.body.id)
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
+    proj.markModified('tasks')
 
     const newProj = await proj.save()
 

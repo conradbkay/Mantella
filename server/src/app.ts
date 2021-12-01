@@ -28,6 +28,7 @@ app.use(morgan(':method :status :response-time ms'))
 app.use(express.json())
 app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
+const DAY_OF_SECONDS = 60 * 60 * 24
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',
@@ -36,7 +37,7 @@ app.use(
     genid: () => {
       return uuid()
     },
-    store: new FileStore({})
+    store: new FileStore({ ttl: DAY_OF_SECONDS })
   })
 )
 

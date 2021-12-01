@@ -35,8 +35,6 @@ export const loginA = (user: any) => {
       const authUser = transformUser(user)
 
       dispatch({ type: 'LOGIN', user: authUser })
-      dispatch(openSnackbarA('Logged in Successfully', 'success'))
-
       dispatch(initializeAuthState(user))
     } else {
       dispatch(openSnackbarA('Could not Login', 'error'))

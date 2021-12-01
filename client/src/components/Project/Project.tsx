@@ -38,9 +38,8 @@ import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
 import { CSSProperties } from '@material-ui/styles'
-import { cloneDeep } from 'lodash'
 import { APIDragTask } from '../../API/task'
-
+import { onDragEnd } from '../../utils/dragTask'
 /**
  * @todo add a filter menu with color, column, due date, label
  */
@@ -123,84 +122,20 @@ const CProject = (props: TProps) => {
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return
+  const dragTask = (result: DropResult) => {
+    const val = onDragEnd(result, project)
+    if (val) {
+      const { editProject, fromListId, toListId, newColumn, actualIndex } = val
+      APIDragTask({
+        projectId: props.project.id,
+        oldListId: fromListId,
+        newListId: toListId,
+        id: result.draggableId,
+        newProgress: newColumn,
+        newIndex: actualIndex
+      })
+      props.setProject({ id: props.project.id, newProj: editProject })
     }
-    if (
-      result.source.droppableId === result.destination.droppableId &&
-      result.source.index === result.destination.index
-    ) {
-      return
-    }
-
-    const [[fromListId], [toListId, toProgress]] = [
-      result.source.droppableId.split('DIVIDER'),
-      result.destination.droppableId.split('DIVIDER')
-    ]
-
-    const editProject = cloneDeep(props.project)
-
-    const fromList = editProject.lists[id(editProject.lists, fromListId)]
-
-    const toList = editProject.lists[id(editProject.lists, toListId)]
-
-    // react-beautiful-dnd will not give accurate index, because each droppable has only the tasks with the same progress/column
-    let actualIndex =
-      result.destination.index +
-      props.project.tasks.reduce((accum, task) => {
-        if (
-          task.progress < parseInt(toProgress, 10) &&
-          toList.taskIds.includes(task.id)
-        ) {
-          return accum + 1
-        }
-        return accum
-      }, 0)
-
-    if (
-      fromList.id === toList.id &&
-      props.project.tasks[id(props.project.tasks, result.draggableId)]
-        .progress !== parseInt(toProgress, 10)
-    ) {
-      const addingLater =
-        actualIndex >
-        fromList.taskIds.findIndex(
-          (taskId: string) => taskId === result.draggableId
-        )
-
-      if (addingLater) {
-        actualIndex -= 1
-      }
-    }
-
-    if (actualIndex < 0) {
-      actualIndex = 0
-    }
-
-    // remove old taskId instance
-    fromList.taskIds = fromList.taskIds.filter(
-      (taskId) => taskId !== result.draggableId
-    )
-
-    // add new taskId instance
-    toList.taskIds.splice(actualIndex, 0, result.draggableId)
-
-    // change tasks column
-    editProject.tasks[id(editProject.tasks, result.draggableId)].progress =
-      parseInt(toProgress, 10)
-
-    APIDragTask({
-      projectId: props.project.id,
-      oldListId: fromListId,
-      newListId: toListId,
-      id: result.draggableId,
-      newProgress: parseInt(toProgress, 10),
-      newIndex: actualIndex
-    })
-    props.setProject({ id: props.project.id, newProj: editProject })
-
-    return
   }
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
@@ -275,7 +210,7 @@ const CProject = (props: TProps) => {
             minHeight: 'calc(100vh - 328px)'
           }}
         >
-          <DragDropContext onDragEnd={onDragEnd}>
+          <DragDropContext onDragEnd={dragTask}>
             <table
               style={{
                 tableLayout: 'fixed',
