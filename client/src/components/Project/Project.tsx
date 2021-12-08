@@ -40,12 +40,13 @@ import { ProjStats } from './Statistics'
 import { CSSProperties } from '@material-ui/styles'
 import { APIDragTask } from '../../API/task'
 import { onDragEnd } from '../../utils/dragTask'
+
 /**
  * @todo add a filter menu with color, column, due date, label
  */
 
 export const input: CSSProperties = {
-  overflow: 'hiddejn',
+  overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   minWidth: '20%',
@@ -125,14 +126,14 @@ const CProject = (props: TProps) => {
   const dragTask = (result: DropResult) => {
     const val = onDragEnd(result, project)
     if (val) {
-      const { editProject, fromListId, toListId, newColumn, actualIndex } = val
+      const { editProject, fromListId, toListId, newColumn, realIndex } = val
       APIDragTask({
         projectId: props.project.id,
         oldListId: fromListId,
         newListId: toListId,
         id: result.draggableId,
         newProgress: newColumn,
-        newIndex: actualIndex
+        newIndex: realIndex
       })
       props.setProject({ id: props.project.id, newProj: editProject })
     }

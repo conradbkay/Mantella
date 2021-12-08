@@ -174,7 +174,7 @@ export const ProjectCell = ({
       )}
       <Droppable
         isDropDisabled={isCollapsed}
-        droppableId={`${list.id}DIVIDER${progress}` /* can only be a string*/}
+        droppableId={`${list.id}|${progress}` /* can only be a string*/}
       >
         {(dropProvided, dropSnapshot) => {
           return (

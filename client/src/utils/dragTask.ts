@@ -1,7 +1,45 @@
 import { cloneDeep } from 'lodash'
 import { DropResult } from 'react-beautiful-dnd'
-import { TProject } from '../types/project'
+import { TList, TProject } from '../types/project'
 import { id } from './utilities'
+
+const getRealIndex = (
+  index: number,
+  project: TProject,
+  newProgress: number,
+  newListIds: string[],
+  draggingTaskId: string,
+  fromList: TList,
+  toListId: string
+): number => {
+  const tasksAtNewList = project.tasks.filter((task) =>
+    newListIds.includes(task.id)
+  )
+
+  const newListTasksWithLowerColumn = tasksAtNewList.filter(
+    (task) => task.progress < newProgress
+  )
+
+  index += newListTasksWithLowerColumn.length
+
+  const draggingToSameList = fromList.id === toListId
+  const draggingTask = project.tasks[id(project.tasks, draggingTaskId)]
+  const draggingToSameColumn = draggingTask.progress === newProgress
+
+  if (draggingToSameList && !draggingToSameColumn) {
+    const draggingTaskCurIndex = fromList.taskIds.findIndex(
+      (taskId: string) => taskId === draggingTaskId
+    )
+
+    const addingLater = index > draggingTaskCurIndex
+
+    if (addingLater) {
+      index = Math.max(0, index - 1)
+    }
+  }
+
+  return index
+}
 
 export const onDragEnd = (
   { destination, source, draggableId }: DropResult,
@@ -17,10 +55,11 @@ export const onDragEnd = (
     return null
   }
 
-  const [[fromListId], [toListId, toProgress]] = [
-    source.droppableId.split('DIVIDER'),
-    destination.droppableId.split('DIVIDER')
+  const [[fromListId], [toListId, newProgressStr]] = [
+    source.droppableId.split('|'),
+    destination.droppableId.split('|')
   ]
+  const newProgress = parseInt(newProgressStr, 10)
 
   const editProject = cloneDeep(project)
 
@@ -29,42 +68,27 @@ export const onDragEnd = (
     editProject.lists[id(editProject.lists, toListId)]
   ]
 
-  // react-beautiful-dnd will not give accurate index, because each droppable has only the tasks with the same progress/column
-  let actualIndex =
-    destination.index +
-    project.tasks.reduce((accum, task) => {
-      if (
-        task.progress < parseInt(toProgress, 10) &&
-        toList.taskIds.includes(task.id)
-      ) {
-        return accum + 1
-      }
-      return accum
-    }, 0)
-
-  if (
-    fromList.id === toList.id &&
-    project.tasks[id(project.tasks, draggableId)].progress !==
-      parseInt(toProgress, 10)
-  ) {
-    const addingLater =
-      actualIndex >
-      fromList.taskIds.findIndex((taskId: string) => taskId === draggableId)
-
-    if (addingLater) {
-      actualIndex -= 1
-    }
-  }
-
-  if (actualIndex < 0) {
-    actualIndex = 0
-  }
+  // react-beautiful-dnd will not give an accurate index, because each droppable has only the tasks with the same progress and column combination
+  let realIndex = getRealIndex(
+    destination.index,
+    project,
+    newProgress,
+    toList.taskIds,
+    draggableId,
+    fromList,
+    toList.id
+  )
 
   fromList.taskIds = fromList.taskIds.filter((taskId) => taskId !== draggableId)
-  toList.taskIds.splice(actualIndex, 0, draggableId)
+  toList.taskIds.splice(realIndex, 0, draggableId)
 
-  const newColumn = parseInt(toProgress, 10)
-  editProject.tasks[id(editProject.tasks, draggableId)].progress = newColumn
+  editProject.tasks[id(editProject.tasks, draggableId)].progress = newProgress
 
-  return { editProject, fromListId, toListId, actualIndex, newColumn }
+  return {
+    editProject,
+    fromListId,
+    toListId,
+    realIndex,
+    newColumn: newProgress
+  }
 }
