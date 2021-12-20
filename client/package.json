@@ -84,10 +84,7 @@
     "@types/react-widgets-moment": "^4.0.1",
     "@types/redux-immutable-state-invariant": "^2.1.1",
     "@types/uuid": "^3.4.9",
-    "gh-pages": "^2.2.0",
-    "tslint": "^5.20.1",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-react": "^3.6.0"
+    "gh-pages": "^2.2.0"
   },
   "browserslist": {
     "production": [
