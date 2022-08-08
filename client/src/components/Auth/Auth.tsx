@@ -1,4 +1,4 @@
-import React, { ComponentProps, useState } from 'react'
+import { ComponentProps, useState } from 'react'
 import { connect } from 'react-redux'
 import {
   Paper,
@@ -153,7 +153,11 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
                 onChange={(e: any) => setConfirmText(e.target.value)}
               />
             )}
-            <Grid container justify="center" style={{ marginTop: '10px' }}>
+            <Grid
+              container
+              justifyContent="center"
+              style={{ marginTop: '10px' }}
+            >
               <Button
                 variant="contained"
                 color="secondary"

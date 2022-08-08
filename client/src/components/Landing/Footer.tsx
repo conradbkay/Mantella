@@ -1,5 +1,3 @@
-import React from 'react'
-
 import {
   Grid,
   Typography,
@@ -48,12 +46,12 @@ export const AboutFooter = withStyles(styles)(
         alignItems="center"
         alignContent="center"
       >
-        {footers.map(footer => (
+        {footers.map((footer) => (
           <Grid item xs key={footer.title}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               {footer.title}
             </Typography>
-            {footer.description.map(item => (
+            {footer.description.map((item) => (
               <Typography key={item} variant="subtitle1" color="textSecondary">
                 {item}
               </Typography>

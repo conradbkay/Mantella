@@ -4,7 +4,6 @@ import {
   FormControl,
   FormHelperText
 } from '@material-ui/core'
-import React from 'react'
 
 import { colors } from '../../colors'
 import uuidv1 from 'uuid/v1'

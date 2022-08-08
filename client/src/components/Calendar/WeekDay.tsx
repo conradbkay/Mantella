@@ -5,7 +5,7 @@ import { getDate, getDay, isPast, addHours } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
 import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
 
 function sameDay(d1: Date, d2: Date) {

@@ -4,8 +4,7 @@
   "description": "Fully-fledged task manager",
   "main": "./server/src/index.ts",
   "scripts": {
-    "start": "npm run server && npm run client",
-    "server": "npm start --prefix server",
+    "start": "npm start --prefix server",
     "build": "npm i --prefix server && cd client && npm install && npm run build",
     "client": "npm start --prefix client"
   },
@@ -24,6 +23,7 @@
   },
   "homepage": "https://mantella.herokuapp.com",
   "dependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "react-scripts": "^5.0.0"
   }
 }

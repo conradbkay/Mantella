@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "noEmitHelpers": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "lib": [
       "dom",
       "es6",

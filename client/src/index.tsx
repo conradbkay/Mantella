@@ -1,4 +1,4 @@
-import React, { CSSProperties, useState } from 'react'
+import { CSSProperties, useState } from 'react'
 import { render } from 'react-dom'
 import './index.css'
 import { Provider } from 'react-redux'
@@ -6,7 +6,7 @@ import { MuiThemeProvider } from '@material-ui/core/styles'
 import { Switch, Route, HashRouter } from 'react-router-dom'
 
 import { store } from './store/store'
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme } from '@material-ui/core/styles'
 import { Pomodoro } from './components/Pomodoro/Pomodoro'
 import { AuthRender } from './components/Auth/Auth'
 import { CreateProject } from './components/createProject/CreateProject'
@@ -32,7 +32,7 @@ const momentLocalizer = require('react-widgets-moment')
 const secondary = '#0336FF'
 const primary = '#00838f'
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     primary: {
       main: primary

@@ -1,4 +1,3 @@
-import * as React from 'react'
 import {
   Dialog,
   DialogContent,
@@ -14,6 +13,7 @@ import {
   Grid
 } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
+import { useState } from 'react'
 
 interface Props extends WithStyles<typeof styles> {
   id: string
@@ -34,7 +34,7 @@ const styles = (theme: Theme) =>
   })
 
 const DeleteColumnDialogComponent = (props: Props) => {
-  const [confirm, setConfirm] = React.useState('')
+  const [confirm, setConfirm] = useState('')
 
   const onSubmit = () => {
     props.deleteFunc(props.id)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, Fragment } from 'react'
 import withStyles from '@material-ui/core/styles/withStyles'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import MenuIcon from '@material-ui/icons/Menu'
@@ -164,7 +164,7 @@ const Topbar = (props: Props) => {
               <div className={classes.inline}>
                 <Typography variant="h6" color="inherit" noWrap>
                   <Trail
-                    items={'Kanban Brawn'}
+                    items={'Mantella'}
                     from={{ transform: 'translate3d(0,-40px,0)' }}
                     to={{ transform: 'translate3d(0,0px,0)' }}
                   >
@@ -173,7 +173,7 @@ const Topbar = (props: Props) => {
                         <a
                           target="_blank"
                           rel="noreferrer"
-                          href="https://github.com/austin-UW/Mantella"
+                          href="https://github.com/USA-Kay/Mantella"
                           style={{
                             ...trailProps,
                             color: 'black',
@@ -188,7 +188,7 @@ const Topbar = (props: Props) => {
                   </Trail>
                 </Typography>
               </div>
-              <React.Fragment>
+              <Fragment>
                 <div className={classes.iconContainer}>
                   <IconButton
                     onClick={() => setDrawer(true)}
@@ -232,7 +232,7 @@ const Topbar = (props: Props) => {
                     </Tooltip>
                   </>
                 )}
-              </React.Fragment>
+              </Fragment>
             </Grid>
           </Grid>
         </Toolbar>

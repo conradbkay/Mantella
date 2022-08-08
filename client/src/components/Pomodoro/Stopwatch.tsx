@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { toDaysHHMMSS } from '../../utils/utilities'

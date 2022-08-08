@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react'
+import { CSSProperties } from 'react'
 import { TProject } from '../../types/project'
 import {
   Select,

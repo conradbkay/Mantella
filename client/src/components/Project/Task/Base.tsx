@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { TTask, TSubtask } from '../../../types/project'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'

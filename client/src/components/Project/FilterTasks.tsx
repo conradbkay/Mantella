@@ -1,4 +1,3 @@
-import React from 'react'
 import { TFilterData } from './Project'
 import {
   Drawer,
@@ -22,6 +21,7 @@ import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
 import { DateTimePicker } from 'react-widgets'
 import { isArray } from 'lodash'
+import { useState } from 'react'
 
 const styles = (theme: Theme) =>
   createStyles({
@@ -45,7 +45,7 @@ interface Props extends WithStyles<typeof styles> {
 }
 
 const FilterTasksComponent = (props: Props) => {
-  const [custom, setCustom] = React.useState(false)
+  const [custom, setCustom] = useState(false)
   const { open, classes, handleClose, filterData, changeFilter } = props
   return (
     <div>

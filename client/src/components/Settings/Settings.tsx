@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Theme,
   createStyles,
@@ -10,9 +9,9 @@ import {
   Button
 } from '@material-ui/core'
 import { List } from '@material-ui/core'
-
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
+import { APILogout } from '../../API/auth'
 import { openSnackbarA } from '../../store/actions/snackbar'
 
 const styles = (theme: Theme) =>
@@ -52,9 +51,7 @@ const CSettings = (props: TProps) => {
               variant="contained"
               color="primary"
               onClick={() => {
-                location.href = '#/'
-                location.reload()
-                // TODO: actually implement logout
+                APILogout()
               }}
               style={{
                 marginLeft: 'auto'

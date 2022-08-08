@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { WithStyles, Theme, createStyles, withStyles } from '@material-ui/core'
 import { setTaskA } from '../../store/actions/task'
 import { connect } from 'react-redux'

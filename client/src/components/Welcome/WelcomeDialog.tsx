@@ -1,5 +1,5 @@
 /* should greet them well instead of the snackbar */
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Dialog, IconButton, Button } from '@material-ui/core'
 import { Close } from '@material-ui/icons'
 import { store } from '../../store/store'

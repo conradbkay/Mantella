@@ -1,8 +1,8 @@
-const debug = require('debug')
-import * as http from 'http'
-const nodemon = require('nodemon')
 import Server from './app'
 import 'reflect-metadata'
+import http from 'http'
+const debug = require('debug')
+const nodemon = require('nodemon')
 debug('ts-express:server')
 
 Server.set('port', process.env.PORT || 4000)

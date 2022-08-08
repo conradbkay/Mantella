@@ -24,7 +24,7 @@ app.use(
   })
 )
 
-app.use(morgan(':method :status :response-time ms'))
+app.use(morgan(':method :url :status :response-time ms'))
 app.use(express.json())
 app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))

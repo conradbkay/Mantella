@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import {
   withStyles,
@@ -58,7 +58,7 @@ const CPomodoro = (props: TProps) => {
 
   const pomodoro = props.pomodoro
 
-  React.useEffect(() => {
+  useEffect(() => {
     clearInterval(interval)
 
     interval = setInterval(() => {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import {
   WithStyles,
@@ -141,7 +141,7 @@ const CProject = (props: TProps) => {
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
-  React.useEffect(() => {
+  useEffect(() => {
     window.addEventListener('resize', () => {
       setIsMobile(getMobile(window))
       setWindowWidth(window.innerWidth)

@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Paper,
   Table,
@@ -8,6 +7,7 @@ import {
   TableBody
 } from '@material-ui/core'
 import { Check, Close, Traffic } from '@material-ui/icons'
+import { CSSProperties } from 'react'
 
 const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
 const features = [
@@ -32,7 +32,7 @@ const styles = {
     marginRight: 'auto',
     padding: 16,
     paddingBottom: 48
-  } as React.CSSProperties
+  } as CSSProperties
 }
 
 export const FeatureTable = () => (

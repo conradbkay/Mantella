@@ -1,4 +1,4 @@
-import React, { ChangeEvent, CSSProperties, useState } from 'react'
+import { ChangeEvent, CSSProperties, useState } from 'react'
 import { TList, TProject, TTask } from '../../../types/project'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'

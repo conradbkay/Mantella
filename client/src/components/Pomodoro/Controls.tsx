@@ -1,4 +1,3 @@
-import React from 'react'
 import { setLengthA } from '../../store/actions/pomodoro'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'

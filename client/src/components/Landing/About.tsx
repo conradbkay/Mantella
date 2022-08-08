@@ -1,4 +1,3 @@
-import React from 'react'
 import { withStyles, Theme, createStyles } from '@material-ui/core/styles'
 import { Typography, WithStyles, Button } from '@material-ui/core'
 import { FeatureTable } from './FeatureTable'

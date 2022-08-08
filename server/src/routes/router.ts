@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 import { Router } from 'express'
 export const router = Router()
 

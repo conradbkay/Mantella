@@ -1,6 +1,6 @@
 import { Checkbox, IconButton, TextField } from '@material-ui/core'
 import { Delete } from '@material-ui/icons'
-import React from 'react'
+
 import { TSubtask } from '../../../../types/project'
 
 type Props = {

@@ -1,7 +1,6 @@
 import { Route, Redirect, RouteProps } from 'react-router'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import React from 'react'
 
 const mapState = (state: TState) => ({
   user: state.user

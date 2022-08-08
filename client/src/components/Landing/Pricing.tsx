@@ -12,8 +12,6 @@ import {
   Theme
 } from '@material-ui/core'
 
-import React from 'react'
-
 import { Link } from 'react-router-dom'
 import { ButtonProps } from '@material-ui/core/Button'
 
@@ -74,7 +72,7 @@ export const Pricing = withStyles(styles)(
       spacing={1}
       style={{ maxWidth: 1400, marginLeft: 'auto', marginRight: 'auto' }}
     >
-      {tiers.map(tier => (
+      {tiers.map((tier) => (
         <Grid
           item
           key={tier.title}
@@ -99,7 +97,7 @@ export const Pricing = withStyles(styles)(
                   /mo
                 </Typography>
               </div>
-              {tier.description.map(line => (
+              {tier.description.map((line) => (
                 <Typography variant="subtitle1" align="center" key={line}>
                   {line}
                 </Typography>

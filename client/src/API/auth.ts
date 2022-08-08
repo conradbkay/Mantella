@@ -37,3 +37,12 @@ export const APIGuestLogin = async () => {
     console.error(err)
   }
 }
+
+export const APILogout = async () => {
+  try {
+    await axios.post('/logout')
+    location.reload()
+  } catch (err) {
+    console.error(err)
+  }
+}

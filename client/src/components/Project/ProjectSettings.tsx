@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -15,6 +14,7 @@ import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
 import { Delete } from '@material-ui/icons'
 import { openSnackbarA } from '../../store/actions/snackbar'
+import { useState } from 'react'
 
 type ActionCreators = typeof actionCreators
 
@@ -24,7 +24,7 @@ interface Props extends ActionCreators {
 }
 
 const CProjectSettings = (props: Props) => {
-  const [hasClicked, setClicked] = React.useState(false)
+  const [hasClicked, setClicked] = useState(false)
 
   const deleteProject = () => {
     location.hash = '/dashboard'
