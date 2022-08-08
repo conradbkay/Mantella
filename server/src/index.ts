@@ -31,7 +31,9 @@ function onListening(id: any): void {
 }
 
 const master = () => {
-  ;(async () => await connect(process.env.DB_CONNECT as string))()
+  ;(async () => {
+    await connect(process.env.DB_CONNECT as string)
+  })()
 
   process.once('beforeExit', async () => {
     await disconnect()

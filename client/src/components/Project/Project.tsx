@@ -23,7 +23,12 @@ import {
   Create,
   Send
 } from '@material-ui/icons'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult
+} from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { ProjectSettings } from './ProjectSettings'
@@ -42,6 +47,9 @@ import { CSSProperties } from '@material-ui/styles'
 import { APIDragTask } from '../../API/task'
 import { onDragEnd } from '../../utils/dragTask'
 import { ShareProject } from './ShareProject'
+import { HoverableAvatar } from '../utils/HoverableAvatar'
+import axios from 'axios'
+import { setTaskA } from '../../store/actions/task'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -115,6 +123,8 @@ const CProject = (props: TProps) => {
   const [editingList, setEditingList] = useState(['', ''])
   const [stats, setStats] = useState(false)
 
+  const [isDraggingUser, setIsDraggingUser] = useState(false)
+
   if (isMobile) {
   }
 
@@ -126,19 +136,42 @@ const CProject = (props: TProps) => {
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const dragTask = (result: DropResult) => {
-    const val = onDragEnd(result, project)
-    if (val) {
-      const { editProject, fromListId, toListId, newColumn, realIndex } = val
-      APIDragTask({
-        projectId: props.project.id,
-        oldListId: fromListId,
-        newListId: toListId,
-        id: result.draggableId,
-        newProgress: newColumn,
-        newIndex: realIndex
+  const dragUser = async (result: DropResult) => {
+    if (result.combine) {
+      const { data } = await axios.post('/assignUserToTask', {
+        taskId: result.combine!.draggableId,
+        projId: project.id,
+        userId: result.draggableId.slice(4)
       })
-      props.setProject({ id: props.project.id, newProj: editProject })
+
+      props.setTask({
+        id: data.task.id,
+        newTask: data.task,
+        projectId: project.id
+      })
+    }
+    if (isDraggingUser) {
+      setIsDraggingUser(false)
+    }
+  }
+
+  const dragTask = (result: DropResult) => {
+    if (result.draggableId.slice(0, 4) === 'USER') {
+      dragUser(result)
+    } else {
+      const val = onDragEnd(result, project)
+      if (val) {
+        const { editProject, fromListId, toListId, newColumn, realIndex } = val
+        APIDragTask({
+          projectId: props.project.id,
+          oldListId: fromListId,
+          newListId: toListId,
+          id: result.draggableId,
+          newProgress: newColumn,
+          newIndex: realIndex
+        })
+        props.setProject({ id: props.project.id, newProj: editProject })
+      }
     }
   }
 
@@ -173,54 +206,91 @@ const CProject = (props: TProps) => {
         <Helmet>
           <style type="text/css">{` body { background-color: #1d364c; }`}</style>
         </Helmet>
-        <AppBar color="default" className={classes.appbar} position="static">
-          <Toolbar>
-            <input
-              style={{ width: `${windowWidth - 300}px` }}
-              className={classes.input}
-              value={name}
-              onBlur={() =>
-                props.setProject({
-                  id: project.id,
-                  newProj: { ...project, name: name || 'newname' }
-                })
-              }
-              onChange={(e: any) => setName(e.target.value)}
-            />
-            <div style={{ marginLeft: 'auto' }}>
-              <IconButton onClick={() => setFiltering(true)}>
-                <FilterList />
-              </IconButton>
-              <IconButton
-                onClick={() => setSettings(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Settings />
-              </IconButton>
-              <IconButton
-                onClick={() => setStats(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Equalizer />
-              </IconButton>
-              <IconButton
-                onClick={() => setSharing(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Send />
-              </IconButton>
-            </div>
-          </Toolbar>
-        </AppBar>
-        <Paper
-          style={{
-            margin: 20,
-            padding: 20,
-            paddingBottom: 80,
-            minHeight: 'calc(100vh - 328px)'
+        <DragDropContext
+          onDragEnd={dragTask}
+          onDragStart={(initial) => {
+            if (initial.draggableId.slice(0, 4) === 'USER') {
+              setIsDraggingUser(true)
+            }
           }}
         >
-          <DragDropContext onDragEnd={dragTask}>
+          <AppBar color="default" className={classes.appbar} position="static">
+            <Toolbar>
+              <input
+                style={{ width: `${windowWidth - 300}px` }}
+                className={classes.input}
+                value={name}
+                onBlur={() =>
+                  props.setProject({
+                    id: project.id,
+                    newProj: { ...project, name: name || 'newname' }
+                  })
+                }
+                onChange={(e: any) => setName(e.target.value)}
+              />
+              <div style={{ marginLeft: 'auto', display: 'flex' }}>
+                <Droppable droppableId="users">
+                  {(dropProvided, dropSnapshot) => (
+                    <div
+                      {...dropProvided.droppableProps}
+                      ref={dropProvided.innerRef}
+                    >
+                      {project.users.map((user, i) => (
+                        <Draggable
+                          key={user.id}
+                          index={i}
+                          draggableId={'USER' + user.id.toString()}
+                        >
+                          {(prov, snap) => (
+                            <div
+                              ref={prov.innerRef}
+                              {...prov.draggableProps}
+                              {...prov.dragHandleProps}
+                              key={user.id}
+                            >
+                              <HoverableAvatar user={user} />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      <div style={{ visibility: 'hidden', height: 0 }}>
+                        {dropProvided.placeholder}
+                      </div>
+                    </div>
+                  )}
+                </Droppable>
+                <IconButton onClick={() => setFiltering(true)}>
+                  <FilterList />
+                </IconButton>
+                <IconButton
+                  onClick={() => setSettings(true)}
+                  style={{ marginLeft: 8 }}
+                >
+                  <Settings />
+                </IconButton>
+                <IconButton
+                  onClick={() => setStats(true)}
+                  style={{ marginLeft: 8 }}
+                >
+                  <Equalizer />
+                </IconButton>
+                <IconButton
+                  onClick={() => setSharing(true)}
+                  style={{ marginLeft: 8 }}
+                >
+                  <Send />
+                </IconButton>
+              </div>
+            </Toolbar>
+          </AppBar>
+          <Paper
+            style={{
+              margin: 20,
+              padding: 20,
+              paddingBottom: 80,
+              minHeight: 'calc(100vh - 328px)'
+            }}
+          >
             <table
               style={{
                 tableLayout: 'fixed',
@@ -262,6 +332,7 @@ const CProject = (props: TProps) => {
                   >
                     {[0, 1, 2].map((progress, i) => (
                       <ProjectCell
+                        isDraggingUser={isDraggingUser}
                         filter={props.filterData}
                         confirmEditingList={() => editList()}
                         setEditingList={(id) => setEditingList(id)}
@@ -301,22 +372,22 @@ const CProject = (props: TProps) => {
                 ))}
               </TableBody>
             </table>
-          </DragDropContext>
-          {creating && (
-            <CreateTask
-              onClose={() => setCreating('')}
-              project={props.project}
-              listId={props.project.lists[0].id}
-              columnId={creating}
-            />
-          )}
-          {dialogOpen && (
-            <CreateColumn
-              onClose={() => setDialogOpen(false)}
-              project={project}
-            />
-          )}
-        </Paper>
+            {creating && (
+              <CreateTask
+                onClose={() => setCreating('')}
+                project={props.project}
+                listId={props.project.lists[0].id}
+                columnId={creating}
+              />
+            )}
+            {dialogOpen && (
+              <CreateColumn
+                onClose={() => setDialogOpen(false)}
+                project={project}
+              />
+            )}
+          </Paper>
+        </DragDropContext>
 
         <Tooltip
           placement="left"
@@ -390,7 +461,8 @@ const actionCreators = {
   selectMember: selectMemberA,
   openSnackbar: openSnackbarA,
   setList: setListA,
-  setFilter: setFilterA
+  setFilter: setFilterA,
+  setTask: setTaskA
 }
 
 export const Project = withStyles(styles)(

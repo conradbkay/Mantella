@@ -120,6 +120,7 @@ interface OwnProps {
   provided: DraggableProvided
   snapshot: DraggableStateSnapshot
   openFunc(): void
+  style: any
 }
 
 const styles = () =>
@@ -192,7 +193,8 @@ const CBaseTask = (props: TaskProps) => {
           borderBottom: 'border',
           ...provided.draggableProps.style,
           color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
-          outline: 'none'
+          outline: 'none',
+          ...props.style
         }}
         onClick={() => {
           /* if (project && project.selectingMember) {

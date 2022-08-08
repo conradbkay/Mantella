@@ -84,6 +84,7 @@ export const Dashboard = connect(mapState)(
                     >
                       {(prov, snap) => (
                         <BaseTask
+                          style={{}}
                           project={
                             props.projects[
                               id(

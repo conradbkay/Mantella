@@ -16,6 +16,7 @@ import {
 } from './types'
 import { router } from './router'
 import { isAuthenticated } from '../passport'
+import { Request, Response } from 'express'
 
 export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   const taskId = uuid()
@@ -40,7 +41,8 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
           }))
         : [],
       comments: [],
-      description: req.body.taskInfo.description
+      description: req.body.taskInfo.description,
+      assignedTo: []
     })
 
     const list = proj.lists.find((col) => col.id === req.body.listId)!
@@ -238,3 +240,34 @@ export const setComment = async (req: setCommentReq, res: setCommentRes) => {
 }
 
 router.post('/setComment', isAuthenticated, setComment)
+
+export const assignUserToTask = async (req: Request, res: Response) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
+
+  if (!proj) {
+    throw new Error('Project does not exist')
+  }
+
+  const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId)!
+
+  if (!task) {
+    throw new Error('task not in project')
+  }
+
+  if (!task.assignedTo) {
+    // legacy tasks
+    task.assignedTo = []
+  }
+
+  if (task.assignedTo.includes(req.body.userId)) {
+    task.assignedTo.splice(task.assignedTo.indexOf(req.body.userId), 1)
+  } else {
+    task.assignedTo.push(req.body.userId)
+  }
+
+  const newProj = await proj.save()
+
+  res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) })
+}
+
+router.post('/assignUserToTask', isAuthenticated, assignUserToTask)

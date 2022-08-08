@@ -8,7 +8,8 @@ export const defaultTask = {
   timeWorkedOn: 0,
   comments: [],
   color: '#FFFFFF',
-  progress: 0 as 0 | 1 | 2
+  progress: 0 as 0 | 1 | 2,
+  assignedTo: []
 }
 
 export const tags = [
@@ -114,7 +115,7 @@ export const generateIds = (length: number): string[] => {
 }
 
 export const generateDefaultProject = (
-  newUserId: string,
+  newUser: { email: string; id: string; profileImg: string; username: string },
   projectId: string
 ): Project => {
   const listIds = [uuid(), uuid(), uuid()]
@@ -140,10 +141,10 @@ export const generateDefaultProject = (
         taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
       }
     ],
-    ownerId: newUserId,
+    ownerId: newUser.id,
     id: projectId,
     tasks: tasks,
-    users: [newUserId]
+    users: [newUser]
   }
 }
 

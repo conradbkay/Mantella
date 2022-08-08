@@ -1,3 +1,10 @@
+export type TProjectUser = {
+  username: string
+  email: string
+  id: string
+  profileImg: string
+}
+
 export interface TProject {
   id: string
   name: string
@@ -10,7 +17,7 @@ export interface TProject {
 
   tasks: TTask[]
 
-  users: string[]
+  users: TProjectUser[]
 
   security?: {
     public: boolean

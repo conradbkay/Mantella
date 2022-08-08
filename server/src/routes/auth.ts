@@ -54,7 +54,18 @@ export const register = async (req: registerReq, res: registerRes) => {
     const [projectId, userId] = generateIds(2)
 
     const [project, newUser] = await Promise.all([
-      ProjectModel.create(generateDefaultProject(userId, projectId)),
+      ProjectModel.create(
+        generateDefaultProject(
+          {
+            id: userId,
+            email: req.body.email,
+            username: req.body.username,
+            profileImg:
+              'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+          },
+          projectId
+        )
+      ),
       await UserModel.create({
         ...generateGuestUser(projectId, userId),
         password,
@@ -98,7 +109,18 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
     const [projectId, userId] = generateIds(2)
 
     const [project, user] = await Promise.all([
-      ProjectModel.create(generateDefaultProject(userId, projectId)),
+      ProjectModel.create(
+        generateDefaultProject(
+          {
+            email: 'No Email Registered',
+            username: 'Guest',
+            id: userId,
+            profileImg:
+              'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+          },
+          projectId
+        )
+      ),
       await UserModel.create(generateGuestUser(projectId, userId))
     ])
 

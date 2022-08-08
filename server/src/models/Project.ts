@@ -33,12 +33,18 @@ export class Project {
       lastEdited?: string
       id: string
     }>
+    assignedTo: string[] // ids
     subTasks: Array<{ name: string; completed: boolean; id: string }>
     recurrance?: { interval?: number; nextDue?: string }
     description?: string
   }>
   @prop()
-  public users!: Array<string>
+  public users!: Array<{
+    id: string
+    profileImg: string
+    username: string
+    email: string
+  }>
   @prop()
   public security?: { public: boolean; assignedUsers: Array<string> }
 }

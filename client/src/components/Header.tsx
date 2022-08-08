@@ -13,8 +13,6 @@ import {
   ListItemIcon,
   Drawer,
   Tab,
-  Avatar,
-  Tooltip,
   Button,
   Menu,
   Typography,
@@ -35,6 +33,7 @@ import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
 import { ProjectFinder } from './ProjectFinder/ProjectFinder'
+import { HoverableAvatar } from './utils/HoverableAvatar'
 
 const noAuthItems = [
   {
@@ -219,18 +218,7 @@ const Topbar = (props: Props) => {
                 </div>
 
                 {props.authenticated !== null && (
-                  <>
-                    <Tooltip title={`${props.authenticated.username}`}>
-                      <Avatar
-                        style={{
-                          margin: 'auto 10px',
-                          backgroundColor: '#0061ff'
-                        }}
-                      >
-                        {props.authenticated.username[0].toUpperCase()}
-                      </Avatar>
-                    </Tooltip>
-                  </>
+                  <HoverableAvatar user={props.authenticated} />
                 )}
               </Fragment>
             </Grid>

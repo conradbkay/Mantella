@@ -21,6 +21,7 @@ interface Props {
   setCreating: (id: string) => void
   setEditingList: (id: [string, string]) => void
   confirmEditingList: () => void
+  isDraggingUser: boolean
 }
 
 const getCellTasks = (
@@ -77,7 +78,8 @@ export const ProjectCell = ({
   deleteList,
   setCreating,
   setEditingList,
-  confirmEditingList
+  confirmEditingList,
+  isDraggingUser
 }: Props) => {
   const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
   const [deletingList, setDeletingList] = useState(false)
@@ -173,6 +175,7 @@ export const ProjectCell = ({
         </div>
       )}
       <Droppable
+        isCombineEnabled={isDraggingUser}
         isDropDisabled={isCollapsed}
         droppableId={`${list.id}|${progress}` /* can only be a string*/}
       >
@@ -199,6 +202,13 @@ export const ProjectCell = ({
                     >
                       {(dragProvided, dragSnapshot) => (
                         <BaseTask
+                          style={
+                            isDraggingUser
+                              ? {
+                                  transform: 'none !important'
+                                }
+                              : {}
+                          }
                           hidden={!filterTask(task, filter)}
                           openFunc={() => openFunc(task.id)}
                           project={project}
@@ -210,7 +220,13 @@ export const ProjectCell = ({
                     </Draggable>
                   ))
                 : null}
-              {dropProvided.placeholder}
+              {isDraggingUser ? (
+                <div style={{ visibility: 'hidden', height: 0 }}>
+                  {dropProvided.placeholder}
+                </div>
+              ) : (
+                dropProvided.placeholder
+              )}
             </div>
           )
         }}

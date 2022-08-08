@@ -202,7 +202,10 @@ export const kickUserFromProject = async (
       throw new Error('You cannot kick members from this project')
     }
 
-    project.users.splice(project.users.indexOf(req.user.id), 1)
+    project.users.splice(
+      project.users.findIndex((user) => user.id === req.user.id),
+      1
+    )
     const deletingUser = await UserModel.findOne({ id: req.user.id })
     if (!deletingUser) {
       throw new Error('user being kicked does not exist')
