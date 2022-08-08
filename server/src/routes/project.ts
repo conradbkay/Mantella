@@ -33,7 +33,7 @@ export const createProject = async (
 ) => {
   const creatingId = uuid()
   const listId = uuid()
-  const user = await UserModel.findOne({ id: req.body.userId })
+  const user = await UserModel.findOne({ id: req.user.id })
   if (user) {
     user.projects.push(creatingId)
 
@@ -95,7 +95,7 @@ export const deleteProject = async (
   req: deleteProjectReq,
   res: deleteProjectRes
 ) => {
-  const user = await UserModel.findOne({ id: req.body.userId })
+  const user = await UserModel.findOne({ id: req.user.id })
 
   if (user) {
     user.projects = user.projects.filter((proj: any) => proj !== req.body.id)
@@ -119,7 +119,7 @@ export const deleteProject = async (
 router.post('/deleteProject', isAuthenticated, deleteProject)
 
 export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
-  const id = req.body.userId
+  const id = req.user.id
   if (id) {
     const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
@@ -149,7 +149,7 @@ export const leaveProject = async (
   req: leaveProjectReq,
   res: leaveProjectRes
 ) => {
-  const id = req.body.userId
+  const id = req.user.id
   if (id) {
     const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
@@ -180,7 +180,7 @@ export const kickUserFromProject = async (
   req: removeMemberFromProjectReq,
   res: removeMemberFromProjectRes
 ) => {
-  const id = req.body.userId
+  const id = req.user.id
   if (id) {
     const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
@@ -202,8 +202,8 @@ export const kickUserFromProject = async (
       throw new Error('You cannot kick members from this project')
     }
 
-    project.users.splice(project.users.indexOf(req.body.userId), 1)
-    const deletingUser = await UserModel.findOne({ id: req.body.userId })
+    project.users.splice(project.users.indexOf(req.user.id), 1)
+    const deletingUser = await UserModel.findOne({ id: req.user.id })
     if (!deletingUser) {
       throw new Error('user being kicked does not exist')
     }
@@ -231,3 +231,33 @@ export const getProjectById = async (req: Request, res: Response) => {
 }
 
 router.get('/getProjectById', isAuthenticated, getProjectById)
+
+export const shareProject = async (req: Request, res: Response) => {
+  let user = await UserModel.findOne({ email: req.body.email })
+
+  if (!user) {
+    res.status(400).json({ message: 'User could not be found' })
+    return
+  }
+
+  if (user.projects.includes(req.body.projectId)) {
+    res.status(400).json({ message: 'User already in project' })
+    return
+  }
+
+  user.projects.push(req.body.projectId)
+
+  await user.save()
+
+  res.status(200).json({ message: 'Success' })
+}
+
+router.post('/shareProject', isAuthenticated, shareProject)
+
+export const getProjectMembers = async (req: Request, res: Response) => {
+  let users = await UserModel.find({ projects: { $in: [req.body.projectId] } })
+
+  res.json({ users })
+}
+
+router.post('/getProjectMembers', isAuthenticated, getProjectMembers)

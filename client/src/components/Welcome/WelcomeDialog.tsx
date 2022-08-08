@@ -51,7 +51,7 @@ export const WelcomeDialog = () => {
             store.dispatch(openSnackbarA('Wise', 'standard'))
           }}
         >
-          Hello Kanban Brawn
+          Hello Mantella
         </Button>
       </div>
     </Dialog>

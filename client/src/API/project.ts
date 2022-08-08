@@ -18,3 +18,12 @@ export const APISetSubtask = async (data: {
 
   return res.data
 }
+
+export const APIShareProject = async (data: {
+  projectId: string
+  email: string
+}) => {
+  const res = await axios.post('/shareProject', data)
+
+  return res.status
+}

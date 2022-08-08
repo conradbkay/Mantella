@@ -79,6 +79,8 @@ export const editTask = async (req: editTaskReq, res: editTaskRes) => {
     task.color = req.body.task.color || task.color
     task.description = req.body.task.description
 
+    project.markModified('tasks') // mongo won't notice that tasks were modified without this since it's so nested
+
     const newProj = await project.save()
     const pure = await newProj.toObject()
     if (pure) {
@@ -131,7 +133,13 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
     const task =
       proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === req.body.id)]
 
-    if (task) {
+    let changedTask = false
+
+    if (task && task.progress !== req.body.newProgress) {
+      changedTask = true
+    }
+
+    if (changedTask) {
       task.progress = req.body.newProgress as 0 | 1 | 2
     }
 
@@ -141,7 +149,10 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
     proj.lists[newListIdx].taskIds.splice(req.body.newIndex, 0, req.body.id)
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
-    proj.markModified('tasks')
+
+    if (changedTask) {
+      proj.markModified('tasks')
+    }
 
     const newProj = await proj.save()
 

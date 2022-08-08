@@ -20,6 +20,7 @@ type ActionCreators = typeof actionCreators
 
 interface Props extends ActionCreators {
   onClose: () => void
+  open: boolean
   project: TProject
 }
 
@@ -32,7 +33,7 @@ const CProjectSettings = (props: Props) => {
   }
 
   return (
-    <Dialog onClose={props.onClose} open={true}>
+    <Dialog onClose={props.onClose} open={props.open}>
       <div style={{ minWidth: '500px' }} />
       <DialogTitle>Project Settings</DialogTitle>
       <DialogContent>

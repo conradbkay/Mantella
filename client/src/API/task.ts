@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { TTask } from '../types/project'
 
 export const APICreateTask = async (
   projId: string,
@@ -21,5 +22,17 @@ export type DragTaskInfo = {
 
 export const APIDragTask = async (info: DragTaskInfo) => {
   const res = await axios.post('/dragTask', info)
+  return res.data
+}
+
+export const APIEditTask = async (newTask: TTask, projectId: string) => {
+  const res = await axios.post('/editTask', {
+    taskId: newTask.id,
+    task: newTask,
+    projId: projectId
+  })
+
+  console.log(res)
+
   return res.data
 }

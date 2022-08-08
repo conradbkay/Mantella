@@ -1,5 +1,5 @@
 import { withStyles, Theme, createStyles } from '@material-ui/core/styles'
-import { Typography, WithStyles, Button } from '@material-ui/core'
+import { Typography, WithStyles, Button, Grid } from '@material-ui/core'
 import { FeatureTable } from './FeatureTable'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
@@ -11,13 +11,12 @@ const styles = (theme: Theme) =>
   createStyles({
     heroContent: {
       minHeight: 200,
-      padding: 80,
+      padding: '80px 40px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      backgroundColor: '#8080ff',
-      position: 'relative',
-      flexDirection: 'column'
+      backgroundImage: 'url(herringbone.webp)',
+      position: 'relative'
     },
     heroTitle: {
       fontSize: 64,
@@ -39,7 +38,6 @@ const styles = (theme: Theme) =>
     description: {
       fontWeight: 400,
       fontSize: '1.25rem',
-      marginTop: -40,
       zIndex: 2
     }
   })
@@ -59,11 +57,12 @@ export const About = withStyles(styles)(
     null,
     actionCreators
   )((props: Props) => {
-    const { classes } = props
+    const { classes, login } = props
 
     const loginAsGuest = async () => {
       const res = await APIGuestLogin()
       if (res) {
+        login(res)
         window.location.hash = '#/project/' + res.projects[0].id
       }
     }
@@ -83,23 +82,34 @@ export const About = withStyles(styles)(
             content="Mantella is the most innovative open-source task manager and kanban Board!"
           />
         </Helmet>
-        <div className={classes.heroContent}>
-          <div className={classes.title}>Mantella</div>
-          <div className={classes.description}>
-            Elegant Project Management and Time Tracking
-          </div>
-          <div style={{ display: 'flex' }}>
+        <Grid container className={classes.heroContent}>
+          <Grid item md={6} sm={12}>
+            <FeatureGallery />
+          </Grid>
+          <Grid
+            item
+            md={6}
+            sm={12}
+            style={{
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            <div className={classes.title}>Mantella</div>
+            <div className={classes.description}>
+              Elegant Project Management and Time Tracking
+            </div>
             <Button
               variant="contained"
-              color="primary"
               size="large"
               onClick={() => loginAsGuest()}
-              style={{ marginTop: 'auto' }}
+              style={{ marginTop: 8, color: 'white', backgroundColor: 'black' }}
             >
               Continue as Guest
             </Button>
-          </div>
-        </div>
+          </Grid>
+        </Grid>
         <div style={{ margin: '20px 0' }}>
           {props.showLinkedIn && (
             <>
@@ -132,7 +142,6 @@ export const About = withStyles(styles)(
             Features
           </Typography>
           <FeatureTable />
-          <FeatureGallery />
         </div>
       </div>
     )

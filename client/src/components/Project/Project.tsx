@@ -20,7 +20,8 @@ import {
   FilterList,
   Settings,
   Equalizer,
-  Create
+  Create,
+  Send
 } from '@material-ui/icons'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
@@ -40,6 +41,7 @@ import { ProjStats } from './Statistics'
 import { CSSProperties } from '@material-ui/styles'
 import { APIDragTask } from '../../API/task'
 import { onDragEnd } from '../../utils/dragTask'
+import { ShareProject } from './ShareProject'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -106,6 +108,7 @@ export type TFilterData = {
 const CProject = (props: TProps) => {
   const [editingTaskId, setEditingTaskId] = useState('')
   const [settings, setSettings] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(getMobile(window))
   const [collapsedLists, setCollapsedLists] = useState([] as string[])
@@ -199,6 +202,12 @@ const CProject = (props: TProps) => {
                 style={{ marginLeft: 8 }}
               >
                 <Equalizer />
+              </IconButton>
+              <IconButton
+                onClick={() => setSharing(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <Send />
               </IconButton>
             </div>
           </Toolbar>
@@ -335,13 +344,17 @@ const CProject = (props: TProps) => {
             />
           </SpeedDial>
         </Tooltip>
-        {settings && (
-          <ProjectSettings
-            project={props.project}
-            onClose={() => setSettings(false)}
-          />
-        )}
-        {editingTaskId && (
+        <ProjectSettings
+          open={settings}
+          project={props.project}
+          onClose={() => setSettings(false)}
+        />
+        <ShareProject
+          open={sharing}
+          projectId={props.project.id}
+          onClose={() => setSharing(false)}
+        />
+        {Boolean(editingTaskId) && (
           <EditTaskModal
             taskId={editingTaskId}
             onClose={() => setEditingTaskId('')}

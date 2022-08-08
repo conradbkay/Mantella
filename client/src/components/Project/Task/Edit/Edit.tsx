@@ -23,14 +23,19 @@ import { Add, Delete } from '@material-ui/icons'
 import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
-import { TComment, TSubtask } from '../../../../types/project'
-import { APIDragTask, DragTaskInfo } from '../../../../API/task'
+import { TComment, TSubtask, TTask } from '../../../../types/project'
+import { APIDragTask, DragTaskInfo, APIEditTask } from '../../../../API/task'
+import { Description } from './DescriptionEditor'
+import { convertToRaw, EditorState, convertFromRaw } from 'draft-js'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
 
   return {
-    task: project.tasks[id(project.tasks, ownProps.taskId)],
+    task:
+      project && project.tasks
+        ? project.tasks[id(project.tasks, ownProps.taskId)]
+        : undefined,
     projects: state.projects
   }
 }
@@ -44,6 +49,16 @@ type OwnProps = {
   onClose: () => void
   taskId: string
   projectId: string
+}
+
+/** todo:
+ * better code support (several themes and languages)
+ * better editor features (fitting headers, colors, etc)
+ * make rendering in task base work for everything
+ */
+
+export const getEditorStateFromTaskDescription = (description: string) => {
+  return EditorState.createWithContent(convertFromRaw(JSON.parse(description)))
 }
 
 type ActionCreators = typeof actionCreators
@@ -61,6 +76,16 @@ export const EditTaskModal = connect(
 
   const project = props.projects[id(props.projects, props.projectId)]
 
+  if (!task || !project) {
+    return null
+  }
+
+  const [editorState, setEditorState] = useState(
+    task.description
+      ? getEditorStateFromTaskDescription(task.description)
+      : EditorState.createEmpty()
+  )
+
   const ownerListId = project.lists.find((list) =>
     list.taskIds.includes(task.id)
   )!.id
@@ -72,31 +97,84 @@ export const EditTaskModal = connect(
     toMergeSubtask?: Partial<Exclude<TSubtask, 'id'>>
   ) => {
     const newTask = cloneDeep(task)
-    const subtaskIndex = newTask.subTasks.findIndex((sub) => {
+    let subtaskIndex = newTask.subTasks.findIndex((sub) => {
       return sub.id === id
     })
+
+    if (subtaskIndex < 0) {
+      subtaskIndex = 0
+    }
+
     if (toMergeSubtask) {
       newTask.subTasks[subtaskIndex] = {
         ...newTask.subTasks[subtaskIndex],
         ...toMergeSubtask
       }
     } else {
-      newTask.subTasks.filter((sub) => sub.id !== id)
+      newTask.subTasks = newTask.subTasks.filter((sub) => sub.id !== id)
     }
     setTask(newTask)
 
     return newTask
   }
 
-  const setComment = (id: string, newComment: Partial<TComment> | null) => {}
+  const setComment = (id: string, newComment: Partial<TComment> | null) => {
+    const newTask = cloneDeep(task)
+
+    let commentIndex = newTask.comments.findIndex((com) => com.id === id)
+
+    if (commentIndex < 0) {
+      commentIndex = 0
+    }
+
+    if (!newComment) {
+      newTask.comments = newTask.comments.filter((com) => com.id !== id)
+    } else {
+      newTask.comments[commentIndex] = {
+        ...newTask.comments[commentIndex],
+        ...newComment
+      }
+    }
+
+    setTask(newTask)
+  }
 
   const deleteTask = () => {
     props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
   }
 
   const dragTask = async (info: DragTaskInfo) => {
-    props.setProject({ id: project.id, newProj: project })
-    await APIDragTask(info)
+    const newProject = await APIDragTask(info)
+
+    props.setProject({ id: project.id, newProj: newProject.project })
+  }
+
+  const confirmChanges = () => {
+    const taskWithDescription: TTask = {
+      ...task,
+      description: JSON.stringify(convertToRaw(editorState.getCurrentContent()))
+    }
+
+    props.setTask({
+      id: props.task!.id,
+      projectId: props.projectId,
+      newTask: taskWithDescription
+    })
+
+    APIEditTask(taskWithDescription, props.projectId)
+
+    if (listId !== ownerListId) {
+      let newIndex = 0
+
+      dragTask({
+        oldListId: ownerListId,
+        newListId: listId,
+        newIndex,
+        newProgress: task.progress,
+        projectId: props.projectId,
+        id: task.id
+      })
+    }
   }
 
   return (
@@ -104,42 +182,7 @@ export const EditTaskModal = connect(
       <Dialog open onClose={() => props.onClose()}>
         <form
           onSubmit={(e) => {
-            props.setTask({
-              id: props.task.id,
-              projectId: props.projectId,
-              newTask: task
-            })
-
-            if (listId !== ownerListId) {
-              let newIndex = 0
-
-              const tasksInNewProgress = project.tasks.filter((filterTask) => {
-                return (
-                  project.lists[id(project.lists, listId)].taskIds.includes(
-                    task.id
-                  ) && task.progress === filterTask.progress
-                )
-              })
-
-              if (tasksInNewProgress.length) {
-                const indexesInList = tasksInNewProgress.map((tasko) => {
-                  return project.lists[
-                    id(project.lists, listId)
-                  ].taskIds.indexOf(tasko.id)
-                })
-                const lowest = Math.min(...indexesInList)
-                newIndex = lowest
-              }
-
-              dragTask({
-                oldListId: ownerListId,
-                newListId: listId,
-                newIndex,
-                newProgress: task.progress,
-                projectId: props.projectId,
-                id: task.id
-              })
-            }
+            confirmChanges()
             e.preventDefault()
             props.onClose()
           }}
@@ -188,21 +231,10 @@ export const EditTaskModal = connect(
               }}
             />
           </div>
-          <div>
-            <TextField
-              style={{ margin: '12px 4px' }}
-              variant="outlined"
-              color="secondary"
-              label="Description"
-              value={task.description}
-              onChange={({ target }) =>
-                setTask({ ...task, description: target.value })
-              }
-              fullWidth
-              multiline
-              rows={3}
-            />
-          </div>
+          <Description
+            editorState={editorState}
+            setEditorState={setEditorState}
+          />
           <div style={{ display: 'flex', marginTop: 8 }}>
             <ChooseColor
               color={task.color || '#FFFFFF'}

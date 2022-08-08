@@ -80,7 +80,8 @@ export const FeatureGallery = () => {
                 style={{
                   flexDirection: 'row',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  fontFamily: 'nunito'
                 }}
               >
                 <Icon

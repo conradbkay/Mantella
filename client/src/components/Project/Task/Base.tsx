@@ -31,6 +31,8 @@ import { selectMemberA } from '../../../store/actions/project'
 import { setSubtaskA } from '../../../store/actions/task'
 import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../../API/project'
+import { Editor } from 'draft-js'
+import { getEditorStateFromTaskDescription } from './Edit/Edit'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -231,14 +233,7 @@ const CBaseTask = (props: TaskProps) => {
                 style={{
                   fontSize: 18,
                   maxWidth: '94%',
-                  color:
-                    snapshot && snapshot.isDragging
-                      ? 'gray'
-                      : task.dueDate &&
-                        isBefore(new Date(), new Date(task.dueDate)) &&
-                        task.progress !== 2
-                      ? '#d32f24'
-                      : 'black',
+                  color: snapshot && snapshot.isDragging ? 'gray' : 'black',
                   marginLeft: 4,
                   marginTop: 4
                 }}
@@ -248,9 +243,17 @@ const CBaseTask = (props: TaskProps) => {
                 </div>
               </span>
             </div>
-            <div style={{ marginTop: 4, marginLeft: 4 }}>
-              {task.description}
-            </div>
+            {task.description && (
+              <div style={{ marginTop: 4, marginLeft: 4 }}>
+                <Editor
+                  editorState={getEditorStateFromTaskDescription(
+                    task.description
+                  )}
+                  readOnly
+                  onChange={() => null}
+                />
+              </div>
+            )}
             <SubtaskMap
               show={showSubTasks}
               subTasks={task.subTasks}
@@ -316,7 +319,16 @@ const CBaseTask = (props: TaskProps) => {
             )}
             {task.dueDate && task.progress !== 2 && (
               <>
-                <div style={{ marginLeft: 6 }}>{formatDate}</div>
+                <div
+                  style={{
+                    marginLeft: 6,
+                    color: isBefore(new Date(task.dueDate), new Date())
+                      ? '#d32f24'
+                      : 'black'
+                  }}
+                >
+                  {formatDate}
+                </div>
               </>
             )}
 

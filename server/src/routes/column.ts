@@ -19,7 +19,7 @@ export const createColumn = async (
   const creatingId = uuid()
 
   const [user, project] = await Promise.all([
-    UserModel.findOne({ id: req.body.userId }),
+    UserModel.findOne({ id: req.user.id }),
     ProjectModel.findOne({ id: req.body.projId })
   ])
 
@@ -48,19 +48,19 @@ export const toggleCollapsed = async (
   res: toggleCollapsedRes
 ) => {
   const [user, project] = await Promise.all([
-    UserModel.findOne({ id: req.body.userId }),
+    UserModel.findOne({ id: req.user.id }),
     await ProjectModel.findOne({ id: req.body.projId })
   ])
 
   if (user && project) {
     const col = project.columns.find((col) => col.id === req.body.colId)
     if (col) {
-      const userIdInCollapsed = col.collapsedUsers.indexOf(req.body.userId)
+      const userIdInCollapsed = col.collapsedUsers.indexOf(req.user.id)
       if (userIdInCollapsed > -1) {
         // user has column collapsed
         col.collapsedUsers.splice(userIdInCollapsed, 1)
       } else {
-        col.collapsedUsers = [...col.collapsedUsers, req.body.userId]
+        col.collapsedUsers = [...col.collapsedUsers, req.user.id]
       }
       const newProj = await project.save()
 

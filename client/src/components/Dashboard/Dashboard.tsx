@@ -175,6 +175,7 @@ export const Dashboard = connect(mapState)(
             projectId={getProjectIdFromTaskId(props.projects, editingTaskId)}
           />
         )}
+
         <Tooltip placement="left" title="Create Project">
           <Fab
             component={Link}
