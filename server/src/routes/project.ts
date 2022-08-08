@@ -180,40 +180,47 @@ export const kickUserFromProject = async (
   req: removeMemberFromProjectReq,
   res: removeMemberFromProjectRes
 ) => {
-  const id = req.user.id
+  const id = req.body.userId
   if (id) {
-    const project = await ProjectModel.findOne({ id: req.body.projectId })
+    let project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
       throw new Error('Project does not exist')
     }
-    const user = await UserModel.findOneAndUpdate(
+
+    if (project.ownerId !== id) {
+      throw new Error('You cannot kick members from this project')
+    }
+
+    await UserModel.findOneAndUpdate(
       { id: id },
       {
-        $push: {
+        $pull: {
           projects: project
         }
       }
     )
 
-    if (!user) {
-      throw new Error('Session expired')
-    }
-    if (project.ownerId !== user.id) {
-      throw new Error('You cannot kick members from this project')
-    }
-
     project.users.splice(
-      project.users.findIndex((user) => user.id === req.user.id),
+      project.users.findIndex((user) => user.id === id),
       1
     )
-    const deletingUser = await UserModel.findOne({ id: req.user.id })
-    if (!deletingUser) {
-      throw new Error('user being kicked does not exist')
+
+    let modifiedTasks = false
+
+    for (let i = 0; i < project.tasks.length; i++) {
+      if (project.tasks[i].assignedTo.includes(id)) {
+        project.tasks[i].assignedTo.splice(
+          project.tasks[i].assignedTo.indexOf(id),
+          1
+        )
+        modifiedTasks = true
+      }
     }
-    deletingUser.projects = deletingUser.projects.filter(
-      (proj: any) => proj !== project.id
-    )
-    await deletingUser.save()
+
+    if (modifiedTasks) {
+      project.markModified('tasks')
+      project = await project.save()
+    }
 
     res.json({ project: project.toObject() })
   } else {
@@ -248,11 +255,27 @@ export const shareProject = async (req: Request, res: Response) => {
     return
   }
 
+  let project = await ProjectModel.findOne({ id: req.body.projectId })
+
+  if (!project) {
+    throw new Error('project does not exist')
+  }
+
+  project.users.push({
+    email: user.email,
+    username: user.username,
+    profileImg: user.profileImg || '',
+    id: user.id
+  })
+  project.markModified('users')
+
+  project = await project.save()
+
   user.projects.push(req.body.projectId)
 
   await user.save()
 
-  res.status(200).json({ message: 'Success' })
+  res.status(200).json({ message: 'Success', project })
 }
 
 router.post('/shareProject', isAuthenticated, shareProject)

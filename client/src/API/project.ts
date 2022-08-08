@@ -25,5 +25,5 @@ export const APIShareProject = async (data: {
 }) => {
   const res = await axios.post('/shareProject', data)
 
-  return res.status
+  return [res.status, res.data.project]
 }

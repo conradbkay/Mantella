@@ -234,6 +234,9 @@ const CProject = (props: TProps) => {
                     <div
                       {...dropProvided.droppableProps}
                       ref={dropProvided.innerRef}
+                      style={{
+                        display: 'flex'
+                      }}
                     >
                       {project.users.map((user, i) => (
                         <Draggable
@@ -247,6 +250,10 @@ const CProject = (props: TProps) => {
                               {...prov.draggableProps}
                               {...prov.dragHandleProps}
                               key={user.id}
+                              style={{
+                                ...prov.draggableProps.style,
+                                display: 'flex'
+                              }}
                             >
                               <HoverableAvatar user={user} />
                             </div>

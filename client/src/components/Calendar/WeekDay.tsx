@@ -85,6 +85,7 @@ const CWeekDay = (props: Props) => {
               >
                 {(prov, snap) => (
                   <BaseTask
+                    style={{}}
                     project={
                       props.projects[
                         id(

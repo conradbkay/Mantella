@@ -9,7 +9,9 @@ import {
   ListItemAvatar,
   ListItemText,
   TextField,
-  Typography
+  Typography,
+  IconButton,
+  ListItemSecondaryAction
 } from '@material-ui/core'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,6 +19,8 @@ import { APIShareProject } from '../../API/project'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { TState } from '../../types/state'
 import { id } from '../../utils/utilities'
+import { Delete } from '@material-ui/icons'
+import { setProjectA } from '../../store/actions/project'
 type Props = {
   onClose: () => void
   projectId: string
@@ -30,10 +34,15 @@ export const ShareProject = ({ onClose, projectId, open }: Props) => {
   const project = useSelector(
     (state: TState) => state.projects[id(state.projects, projectId)]
   )
+  const user = useSelector((state: TState) => state.user)
 
   const submit = async () => {
     try {
-      await APIShareProject({ email: senderEmail, projectId })
+      const res = await APIShareProject({ email: senderEmail, projectId })
+
+      const project = res[1]
+
+      dispatch(setProjectA({ id: project.id, newProj: project }))
 
       onClose()
 
@@ -71,6 +80,15 @@ export const ShareProject = ({ onClose, projectId, open }: Props) => {
                 primary={member.username}
                 secondary={member.email}
               />
+              <ListItemSecondaryAction>
+                <IconButton
+                  disabled={project.ownerId !== user!.id}
+                  edge="end"
+                  aria-label="delete"
+                >
+                  <Delete />
+                </IconButton>
+              </ListItemSecondaryAction>
             </ListItem>
           ))}
         </List>
