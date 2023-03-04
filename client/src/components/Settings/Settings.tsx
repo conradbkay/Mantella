@@ -1,37 +1,31 @@
 import {
   Theme,
-  createStyles,
-  WithStyles,
-  withStyles,
   ListSubheader,
   ListItem,
   ListItemText,
   Button
-} from '@material-ui/core'
-import { List } from '@material-ui/core'
+} from '@mui/material'
+import { List } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import { APILogout } from '../../API/auth'
 import { openSnackbarA } from '../../store/actions/snackbar'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      maxWidth: 1000,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      backgroundColor: theme.palette.background.paper,
-      width: '95%',
-      marginTop: 50
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    maxWidth: 1000,
+    backgroundColor: theme.palette.background.paper,
+    width: '95%'
+  }
+}))
 
 type ActionCreators = typeof actionCreators
 
-interface TProps extends WithStyles<typeof styles>, ActionCreators {}
+interface TProps extends ActionCreators {}
 
 const CSettings = (props: TProps) => {
-  const { classes } = props
+  const classes = useStyles()
   return (
     <>
       <div>
@@ -41,6 +35,7 @@ const CSettings = (props: TProps) => {
         <List
           subheader={<ListSubheader>Data</ListSubheader>}
           className={classes.root}
+          style={{ margin: 'auto', marginTop: 80 }}
         >
           <ListItem>
             <ListItemText
@@ -70,6 +65,4 @@ const actionCreators = {
   openSnackbar: openSnackbarA
 }
 
-export const Settings = connect(null, { ...actionCreators })(
-  withStyles(styles)(CSettings)
-)
+export const Settings = connect(null, { ...actionCreators })(CSettings)

@@ -2,17 +2,16 @@ import { CSSProperties, useState } from 'react'
 import { render } from 'react-dom'
 import './index.css'
 import { Provider } from 'react-redux'
-import { MuiThemeProvider } from '@material-ui/core/styles'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, HashRouter } from 'react-router-dom'
 
 import { store } from './store/store'
-import { createTheme } from '@material-ui/core/styles'
 import { Pomodoro } from './components/Pomodoro/Pomodoro'
 import { AuthRender } from './components/Auth/Auth'
 import { CreateProject } from './components/createProject/CreateProject'
 import { NoMatch } from './components/NoMatch/NoMatch'
-import { Fab, CircularProgress } from '@material-ui/core'
-import { Timer } from '@material-ui/icons'
+import { Fab, CircularProgress } from '@mui/material'
+import { Timer } from '@mui/icons-material'
 import { About } from './components/Landing/About'
 import { Header } from './components/Header'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
@@ -23,11 +22,7 @@ import { PublicOnlyRoute, PrivateRoute } from './components/utils/Routing'
 import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings/Settings'
 import { CalendarWeek } from './components/Calendar/Week'
-import Moment from 'moment'
-import 'react-widgets/dist/css/react-widgets.css'
 import { APILogin } from './API/auth'
-
-const momentLocalizer = require('react-widgets-moment')
 
 const secondary = '#0336FF'
 const primary = '#00838f'
@@ -73,6 +68,7 @@ const Router = () => {
   return (
     <HashRouter>
       <Header />
+      <div style={{ marginTop: 49 }} />
       <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
       {/* <WelcomeDialog /> */}
       {!open && (
@@ -163,15 +159,12 @@ const Router = () => {
 export const Wrapper = () => {
   return (
     <Provider store={store}>
-      <MuiThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
         <SnackbarRoot />
         <Router />
-      </MuiThemeProvider>
+      </ThemeProvider>
     </Provider>
   )
 }
-
-Moment.locale('en')
-momentLocalizer()
 
 render(<Wrapper />, document.getElementById('root'))

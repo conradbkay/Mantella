@@ -3,10 +3,7 @@ import {
   Drawer,
   List,
   ListItem,
-  WithStyles,
   Theme,
-  createStyles,
-  withStyles,
   FormControl,
   InputLabel,
   Select,
@@ -15,29 +12,29 @@ import {
   Switch,
   Slider,
   ListItemText
-} from '@material-ui/core'
+} from '@mui/material'
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
 import { DateTimePicker } from 'react-widgets'
 import { isArray } from 'lodash'
 import { useState } from 'react'
+import { makeStyles } from '@mui/styles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBarShift: {},
-    menuButton: {
-      marginLeft: 12,
-      marginRight: 20
-    },
-    drawer: {
-      minWidth: 400
-    },
-    drawerPaper: {},
-    toolbar: theme.mixins.toolbar
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  appBarShift: {},
+  menuButton: {
+    marginLeft: 12,
+    marginRight: 20
+  },
+  drawer: {
+    minWidth: 400
+  },
+  drawerPaper: {},
+  toolbar: theme.mixins.toolbar
+}))
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   filterData: TFilterData
   open: boolean
   changeFilter: (newFilter: TFilterData) => void
@@ -46,7 +43,8 @@ interface Props extends WithStyles<typeof styles> {
 
 const FilterTasksComponent = (props: Props) => {
   const [custom, setCustom] = useState(false)
-  const { open, classes, handleClose, filterData, changeFilter } = props
+  const classes = useStyles()
+  const { open, handleClose, filterData, changeFilter } = props
   return (
     <div>
       <Drawer
@@ -219,4 +217,4 @@ const FilterTasksComponent = (props: Props) => {
   )
 }
 
-export const FilterTasks = withStyles(styles)(FilterTasksComponent)
+export const FilterTasks = FilterTasksComponent

@@ -1,6 +1,6 @@
 import './styles.css'
 import { Link } from 'react-router-dom'
-import { Button } from '@material-ui/core'
+import { Button } from '@mui/material'
 import { TState } from '../../types/state'
 import { connect } from 'react-redux'
 

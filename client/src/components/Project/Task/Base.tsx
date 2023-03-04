@@ -6,14 +6,7 @@ import {
   selectPomodoroTaskA,
   toggleTimerA
 } from '../../../store/actions/pomodoro'
-import {
-  LinearProgress,
-  Badge,
-  createStyles,
-  WithStyles,
-  withStyles,
-  IconButton
-} from '@material-ui/core'
+import { LinearProgress, Badge, IconButton } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
@@ -24,7 +17,7 @@ import {
   Pause,
   Comment,
   List
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
@@ -33,6 +26,7 @@ import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../../API/project'
 import { Editor } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './Edit/Edit'
+import { makeStyles } from '@mui/styles'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -123,40 +117,38 @@ interface OwnProps {
   style: any
 }
 
-const styles = () =>
-  createStyles({
-    badgeColor: {
-      backgroundColor: '#4caf50'
-    },
-    badge: {
-      marginTop: 15,
-      marginRight: 15
-      // position: 'relative'
-    },
-    input: {
-      cursor: 'inherit',
-      position: 'absolute',
-      opacity: 0,
-      width: '100%',
-      height: '100%',
-      top: 0,
-      left: 0,
-      margin: 0,
-      padding: 0
-    },
-    play: {
-      padding: 6,
-      marginRight: 2,
-      color: 'rgba(0, 0, 0, 0.54)'
-    }
-  })
+const useStyles = makeStyles(() => ({
+  badgeColor: {
+    backgroundColor: '#4caf50'
+  },
+  badge: {
+    marginTop: 15,
+    marginRight: 15
+    // position: 'relative'
+  },
+  input: {
+    cursor: 'inherit',
+    position: 'absolute',
+    opacity: 0,
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    margin: 0,
+    padding: 0
+  },
+  play: {
+    padding: 6,
+    marginRight: 2,
+    color: 'rgba(0, 0, 0, 0.54)'
+  }
+}))
 
 type ActionCreators = typeof actionCreators
 interface TaskProps
   extends OwnProps,
     ReturnType<typeof mapState>,
-    ActionCreators,
-    WithStyles<typeof styles> {}
+    ActionCreators {}
 
 const CBaseTask = (props: TaskProps) => {
   const [showComments, setShowComments] = useState(false)
@@ -177,6 +169,8 @@ const CBaseTask = (props: TaskProps) => {
   const MIN_HEIGHT = 20
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
+
+  const classes = useStyles()
 
   return task ? (
     <div style={{ width: '100%' }}>
@@ -211,8 +205,8 @@ const CBaseTask = (props: TaskProps) => {
       >
         <Badge
           classes={{
-            colorSecondary: props.classes.badgeColor,
-            badge: props.classes.badge
+            colorSecondary: classes.badgeColor,
+            badge: classes.badge
           }}
           color={'primary'}
           badgeContent={task.points}
@@ -342,7 +336,7 @@ const CBaseTask = (props: TaskProps) => {
             >
               {Object.values(task.comments).length !== 0 && (
                 <IconButton
-                  className={props.classes.play}
+                  className={classes.play}
                   onClick={(e) => {
                     e.stopPropagation()
                     setShowComments(!showComments)
@@ -354,7 +348,7 @@ const CBaseTask = (props: TaskProps) => {
               {Object.values(task.subTasks).length !== 0 && (
                 <IconButton
                   style={{ marginRight: 8 }}
-                  className={props.classes.play}
+                  className={classes.play}
                   onClick={(e) => {
                     // eventually have it toggle icon based on current showSubtasks(same with comments)
                     e.stopPropagation()
@@ -372,7 +366,7 @@ const CBaseTask = (props: TaskProps) => {
               {!props.isCurrentTask ? (
                 <PlayArrow
                   style={{ marginLeft: 'auto' }}
-                  className={props.classes.play}
+                  className={classes.play}
                   onClick={(e) => {
                     e.stopPropagation()
                     props.selectPomodoroTask(task.id)
@@ -382,7 +376,7 @@ const CBaseTask = (props: TaskProps) => {
               ) : (
                 <Pause
                   style={{ marginLeft: 'auto' }}
-                  className={props.classes.play}
+                  className={classes.play}
                   onClick={(e) => {
                     e.stopPropagation()
                     props.selectPomodoroTask(task.id)
@@ -428,6 +422,4 @@ const actionCreators = {
   setSubtask: setSubtaskA
 }
 
-export const BaseTask = withStyles(styles)(
-  connect(mapState, actionCreators)(CBaseTask)
-)
+export const BaseTask = connect(mapState, actionCreators)(CBaseTask)

@@ -1,23 +1,16 @@
-import {
-  withStyles,
-  createStyles,
-  Theme,
-  SnackbarContent,
-  Snackbar,
-  IconButton,
-  WithStyles
-} from '@material-ui/core'
+import { Theme, SnackbarContent, Snackbar, IconButton } from '@mui/material'
 
 import { connect } from 'react-redux'
 
-import CheckCircleIcon from '@material-ui/icons/CheckCircle'
-import WarningIcon from '@material-ui/icons/Warning'
-import ErrorIcon from '@material-ui/icons/Error'
-import CloseIcon from '@material-ui/icons/Close'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import WarningIcon from '@mui/icons-material/Warning'
+import ErrorIcon from '@mui/icons-material/Error'
+import CloseIcon from '@mui/icons-material/Close'
 import { closeSnackbarA } from '../../store/actions/snackbar'
 import { TVariant } from '../../types/state'
 import { TState } from '../../types/state'
-import { Info } from '@material-ui/icons'
+import { Info } from '@mui/icons-material'
+import { makeStyles } from '@mui/styles'
 
 type Classes = {
   success: string
@@ -40,27 +33,23 @@ const getClassSnackbarVariant = (variant: TVariant, classes: Classes) => {
 const FULL_WIDTH_POINT_PX = 960
 const AUTO_HIDE_POINT_MS = 3000
 
-const styles = (theme: Theme) =>
-  createStyles({
-    success: { backgroundColor: '#43A047' }, // what a nice green
-    warning: { backgroundColor: '#FFA000' },
-    standard: {},
-    error: { backgroundColor: theme.palette.error.dark },
-    close: { width: 24, height: 24 },
-    message: { display: 'flex', alignItems: 'center' },
-    icon: { fontSize: 20, marginRight: theme.spacing(1) },
-    snackbar: {
-      [theme.breakpoints.down(FULL_WIDTH_POINT_PX)]: {
-        marginBottom: '0px !important'
-      }
+const useStyles = makeStyles((theme: Theme) => ({
+  success: { backgroundColor: '#43A047' }, // what a nice green
+  warning: { backgroundColor: '#FFA000' },
+  standard: {},
+  error: { backgroundColor: theme.palette.error.dark },
+  close: { width: 24, height: 24 },
+  message: { display: 'flex', alignItems: 'center' },
+  icon: { fontSize: 20, marginRight: theme.spacing(1) },
+  snackbar: {
+    [theme.breakpoints.down(FULL_WIDTH_POINT_PX)]: {
+      marginBottom: '0px !important'
     }
-  })
+  }
+}))
 
 type ActionCreators = typeof actionCreators
-interface TProps
-  extends WithStyles<typeof styles>,
-    ReturnType<typeof mapState>,
-    ActionCreators {}
+interface TProps extends ReturnType<typeof mapState>, ActionCreators {}
 
 const SnackbarComponent = (props: TProps) => {
   // Find what Icon to use for snackbar by variant
@@ -70,7 +59,8 @@ const SnackbarComponent = (props: TProps) => {
     error: ErrorIcon,
     standard: Info
   }
-  const { classes, open, message, variant, closeSnackbar } = props
+  const { open, message, variant, closeSnackbar } = props
+  const classes = useStyles()
   const backgroundClass: string = getClassSnackbarVariant(variant, classes)
 
   const Icon = variantIcon[variant]
@@ -116,7 +106,4 @@ const actionCreators = {
   closeSnackbar: closeSnackbarA
 }
 
-export const SnackbarRoot = connect(
-  mapState,
-  actionCreators
-)(withStyles(styles)(SnackbarComponent))
+export const SnackbarRoot = connect(mapState, actionCreators)(SnackbarComponent)

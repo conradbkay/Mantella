@@ -12,14 +12,14 @@ import {
   Typography,
   IconButton,
   ListItemSecondaryAction
-} from '@material-ui/core'
+} from '@mui/material'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { APIShareProject } from '../../API/project'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { TState } from '../../types/state'
 import { id } from '../../utils/utilities'
-import { Delete } from '@material-ui/icons'
+import { Delete } from '@mui/icons-material'
 import { setProjectA } from '../../store/actions/project'
 type Props = {
   onClose: () => void

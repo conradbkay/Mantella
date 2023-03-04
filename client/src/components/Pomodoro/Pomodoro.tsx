@@ -1,17 +1,7 @@
 import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import {
-  withStyles,
-  createStyles,
-  Theme,
-  WithStyles,
-  DialogTitle,
-  IconButton,
-  Tabs,
-  Tab,
-  Card
-} from '@material-ui/core'
-import { Close, Settings } from '@material-ui/icons'
+import { Theme, DialogTitle, IconButton, Tabs, Tab, Card } from '@mui/material'
+import { Close, Settings } from '@mui/icons-material'
 import { toggleTimerA, tickA } from '../../store/actions/pomodoro'
 import { toDaysHHMMSS } from '../../utils/utilities'
 import { Swal } from './Swal'
@@ -20,33 +10,30 @@ import { Display } from './Display'
 import { Stopwatch } from './Stopwatch'
 import { TState } from '../../types/state'
 import { getProjectIdFromTaskId, getAllTasks } from '../../utils/utilities'
+import { makeStyles } from '@mui/styles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    card: {
-      position: 'fixed',
-      bottom: theme.spacing(4),
-      outline: 'none',
-      left: theme.spacing(4),
-      maxWidth: 700,
-      minWidth: 300,
-      zIndex: 1099,
-      backgroundColor: '#f2f2f2'
-    },
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500]
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  card: {
+    position: 'fixed',
+    bottom: theme.spacing(4),
+    outline: 'none',
+    left: theme.spacing(4),
+    maxWidth: 700,
+    minWidth: 300,
+    zIndex: 1099,
+    backgroundColor: '#f2f2f2'
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  }
+}))
 
 type ActionCreators = typeof actionCreators
 
-interface TProps
-  extends ReturnType<typeof mapState>,
-    ActionCreators,
-    WithStyles<typeof styles> {
+interface TProps extends ReturnType<typeof mapState>, ActionCreators {
   open: boolean
   stateFunc(next: boolean): void
 }
@@ -88,7 +75,8 @@ const CPomodoro = (props: TProps) => {
     props.toggleTimer()
   }
 
-  const { open, classes, stateFunc } = props
+  const classes = useStyles()
+  const { open, stateFunc } = props
   const time = toDaysHHMMSS(pomodoro.currSeconds)
 
   Swal(pomodoro, stateFunc, () => toggleWorking())
@@ -131,7 +119,4 @@ const actionCreators = {
   tick: tickA
 }
 
-export const Pomodoro = connect(
-  mapState,
-  actionCreators
-)(withStyles(styles)(CPomodoro))
+export const Pomodoro = connect(mapState, actionCreators)(CPomodoro)

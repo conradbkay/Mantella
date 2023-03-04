@@ -5,32 +5,25 @@ import {
   ListSubheader,
   ListItem,
   ListItemText,
-  Theme,
-  createStyles,
-  withStyles,
-  WithStyles,
   Button,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { formalize } from '../../utils/utilities'
 import { TState } from '../../types/state'
+import { makeStyles } from '@mui/styles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    list: {
-      backgroundColor: '#FAFAFA',
-      margin: '25px auto 0px auto',
-      borderRadius: 0,
-      width: '100%'
-    }
-  })
+const useStyles = makeStyles(() => ({
+  list: {
+    backgroundColor: '#FAFAFA',
+    margin: '25px auto 0px auto',
+    borderRadius: 0,
+    width: '100%'
+  }
+}))
 
-interface TProps
-  extends ReturnType<typeof mapState>,
-    WithStyles<typeof styles>,
-    RouteComponentProps {
+interface TProps extends ReturnType<typeof mapState>, RouteComponentProps {
   variant?: 'menu'
   noButton?: true
   onClick?(): void
@@ -39,7 +32,7 @@ interface TProps
 const CProjectSearch = (props: TProps) => {
   const [search, setSearch] = useState('')
 
-  const { classes } = props
+  const classes = useStyles()
 
   let projects = [...Object.values(props.projects)]
 
@@ -120,6 +113,4 @@ const mapState = (state: TState) => {
   }
 }
 
-export const ProjectFinder = withRouter(
-  connect(mapState)(withStyles(styles)(CProjectSearch))
-)
+export const ProjectFinder = withRouter(connect(mapState)(CProjectSearch))

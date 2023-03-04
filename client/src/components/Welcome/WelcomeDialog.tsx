@@ -1,7 +1,7 @@
 /* should greet them well instead of the snackbar */
 import { useEffect, useState } from 'react'
-import { Dialog, IconButton, Button } from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+import { Dialog, IconButton, Button } from '@mui/material'
+import { Close } from '@mui/icons-material'
 import { store } from '../../store/store'
 import { openSnackbarA } from '../../store/actions/snackbar'
 

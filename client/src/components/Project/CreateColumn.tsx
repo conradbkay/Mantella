@@ -8,37 +8,35 @@ import {
   DialogActions,
   Button,
   Theme,
-  createStyles,
-  WithStyles,
-  IconButton,
-  withStyles
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+  IconButton
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import { Change } from '../../types/types'
 import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
 import uuid from 'uuid'
+import { makeStyles } from '@mui/styles'
 
 type ActionCreators = typeof actionCreators
 
-interface Props extends ActionCreators, WithStyles<typeof styles> {
+interface Props extends ActionCreators {
   project: TProject
   onClose(): void
 }
 
-const styles = (theme: Theme) =>
-  createStyles({
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500]
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  }
+}))
 
 const CCreateColumn = (props: Props) => {
-  const { project, onClose, classes } = props
+  const { project, onClose } = props
+  const classes = useStyles()
 
   const [name, setName] = useState('')
 
@@ -96,7 +94,4 @@ const actionCreators = {
   setList: setListA
 }
 // rename
-export const CreateColumn = connect(
-  null,
-  actionCreators
-)(withStyles(styles)(CCreateColumn))
+export const CreateColumn = connect(null, actionCreators)(CCreateColumn)

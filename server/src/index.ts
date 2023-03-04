@@ -31,9 +31,13 @@ function onListening(id: any): void {
 }
 
 const master = () => {
-  ;(async () => {
-    await connect(process.env.DB_CONNECT as string)
-  })()
+  try {
+    ;(async () => {
+      await connect(process.env.DB_CONNECT as string)
+    })()
+  } catch (err) {
+    console.log('Mongo ', err)
+  }
 
   process.once('beforeExit', async () => {
     await disconnect()

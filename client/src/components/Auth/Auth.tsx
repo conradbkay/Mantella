@@ -4,31 +4,24 @@ import {
   Paper,
   Grid,
   Button,
-  withStyles,
-  WithStyles,
   Avatar,
   Typography,
   IconButton,
-  TextField
-} from '@material-ui/core'
-import { LockOpen } from '@material-ui/icons'
-import { formStyles } from '../styles/formStyles'
+  TextField,
+  InputAdornment
+} from '@mui/material'
+import { LockOpen } from '@mui/icons-material'
+import { useFormStyles } from '../styles/formStyles'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { Link } from 'react-router-dom'
 import Helmet from 'react-helmet'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { registerA, loginA } from '../../store/actions/auth'
 import { APILogin, APIRegister } from '../../API/auth'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
-  return (
-    <TextField
-      margin="dense"
-      fullWidth
-      required
-      label="Full Name"
-      {...inputProps}
-    />
-  )
+  return <TextField margin="dense" fullWidth required {...inputProps} />
 }
 
 const socialProviders = [
@@ -41,12 +34,6 @@ const socialProviders = [
   },
   {
     imageUrl:
-      'https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/facebook_circle-512.png',
-    provider: 'facebook',
-    appId: '1232255530509893'
-  },
-  {
-    imageUrl:
       'https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-social-github-512.png',
     provider: 'github',
     appId: '373e2991118f9d8e97b1c8717ec9dd863df71461'
@@ -55,24 +42,23 @@ const socialProviders = [
 
 type ActionCreators = typeof actionCreators
 
-interface Props extends WithStyles<typeof formStyles>, ActionCreators {
+interface Props extends ActionCreators {
   authType: 'Register' | 'Login'
 }
 
-const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
+const Auth = ({ authType, openSnackbar, register, login }: Props) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmText, setConfirmText] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState('')
+
+  const classes = useFormStyles()
 
   return (
     <div style={{ margin: 20 }}>
       <Helmet>
         <style type="text/css">{` body { background-color: #1d364c; }`}</style>
-        <meta
-          content="Get started with Mantella today, totally free!"
-          name={'description'}
-        />
       </Helmet>
       <main className={classes.layout}>
         <form
@@ -96,8 +82,12 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
               }
             } else {
               const user = await APILogin(email, password)
-              login(user)
-              window.location.hash = '#/calendar'
+              if (user) {
+                login(user)
+                window.location.hash = '#/calendar'
+              } else {
+                openSnackbar('Could not login', 'error')
+              }
             }
           }}
         >
@@ -138,8 +128,20 @@ const Auth = ({ authType, openSnackbar, classes, register, login }: Props) => {
               autoComplete="on"
               label="Password"
               name="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
               value={password}
               onChange={(e: any) => setPassword(e.target.value)}
             />
@@ -204,6 +206,4 @@ const actionCreators = {
   login: loginA
 }
 
-export const AuthRender = withStyles(formStyles)(
-  connect(null, actionCreators)(Auth)
-)
+export const AuthRender = connect(null, actionCreators)(Auth)

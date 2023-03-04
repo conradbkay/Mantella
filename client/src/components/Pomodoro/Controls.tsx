@@ -1,8 +1,8 @@
 import { setLengthA } from '../../store/actions/pomodoro'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { Button } from '@material-ui/core'
-import { Add, Remove } from '@material-ui/icons'
+import { Button } from '@mui/material'
+import { Add, Remove } from '@mui/icons-material'
 import { toDaysHHMMSS } from '../../utils/utilities'
 
 type ActionCreators = typeof actionCreators

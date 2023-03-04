@@ -12,10 +12,10 @@ import {
   MenuItem,
   Select,
   TextField
-} from '@material-ui/core'
+} from '@mui/material'
 import { connect } from 'react-redux'
 import { setProjectA } from '../../../store/actions/project'
-import { Close } from '@material-ui/icons'
+import { Close } from '@mui/icons-material'
 import { ChooseColor } from '../../utils/chooseColor'
 import { TProject } from '../../../types/project'
 import { DateTimePicker } from 'react-widgets'
@@ -175,7 +175,7 @@ export const CreateTask = connect(
               dropUp
               containerClassName="fullwidth"
               value={dueDate}
-              onChange={(date) => {
+              onChange={(date: any) => {
                 setDueDate(date)
               }}
             />

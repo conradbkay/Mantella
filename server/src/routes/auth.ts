@@ -25,8 +25,12 @@ export const login = async (
 ) => {
   try {
     const [user, projects] = await Promise.all([
-      UserModel.findOne({ email: req.user.email }).lean(),
-      ProjectModel.find({ id: req.user.projects }).lean()
+      UserModel.findOne({
+        email: req.user ? (req.user as any).email : 'undefined'
+      }).lean(),
+      ProjectModel.find({
+        id: req.user ? (req.user as any).projects : 'undefined'
+      }).lean()
     ])
 
     res.json({
@@ -40,7 +44,7 @@ export const login = async (
   }
 }
 
-/* for some reason session: true is required for persistent login */
+// doesn't work without {session: true}
 router.post('/login', passport.authenticate('local', { session: true }), login)
 router.post('/cookieLogin', isAuthenticated, login)
 
@@ -81,10 +85,12 @@ export const register = async (req: registerReq, res: registerRes) => {
       }
     } as registerResObj)
   } catch (err) {
+    console.log(err)
     throw new Error('Could not register, is that email address already in use?')
   }
 }
 
+// todo: make session persist
 router.post('/register', register)
 
 export const logout = async (req: Request, res: Response) => {

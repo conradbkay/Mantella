@@ -10,7 +10,7 @@ import {
   FormHelperText,
   Typography,
   IconButton
-} from '@material-ui/core'
+} from '@mui/material'
 import uuid from 'uuid'
 import { connect } from 'react-redux'
 import { TState } from '../../../../types/state'
@@ -19,7 +19,7 @@ import { setTaskA } from '../../../../store/actions/task'
 import { ChooseColor } from '../../../utils/chooseColor'
 import { setProjectA } from '../../../../store/actions/project'
 import DateTimePicker from 'react-widgets/lib/DateTimePicker'
-import { Add, Delete } from '@material-ui/icons'
+import { Add, Delete } from '@mui/icons-material'
 import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'

@@ -1,30 +1,21 @@
 import { CSSProperties } from 'react'
 import { TProject } from '../../types/project'
-import {
-  Select,
-  MenuItem,
-  IconButton,
-  Theme,
-  createStyles,
-  WithStyles,
-  withStyles
-} from '@material-ui/core'
-import { NavigateBefore, NavigateNext } from '@material-ui/icons'
+import { Select, MenuItem, IconButton, Theme } from '@mui/material'
+import { NavigateBefore, NavigateNext } from '@mui/icons-material'
 import { format, addDays, subDays } from 'date-fns'
-
+import { makeStyles } from '@mui/styles'
 const mobilePx = 750
 
-const styles = (theme: Theme) =>
-  createStyles({
-    nav: {
-      [theme.breakpoints.up(mobilePx)]: {
-        ...boxStyle
-      },
-      [theme.breakpoints.down(mobilePx)]: {
-        marginRight: 'auto'
-      }
+const useStyles = makeStyles((theme: Theme) => ({
+  nav: {
+    [theme.breakpoints.up(mobilePx)]: {
+      ...boxStyle
+    },
+    [theme.breakpoints.down(mobilePx)]: {
+      marginRight: 'auto'
     }
-  })
+  }
+}))
 
 const boxStyle: CSSProperties = {
   alignItems: 'center',
@@ -33,7 +24,7 @@ const boxStyle: CSSProperties = {
   justifyContent: 'center'
 }
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   projects: TProject[]
   toggleProject: (id: string[]) => void
   currIds: string[]
@@ -41,8 +32,10 @@ interface Props extends WithStyles<typeof styles> {
   setDate: (newDay: Date) => void
 }
 
-const CWeekControls = (props: Props) => {
+export const WeekControls = (props: Props) => {
   const { projects, toggleProject, currIds } = props
+
+  const classes = useStyles()
 
   return (
     <div
@@ -75,7 +68,7 @@ const CWeekControls = (props: Props) => {
           </MenuItem>
         ))}
       </Select>
-      <div className={props.classes.nav}>
+      <div className={classes.nav}>
         <IconButton onClick={() => props.setDate(subDays(props.startDay, 6))}>
           <NavigateBefore />
         </IconButton>
@@ -93,5 +86,3 @@ const CWeekControls = (props: Props) => {
     </div>
   )
 }
-
-export const WeekControls = withStyles(styles)(CWeekControls)

@@ -1,4 +1,4 @@
-import { Icon, Paper } from '@material-ui/core'
+import { Icon, Paper } from '@mui/material'
 
 const galleryOptions = [
   {

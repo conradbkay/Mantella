@@ -4,18 +4,16 @@ import {
   DialogContentText,
   Button,
   Theme,
-  createStyles,
-  WithStyles,
   IconButton,
-  withStyles,
   DialogTitle,
   TextField,
   Grid
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+} from '@mui/material'
+import { Close } from '@mui/icons-material'
 import { useState } from 'react'
+import { makeStyles } from '@mui/styles'
 
-interface Props extends WithStyles<typeof styles> {
+interface Props {
   id: string
   name: 'Project' | 'Column' | 'Content'
   inputName?: string
@@ -23,15 +21,14 @@ interface Props extends WithStyles<typeof styles> {
   deleteFunc(id: string): void
 }
 
-const styles = (theme: Theme) =>
-  createStyles({
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500]
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  }
+}))
 
 const DeleteColumnDialogComponent = (props: Props) => {
   const [confirm, setConfirm] = useState('')
@@ -41,7 +38,9 @@ const DeleteColumnDialogComponent = (props: Props) => {
     props.onClose() // need this so it doesn't delete another column
   }
 
-  const { onClose, classes, name, inputName } = props
+  const classes = useStyles()
+
+  const { onClose, name, inputName } = props
   return (
     <Dialog open={true} onClose={onClose}>
       <DialogTitle>Delete {inputName ? inputName : name}</DialogTitle>
@@ -91,4 +90,4 @@ const DeleteColumnDialogComponent = (props: Props) => {
   )
 }
 
-export const DeleteDialog = withStyles(styles)(DeleteColumnDialogComponent)
+export const DeleteDialog = DeleteColumnDialogComponent

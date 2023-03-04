@@ -5,8 +5,8 @@ import {
   TableRow,
   TableCell,
   TableBody
-} from '@material-ui/core'
-import { Check, Close, Traffic } from '@material-ui/icons'
+} from '@mui/material'
+import { Check, Close, Traffic } from '@mui/icons-material'
 import { CSSProperties } from 'react'
 
 const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']

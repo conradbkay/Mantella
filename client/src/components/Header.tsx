@@ -1,11 +1,8 @@
 import { useState, Fragment } from 'react'
-import withStyles from '@material-ui/core/styles/withStyles'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import MenuIcon from '@material-ui/icons/Menu'
+import MenuIcon from '@mui/icons-material/Menu'
 import {
   Theme,
-  WithStyles,
-  createStyles,
   IconButton,
   List,
   ListItem,
@@ -17,10 +14,11 @@ import {
   Menu,
   Typography,
   Grid,
-  Toolbar,
   AppBar,
   Tabs
-} from '@material-ui/core'
+} from '@mui/material'
+import { Slide, useScrollTrigger } from '@mui/material'
+import { ReactElement } from 'react'
 import { Trail } from 'react-spring/renderprops'
 import {
   HowToReg,
@@ -28,12 +26,13 @@ import {
   Help,
   Settings,
   Home
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
 import { ProjectFinder } from './ProjectFinder/ProjectFinder'
 import { HoverableAvatar } from './utils/HoverableAvatar'
+import { makeStyles } from '@mui/styles'
 
 const noAuthItems = [
   {
@@ -63,59 +62,81 @@ const authItems = [
   }
 ]
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBar: {
-      position: 'relative',
-      boxShadow: 'none',
-      borderBottom: `1px solid ${theme.palette.grey['100']}`,
-      backgroundColor: 'white'
-    },
-    inline: {
-      display: 'inline'
-    },
-    flex: {
-      display: 'flex'
-    },
-    link: {
-      textDecoration: 'none',
-      color: 'inherit'
-    },
-    tagline: {
-      display: 'inline-block',
-      marginLeft: 10
-    },
-    iconContainer: {
-      display: 'none',
-      [theme.breakpoints.down('md')]: {
-        display: 'block',
-        marginLeft: 'auto'
-      }
-    },
-    tabContainer: {
-      marginLeft: 'auto',
-      [theme.breakpoints.down('md')]: {
-        display: 'none'
-      }
-    },
-    tabItem: {
-      paddingTop: 20,
-      paddingBottom: 20,
-      minWidth: 'auto'
-    },
-    iconButton: {}
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  appBar: {
+    borderBottom: `1px solid ${theme.palette.grey['300']}`,
+    backgroundColor: 'white'
+  },
+  fullHeight: {
+    height: '100%'
+  },
+  mainHeader: {
+    width: '100%',
+    padding: '0px 18px',
+    height: 81.5,
+    maxWidth: '100vw',
+    [theme.breakpoints.down('sm')]: {
+      padding: '0px 12px'
+    }
+  },
+  inline: {
+    display: 'inline'
+  },
+  flex: {
+    display: 'flex'
+  },
+  link: {
+    textDecoration: 'none',
+    color: 'inherit'
+  },
+  tagline: {
+    display: 'inline-block',
+    marginLeft: 10
+  },
+  iconContainer: {
+    display: 'none',
+    [theme.breakpoints.down('md')]: {
+      display: 'block',
+      marginLeft: 'auto'
+    }
+  },
+  tabContainer: {
+    height: '100%',
+    marginLeft: 'auto',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  },
+  tabItem: {
+    paddingTop: 20,
+    paddingBottom: 20,
+    minWidth: 'auto',
+    height: '100%'
+  },
+  iconButton: {}
+}))
 
-interface Props
-  extends WithStyles<typeof styles>,
-    RouteComponentProps,
-    ReturnType<typeof mapState> {}
+type HideOnScrollProps = {
+  children: ReactElement
+}
+
+const HideOnScroll: React.FC<HideOnScrollProps> = ({ children }) => {
+  const trigger = useScrollTrigger()
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  )
+}
+
+interface Props extends RouteComponentProps, ReturnType<typeof mapState> {}
 
 const Topbar = (props: Props) => {
   const [drawer, setDrawer] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
 
-  const { classes } = props
+  const classes = useStyles()
 
   const MenuItems = props.authenticated !== null ? authItems : noAuthItems
 
@@ -125,13 +146,25 @@ const Topbar = (props: Props) => {
 
   return (
     <>
-      <AppBar position="absolute" color="default" className={classes.appBar}>
-        <Toolbar style={{ minHeight: 64, padding: '0px 24px' }}>
-          <Grid container spacing={3} alignItems="center">
+      <HideOnScroll>
+        <AppBar
+          position="fixed"
+          color="default"
+          className={classes.appBar}
+          style={{
+            boxShadow: 'none'
+          }}
+        >
+          <Grid
+            container
+            spacing={3}
+            alignItems="center"
+            className={classes.mainHeader}
+          >
             <Grid
               item
               xs={12}
-              style={{ alignItems: 'center' }}
+              style={{ alignItems: 'center', height: '100%' }}
               className={classes.flex}
             >
               {props.authenticated !== null && (
@@ -202,11 +235,13 @@ const Topbar = (props: Props) => {
                     value={value === -1 ? false : value}
                     indicatorColor="primary"
                     textColor="primary"
+                    classes={{ flexContainer: classes.fullHeight }}
+                    style={{ height: '100%' }}
                   >
                     {MenuItems.map((item, index) => (
                       <Tab
                         disabled={location.hash.slice(1) === item.pathname}
-                        style={{ minWidth: 96 }}
+                        style={{ minWidth: 96, height: '100%' }}
                         key={index}
                         to={item.pathname}
                         component={NavLink}
@@ -223,8 +258,8 @@ const Topbar = (props: Props) => {
               </Fragment>
             </Grid>
           </Grid>
-        </Toolbar>
-      </AppBar>
+        </AppBar>
+      </HideOnScroll>
       <Drawer anchor="right" open={drawer} onClose={() => setDrawer(false)}>
         <div style={{ width: 'auto' }}>
           <List>
@@ -253,6 +288,4 @@ const mapState = (state: TState) => ({
   authenticated: state.user
 })
 
-const Routed = withRouter(connect(mapState)(Topbar))
-
-export const Header = withStyles(styles)(Routed)
+export const Header = withRouter(connect(mapState)(Topbar))

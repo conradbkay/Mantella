@@ -1,15 +1,13 @@
 import {
-  withStyles,
-  WithStyles,
   Avatar,
   Typography,
   Button,
   TextField,
   CircularProgress,
   Paper
-} from '@material-ui/core'
-import { formStyles } from '../styles/formStyles'
-import { CalendarTodayRounded } from '@material-ui/icons'
+} from '@mui/material'
+import { useFormStyles } from '../styles/formStyles'
+import { CalendarTodayRounded } from '@mui/icons-material'
 import { connect } from 'react-redux'
 import { Change } from '../../types/types'
 import { TState } from '../../types/state'
@@ -19,9 +17,7 @@ import { setProjectA } from '../../store/actions/project'
 import Helmet from 'react-helmet'
 import { APICreateProject } from '../../API/project'
 
-type CreateProjectProps = WithStyles<typeof formStyles> &
-  typeof actionCreators &
-  ReturnType<typeof mapState>
+type CreateProjectProps = typeof actionCreators & ReturnType<typeof mapState>
 
 const CCreateProject = (props: CreateProjectProps) => {
   const [name, setName] = useState('')
@@ -43,7 +39,7 @@ const CCreateProject = (props: CreateProjectProps) => {
     setLoading(false)
   }
 
-  const { classes } = props
+  const classes = useFormStyles()
 
   return (
     <>
@@ -106,7 +102,4 @@ const actionCreators = {
   setProject: setProjectA
 }
 
-export const CreateProject = connect(
-  mapState,
-  actionCreators
-)(withStyles(formStyles)(CCreateProject))
+export const CreateProject = connect(mapState, actionCreators)(CCreateProject)

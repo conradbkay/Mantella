@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { getDate, getDay, isPast, addHours } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
-import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { useState } from 'react'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
@@ -18,9 +17,7 @@ function sameDay(d1: Date, d2: Date) {
 
 const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const styles = (theme: Theme) => ({})
-
-interface Props extends ReturnType<typeof mapState>, WithStyles<typeof styles> {
+interface Props extends ReturnType<typeof mapState> {
   day: Date
   index: 0 | 1 | 2 | 3 | 4 | 5 | 6
   filteringProjects: string[]
@@ -124,4 +121,4 @@ const mapState = (state: TState) => ({
   projects: state.projects
 })
 
-export const WeekDay = withStyles(styles)(connect(mapState)(CWeekDay))
+export const WeekDay = connect(mapState)(CWeekDay)

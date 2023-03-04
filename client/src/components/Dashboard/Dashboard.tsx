@@ -5,7 +5,7 @@ import {
   Fab,
   Tooltip,
   Typography
-} from '@material-ui/core'
+} from '@mui/material'
 import { CSSProperties, useState } from 'react'
 import {
   DragDropContext,
@@ -25,7 +25,7 @@ import {
 import { BaseTask } from '../Project/Task/Base'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
 import { Link } from 'react-router-dom'
-import { Add } from '@material-ui/icons'
+import { Add } from '@mui/icons-material'
 
 const root: CSSProperties = {
   display: 'flex',

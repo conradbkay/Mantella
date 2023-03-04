@@ -1,5 +1,5 @@
 import { ProjectModel } from '../models/Project'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 import { router } from './router'
 import {
   createListReq,

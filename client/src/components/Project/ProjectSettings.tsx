@@ -8,11 +8,11 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar
-} from '@material-ui/core'
+} from '@mui/material'
 import { connect } from 'react-redux'
 import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
-import { Delete } from '@material-ui/icons'
+import { Delete } from '@mui/icons-material'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { useState } from 'react'
 

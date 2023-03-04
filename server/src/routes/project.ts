@@ -1,6 +1,6 @@
 import { UserModel } from '../models/User'
 import { ProjectModel } from '../models/Project'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
 import {
   createProjectReq,
   createProjectRes,
@@ -33,7 +33,7 @@ export const createProject = async (
 ) => {
   const creatingId = uuid()
   const listId = uuid()
-  const user = await UserModel.findOne({ id: req.user.id })
+  const user = await UserModel.findOne({ id: (req.user as any).id })
   if (user) {
     user.projects.push(creatingId)
 
@@ -95,7 +95,7 @@ export const deleteProject = async (
   req: deleteProjectReq,
   res: deleteProjectRes
 ) => {
-  const user = await UserModel.findOne({ id: req.user.id })
+  const user = await UserModel.findOne({ id: (req.user as any).id })
 
   if (user) {
     user.projects = user.projects.filter((proj: any) => proj !== req.body.id)
@@ -119,7 +119,7 @@ export const deleteProject = async (
 router.post('/deleteProject', isAuthenticated, deleteProject)
 
 export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
-  const id = req.user.id
+  const id = (req.user as any).id
   if (id) {
     const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {
@@ -149,7 +149,7 @@ export const leaveProject = async (
   req: leaveProjectReq,
   res: leaveProjectRes
 ) => {
-  const id = req.user.id
+  const id = (req.user as any).id
   if (id) {
     const project = await ProjectModel.findOne({ id: req.body.projectId })
     if (!project) {

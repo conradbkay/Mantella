@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { WithStyles, Theme, createStyles, withStyles } from '@material-ui/core'
+import { Theme } from '@mui/material'
 import { setTaskA } from '../../store/actions/task'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
@@ -9,13 +9,11 @@ import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
 import { differenceInCalendarDays } from 'date-fns'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
+import { makeStyles } from '@mui/styles'
 
 type ActionCreators = typeof actionCreators
 
-interface TProps
-  extends ReturnType<typeof mapState>,
-    ActionCreators,
-    WithStyles<typeof styles> {}
+interface TProps extends ReturnType<typeof mapState>, ActionCreators {}
 
 /** Gets the day behind the passed date, the passed date, and the 5 dates after passed date */
 const getDays = (start: Date): Date[] => {
@@ -27,24 +25,23 @@ const getDays = (start: Date): Date[] => {
   return result
 }
 
-const styles = (theme: Theme) =>
-  createStyles({
-    dragContainer: {
-      border: '1px solid #dadce0',
-      borderRadius: '.8rem',
-      overflowX: 'hidden',
-      marginTop: 10
-    },
-    tasksContainer: {
-      minHeight: 200,
-      overflowX: 'auto',
-      display: 'flex',
-      flex: '1 1 auto',
-      overflowY: 'hidden'
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  dragContainer: {
+    border: '1px solid #dadce0',
+    borderRadius: '.8rem',
+    overflowX: 'hidden',
+    marginTop: 10
+  },
+  tasksContainer: {
+    minHeight: 200,
+    overflowX: 'auto',
+    display: 'flex',
+    flex: '1 1 auto',
+    overflowY: 'hidden'
+  }
+}))
 
-const CWeek = withStyles(styles)((props: TProps) => {
+const CWeek = (props: TProps) => {
   const [filterProjectId, setFilterProjectId] = useState(['-1'])
   const [baseDay, setBaseDay] = useState(new Date())
 
@@ -83,6 +80,8 @@ const CWeek = withStyles(styles)((props: TProps) => {
     })
   }
 
+  const classes = useStyles()
+
   const days = getDays(baseDay)
   return (
     <>
@@ -97,8 +96,8 @@ const CWeek = withStyles(styles)((props: TProps) => {
           setDate={(newDay: Date) => setBaseDay(newDay)}
         />
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className={props.classes.dragContainer}>
-            <div className={props.classes.tasksContainer}>
+          <div className={classes.dragContainer}>
+            <div className={classes.tasksContainer}>
               {days.map((day, i) => (
                 <WeekDay
                   filteringProjects={filterProjectId}
@@ -118,7 +117,7 @@ const CWeek = withStyles(styles)((props: TProps) => {
       )}
     </>
   )
-})
+}
 
 const mapState = (state: TState) => ({
   projects: state.projects

@@ -7,8 +7,8 @@ import {
   toggleStopwatchA,
   resetStopwatchA
 } from '../../store/actions/pomodoro'
-import { Button } from '@material-ui/core'
-import { PlayArrow, Pause } from '@material-ui/icons'
+import { Button } from '@mui/material'
+import { PlayArrow, Pause } from '@mui/icons-material'
 
 type ActionCreators = typeof actionCreators
 

@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, CSSProperties } from 'react'
 import { connect } from 'react-redux'
 import {
-  WithStyles,
-  withStyles,
   Theme,
-  createStyles,
   Tooltip,
   Paper,
   AppBar,
   Toolbar,
   IconButton,
-  TableBody
-} from '@material-ui/core'
+  TableBody,
+  SpeedDial,
+  SpeedDialAction
+} from '@mui/material'
 import { TState } from '../../types/state'
 import { selectMemberA, setProjectA } from '../../store/actions/project'
 import { CreateColumn } from './CreateColumn'
@@ -22,7 +21,7 @@ import {
   Equalizer,
   Create,
   Send
-} from '@material-ui/icons'
+} from '@mui/icons-material'
 import {
   DragDropContext,
   Draggable,
@@ -38,18 +37,16 @@ import { ProjectCell } from './Cell/ProjectCell'
 import { CreateTask } from './Task/Create'
 import { EditTaskModal } from './Task/Edit/Edit'
 import { setListA } from '../../store/actions/list'
-import SpeedDial from '@material-ui/lab/SpeedDial'
-import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
 import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
-import { CSSProperties } from '@material-ui/styles'
 import { APIDragTask } from '../../API/task'
 import { onDragEnd } from '../../utils/dragTask'
 import { ShareProject } from './ShareProject'
 import { HoverableAvatar } from '../utils/HoverableAvatar'
 import axios from 'axios'
 import { setTaskA } from '../../store/actions/task'
+import makeStyles from '@mui/styles/makeStyles'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -73,21 +70,18 @@ export const input: CSSProperties = {
   '&:focus': {
     borderColor: '#27b6ba'
   }
-}
+} as any
 
-const styles = (theme: Theme) =>
-  createStyles({
-    fab: {
-      position: 'fixed',
-      bottom: theme.spacing(2),
-      right: theme.spacing(2)
-    },
-    tooltip: {
-      fontSize: 18
-    },
-    appbar: {},
-    input: input
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2)
+  },
+  tooltip: {
+    fontSize: 18
+  }
+}))
 
 type ActionCreators = typeof actionCreators
 
@@ -100,8 +94,7 @@ type OwnProps = {
 interface TProps
   extends ReturnType<typeof mapState>,
     ActionCreators,
-    OwnProps,
-    WithStyles<typeof styles> {}
+    OwnProps {}
 
 export const getMobile = (window: Window) => {
   return window.innerWidth <= 1000
@@ -199,7 +192,10 @@ const CProject = (props: TProps) => {
     setEditingList(['', ''])
   }
 
-  const { classes, project } = props
+  const { project } = props
+
+  const classes = useStyles()
+
   if (project) {
     return (
       <div>
@@ -214,11 +210,10 @@ const CProject = (props: TProps) => {
             }
           }}
         >
-          <AppBar color="default" className={classes.appbar} position="static">
+          <AppBar color="default" position="static">
             <Toolbar>
               <input
-                style={{ width: `${windowWidth - 300}px` }}
-                className={classes.input}
+                style={{ ...input, width: `${windowWidth - 300}px` }}
                 value={name}
                 onBlur={() =>
                   props.setProject({
@@ -415,7 +410,7 @@ const CProject = (props: TProps) => {
             <SpeedDialAction
               icon={<Create />}
               tooltipTitle="Create Task"
-              onClick={(e) => {
+              onClick={(e: any) => {
                 e.stopPropagation()
                 setCreating(project.lists[0].id)
               }}
@@ -472,6 +467,4 @@ const actionCreators = {
   setTask: setTaskA
 }
 
-export const Project = withStyles(styles)(
-  connect(mapState, actionCreators)(CProject)
-)
+export const Project = connect(mapState, actionCreators)(CProject)
