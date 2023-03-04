@@ -5,7 +5,6 @@
   "main": "./server/src/index.ts",
   "scripts": {
     "start": "npm start --prefix server",
-    "build": "npm i --prefix server && cd client && npm install && npm run build",
     "client": "npm start --prefix client"
   },
   "engines": {
