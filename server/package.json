@@ -18,7 +18,7 @@
     "npm": "8.1.0"
   },
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=460 ./build/src/index.js",
+    "start": "node --optimize_for_size --max_old_space_size=460 ./build/index.js",
     "dev": "nodemon",
     "build": "tsc --project tsconfig.prod.json",
     "fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'",
