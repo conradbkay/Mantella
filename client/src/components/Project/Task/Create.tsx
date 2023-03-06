@@ -15,10 +15,10 @@ import {
 } from '@mui/material'
 import { connect } from 'react-redux'
 import { setProjectA } from '../../../store/actions/project'
-import { Close } from '@mui/icons-material'
+import Close from '@mui/icons-material/Close'
 import { ChooseColor } from '../../utils/chooseColor'
 import { TProject } from '../../../types/project'
-import { DateTimePicker } from 'react-widgets'
+import DatePicker from 'react-widgets/DatePicker'
 import { APICreateTask } from '../../../API/task'
 const actionCreators = {
   setProject: setProjectA
@@ -171,7 +171,8 @@ export const CreateTask = connect(
             </FormControl>
           </div>
           <div style={{ display: 'flex', marginTop: 20 }}>
-            <DateTimePicker
+            <DatePicker
+              includeTime
               dropUp
               containerClassName="fullwidth"
               value={dueDate}

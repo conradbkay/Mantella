@@ -10,14 +10,10 @@ import { LinearProgress, Badge, IconButton } from '@mui/material'
 import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
-import {
-  CheckBox,
-  CheckBoxOutlineBlankOutlined,
-  PlayArrow,
-  Pause,
-  Comment,
-  List
-} from '@mui/icons-material'
+import PlayArrow from '@mui/icons-material/PlayArrow'
+import Pause from '@mui/icons-material/Pause'
+import Comment from '@mui/icons-material/Comment'
+import List from '@mui/icons-material/List'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
@@ -25,8 +21,9 @@ import { setSubtaskA } from '../../../store/actions/task'
 import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../../API/project'
 import { Editor } from 'draft-js'
-import { getEditorStateFromTaskDescription } from './Edit/Edit'
+import { getEditorStateFromTaskDescription } from './Edit/getEditorState'
 import { makeStyles } from '@mui/styles'
+import { SubtaskMap } from './SubtaskMap'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -48,64 +45,6 @@ const useInterval = (callback: () => void, delay: number) => {
     return
   }, [delay])
 }
-
-export const SubtaskMap = ({
-  subTasks,
-  onCheckbox,
-  taskId,
-  show
-}: {
-  subTasks: TSubtask[]
-  onCheckbox: (newSub: TSubtask) => void
-  taskId: string
-  show: boolean
-}) => (
-  <div style={{ marginLeft: 30 }}>
-    <Transition
-      initial={null}
-      native
-      items={show ? subTasks : []}
-      keys={show ? subTasks.map((subTask) => subTask.id) : []}
-      from={{ opacity: 1, height: 0, overflow: 'hidden' }}
-      enter={{ opacity: 1, height: 'auto' }}
-      leave={{ opacity: 0, height: 0, overflow: 'hidden' }}
-    >
-      {(subTask) => (props) =>
-        (
-          <animated.div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              ...props
-            }}
-          >
-            <div
-              style={{
-                marginTop: 6
-              }}
-            >
-              {subTask.completed ? (
-                <CheckBox
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: false })
-                  }}
-                />
-              ) : (
-                <CheckBoxOutlineBlankOutlined
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: true })
-                  }}
-                />
-              )}
-            </div>
-            <span style={{ marginLeft: 8 }}>{subTask.name}</span>
-          </animated.div>
-        )}
-    </Transition>
-  </div>
-)
 
 interface OwnProps {
   project: TProject

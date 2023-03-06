@@ -25,7 +25,7 @@ import {
 import { BaseTask } from '../Project/Task/Base'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
 import { Link } from 'react-router-dom'
-import { Add } from '@mui/icons-material'
+import Add from '@mui/icons-material/Add'
 
 const root: CSSProperties = {
   display: 'flex',

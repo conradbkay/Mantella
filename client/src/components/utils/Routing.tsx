@@ -11,25 +11,6 @@ interface TProps extends ReturnType<typeof mapState>, RouteProps {
   componentProps: any
 }
 
-export const PrivateRoute = connect(mapState)(
-  ({ component: PropComponent, componentProps, user, ...rest }: TProps) => {
-    return (
-      <Route
-        {...rest}
-        render={(props) =>
-          user !== null ? (
-            <PropComponent
-              params={props.match.params}
-              {...(componentProps as typeof PropComponent['props'])}
-            />
-          ) : (
-            <Redirect to="/login" />
-          )
-        }
-      />
-    )
-  }
-)
 export const PublicOnlyRoute = connect(mapState)(
   ({ component: PropComponent, componentProps, user, ...rest }: TProps) => {
     return (

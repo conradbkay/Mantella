@@ -7,7 +7,7 @@ import {
   Paper
 } from '@mui/material'
 import { useFormStyles } from '../styles/formStyles'
-import { CalendarTodayRounded } from '@mui/icons-material'
+import CalendarTodayRounded from '@mui/icons-material/CalendarTodayRounded'
 import { connect } from 'react-redux'
 import { Change } from '../../types/types'
 import { TState } from '../../types/state'

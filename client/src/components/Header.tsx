@@ -20,13 +20,11 @@ import {
 import { Slide, useScrollTrigger } from '@mui/material'
 import { ReactElement } from 'react'
 import { Trail } from 'react-spring/renderprops'
-import {
-  HowToReg,
-  CalendarToday,
-  Help,
-  Settings,
-  Home
-} from '@mui/icons-material'
+import HowToReg from '@mui/icons-material/HowToReg'
+import CalendarToday from '@mui/icons-material/CalendarToday'
+import Help from '@mui/icons-material/Help'
+import Settings from '@mui/icons-material/Settings'
+import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'

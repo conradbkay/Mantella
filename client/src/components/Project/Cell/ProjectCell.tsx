@@ -4,9 +4,11 @@ import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
 import { IconButton, Menu as MuiMenu, MenuItem } from '@mui/material'
 import { id } from '../../../utils/utilities'
-import { Menu, Add } from '@mui/icons-material'
-import { input, TFilterData } from '../Project'
+import Menu from '@mui/icons-material/Menu'
+import Add from '@mui/icons-material/Add'
 import { filterTask, filterTasks } from '../../../utils/filterTasks'
+import { TFilterData } from '../types'
+import { input } from '../styles'
 
 interface Props {
   project: TProject

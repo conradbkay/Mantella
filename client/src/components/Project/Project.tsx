@@ -1,4 +1,4 @@
-import { useEffect, useState, CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import {
   Theme,
@@ -14,14 +14,12 @@ import {
 import { TState } from '../../types/state'
 import { selectMemberA, setProjectA } from '../../store/actions/project'
 import { CreateColumn } from './CreateColumn'
-import {
-  Add,
-  FilterList,
-  Settings,
-  Equalizer,
-  Create,
-  Send
-} from '@mui/icons-material'
+import Add from '@mui/icons-material/Add'
+import FilterList from '@mui/icons-material/FilterList'
+import Settings from '@mui/icons-material/Settings'
+import Equalizer from '@mui/icons-material/Equalizer'
+import Create from '@mui/icons-material/Create'
+import Send from '@mui/icons-material/Send'
 import {
   DragDropContext,
   Draggable,
@@ -47,30 +45,11 @@ import { HoverableAvatar } from '../utils/HoverableAvatar'
 import axios from 'axios'
 import { setTaskA } from '../../store/actions/task'
 import makeStyles from '@mui/styles/makeStyles'
+import { input } from './styles'
 
 /**
  * @todo add a filter menu with color, column, due date, label
  */
-
-export const input: CSSProperties = {
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-  minWidth: '20%',
-  fontSize: 18,
-  outline: 'none',
-  backgroundColor: '#f5f5f5',
-  borderRadius: 4,
-  width: 'auto',
-  padding: 8,
-  border: '1px solid transparent',
-  '&:hover': {
-    backgroundColor: 'white'
-  },
-  '&:focus': {
-    borderColor: '#27b6ba'
-  }
-} as any
 
 const useStyles = makeStyles((theme: Theme) => ({
   fab: {
@@ -96,7 +75,7 @@ interface TProps
     ActionCreators,
     OwnProps {}
 
-export const getMobile = (window: Window) => {
+const getMobile = (window: Window) => {
   return window.innerWidth <= 1000
 }
 

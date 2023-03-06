@@ -11,19 +11,10 @@
     "importHelpers": true,
     "noEmitHelpers": true,
     "jsx": "react-jsx",
-    "lib": [
-      "dom",
-      "es6",
-      "es2016",
-      "es2017",
-      "esnext.asynciterable"
-    ],
-    "types": [
-      "node",
-      "jest"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["vite/client", "vite-plugin-svgr/client", "vitest/globals"],
     "rootDir": "src",
-    "target": "es6",
+    "target": "ESNext",
     "module": "esnext",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,

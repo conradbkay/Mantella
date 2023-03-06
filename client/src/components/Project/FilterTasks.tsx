@@ -1,4 +1,4 @@
-import { TFilterData } from './Project'
+import { TFilterData } from './types'
 import {
   Drawer,
   List,
@@ -16,7 +16,7 @@ import {
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
-import { DateTimePicker } from 'react-widgets'
+import DatePicker from 'react-widgets/DatePicker'
 import { isArray } from 'lodash'
 import { useState } from 'react'
 import { makeStyles } from '@mui/styles'
@@ -153,7 +153,8 @@ const FilterTasksComponent = (props: Props) => {
                     flexDirection: 'column'
                   }}
                 >
-                  <DateTimePicker
+                  <DatePicker
+                    includeTime
                     containerClassName="fullwidth gap"
                     value={(filterData.dueDate[0] as any) || undefined}
                     onChange={(date: Date | undefined) => {
@@ -180,7 +181,8 @@ const FilterTasksComponent = (props: Props) => {
                       }
                     }}
                   />
-                  <DateTimePicker
+                  <DatePicker
+                    includeTime
                     containerClassName="fullwidth"
                     value={(filterData.dueDate[1] as any) || undefined}
                     onChange={(date: Date | undefined) => {

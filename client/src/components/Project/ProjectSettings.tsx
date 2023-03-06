@@ -12,7 +12,7 @@ import {
 import { connect } from 'react-redux'
 import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
-import { Delete } from '@mui/icons-material'
+import Delete from '@mui/icons-material/Delete'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { useState } from 'react'
 

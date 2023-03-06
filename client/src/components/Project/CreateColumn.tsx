@@ -10,7 +10,7 @@ import {
   Theme,
   IconButton
 } from '@mui/material'
-import { Close } from '@mui/icons-material'
+import Close from '@mui/icons-material/Close'
 import { Change } from '../../types/types'
 import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'

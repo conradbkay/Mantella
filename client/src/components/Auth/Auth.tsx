@@ -10,7 +10,7 @@ import {
   TextField,
   InputAdornment
 } from '@mui/material'
-import { LockOpen } from '@mui/icons-material'
+import LockOpen from '@mui/icons-material/LockOpen'
 import { useFormStyles } from '../styles/formStyles'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { Link } from 'react-router-dom'
