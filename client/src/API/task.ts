@@ -34,3 +34,21 @@ export const APIEditTask = async (newTask: TTask, projectId: string) => {
 
   return res.data
 }
+
+export const APIAssignUserToTask = async ({
+  taskId,
+  projId,
+  userId
+}: {
+  taskId: string
+  projId: string
+  userId: string
+}) => {
+  const { data } = await axios.post('/assignUserToTask', {
+    taskId,
+    projId,
+    userId
+  })
+
+  return data.task
+}

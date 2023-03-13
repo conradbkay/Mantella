@@ -3,13 +3,11 @@ import { Theme } from '@mui/material'
 import { setTaskA } from '../../store/actions/task'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { DropResult, DragDropContext } from 'react-beautiful-dnd'
 import { subDays, addDays } from 'date-fns'
 import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
-import { differenceInCalendarDays } from 'date-fns'
-import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { makeStyles } from '@mui/styles'
+import { TTask } from '../../types/project'
 
 type ActionCreators = typeof actionCreators
 
@@ -51,38 +49,36 @@ const CWeek = (props: TProps) => {
 
   const weekEmpty = allTasks.filter((task) => task.dueDate).length
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
-
-    if (!destination || source.droppableId === destination.droppableId) {
-      return // dragging outside boundaries or dropping into the same day
-    }
-
-    const task = allTasks[id(allTasks, draggableId)]
-
-    const findNewDate = (taskDueDate: string) => {
-      const newDay = new Date(parseInt(destination.droppableId))
-
-      const diff = differenceInCalendarDays(newDay, new Date(taskDueDate))
-
-      return addDays(new Date(taskDueDate), diff).toString()
-    }
-
-    const newTask = {
-      ...task,
-      dueDate: findNewDate(allTasks[id(allTasks, draggableId)].dueDate!)
-    }
-
-    props.setTask({
-      id: draggableId,
-      newTask,
-      projectId: getProjectIdFromTaskId(props.projects, draggableId)
-    })
-  }
-
   const classes = useStyles()
 
   const days = getDays(baseDay)
+
+  const weekTasks: TTask[][] = new Array(7).fill([])
+
+  for (let task of allTasks) {
+    if (!task.dueDate) continue
+
+    const taskDay = days
+      .map((day) => day.getMonth() + '|' + day.getDate())
+      .indexOf(
+        new Date(task.dueDate).getMonth() +
+          '|' +
+          new Date(task.dueDate).getDate()
+      )
+
+    if (taskDay === -1) {
+      continue
+    }
+
+    weekTasks[taskDay].push(task)
+  }
+
+  for (let i = 0; i < weekTasks.length; i++) {
+    weekTasks[i].sort((a, b) => {
+      return new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
+    })
+  }
+
   return (
     <>
       <div style={{ margin: 20 }}>
@@ -95,20 +91,20 @@ const CWeek = (props: TProps) => {
           }}
           setDate={(newDay: Date) => setBaseDay(newDay)}
         />
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className={classes.dragContainer}>
-            <div className={classes.tasksContainer}>
-              {days.map((day, i) => (
-                <WeekDay
-                  filteringProjects={filterProjectId}
-                  day={day}
-                  key={i}
-                  index={i as any}
-                />
-              ))}
-            </div>
+
+        <div className={classes.dragContainer}>
+          <div className={classes.tasksContainer}>
+            {days.map((day, i) => (
+              <WeekDay
+                tasks={weekTasks[i]}
+                filteringProjects={filterProjectId}
+                day={day}
+                key={i}
+                index={i as any}
+              />
+            ))}
           </div>
-        </DragDropContext>
+        </div>
       </div>
       {weekEmpty && (
         <h1 style={{ margin: '20px auto', textAlign: 'center' }}>

@@ -1,14 +1,15 @@
 import { ChangeEvent, CSSProperties, useState } from 'react'
 import { TList, TProject, TTask } from '../../../types/project'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
 import { IconButton, Menu as MuiMenu, MenuItem } from '@mui/material'
 import { id } from '../../../utils/utilities'
 import Menu from '@mui/icons-material/Menu'
 import Add from '@mui/icons-material/Add'
-import { filterTask, filterTasks } from '../../../utils/filterTasks'
+import { filterTask /*filterTasks*/ } from '../../../utils/filterTasks'
 import { TFilterData } from '../types'
 import { input } from '../styles'
+import { useDroppable } from '@dnd-kit/core'
+import DraggableTask from '../Task/Draggable'
 
 interface Props {
   project: TProject
@@ -65,6 +66,8 @@ const getCellStyles = ({
     padding: isCollapsed ? '0px 8px' : 8,
     maxHeight: isCollapsed ? 100 : '60vh',
     overflowY: 'auto'
+    //display: 'flex',
+    //flexDirection: 'column'
   }
 }
 
@@ -88,8 +91,10 @@ export const ProjectCell = ({
 
   let tasks = getCellTasks(project.tasks, list.taskIds, progress)
   // TODO: For now tasks cannot be dragged if tasks are filtered out
-  const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
+  //const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
   const isCollapsed = collapsedLists.includes(list.id)
+
+  const { setNodeRef } = useDroppable({ id: `${list.id}|${progress}` })
 
   return (
     <td style={getCellStyles({ project, isCollapsed, list, progress })}>
@@ -176,63 +181,38 @@ export const ProjectCell = ({
           </MuiMenu>
         </div>
       )}
-      <Droppable
-        isCombineEnabled={isDraggingUser}
-        isDropDisabled={isCollapsed}
-        droppableId={`${list.id}|${progress}` /* can only be a string*/}
-      >
-        {(dropProvided, dropSnapshot) => {
-          return (
-            <div
-              style={{
-                flexDirection: 'column',
-                display: 'flex',
-                minHeight: isCollapsed ? 0 : 78,
-                backgroundColor: 'white',
-                paddingBottom: isCollapsed ? 0 : 78 // needed for dragging to bottom of list
-              }}
-              {...dropProvided.droppableProps}
-              ref={dropProvided.innerRef}
-            >
-              {!isCollapsed
-                ? tasks.map((task, i) => (
-                    <Draggable
-                      isDragDisabled={isDragDisabled}
-                      draggableId={task.id}
-                      index={i}
-                      key={task.id}
-                    >
-                      {(dragProvided, dragSnapshot) => (
-                        <BaseTask
-                          style={
-                            isDraggingUser
-                              ? {
-                                  transform: 'none !important'
-                                }
-                              : {}
+      <div ref={setNodeRef}>
+        <div
+          style={{
+            flexDirection: 'column',
+            display: 'flex',
+            minHeight: isCollapsed ? 0 : 78,
+            backgroundColor: 'white',
+            paddingBottom: isCollapsed ? 0 : 78 // needed for dragging to bottom of list
+          }}
+        >
+          {!isCollapsed
+            ? tasks.map((task, i) => (
+                <DraggableTask task={task} key={task.id}>
+                  <BaseTask
+                    style={
+                      isDraggingUser
+                        ? {
+                            //transform: 'none !important'
                           }
-                          hidden={!filterTask(task, filter)}
-                          openFunc={() => openFunc(task.id)}
-                          project={project}
-                          task={task}
-                          provided={dragProvided}
-                          snapshot={dragSnapshot}
-                        />
-                      )}
-                    </Draggable>
-                  ))
-                : null}
-              {isDraggingUser ? (
-                <div style={{ visibility: 'hidden', height: 0 }}>
-                  {dropProvided.placeholder}
-                </div>
-              ) : (
-                dropProvided.placeholder
-              )}
-            </div>
-          )
-        }}
-      </Droppable>
+                        : {}
+                    }
+                    hidden={!filterTask(task, filter)}
+                    openFunc={() => openFunc(task.id)}
+                    project={project}
+                    isDraggingUser={isDraggingUser}
+                    task={task}
+                  />
+                </DraggableTask>
+              ))
+            : null}
+        </div>
+      </div>
     </td>
   )
 }

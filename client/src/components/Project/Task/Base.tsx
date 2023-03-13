@@ -7,11 +7,6 @@ import {
   toggleTimerA
 } from '../../../store/actions/pomodoro'
 import { LinearProgress, Badge, IconButton } from '@mui/material'
-import {
-  Draggable,
-  DraggableProvided,
-  DraggableStateSnapshot
-} from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
 import PlayArrow from '@mui/icons-material/PlayArrow'
@@ -28,8 +23,9 @@ import { Editor } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './Edit/getEditorState'
 import { makeStyles } from '@mui/styles'
 import { SubtaskMap } from './SubtaskMap'
-import { HoverableAvatar } from '../../utils/HoverableAvatar'
 import { id } from '../../../utils/utilities'
+import { useDroppable } from '@dnd-kit/core'
+import DraggableAvatar from './DraggableAvatar'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -56,10 +52,9 @@ interface OwnProps {
   project: TProject
   task: TTask
   hidden?: boolean
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
   openFunc(): void
-  style: any
+  isDraggingUser?: boolean
+  style?: any
 }
 
 const useStyles = makeStyles(() => ({
@@ -110,38 +105,39 @@ const CBaseTask = (props: TaskProps) => {
     }
   }, 1000)
 
-  const { task, isSelectingTask, provided, snapshot, openFunc } = props
+  const { task, isSelectingTask, openFunc } = props
   const MIN_HEIGHT = 20
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
 
   const classes = useStyles()
 
+  const { setNodeRef } = useDroppable({
+    id: /*'ASSIGNED|' + */ task.id,
+    data: {
+      type: 'assigned',
+      accepts: ['user']
+    }
+  })
+
   return task ? (
     <div style={{ width: '100%' }}>
       <div
+        ref={setNodeRef}
         id={task.id.toString()}
-        ref={provided ? provided.innerRef : undefined}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
         style={{
           display: props.hidden ? 'none' : undefined,
           minHeight: MIN_HEIGHT,
           backgroundColor: task.color ? task.color : 'white',
           border,
           borderBottom: 'border',
-          ...provided.draggableProps.style,
-          color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
+          color: 'black',
+          //color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
           outline: 'none',
-          ...props.style
+          ...(props.style || {})
         }}
         onClick={() => {
-          /* if (project && project.selectingMember) {
-            props.stopSelectingMember({
-              id: project.selectingMember,
-              projectId: project.id
-            })
-          } else */ if (isSelectingTask) {
+          if (isSelectingTask) {
             props.selectPomodoroTask(task.id.toString())
           } else {
             openFunc()
@@ -174,7 +170,7 @@ const CBaseTask = (props: TaskProps) => {
                 style={{
                   fontSize: 18,
                   maxWidth: '94%',
-                  color: snapshot && snapshot.isDragging ? 'gray' : 'black',
+                  color: /*snapshot && snapshot.isDragging ? 'gray' :*/ 'black',
                   marginLeft: 4,
                   marginTop: 4
                 }}
@@ -272,39 +268,28 @@ const CBaseTask = (props: TaskProps) => {
                 </div>
               </>
             )}
-
             <div
               style={{
                 display: 'flex',
                 cursor: 'pointer'
               }}
             >
-              {task.assignedTo &&
-                task.assignedTo.map((userId, i) => (
-                  <Draggable
-                    key={userId}
-                    index={i}
-                    draggableId={'TASK_USER|' + task.id + '|' + userId}
-                  >
-                    {(prov, snap) => (
-                      <div
-                        ref={prov.innerRef}
-                        {...prov.draggableProps}
-                        {...prov.dragHandleProps}
-                        style={{
-                          ...prov.draggableProps.style,
-                          display: 'flex'
-                        }}
-                      >
-                        <HoverableAvatar
-                          user={
-                            props.project.users[id(props.project.users, userId)]
-                          }
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
+              <div
+                style={{
+                  display: 'flex'
+                }}
+              >
+                {task.assignedTo &&
+                  task.assignedTo.map((userId, i) => (
+                    <DraggableAvatar
+                      key={userId}
+                      task={task}
+                      user={
+                        props.project.users[id(props.project.users, userId)]
+                      }
+                    />
+                  ))}
+              </div>
               {Object.values(task.comments).length !== 0 && (
                 <IconButton
                   className={classes.play}

@@ -1,5 +1,4 @@
 import { cloneDeep } from 'lodash'
-import { DropResult } from 'react-beautiful-dnd'
 import { TList, TProject } from '../types/project'
 import { id } from './utilities'
 

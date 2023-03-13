@@ -20,12 +20,6 @@ import Settings from '@mui/icons-material/Settings'
 import Equalizer from '@mui/icons-material/Equalizer'
 import Create from '@mui/icons-material/Create'
 import Send from '@mui/icons-material/Send'
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult
-} from 'react-beautiful-dnd'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { ProjectSettings } from './ProjectSettings'
@@ -38,14 +32,14 @@ import { setListA } from '../../store/actions/list'
 import { FilterTasks } from './FilterTasks'
 import { setFilterA } from '../../store/actions/filter'
 import { ProjStats } from './Statistics'
-import { APIDragTask } from '../../API/task'
+import { APIAssignUserToTask, APIDragTask } from '../../API/task'
 import { onDragEnd } from '../../utils/dragTask'
 import { ShareProject } from './ShareProject'
-import { HoverableAvatar } from '../utils/HoverableAvatar'
-import axios from 'axios'
 import { setTaskA } from '../../store/actions/task'
 import makeStyles from '@mui/styles/makeStyles'
 import { input } from './styles'
+import DraggableAvatar from './Task/DraggableAvatar'
+import { useDroppable } from '@dnd-kit/core'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -102,17 +96,17 @@ const CProject = (props: TProps) => {
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const dragUser = async (result: DropResult) => {
+  const dragUser = async (result: any) => {
     if (result.combine) {
-      const { data } = await axios.post('/assignUserToTask', {
+      const newTask = await APIAssignUserToTask({
         taskId: result.combine!.draggableId,
         projId: project.id,
         userId: result.draggableId.slice(4)
       })
 
       props.setTask({
-        id: data.task.id,
-        newTask: data.task,
+        id: newTask.id,
+        newTask,
         projectId: project.id
       })
     }
@@ -121,27 +115,27 @@ const CProject = (props: TProps) => {
     }
   }
 
-  const dragFromTask = async (result: DropResult) => {
+  const dragFromTask = async (result: any) => {
     // assume they want to remove the user from the task if they don't drag it to another task
     if (!result.destination || result.destination.droppableId === 'users') {
       const [, taskId, userId] = result.draggableId.split('|')
 
-      const { data } = await axios.post('/assignUserToTask', {
+      const newTask = await APIAssignUserToTask({
         taskId: taskId,
         projId: project.id,
         userId: userId
       })
 
       props.setTask({
-        id: data.task.id,
-        newTask: data.task,
+        id: newTask.id,
+        newTask,
         projectId: project.id
       })
     } else {
     }
   }
 
-  const dragTask = (result: DropResult) => {
+  const dragTask = (result: any) => {
     if (result.draggableId.slice(0, 4) === 'USER') {
       dragUser(result)
     } else if (result.draggableId.slice(0, 9) === 'TASK_USER') {
@@ -162,6 +156,8 @@ const CProject = (props: TProps) => {
       }
     }
   }
+
+  console.log(dragTask)
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
@@ -191,199 +187,167 @@ const CProject = (props: TProps) => {
 
   const classes = useStyles()
 
+  const { setNodeRef } = useDroppable({ id: 'users' })
+
   if (project) {
     return (
       <div>
         <Helmet>
           <style type="text/css">{` body { background-color: #1d364c; }`}</style>
         </Helmet>
-        <DragDropContext
-          onDragEnd={dragTask}
-          onDragStart={(initial) => {
-            if (initial.draggableId.slice(0, 4) === 'USER') {
-              setIsDraggingUser(true)
-            }
+        <AppBar color="default" position="static">
+          <Toolbar>
+            <input
+              style={{ ...input, width: `${windowWidth - 300}px` }}
+              value={name}
+              onBlur={() =>
+                props.setProject({
+                  id: project.id,
+                  newProj: { ...project, name: name || 'newname' }
+                })
+              }
+              onChange={(e: any) => setName(e.target.value)}
+            />
+            <div style={{ marginLeft: 'auto', display: 'flex' }}>
+              <div ref={setNodeRef}>
+                <div
+                  style={{
+                    display: 'flex'
+                  }}
+                >
+                  {project.users.map((user, i) => (
+                    <DraggableAvatar user={user} key={user.id} />
+                  ))}
+                </div>
+              </div>
+              <IconButton onClick={() => setFiltering(true)}>
+                <FilterList />
+              </IconButton>
+              <IconButton
+                onClick={() => setSettings(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <Settings />
+              </IconButton>
+              <IconButton
+                onClick={() => setStats(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <Equalizer />
+              </IconButton>
+              <IconButton
+                onClick={() => setSharing(true)}
+                style={{ marginLeft: 8 }}
+              >
+                <Send />
+              </IconButton>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <Paper
+          style={{
+            margin: 20,
+            padding: 20,
+            paddingBottom: 80,
+            minHeight: 'calc(100vh - 328px)'
           }}
         >
-          <AppBar color="default" position="static">
-            <Toolbar>
-              <input
-                style={{ ...input, width: `${windowWidth - 300}px` }}
-                value={name}
-                onBlur={() =>
-                  props.setProject({
-                    id: project.id,
-                    newProj: { ...project, name: name || 'newname' }
-                  })
-                }
-                onChange={(e: any) => setName(e.target.value)}
-              />
-              <div style={{ marginLeft: 'auto', display: 'flex' }}>
-                <Droppable droppableId="users">
-                  {(dropProvided, dropSnapshot) => (
-                    <div
-                      {...dropProvided.droppableProps}
-                      ref={dropProvided.innerRef}
-                      style={{
-                        display: 'flex'
-                      }}
-                    >
-                      {project.users.map((user, i) => (
-                        <Draggable
-                          key={user.id}
-                          index={i}
-                          draggableId={'USER' + user.id.toString()}
-                        >
-                          {(prov, snap) => (
-                            <div
-                              ref={prov.innerRef}
-                              {...prov.draggableProps}
-                              {...prov.dragHandleProps}
-                              style={{
-                                ...prov.draggableProps.style,
-                                display: 'flex'
-                              }}
-                            >
-                              <HoverableAvatar user={user} />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      <div style={{ visibility: 'hidden', height: 0 }}>
-                        {dropProvided.placeholder}
-                      </div>
-                    </div>
-                  )}
-                </Droppable>
-                <IconButton onClick={() => setFiltering(true)}>
-                  <FilterList />
-                </IconButton>
-                <IconButton
-                  onClick={() => setSettings(true)}
-                  style={{ marginLeft: 8 }}
-                >
-                  <Settings />
-                </IconButton>
-                <IconButton
-                  onClick={() => setStats(true)}
-                  style={{ marginLeft: 8 }}
-                >
-                  <Equalizer />
-                </IconButton>
-                <IconButton
-                  onClick={() => setSharing(true)}
-                  style={{ marginLeft: 8 }}
-                >
-                  <Send />
-                </IconButton>
-              </div>
-            </Toolbar>
-          </AppBar>
-          <Paper
+          <table
             style={{
-              margin: 20,
-              padding: 20,
-              paddingBottom: 80,
-              minHeight: 'calc(100vh - 328px)'
+              tableLayout: 'fixed',
+              width: '100%',
+              borderCollapse: 'separate'
             }}
           >
-            <table
-              style={{
-                tableLayout: 'fixed',
-                width: '100%',
-                borderCollapse: 'separate'
-              }}
-            >
-              <TableBody>
-                <tr style={{ display: 'flex' }}>
-                  {[0, 1, 2].map((col) => (
-                    <td
-                      key={col}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#f2f2f2',
-                        borderLeft: col ? 'none' : '1px solid #aebacc',
-                        borderRight: '1px solid #aebacc',
-                        borderTop: '1px solid #aebacc',
-                        textAlign: 'center',
-                        padding: 8,
-                        fontSize: 20
+            <TableBody>
+              <tr style={{ display: 'flex' }}>
+                {[0, 1, 2].map((col) => (
+                  <td
+                    key={col}
+                    style={{
+                      width: '100%',
+                      backgroundColor: '#f2f2f2',
+                      borderLeft: col ? 'none' : '1px solid #aebacc',
+                      borderRight: '1px solid #aebacc',
+                      borderTop: '1px solid #aebacc',
+                      textAlign: 'center',
+                      padding: 8,
+                      fontSize: 20
+                    }}
+                  >
+                    {col === 0
+                      ? 'No Progress'
+                      : col === 1
+                      ? 'In Progress'
+                      : 'Complete'}
+                  </td>
+                ))}
+              </tr>
+              {project.lists.map((list) => (
+                <tr
+                  style={{
+                    verticalAlign: 'top',
+                    display: 'flex'
+                  }}
+                  key={list.id}
+                >
+                  {[0, 1, 2].map((progress, i) => (
+                    <ProjectCell
+                      isDraggingUser={isDraggingUser}
+                      filter={props.filterData}
+                      confirmEditingList={() => editList()}
+                      setEditingList={(id) => setEditingList(id)}
+                      editingName={
+                        progress === 0
+                          ? list.id === editingList[0]
+                            ? editingList[1]
+                            : ''
+                          : ''
+                      }
+                      setCreating={(id) => setCreating(id)}
+                      deleteList={(listId) => {
+                        props.setList({
+                          id: listId,
+                          projectId: props.project.id,
+                          newList: null
+                        })
                       }}
-                    >
-                      {col === 0
-                        ? 'No Progress'
-                        : col === 1
-                        ? 'In Progress'
-                        : 'Complete'}
-                    </td>
+                      collapseList={(listId) => {
+                        if (collapsedLists.includes(listId)) {
+                          setCollapsedLists(
+                            collapsedLists.filter((lId) => listId !== lId)
+                          )
+                        } else {
+                          setCollapsedLists([...collapsedLists, listId])
+                        }
+                      }}
+                      collapsedLists={collapsedLists}
+                      openFunc={(tId: string) => setEditingTaskId(tId)}
+                      key={i}
+                      progress={progress as 0 | 1 | 2}
+                      list={list}
+                      project={project}
+                    />
                   ))}
                 </tr>
-                {project.lists.map((list) => (
-                  <tr
-                    style={{
-                      verticalAlign: 'top',
-                      display: 'flex'
-                    }}
-                    key={list.id}
-                  >
-                    {[0, 1, 2].map((progress, i) => (
-                      <ProjectCell
-                        isDraggingUser={isDraggingUser}
-                        filter={props.filterData}
-                        confirmEditingList={() => editList()}
-                        setEditingList={(id) => setEditingList(id)}
-                        editingName={
-                          progress === 0
-                            ? list.id === editingList[0]
-                              ? editingList[1]
-                              : ''
-                            : ''
-                        }
-                        setCreating={(id) => setCreating(id)}
-                        deleteList={(listId) => {
-                          props.setList({
-                            id: listId,
-                            projectId: props.project.id,
-                            newList: null
-                          })
-                        }}
-                        collapseList={(listId) => {
-                          if (collapsedLists.includes(listId)) {
-                            setCollapsedLists(
-                              collapsedLists.filter((lId) => listId !== lId)
-                            )
-                          } else {
-                            setCollapsedLists([...collapsedLists, listId])
-                          }
-                        }}
-                        collapsedLists={collapsedLists}
-                        openFunc={(tId: string) => setEditingTaskId(tId)}
-                        key={i}
-                        progress={progress as 0 | 1 | 2}
-                        list={list}
-                        project={project}
-                      />
-                    ))}
-                  </tr>
-                ))}
-              </TableBody>
-            </table>
-            {creating && (
-              <CreateTask
-                onClose={() => setCreating('')}
-                project={props.project}
-                listId={props.project.lists[0].id}
-                columnId={creating}
-              />
-            )}
-            {dialogOpen && (
-              <CreateColumn
-                onClose={() => setDialogOpen(false)}
-                project={project}
-              />
-            )}
-          </Paper>
-        </DragDropContext>
+              ))}
+            </TableBody>
+          </table>
+          {creating && (
+            <CreateTask
+              onClose={() => setCreating('')}
+              project={props.project}
+              listId={props.project.lists[0].id}
+              columnId={creating}
+            />
+          )}
+          {dialogOpen && (
+            <CreateColumn
+              onClose={() => setDialogOpen(false)}
+              project={project}
+            />
+          )}
+        </Paper>
 
         <Tooltip
           placement="left"

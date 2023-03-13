@@ -1,11 +1,11 @@
-import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { getDate, getDay, isPast, addHours } from 'date-fns'
+import { getDay } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { useState } from 'react'
 import { EditTaskModal } from '../Project/Task/Edit/Edit'
+import { TTask } from '../../types/project'
 
 function sameDay(d1: Date, d2: Date) {
   return (
@@ -21,23 +21,12 @@ interface Props extends ReturnType<typeof mapState> {
   day: Date
   index: 0 | 1 | 2 | 3 | 4 | 5 | 6
   filteringProjects: string[]
+  tasks: TTask[]
 }
 
 const CWeekDay = (props: Props) => {
-  const { day, tasks, index } = props
-  const hasPassed = isPast(addHours(day, 20))
+  const { day, index, tasks } = props
   const [editingTaskId, setEditingTaskId] = useState('')
-
-  const withDate = tasks.filter(
-    (task) =>
-      task.dueDate !== undefined &&
-      getDate(new Date(task.dueDate!)) === getDate(day)
-  )
-  if (withDate.length) {
-    withDate.sort(
-      (a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
-    )
-  }
 
   return (
     <div
@@ -59,50 +48,28 @@ const CWeekDay = (props: Props) => {
         {day.getDate()}
         <div style={{ fontSize: '1.3rem' }}>{names[getDay(day)]}</div>
       </div>
-      <Droppable
-        isDropDisabled={hasPassed}
-        droppableId={day.getTime().toString()}
+
+      <div
+        style={{
+          marginTop: 93,
+          height: '100%'
+        }}
       >
-        {(provided, snapshot) => (
-          <div
-            style={{
-              backgroundColor: snapshot.isDraggingOver ? '#bae3ff' : 'white',
-              transition: 'background-color .2s ease',
-              marginTop: 93,
-              height: '100%'
-            }}
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {withDate.map((task, i) => (
-              <Draggable
-                key={task.id}
-                index={i}
-                draggableId={task.id.toString()}
-              >
-                {(prov, snap) => (
-                  <BaseTask
-                    style={{}}
-                    project={
-                      props.projects[
-                        id(
-                          props.projects,
-                          getProjectIdFromTaskId(props.projects, task.id)
-                        )
-                      ]
-                    }
-                    openFunc={() => setEditingTaskId(task.id)}
-                    provided={prov}
-                    snapshot={snap}
-                    task={task}
-                  />
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+        {tasks.map((task, i) => (
+          <BaseTask
+            project={
+              props.projects[
+                id(
+                  props.projects,
+                  getProjectIdFromTaskId(props.projects, task.id)
+                )
+              ]
+            }
+            openFunc={() => setEditingTaskId(task.id)}
+            task={task}
+          />
+        ))}
+      </div>
       {editingTaskId && (
         <EditTaskModal
           taskId={editingTaskId}
@@ -115,9 +82,6 @@ const CWeekDay = (props: Props) => {
 }
 
 const mapState = (state: TState) => ({
-  tasks: state.projects.reduce((accum, proj) => {
-    return [...accum, ...proj.tasks]
-  }, []),
   projects: state.projects
 })
 
