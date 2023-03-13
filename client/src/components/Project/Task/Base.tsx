@@ -7,7 +7,11 @@ import {
   toggleTimerA
 } from '../../../store/actions/pomodoro'
 import { LinearProgress, Badge, IconButton } from '@mui/material'
-import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
+import {
+  Draggable,
+  DraggableProvided,
+  DraggableStateSnapshot
+} from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
 import PlayArrow from '@mui/icons-material/PlayArrow'
@@ -24,6 +28,8 @@ import { Editor } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './Edit/getEditorState'
 import { makeStyles } from '@mui/styles'
 import { SubtaskMap } from './SubtaskMap'
+import { HoverableAvatar } from '../../utils/HoverableAvatar'
+import { id } from '../../../utils/utilities'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -273,6 +279,32 @@ const CBaseTask = (props: TaskProps) => {
                 cursor: 'pointer'
               }}
             >
+              {task.assignedTo &&
+                task.assignedTo.map((userId, i) => (
+                  <Draggable
+                    key={userId}
+                    index={i}
+                    draggableId={'TASK_USER|' + task.id + '|' + userId}
+                  >
+                    {(prov, snap) => (
+                      <div
+                        ref={prov.innerRef}
+                        {...prov.draggableProps}
+                        {...prov.dragHandleProps}
+                        style={{
+                          ...prov.draggableProps.style,
+                          display: 'flex'
+                        }}
+                      >
+                        <HoverableAvatar
+                          user={
+                            props.project.users[id(props.project.users, userId)]
+                          }
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
               {Object.values(task.comments).length !== 0 && (
                 <IconButton
                   className={classes.play}

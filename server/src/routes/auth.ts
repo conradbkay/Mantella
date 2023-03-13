@@ -14,9 +14,6 @@ import {
   registerResObj
 } from './types'
 import { NextFunction, Request, Response } from 'express'
-import { router } from './router'
-import passport from 'passport'
-import { isAuthenticated } from '../passport'
 
 export const login = async (
   req: loginReq,
@@ -24,18 +21,15 @@ export const login = async (
   next: NextFunction
 ) => {
   try {
-    const [user, projects] = await Promise.all([
-      UserModel.findOne({
-        email: req.user ? (req.user as any).email : 'undefined'
-      }).lean(),
-      ProjectModel.find({
-        id: req.user ? (req.user as any).projects : 'undefined'
-      }).lean()
-    ])
+    const projects = await ProjectModel.find({
+      id: (req.user as any).projects
+    }).lean()
 
     res.json({
       user: {
-        ...user,
+        ...(req.user as any).toObject(),
+        password: undefined,
+        _id: undefined,
         projects: projects
       }
     } as loginResObj)
@@ -43,10 +37,6 @@ export const login = async (
     next(err)
   }
 }
-
-// doesn't work without {session: true}
-router.post('/login', passport.authenticate('local', { session: true }), login)
-router.post('/cookieLogin', isAuthenticated, login)
 
 const SALT_LENGTH = process.env.NODE_ENV === 'production' ? 10 : 4
 
@@ -78,9 +68,17 @@ export const register = async (req: registerReq, res: registerRes) => {
       })
     ])
 
+    req.login(newUser, (err: any) => {
+      if (err) {
+        console.log('could not passport login during signup', err)
+      }
+    })
+
     res.json({
       user: {
         ...newUser.toObject(),
+        password: undefined,
+        _id: undefined,
         projects: [project.toObject()]
       }
     } as registerResObj)
@@ -89,26 +87,20 @@ export const register = async (req: registerReq, res: registerRes) => {
     throw new Error('Could not register, is that email address already in use?')
   }
 }
-
-// todo: make session persist
-router.post('/register', register)
-
 export const logout = async (req: Request, res: Response) => {
   if (req.session) {
-    req.session.destroy((err) => {
+    req.session.destroy((err: any) => {
       if (err) {
         console.log(err)
         res.status(400).send('unable to log out')
       }
 
-      res.send('logged out')
+      res.redirect('/')
     })
   } else {
     res.end()
   }
 }
-
-router.post('/logout', logout)
 
 export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
   try {
@@ -140,5 +132,3 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
     throw new Error('Could not create guest, sorry!')
   }
 }
-
-router.post('/guestLogin', guestLogin)

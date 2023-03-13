@@ -79,12 +79,6 @@ const getMobile = (window: Window) => {
   return window.innerWidth <= 1000
 }
 
-export type TFilterData = {
-  dueDate: 'all' | 'none' | 'today' | 'tomorrow' | [Date | null, Date | null]
-  color: string[]
-  points?: [number, number]
-}
-
 const CProject = (props: TProps) => {
   const [editingTaskId, setEditingTaskId] = useState('')
   const [settings, setSettings] = useState(false)
@@ -127,9 +121,31 @@ const CProject = (props: TProps) => {
     }
   }
 
+  const dragFromTask = async (result: DropResult) => {
+    // assume they want to remove the user from the task if they don't drag it to another task
+    if (!result.destination || result.destination.droppableId === 'users') {
+      const [, taskId, userId] = result.draggableId.split('|')
+
+      const { data } = await axios.post('/assignUserToTask', {
+        taskId: taskId,
+        projId: project.id,
+        userId: userId
+      })
+
+      props.setTask({
+        id: data.task.id,
+        newTask: data.task,
+        projectId: project.id
+      })
+    } else {
+    }
+  }
+
   const dragTask = (result: DropResult) => {
     if (result.draggableId.slice(0, 4) === 'USER') {
       dragUser(result)
+    } else if (result.draggableId.slice(0, 9) === 'TASK_USER') {
+      dragFromTask(result)
     } else {
       const val = onDragEnd(result, project)
       if (val) {
@@ -223,7 +239,6 @@ const CProject = (props: TProps) => {
                               ref={prov.innerRef}
                               {...prov.draggableProps}
                               {...prov.dragHandleProps}
-                              key={user.id}
                               style={{
                                 ...prov.draggableProps.style,
                                 display: 'flex'

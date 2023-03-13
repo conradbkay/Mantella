@@ -28,7 +28,7 @@ const CProjectSettings = (props: Props) => {
   const [hasClicked, setClicked] = useState(false)
 
   const deleteProject = () => {
-    location.hash = '/dashboard'
+    window.location.hash = '/dashboard'
     props.setProject({ id: props.project.id, newProj: null })
   }
 

@@ -9,6 +9,7 @@ export const isAuthenticated = (req: any, res: any, next: any) => {
 }
 
 export const passportStrategy = async (
+  req: any,
   email: string,
   password: string,
   done: Function
@@ -22,6 +23,7 @@ export const passportStrategy = async (
     if (!matches) {
       return done(null, false, { message: 'Incorrect password.' })
     }
+
     return done(null, user)
   } catch (err) {
     return done(err)
@@ -35,7 +37,7 @@ export const serializeUser = (user: any, done: any) => {
 export const deserializeUser = async (id: string, done: any) => {
   try {
     const user = await UserModel.findOne({ id })
-    done(null, user?.toObject())
+    done(null, user)
   } catch (err) {
     done(err)
   }

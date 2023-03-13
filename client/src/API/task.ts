@@ -32,7 +32,5 @@ export const APIEditTask = async (newTask: TTask, projectId: string) => {
     projId: projectId
   })
 
-  console.log(res)
-
   return res.data
 }

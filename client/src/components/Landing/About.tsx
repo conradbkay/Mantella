@@ -62,7 +62,7 @@ export const About = connect(
     const res = await APIGuestLogin()
     if (res) {
       login(res)
-      window.location.hash = '#/project/' + res.projects[0].id
+      window.location.hash = '/project/' + res.projects[0].id
     }
   }
 

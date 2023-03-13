@@ -1,4 +1,3 @@
-import { UserModel } from '../models/User'
 import { v4 as uuid } from 'uuid'
 import { ProjectModel } from '../models/Project'
 import {
@@ -18,12 +17,9 @@ export const createColumn = async (
 ) => {
   const creatingId = uuid()
 
-  const [user, project] = await Promise.all([
-    UserModel.findOne({ id: (req.user as any).id }),
-    ProjectModel.findOne({ id: req.body.projId })
-  ])
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
-  if (!user || !project) {
+  if (!req.user || !project) {
     throw new Error('Error creating column')
   }
 
@@ -47,12 +43,9 @@ export const toggleCollapsed = async (
   req: toggleCollapsedReq,
   res: toggleCollapsedRes
 ) => {
-  const [user, project] = await Promise.all([
-    UserModel.findOne({ id: (req.user as any).id }),
-    await ProjectModel.findOne({ id: req.body.projId })
-  ])
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
-  if (user && project) {
+  if (req.user && project) {
     const col = project.columns.find((col) => col.id === req.body.colId)
     if (col) {
       const userIdInCollapsed = col.collapsedUsers.indexOf((req.user as any).id)

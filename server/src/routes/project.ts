@@ -33,16 +33,16 @@ export const createProject = async (
 ) => {
   const creatingId = uuid()
   const listId = uuid()
-  const user = await UserModel.findOne({ id: (req.user as any).id })
-  if (user) {
-    user.projects.push(creatingId)
+
+  if (req.user) {
+    ;(req.user as any).projects.push(creatingId)
 
     const [created] = await Promise.all([
       ProjectModel.create({
         id: creatingId,
         name: req.body.name,
-        ownerId: user.id,
-        users: [user.id],
+        ownerId: (req.user as any).id,
+        users: [(req.user as any).id],
         columns: [
           generateColumn('Created', uuid(), false),
           generateColumn('In Progress', uuid(), true),
@@ -60,7 +60,7 @@ export const createProject = async (
         columnOrder: [listId],
         isPrivate: false
       }),
-      user.save()
+      (req.user as any).save()
     ])
     res.json({ project: created.toObject() })
   } else {

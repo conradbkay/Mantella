@@ -6,10 +6,14 @@ export const APILogin = async (
   isCookie?: boolean
 ) => {
   try {
-    const res = await axios.post(isCookie ? '/cookieLogin' : '/login', {
-      email,
-      password
-    })
+    const res = await axios.post(
+      isCookie ? '/cookieLogin' : '/login',
+      {
+        email,
+        password
+      },
+      { withCredentials: true }
+    )
     return res.data.user
   } catch (err) {
     console.error(err)
@@ -41,8 +45,9 @@ export const APIGuestLogin = async () => {
 export const APILogout = async () => {
   try {
     await axios.post('/logout')
-    location.reload()
+    window.location.reload()
   } catch (err) {
     console.error(err)
+    window.location.reload()
   }
 }

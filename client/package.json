@@ -40,7 +40,7 @@
     "node-fetch": "^2.6.1",
     "prettier": "^2.8.4",
     "react": "^17.0.2",
-    "react-beautiful-dnd": "^13.1.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^17.0.2",
     "react-helmet": "^5.2.0",
     "react-redux": "^7.2.2",
@@ -67,7 +67,6 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "proxy": "http://localhost:4000",
   "devDependencies": {
     "@testing-library/jest-dom": "^5.15.1",
     "@testing-library/react": "^11.2.7",
@@ -90,6 +89,7 @@
     "babel-eslint": "^10.1.0",
     "c8": "^7.13.0",
     "jsdom": "^21.1.0",
+    "react-scripts": "^5.0.1",
     "vite": "^4.1.4",
     "vite-plugin-svgr": "^2.4.0",
     "vite-tsconfig-paths": "^4.0.5",

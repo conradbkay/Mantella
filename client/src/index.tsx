@@ -4,6 +4,6 @@ import './index.css'
 import axios from 'axios'
 import 'react-widgets/styles.css'
 
-axios.defaults.baseURL = `http://localhost:4000`
+axios.defaults.baseURL = `/api`
 
 render(<Wrapper />, document.getElementById('root'))

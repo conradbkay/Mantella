@@ -265,6 +265,8 @@ export const assignUserToTask = async (req: Request, res: Response) => {
     task.assignedTo.push(req.body.userId)
   }
 
+  proj.markModified('tasks')
+
   const newProj = await proj.save()
 
   res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) })

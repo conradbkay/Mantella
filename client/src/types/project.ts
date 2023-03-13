@@ -34,7 +34,7 @@ export interface TTask {
   timeWorkedOn: number
   color: string
   dueDate?: string | null // date
-
+  assignedTo?: string[] | null
   comments: Array<{
     id: string
     comment: string

@@ -31,7 +31,7 @@ const CCreateProject = (props: CreateProjectProps) => {
         newProj: res
       })
 
-      window.location.hash = '#/project/' + res.id
+      window.location.hash = '/project/' + res.id
       props.openSnackbar('Project Created Successfully', 'success')
     } else {
       props.openSnackbar('Project Could Not Be Created', 'warning')

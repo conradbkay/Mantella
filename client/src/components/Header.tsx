@@ -238,7 +238,9 @@ const Topbar = (props: Props) => {
                   >
                     {MenuItems.map((item, index) => (
                       <Tab
-                        disabled={location.hash.slice(1) === item.pathname}
+                        disabled={
+                          window.location.hash.slice(1) === item.pathname
+                        }
                         style={{ minWidth: 96, height: '100%' }}
                         key={index}
                         to={item.pathname}

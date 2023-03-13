@@ -1,7 +1,7 @@
 import { CSSProperties, useState } from 'react'
 import { Provider } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
-import { Switch, Route, HashRouter } from 'react-router-dom'
+import { Switch, Route, BrowserRouter } from 'react-router-dom'
 
 import { store } from './store/store'
 import { Pomodoro } from './components/Pomodoro/Pomodoro'
@@ -15,7 +15,6 @@ import { Header } from './components/Header'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
 import { loginA } from './store/actions/auth'
 import { Dashboard } from './components/Dashboard/Dashboard'
-import { openSnackbarA } from './store/actions/snackbar'
 import { PublicOnlyRoute } from './components/utils/Routing'
 import { PrivateRoute } from './components/utils/PrivateRoute'
 import { Project } from './components/Project/Project'
@@ -54,8 +53,6 @@ const Router = () => {
 
       if (loginRes) {
         store.dispatch(loginA(loginRes) as any)
-      } else {
-        store.dispatch(openSnackbarA('Hey there, Welcome!', 'standard'))
       }
 
       setLoaded(true)
@@ -65,7 +62,7 @@ const Router = () => {
   }
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Header />
       <div style={{ marginTop: 58.5 /* headerHeight */ }} />
       <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
@@ -151,7 +148,7 @@ const Router = () => {
           />
         </div>
       )}
-    </HashRouter>
+    </BrowserRouter>
   )
 }
 

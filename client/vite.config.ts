@@ -15,7 +15,12 @@ export default defineConfig({
   define: { global: 'globalThis' },
   server: {
     open: true,
-    port: 3000
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true
+      }
+    }
   },
   test: {
     globals: true,

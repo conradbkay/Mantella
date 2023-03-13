@@ -73,7 +73,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               })
               if (user) {
                 register(user)
-                window.location.hash = '#/project/' + user.projects[0].id
+                window.location.hash = '/project/' + user.projects[0].id
               } else {
                 openSnackbar(
                   'User with that Email already exists, Sorry!',
@@ -84,7 +84,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               const user = await APILogin(email, password)
               if (user) {
                 login(user)
-                window.location.hash = '#/calendar'
+                window.location.hash = '/calendar'
               } else {
                 openSnackbar('Could not login', 'error')
               }
