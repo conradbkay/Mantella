@@ -10,7 +10,6 @@ import {
   ListItemAvatar
 } from '@mui/material'
 import { connect } from 'react-redux'
-import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
 import Delete from '@mui/icons-material/Delete'
 import { openSnackbarA } from '../../store/actions/snackbar'
@@ -21,15 +20,15 @@ type ActionCreators = typeof actionCreators
 interface Props extends ActionCreators {
   onClose: () => void
   open: boolean
-  project: TProject
+  projectId: string
 }
 
 const CProjectSettings = (props: Props) => {
   const [hasClicked, setClicked] = useState(false)
 
   const deleteProject = () => {
-    window.location.hash = '/dashboard'
-    props.setProject({ id: props.project.id, newProj: null })
+    window.location.href = '/dashboard'
+    props.setProject({ id: props.projectId, newProj: null })
   }
 
   return (

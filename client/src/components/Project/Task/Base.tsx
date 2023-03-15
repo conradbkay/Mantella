@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { TTask, TSubtask } from '../../../types/project'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
@@ -26,6 +26,7 @@ import { SubtaskMap } from './SubtaskMap'
 import { id } from '../../../utils/utilities'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableAvatar from './DraggableAvatar'
+import { taskDummyOpacity } from '../Project'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -50,6 +51,7 @@ const useInterval = (callback: () => void, delay: number) => {
 
 interface OwnProps {
   project: TProject
+  isDragging?: boolean
   task: TTask
   hidden?: boolean
   openFunc(): void
@@ -90,7 +92,7 @@ interface TaskProps
     ReturnType<typeof mapState>,
     ActionCreators {}
 
-const CBaseTask = (props: TaskProps) => {
+const CBaseTask = memo((props: TaskProps) => {
   const [showComments, setShowComments] = useState(false)
   const [showSubTasks, setShowSubTasks] = useState(true)
 
@@ -112,6 +114,7 @@ const CBaseTask = (props: TaskProps) => {
 
   const classes = useStyles()
 
+  // TODO: don't use if isn't a draggable Task already
   const { setNodeRef } = useDroppable({
     id: /*'ASSIGNED|' + */ task.id,
     data: {
@@ -132,6 +135,7 @@ const CBaseTask = (props: TaskProps) => {
           border,
           borderBottom: 'border',
           color: 'black',
+          opacity: props.isDragging ? taskDummyOpacity : undefined,
           //color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
           outline: 'none',
           ...(props.style || {})
@@ -362,7 +366,7 @@ const CBaseTask = (props: TaskProps) => {
       </div>
     </div>
   ) : null
-}
+})
 
 const mapState = (state: TState, ownProps: OwnProps) => ({
   isSelectingTask: state.pomodoro.selectingTask,

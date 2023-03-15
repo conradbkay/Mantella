@@ -2,7 +2,7 @@ import axios from 'axios'
 export const APICreateProject = async (name: string) => {
   try {
     const res = await axios.post('/createProject', { name })
-    return res.data.projects
+    return res.data.project
   } catch (err) {
     console.error(err)
   }

@@ -51,6 +51,7 @@ type OwnProps = {
   onClose: () => void
   taskId: string
   projectId: string
+  open: boolean
 }
 
 /** todo:
@@ -177,7 +178,7 @@ export const EditTaskModal = connect(
 
   return (
     <div>
-      <Dialog open onClose={() => props.onClose()}>
+      <Dialog open={props.open} onClose={() => props.onClose()}>
         <form
           onSubmit={(e) => {
             confirmChanges()

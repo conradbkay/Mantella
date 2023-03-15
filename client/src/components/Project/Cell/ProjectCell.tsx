@@ -6,25 +6,22 @@ import { id } from '../../../utils/utilities'
 import Menu from '@mui/icons-material/Menu'
 import Add from '@mui/icons-material/Add'
 import { filterTask /*filterTasks*/ } from '../../../utils/filterTasks'
-import { TFilterData } from '../types'
 import { input } from '../styles'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableTask from '../Task/Draggable'
+import { PROJECT_BORDER, PROJECT_BORDER_COLOR } from '../Project'
+import { TState } from '../../../types/state'
+import { useDispatch, useSelector } from 'react-redux'
+import { setListA } from '../../../store/actions/list'
+import { SortableContext } from '@dnd-kit/sortable'
 
 interface Props {
   project: TProject
   list: TList
   progress: 0 | 1 | 2
-  filter: TFilterData
-  collapsedLists: string[]
-  editingName: string
-  collapseList: (id: string) => void
+  draggingId?: string | null
   openFunc: (id: string) => void
-  deleteList: (id: string) => void
   setCreating: (id: string) => void
-  setEditingList: (id: [string, string]) => void
-  confirmEditingList: () => void
-  isDraggingUser: boolean
 }
 
 const getCellTasks = (
@@ -44,30 +41,32 @@ const getCellStyles = ({
   project,
   list,
   progress,
-  isCollapsed
+  collapsed
 }: {
   project: TProject
   list: TList
   progress: number
-  isCollapsed: boolean
+  collapsed: boolean
 }): CSSProperties => {
   const isLastColumn = progress === 2
   const isFirstColumn = progress === 0
   const isFinalRow =
     project.lists.findIndex((projList) => projList.id === list.id) ===
     project.lists.length - 1
-  const borderColor = '#aebacc' // light grey
   return {
-    borderTop: '1px solid ' + borderColor,
-    borderRight: `1px ${isLastColumn ? 'solid' : 'dashed'} ${borderColor}`,
-    borderBottom: isFinalRow ? '1px solid ' + borderColor : undefined,
-    borderLeft: isFirstColumn ? '1px solid ' + borderColor : undefined,
+    borderTop: PROJECT_BORDER,
+    borderRight: `1px ${
+      isLastColumn ? 'solid' : 'dashed'
+    } ${PROJECT_BORDER_COLOR}`,
+    borderBottom: isFinalRow ? PROJECT_BORDER : undefined,
+    borderLeft: isFirstColumn ? PROJECT_BORDER : undefined,
     width: '100%',
-    padding: isCollapsed ? '0px 8px' : 8,
-    maxHeight: isCollapsed ? 100 : '60vh',
-    overflowY: 'auto'
-    //display: 'flex',
-    //flexDirection: 'column'
+    padding: collapsed ? '0px 8px' : 8,
+    maxHeight: collapsed ? 100 : undefined, //'60vh',
+    overflowY: 'auto',
+    maxWidth: '100%',
+    display: 'flex',
+    flexDirection: 'column'
   }
 }
 
@@ -75,32 +74,57 @@ export const ProjectCell = ({
   project,
   list,
   progress,
-  filter,
-  collapsedLists,
-  editingName,
-  collapseList,
   openFunc,
-  deleteList,
-  setCreating,
-  setEditingList,
-  confirmEditingList,
-  isDraggingUser
+  draggingId,
+  setCreating
 }: Props) => {
   const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
   const [deletingList, setDeletingList] = useState(false)
+  const [editingList, setEditingList] = useState(['', ''])
+  const [collapsed, setCollapsed] = useState(false)
+
+  const { filter } = useSelector((state: TState) => ({
+    filter: state.filter
+  }))
+
+  const dispatch = useDispatch()
+
+  const editList = () => {
+    dispatch(
+      setListA({
+        id: editingList[0],
+        projectId: project.id,
+        newList: { name: editingList[1] }
+      })
+    )
+    setEditingList(['', ''])
+  }
 
   let tasks = getCellTasks(project.tasks, list.taskIds, progress)
   // TODO: For now tasks cannot be dragged if tasks are filtered out
   //const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
-  const isCollapsed = collapsedLists.includes(list.id)
+
+  const editingName =
+    progress === 0 && list.id === editingList[0] ? editingList[1] : ''
 
   const { setNodeRef } = useDroppable({ id: `${list.id}|${progress}` })
 
+  const deleteList = () => {
+    dispatch(
+      setListA({
+        id: list.id,
+        projectId: project.id,
+        newList: null
+      })
+    )
+  }
+
+  // TODO: make background color change when dragging task, same for task changing when dragging user on
   return (
-    <td style={getCellStyles({ project, isCollapsed, list, progress })}>
+    <td style={getCellStyles({ project, collapsed, list, progress })}>
       {progress === 0 && (
         <div style={{ display: 'flex', margin: 4 }}>
-          {isCollapsed && (
+          {collapsed && (
             <h2
               style={{
                 fontSize: 16,
@@ -115,7 +139,7 @@ export const ProjectCell = ({
             <input
               style={{ width: '100%', ...input }}
               value={editingName}
-              onBlur={() => confirmEditingList()}
+              onBlur={() => editList()}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setEditingList([list.id, e.target.value])
               }
@@ -129,7 +153,7 @@ export const ProjectCell = ({
           >
             <Menu />
           </IconButton>
-          {!isCollapsed && (
+          {!collapsed && (
             <IconButton
               color="primary"
               style={{ marginLeft: 8 }}
@@ -147,10 +171,10 @@ export const ProjectCell = ({
             <MenuItem
               onClick={() => {
                 setAnchorEl(null)
-                collapseList(list.id)
+                setCollapsed(true)
               }}
             >
-              {isCollapsed ? 'Uncollapse' : 'Collapse'}
+              {collapsed ? 'Uncollapse' : 'Collapse'}
             </MenuItem>
             <MenuItem
               onClick={() => {
@@ -164,7 +188,7 @@ export const ProjectCell = ({
               onClick={() => {
                 if (deletingList && project.lists.length > 1) {
                   setAnchorEl(null)
-                  deleteList(list.id)
+                  deleteList()
                 } else {
                   const DOUBLE_CLICK_TIMEOUT = 4000
                   setDeletingList(true)
@@ -181,38 +205,37 @@ export const ProjectCell = ({
           </MuiMenu>
         </div>
       )}
-      <div ref={setNodeRef}>
-        <div
-          style={{
-            flexDirection: 'column',
-            display: 'flex',
-            minHeight: isCollapsed ? 0 : 78,
-            backgroundColor: 'white',
-            paddingBottom: isCollapsed ? 0 : 78 // needed for dragging to bottom of list
-          }}
-        >
-          {!isCollapsed
-            ? tasks.map((task, i) => (
-                <DraggableTask task={task} key={task.id}>
-                  <BaseTask
-                    style={
-                      isDraggingUser
-                        ? {
-                            //transform: 'none !important'
-                          }
-                        : {}
-                    }
-                    hidden={!filterTask(task, filter)}
-                    openFunc={() => openFunc(task.id)}
-                    project={project}
-                    isDraggingUser={isDraggingUser}
-                    task={task}
-                  />
-                </DraggableTask>
-              ))
-            : null}
+      <SortableContext
+        id={`${list.id}|${progress}`}
+        items={tasks}
+        strategy={(() => {}) as any}
+      >
+        <div ref={setNodeRef} style={{ height: '100%' }}>
+          <div
+            style={{
+              flexDirection: 'column',
+              display: 'flex',
+              minHeight: collapsed ? 0 : 78,
+              height: '100%',
+              backgroundColor: draggingId ? '#E8FBFF' : 'white'
+            }}
+          >
+            {!collapsed
+              ? tasks.map((task, i) => (
+                  <DraggableTask task={task} key={task.id}>
+                    <BaseTask
+                      isDragging={draggingId === task.id}
+                      hidden={!filterTask(task, filter)}
+                      openFunc={() => openFunc(task.id)}
+                      project={project}
+                      task={task}
+                    />
+                  </DraggableTask>
+                ))
+              : null}
+          </div>
         </div>
-      </div>
+      </SortableContext>
     </td>
   )
 }
