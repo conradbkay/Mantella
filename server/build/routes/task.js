@@ -107,8 +107,8 @@ const dragTask = async (req, res) => {
         proj.lists[newListIdx].taskIds[req.body.newListProgress] =
             req.body.newListReplaceIds;
         proj.markModified('lists'); // mongoose does not watch subarrays this deep
-        proj.save();
-        res.status(200);
+        await proj.save();
+        res.json({ message: 'success' });
     }
     else {
         throw new Error('project not defined');

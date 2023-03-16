@@ -142,9 +142,9 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
 
-    proj.save()
+    await proj.save()
 
-    res.status(200)
+    res.json({ message: 'success' })
   } else {
     throw new Error('project not defined')
   }
