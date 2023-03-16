@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import { closeSnackbarA } from '../../store/actions/snackbar'
 import { TVariant } from '../../types/state'
 import { TState } from '../../types/state'
-import { Info } from '@mui/icons-material'
+import Info from '@mui/icons-material/Info'
 import { makeStyles } from '@mui/styles'
 
 type Classes = {

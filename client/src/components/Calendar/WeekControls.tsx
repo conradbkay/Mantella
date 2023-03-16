@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react'
 import { TProject } from '../../types/project'
 import { Select, MenuItem, IconButton, Theme } from '@mui/material'
-import { NavigateBefore, NavigateNext } from '@mui/icons-material'
+import NavigateNext from '@mui/icons-material/NavigateNext'
+import NavigateBefore from '@mui/icons-material/NavigateBefore'
 import { format, addDays, subDays } from 'date-fns'
 import { makeStyles } from '@mui/styles'
 const mobilePx = 750

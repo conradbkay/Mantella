@@ -8,18 +8,13 @@ export class Project {
   @prop()
   public ownerId?: string
   @prop()
-  public lists!: Array<{ taskIds: string[]; name: string; id: string }>
-  @prop()
-  public columns!: Array<{
-    id: string
+  public lists!: Array<{
+    taskIds: [string[], string[], string[]]
     name: string
-    collapsedUsers: string[]
-    inProgress?: boolean
-    taskIds: string[]
+    id: string
   }>
   @prop()
   public tasks!: Array<{
-    progress?: 0 | 1 | 2
     security?: { public: boolean; assignedUsers: string[] }
     id: string
     name: string
@@ -50,6 +45,5 @@ export class Project {
 }
 
 export type Task = Project['tasks'][0]
-export type Column = Project['columns'][0]
 
 export const ProjectModel = getModelForClass(Project)

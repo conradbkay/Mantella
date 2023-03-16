@@ -1,5 +1,5 @@
 import { Checkbox, IconButton, TextField } from '@mui/material'
-import { Delete } from '@mui/icons-material'
+import Delete from '@mui/icons-material/Delete'
 
 import { TSubtask } from '../../../../types/project'
 

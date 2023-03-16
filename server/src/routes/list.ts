@@ -62,7 +62,7 @@ export const createList = async (req: createListReq, res: createListRes) => {
     project.lists.push({
       id: newId,
       name: req.body.name || 'new list',
-      taskIds: []
+      taskIds: [[], [], []]
     })
 
     const newProj = await project.save()
@@ -71,7 +71,7 @@ export const createList = async (req: createListReq, res: createListRes) => {
 
     res.json({
       project: pure,
-      list: (newProj.lists.find((l) => l.id === newId) as any).toObject()
+      list: pure.lists.find((l) => l.id === newId)
     })
   } else {
     throw new Error('proj not found')

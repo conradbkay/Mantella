@@ -8,8 +8,6 @@ import {
   deleteProjectRes,
   editProjectReq,
   editProjectRes,
-  joinProjectReq,
-  joinProjectRes,
   leaveProjectReq,
   leaveProjectRes,
   removeMemberFromProjectReq,
@@ -19,40 +17,34 @@ import { Request, Response } from 'express'
 import { router } from './router'
 import { isAuthenticated } from '../passport'
 
-const generateColumn = (name: string, id: string, isInProgress: boolean) => ({
-  id,
-  name,
-  collapsedUsers: [],
-  inProgress: isInProgress,
-  taskIds: []
-})
-
 export const createProject = async (
   req: createProjectReq,
   res: createProjectRes
 ) => {
   const creatingId = uuid()
   const listId = uuid()
-  const user = await UserModel.findOne({ id: (req.user as any).id })
-  if (user) {
-    user.projects.push(creatingId)
+
+  if (req.user) {
+    ;(req.user as any).projects.push(creatingId)
 
     const [created] = await Promise.all([
       ProjectModel.create({
         id: creatingId,
         name: req.body.name,
-        ownerId: user.id,
-        users: [user.id],
-        columns: [
-          generateColumn('Created', uuid(), false),
-          generateColumn('In Progress', uuid(), true),
-          generateColumn('Created', uuid(), false)
+        ownerId: (req.user as any).id,
+        users: [
+          {
+            id: (req.user as any).id,
+            username: (req.user as any).username,
+            email: (req.user as any).email,
+            profileImg: (req.user as any).profileImg
+          }
         ],
         lists: [
           {
             id: listId,
             name: 'Generic',
-            taskIds: []
+            taskIds: [[], [], []]
           }
         ],
         tasks: [],
@@ -60,7 +52,7 @@ export const createProject = async (
         columnOrder: [listId],
         isPrivate: false
       }),
-      user.save()
+      (req.user as any).save()
     ])
     res.json({ project: created.toObject() })
   } else {
@@ -95,14 +87,16 @@ export const deleteProject = async (
   req: deleteProjectReq,
   res: deleteProjectRes
 ) => {
-  const user = await UserModel.findOne({ id: (req.user as any).id })
+  const users = await UserModel.find({ projects: req.body.id })
 
-  if (user) {
-    user.projects = user.projects.filter((proj: any) => proj !== req.body.id)
-    if (!user.projects.length) {
-      throw new Error('cannot delete only project')
+  if (users) {
+    for (const user of users) {
+      user.projects = user.projects.filter((proj: any) => proj !== req.body.id)
+      if (!user.projects.length) {
+        throw new Error('cannot delete only project')
+      }
+      await user.save()
     }
-    await user.save()
   }
 
   const deleted = await ProjectModel.findOneAndDelete({ id: req.body.id })
@@ -117,33 +111,6 @@ export const deleteProject = async (
 }
 
 router.post('/deleteProject', isAuthenticated, deleteProject)
-
-export const joinProject = async (req: joinProjectReq, res: joinProjectRes) => {
-  const id = (req.user as any).id
-  if (id) {
-    const project = await ProjectModel.findOne({ id: req.body.projectId })
-    if (!project) {
-      throw new Error('Project does not exist')
-    }
-    const user = await UserModel.findOneAndUpdate(
-      { id: id },
-      {
-        $push: {
-          projects: project.id
-        }
-      }
-    )
-
-    if (user) {
-      res.json({ project: project.toObject() })
-    }
-    throw new Error('could not join project')
-  } else {
-    throw new Error('User not signed in')
-  }
-}
-
-router.post('/joinProject', isAuthenticated, joinProject)
 
 export const leaveProject = async (
   req: leaveProjectReq,

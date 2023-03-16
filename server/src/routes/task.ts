@@ -27,7 +27,6 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
     proj.tasks.push({
       id: taskId,
       name: req.body.taskInfo.name || 'Unnamed Task',
-      progress: 0,
       points: req.body.taskInfo.points || 0,
       timeWorkedOn: 0,
       color: req.body.taskInfo.color || '#FFFFFF',
@@ -46,13 +45,13 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
     })
 
     const list = proj.lists.find((col) => col.id === req.body.listId)!
-    list.taskIds = [...list.taskIds, taskId]
+    list.taskIds[0] = [...list.taskIds[0], taskId]
 
-    // proj.columns[0].taskIds.push(taskId)
-
+    proj.markModified('tasks')
+    proj.markModified('lists')
     const newProj = await proj.save()
 
-    const pure = await newProj.toObject()
+    const pure = newProj.toObject()
 
     if (pure) {
       const task = pure.tasks.find((tk) => taskId === tk.id)
@@ -109,7 +108,11 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
     ;(proj.tasks.find((tsk) => tsk.id === req.body.id) as any).remove()
 
     proj.lists.forEach((list) => {
-      list.taskIds.splice(list.taskIds.indexOf(req.body.id), 1)
+      list.taskIds.forEach((ids, i) => {
+        if (ids.includes(req.body.id)) {
+          list.taskIds[i].splice(ids.indexOf(req.body.id), 1)
+        }
+      })
     })
 
     const newProj = await proj.save()
@@ -132,35 +135,16 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
       (list) => list.id === req.body.newListId
     )
 
-    const task =
-      proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === req.body.id)]
-
-    let changedTask = false
-
-    if (task && task.progress !== req.body.newProgress) {
-      changedTask = true
-    }
-
-    if (changedTask) {
-      task.progress = req.body.newProgress as 0 | 1 | 2
-    }
-
-    proj.lists[oldListIdx].taskIds = proj.lists[oldListIdx].taskIds.filter(
-      (taskId) => taskId !== req.body.id
-    )
-    proj.lists[newListIdx].taskIds.splice(req.body.newIndex, 0, req.body.id)
+    proj.lists[oldListIdx].taskIds[req.body.oldListProgress] =
+      req.body.oldListReplaceIds
+    proj.lists[newListIdx].taskIds[req.body.newListProgress] =
+      req.body.newListReplaceIds
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
 
-    if (changedTask) {
-      proj.markModified('tasks')
-    }
+    proj.save()
 
-    const newProj = await proj.save()
-
-    res.json({
-      project: newProj.toObject()
-    })
+    res.status(200)
   } else {
     throw new Error('project not defined')
   }
@@ -264,6 +248,8 @@ export const assignUserToTask = async (req: Request, res: Response) => {
   } else {
     task.assignedTo.push(req.body.userId)
   }
+
+  proj.markModified('tasks')
 
   const newProj = await proj.save()
 

@@ -8,7 +8,6 @@ export const defaultTask = {
   timeWorkedOn: 0,
   comments: [],
   color: '#FFFFFF',
-  progress: 0 as 0 | 1 | 2,
   assignedTo: []
 }
 
@@ -123,22 +122,21 @@ export const generateDefaultProject = (
   const tasks = taskObjects(ids)
   return {
     name: 'Tutorial Project',
-    columns: [],
     lists: [
       {
         id: listIds[0],
         name: 'Fundementals',
-        taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
+        taskIds: [[ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]], [], []]
       },
       {
         id: listIds[1],
         name: 'Setting Up',
-        taskIds: [ids[6], ids[7], ids[8], ids[9]]
+        taskIds: [[ids[6], ids[7], ids[8], ids[9]], [], []]
       },
       {
         id: listIds[2],
         name: 'Other Features',
-        taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
+        taskIds: [[ids[10], ids[11], ids[12], ids[13], ids[14]], [], []]
       }
     ],
     ownerId: newUser.id,

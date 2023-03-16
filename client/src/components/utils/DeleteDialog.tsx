@@ -9,7 +9,7 @@ import {
   TextField,
   Grid
 } from '@mui/material'
-import { Close } from '@mui/icons-material'
+import Close from '@mui/icons-material/Close'
 import { useState } from 'react'
 import { makeStyles } from '@mui/styles'
 

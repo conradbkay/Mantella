@@ -10,7 +10,7 @@ import {
   TextField,
   InputAdornment
 } from '@mui/material'
-import { LockOpen } from '@mui/icons-material'
+import LockOpen from '@mui/icons-material/LockOpen'
 import { useFormStyles } from '../styles/formStyles'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { Link } from 'react-router-dom'
@@ -73,7 +73,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               })
               if (user) {
                 register(user)
-                window.location.hash = '#/project/' + user.projects[0].id
+                window.location.href = '/project/' + user.projects[0].id
               } else {
                 openSnackbar(
                   'User with that Email already exists, Sorry!',
@@ -84,7 +84,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               const user = await APILogin(email, password)
               if (user) {
                 login(user)
-                window.location.hash = '#/calendar'
+                //window.location.href = '/calendar'
               } else {
                 openSnackbar('Could not login', 'error')
               }

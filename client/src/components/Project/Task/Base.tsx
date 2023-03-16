@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
 import { TTask, TSubtask } from '../../../types/project'
 import { connect } from 'react-redux'
 import { TState } from '../../../types/state'
@@ -7,17 +7,12 @@ import {
   toggleTimerA
 } from '../../../store/actions/pomodoro'
 import { LinearProgress, Badge, IconButton } from '@mui/material'
-import { DraggableProvided, DraggableStateSnapshot } from 'react-beautiful-dnd'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
-import {
-  CheckBox,
-  CheckBoxOutlineBlankOutlined,
-  PlayArrow,
-  Pause,
-  Comment,
-  List
-} from '@mui/icons-material'
+import PlayArrow from '@mui/icons-material/PlayArrow'
+import Pause from '@mui/icons-material/Pause'
+import Comment from '@mui/icons-material/Comment'
+import List from '@mui/icons-material/List'
 import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../../types/project'
 import { selectMemberA } from '../../../store/actions/project'
@@ -25,8 +20,13 @@ import { setSubtaskA } from '../../../store/actions/task'
 import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../../API/project'
 import { Editor } from 'draft-js'
-import { getEditorStateFromTaskDescription } from './Edit/Edit'
+import { getEditorStateFromTaskDescription } from './Edit/getEditorState'
 import { makeStyles } from '@mui/styles'
+import { SubtaskMap } from './SubtaskMap'
+import { id } from '../../../utils/utilities'
+import { useDroppable } from '@dnd-kit/core'
+import DraggableAvatar from './DraggableAvatar'
+import { taskDummyOpacity } from '../Project'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -49,72 +49,14 @@ const useInterval = (callback: () => void, delay: number) => {
   }, [delay])
 }
 
-export const SubtaskMap = ({
-  subTasks,
-  onCheckbox,
-  taskId,
-  show
-}: {
-  subTasks: TSubtask[]
-  onCheckbox: (newSub: TSubtask) => void
-  taskId: string
-  show: boolean
-}) => (
-  <div style={{ marginLeft: 30 }}>
-    <Transition
-      initial={null}
-      native
-      items={show ? subTasks : []}
-      keys={show ? subTasks.map((subTask) => subTask.id) : []}
-      from={{ opacity: 1, height: 0, overflow: 'hidden' }}
-      enter={{ opacity: 1, height: 'auto' }}
-      leave={{ opacity: 0, height: 0, overflow: 'hidden' }}
-    >
-      {(subTask) => (props) =>
-        (
-          <animated.div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              ...props
-            }}
-          >
-            <div
-              style={{
-                marginTop: 6
-              }}
-            >
-              {subTask.completed ? (
-                <CheckBox
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: false })
-                  }}
-                />
-              ) : (
-                <CheckBoxOutlineBlankOutlined
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: true })
-                  }}
-                />
-              )}
-            </div>
-            <span style={{ marginLeft: 8 }}>{subTask.name}</span>
-          </animated.div>
-        )}
-    </Transition>
-  </div>
-)
-
 interface OwnProps {
   project: TProject
+  isDragging?: boolean
   task: TTask
   hidden?: boolean
-  provided: DraggableProvided
-  snapshot: DraggableStateSnapshot
   openFunc(): void
-  style: any
+  isDraggingUser?: boolean
+  style?: any
 }
 
 const useStyles = makeStyles(() => ({
@@ -150,7 +92,7 @@ interface TaskProps
     ReturnType<typeof mapState>,
     ActionCreators {}
 
-const CBaseTask = (props: TaskProps) => {
+const CBaseTask = memo((props: TaskProps) => {
   const [showComments, setShowComments] = useState(false)
   const [showSubTasks, setShowSubTasks] = useState(true)
 
@@ -165,38 +107,41 @@ const CBaseTask = (props: TaskProps) => {
     }
   }, 1000)
 
-  const { task, isSelectingTask, provided, snapshot, openFunc } = props
+  const { task, isSelectingTask, openFunc } = props
   const MIN_HEIGHT = 20
 
   const border = '1px solid rgba(0, 0, 0, 0.12)'
 
   const classes = useStyles()
 
+  // TODO: don't use if isn't a draggable Task already
+  const { setNodeRef } = useDroppable({
+    id: /*'ASSIGNED|' + */ task.id,
+    data: {
+      type: 'assigned',
+      accepts: ['user']
+    }
+  })
+
   return task ? (
     <div style={{ width: '100%' }}>
       <div
+        ref={setNodeRef}
         id={task.id.toString()}
-        ref={provided ? provided.innerRef : undefined}
-        {...provided.draggableProps}
-        {...provided.dragHandleProps}
         style={{
           display: props.hidden ? 'none' : undefined,
           minHeight: MIN_HEIGHT,
-          backgroundColor: task.color ? task.color : 'white',
+          backgroundColor: task.color || 'white',
           border,
           borderBottom: 'border',
-          ...provided.draggableProps.style,
-          color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
+          color: 'black',
+          opacity: props.isDragging ? taskDummyOpacity : undefined,
+          //color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
           outline: 'none',
-          ...props.style
+          ...(props.style || {})
         }}
-        onClick={() => {
-          /* if (project && project.selectingMember) {
-            props.stopSelectingMember({
-              id: project.selectingMember,
-              projectId: project.id
-            })
-          } else */ if (isSelectingTask) {
+        onMouseDown={() => {
+          if (isSelectingTask) {
             props.selectPomodoroTask(task.id.toString())
           } else {
             openFunc()
@@ -229,7 +174,7 @@ const CBaseTask = (props: TaskProps) => {
                 style={{
                   fontSize: 18,
                   maxWidth: '94%',
-                  color: snapshot && snapshot.isDragging ? 'gray' : 'black',
+                  color: /*snapshot && snapshot.isDragging ? 'gray' :*/ 'black',
                   marginLeft: 4,
                   marginTop: 4
                 }}
@@ -327,13 +272,28 @@ const CBaseTask = (props: TaskProps) => {
                 </div>
               </>
             )}
-
             <div
               style={{
                 display: 'flex',
                 cursor: 'pointer'
               }}
             >
+              <div
+                style={{
+                  display: 'flex'
+                }}
+              >
+                {task.assignedTo &&
+                  task.assignedTo.map((userId, i) => (
+                    <DraggableAvatar
+                      key={userId}
+                      task={task}
+                      user={
+                        props.project.users[id(props.project.users, userId)]
+                      }
+                    />
+                  ))}
+              </div>
               {Object.values(task.comments).length !== 0 && (
                 <IconButton
                   className={classes.play}
@@ -406,7 +366,7 @@ const CBaseTask = (props: TaskProps) => {
       </div>
     </div>
   ) : null
-}
+})
 
 const mapState = (state: TState, ownProps: OwnProps) => ({
   isSelectingTask: state.pomodoro.selectingTask,

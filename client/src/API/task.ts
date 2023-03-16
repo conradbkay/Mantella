@@ -17,6 +17,7 @@ export type DragTaskInfo = {
   newListId: string
   id: string
   newProgress: number
+  oldProgress: number
   newIndex: number
 }
 
@@ -32,7 +33,23 @@ export const APIEditTask = async (newTask: TTask, projectId: string) => {
     projId: projectId
   })
 
-  console.log(res)
-
   return res.data
+}
+
+export const APIAssignUserToTask = async ({
+  taskId,
+  projId,
+  userId
+}: {
+  taskId: string
+  projId: string
+  userId: string
+}) => {
+  const { data } = await axios.post('/assignUserToTask', {
+    taskId,
+    projId,
+    userId
+  })
+
+  return data.task
 }

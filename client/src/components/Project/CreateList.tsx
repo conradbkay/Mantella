@@ -10,13 +10,13 @@ import {
   Theme,
   IconButton
 } from '@mui/material'
-import { Close } from '@mui/icons-material'
+import Close from '@mui/icons-material/Close'
 import { Change } from '../../types/types'
 import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
-import uuid from 'uuid'
 import { makeStyles } from '@mui/styles'
+import { APICreateList } from '../../API/list'
 
 type ActionCreators = typeof actionCreators
 
@@ -43,16 +43,15 @@ const CCreateColumn = (props: Props) => {
   return (
     <Dialog open={true} onClose={onClose}>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
 
+          const list = await APICreateList(project.id, name || 'List')
+
           props.setList({
-            id: uuid(),
+            id: list.id,
             projectId: project.id,
-            newList: {
-              name: name || 'List',
-              taskIds: []
-            }
+            newList: list
           })
 
           onClose()

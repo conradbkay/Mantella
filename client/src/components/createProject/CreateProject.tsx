@@ -7,7 +7,7 @@ import {
   Paper
 } from '@mui/material'
 import { useFormStyles } from '../styles/formStyles'
-import { CalendarTodayRounded } from '@mui/icons-material'
+import CalendarTodayRounded from '@mui/icons-material/CalendarTodayRounded'
 import { connect } from 'react-redux'
 import { Change } from '../../types/types'
 import { TState } from '../../types/state'
@@ -31,7 +31,7 @@ const CCreateProject = (props: CreateProjectProps) => {
         newProj: res
       })
 
-      window.location.hash = '#/project/' + res.id
+      window.location.href = '/project/' + res.id
       props.openSnackbar('Project Created Successfully', 'success')
     } else {
       props.openSnackbar('Project Could Not Be Created', 'warning')

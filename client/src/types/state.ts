@@ -1,4 +1,4 @@
-import { TFilterData } from '../components/Project/Project'
+import { TFilterData } from '../components/Project/types'
 import { TProject } from './project'
 
 export type TStopWatch = {

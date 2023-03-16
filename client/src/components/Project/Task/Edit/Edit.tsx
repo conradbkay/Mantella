@@ -18,15 +18,17 @@ import { id, getAllListsArr } from '../../../../utils/utilities'
 import { setTaskA } from '../../../../store/actions/task'
 import { ChooseColor } from '../../../utils/chooseColor'
 import { setProjectA } from '../../../../store/actions/project'
-import DateTimePicker from 'react-widgets/lib/DateTimePicker'
-import { Add, Delete } from '@mui/icons-material'
+import DatePicker from 'react-widgets/DatePicker'
+import Add from '@mui/icons-material/Add'
+import Delete from '@mui/icons-material/Delete'
 import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
 import { TComment, TSubtask, TTask } from '../../../../types/project'
 import { APIDragTask, DragTaskInfo, APIEditTask } from '../../../../API/task'
 import { Description } from './DescriptionEditor'
-import { convertToRaw, EditorState, convertFromRaw } from 'draft-js'
+import { convertToRaw, EditorState } from 'draft-js'
+import { getEditorStateFromTaskDescription } from './getEditorState'
 
 const mapState = (state: TState, ownProps: OwnProps) => {
   const project = state.projects[id(state.projects, ownProps.projectId)]
@@ -57,10 +59,6 @@ type OwnProps = {
  * make rendering in task base work for everything
  */
 
-export const getEditorStateFromTaskDescription = (description: string) => {
-  return EditorState.createWithContent(convertFromRaw(JSON.parse(description)))
-}
-
 type ActionCreators = typeof actionCreators
 
 interface TProps
@@ -87,7 +85,7 @@ export const EditTaskModal = connect(
   )
 
   const ownerListId = project.lists.find((list) =>
-    list.taskIds.includes(task.id)
+    list.taskIds.flat(1).includes(task.id)
   )!.id
 
   const [listId, setListId] = useState(ownerListId)
@@ -166,11 +164,22 @@ export const EditTaskModal = connect(
     if (listId !== ownerListId) {
       let newIndex = 0
 
+      let progress = 0
+
+      project.lists.forEach((list) => {
+        list.taskIds.forEach((ids, i) => {
+          if (ids.includes(task.id)) {
+            progress = i
+          }
+        })
+      })
+
       dragTask({
         oldListId: ownerListId,
         newListId: listId,
         newIndex,
-        newProgress: task.progress,
+        newProgress: progress,
+        oldProgress: progress,
         projectId: props.projectId,
         id: task.id
       })
@@ -271,7 +280,8 @@ export const EditTaskModal = connect(
             </FormControl>
           </div>
           <div style={{ display: 'flex', marginTop: 8 }}>
-            <DateTimePicker
+            <DatePicker
+              includeTime
               containerClassName="fullwidth"
               value={task.dueDate ? new Date(task.dueDate) : undefined}
               onChange={(date: Date | undefined) => {

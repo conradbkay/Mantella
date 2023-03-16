@@ -10,7 +10,7 @@ export interface TProject {
   name: string
   ownerId: string
   lists: Array<{
-    taskIds: string[]
+    taskIds: [string[], string[], string[]]
     name: string
     id: string
   }>
@@ -34,7 +34,7 @@ export interface TTask {
   timeWorkedOn: number
   color: string
   dueDate?: string | null // date
-
+  assignedTo?: string[] | null
   comments: Array<{
     id: string
     comment: string
