@@ -109,10 +109,12 @@ app.use('/api/', router)
   }
 
   app.get('/*', redirectionFilter)*/
-app.use(express.static(path.resolve(__dirname, '../../client/build')))
+app.use(
+  express.static(path.join(__dirname, '../../../client/build/index.html'))
+)
 
 app.get('/*', function (req, res) {
-  res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'))
+  res.sendFile(path.join(__dirname, '../../../client/build', 'index.html'))
 })
 
 app.use((err: Error, req: any, res: any, next: any) => {
