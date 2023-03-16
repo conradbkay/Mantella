@@ -7,6 +7,8 @@ node_modules
 client/node_modules
 server/node_modules
 client/.env
+client/build
+server/build
 server/.env
 # misc
 .DS_Store
