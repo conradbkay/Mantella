@@ -1,5 +1,4 @@
-import { Dialog, DialogContentText, DialogTitle } from '@material-ui/core'
-import React from 'react'
+import { Dialog, DialogContentText, DialogTitle } from '@mui/material'
 
 type OwnProps = {
   projectId: string

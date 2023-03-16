@@ -6,16 +6,12 @@ import {
   Typography,
   CardActions,
   Button,
-  withStyles,
-  WithStyles,
-  createStyles,
   Theme
-} from '@material-ui/core'
-
-import React from 'react'
+} from '@mui/material'
 
 import { Link } from 'react-router-dom'
-import { ButtonProps } from '@material-ui/core/Button'
+import { ButtonProps } from '@mui/material/Button'
+import { makeStyles } from '@mui/styles'
 
 const tiers: Array<{
   title: string
@@ -52,29 +48,30 @@ const tiers: Array<{
   }
 ]
 
-const styles = (theme: Theme) =>
-  createStyles({
-    cardHeader: {
-      backgroundColor: theme.palette.grey[200]
-    },
-    cardPricing: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'baseline',
-      marginBottom: theme.spacing(2)
-    },
-    cardActions: {}
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  cardHeader: {
+    backgroundColor: theme.palette.grey[200]
+  },
+  cardPricing: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'baseline',
+    marginBottom: theme.spacing(2)
+  },
+  cardActions: {}
+}))
 
-export const Pricing = withStyles(styles)(
-  ({ classes }: WithStyles<typeof styles>) => (
+export const Pricing = () => {
+  const classes = useStyles()
+
+  return (
     <Grid
       container
       alignItems="center"
       spacing={1}
       style={{ maxWidth: 1400, marginLeft: 'auto', marginRight: 'auto' }}
     >
-      {tiers.map(tier => (
+      {tiers.map((tier) => (
         <Grid
           item
           key={tier.title}
@@ -99,7 +96,7 @@ export const Pricing = withStyles(styles)(
                   /mo
                 </Typography>
               </div>
-              {tier.description.map(line => (
+              {tier.description.map((line) => (
                 <Typography variant="subtitle1" align="center" key={line}>
                   {line}
                 </Typography>
@@ -121,4 +118,4 @@ export const Pricing = withStyles(styles)(
       ))}
     </Grid>
   )
-)
+}

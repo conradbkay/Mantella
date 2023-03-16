@@ -1,10 +1,4 @@
-import {
-  Select,
-  MenuItem,
-  FormControl,
-  FormHelperText
-} from '@material-ui/core'
-import React from 'react'
+import { Select, MenuItem, FormControl, FormHelperText } from '@mui/material'
 
 import { colors } from '../../colors'
 import uuidv1 from 'uuid/v1'

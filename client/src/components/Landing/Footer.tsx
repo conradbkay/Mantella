@@ -1,13 +1,5 @@
-import React from 'react'
-
-import {
-  Grid,
-  Typography,
-  WithStyles,
-  Theme,
-  createStyles,
-  withStyles
-} from '@material-ui/core'
+import { Grid, Typography, Theme } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 
 const footers = [
   {
@@ -24,36 +16,36 @@ const footers = [
   }
 ]
 
-const styles = (theme: Theme) =>
-  createStyles({
-    footer: {
-      marginTop: 64,
-      borderTop: `1px solid ${theme.palette.divider}`, // nice little division
-      padding: `${theme.spacing(6)}px 0`,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      [theme.breakpoints.up(1200)]: {
-        width: 1000 // dont make it always fullWidth(eez to big)
-      }
+const useStyles = makeStyles((theme: Theme) => ({
+  footer: {
+    marginTop: 64,
+    borderTop: `1px solid ${theme.palette.divider}`, // nice little division
+    padding: `${theme.spacing(6)}px 0`,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    [theme.breakpoints.up(1200)]: {
+      width: 1000 // dont make it always fullWidth(eez to big)
     }
-  })
+  }
+}))
 
-export const AboutFooter = withStyles(styles)(
-  ({ classes }: WithStyles<typeof styles>) => (
+export const AboutFooter = () => {
+  const classes = useStyles()
+  return (
     <footer className={classes.footer}>
       <Grid
         container
         spacing={1}
-        justify="center"
+        justifySelf="center"
         alignItems="center"
         alignContent="center"
       >
-        {footers.map(footer => (
+        {footers.map((footer) => (
           <Grid item xs key={footer.title}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               {footer.title}
             </Typography>
-            {footer.description.map(item => (
+            {footer.description.map((item) => (
               <Typography key={item} variant="subtitle1" color="textSecondary">
                 {item}
               </Typography>
@@ -63,4 +55,4 @@ export const AboutFooter = withStyles(styles)(
       </Grid>
     </footer>
   )
-)
+}

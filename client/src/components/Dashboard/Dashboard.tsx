@@ -5,27 +5,16 @@ import {
   Fab,
   Tooltip,
   Typography
-} from '@material-ui/core'
-import React, { CSSProperties, useState } from 'react'
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult
-} from 'react-beautiful-dnd'
+} from '@mui/material'
+import { CSSProperties, useState } from 'react'
 import { connect } from 'react-redux'
 import { colors } from '../../colors'
 import { TState } from '../../types/state'
-import {
-  getAllTasks,
-  getProjectIdFromTaskId,
-  id,
-  moveInArray
-} from '../../utils/utilities'
+import { getAllTasks, getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { BaseTask } from '../Project/Task/Base'
-import { EditTaskModal } from '../Project/Task/Edit'
+import { EditTaskModal } from '../Project/Task/Edit/Edit'
 import { Link } from 'react-router-dom'
-import { Add } from '@material-ui/icons'
+import Add from '@mui/icons-material/Add'
 
 const root: CSSProperties = {
   display: 'flex',
@@ -48,18 +37,8 @@ const genColors = () => {
 export const Dashboard = connect(mapState)(
   (props: ReturnType<typeof mapState>) => {
     const [editingTaskId, setEditingTaskId] = useState('')
-    const [tasks, setTasks] = useState(getAllTasks(props.projects))
-
-    const onDragEnd = (result: DropResult) => {
-      const { source, destination } = result
-
-      if (destination) {
-        setTasks(
-          moveInArray(tasks, source.index, destination.index - source.index)
-        )
-      }
-    }
-
+    //const [tasks, setTasks] = useState(getAllTasks(props.projects))
+    const tasks = getAllTasks(props.projects)
     let betterColors = genColors()
 
     return (
@@ -74,39 +53,22 @@ export const Dashboard = connect(mapState)(
           <Typography variant="h5" gutterBottom style={{ fontWeight: 600 }}>
             Your Tasks
           </Typography>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="dashboard">
-              {(provided, snapshot) => (
-                <div {...provided.droppableProps} ref={provided.innerRef}>
-                  {tasks.map((task, i) => (
-                    <Draggable
-                      key={task.id}
-                      index={i}
-                      draggableId={task.id.toString()}
-                    >
-                      {(prov, snap) => (
-                        <BaseTask
-                          project={
-                            props.projects[
-                              id(
-                                props.projects,
-                                getProjectIdFromTaskId(props.projects, task.id)
-                              )
-                            ]
-                          }
-                          openFunc={() => setEditingTaskId(task.id)}
-                          task={task}
-                          provided={prov}
-                          snapshot={snap}
-                        />
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
+
+          {tasks.map((task, i) => (
+            <BaseTask
+              style={{}}
+              project={
+                props.projects[
+                  id(
+                    props.projects,
+                    getProjectIdFromTaskId(props.projects, task.id)
+                  )
+                ]
+              }
+              openFunc={() => setEditingTaskId(task.id)}
+              task={task}
+            />
+          ))}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <Typography
@@ -119,8 +81,10 @@ export const Dashboard = connect(mapState)(
           <div style={{ margin: '0px 40px' }}>
             {props.projects.map((project, i) => {
               const cols = [0, 0, 0]
-              project.tasks.map((task) => {
-                cols[task.progress]++
+              project.lists.forEach((list) => {
+                list.taskIds.forEach((ids, i) => {
+                  cols[i] += ids.length
+                })
               })
 
               const color = betterColors.splice(i, 1)[0]
@@ -177,6 +141,7 @@ export const Dashboard = connect(mapState)(
             projectId={getProjectIdFromTaskId(props.projects, editingTaskId)}
           />
         )}
+
         <Tooltip placement="left" title="Create Project">
           <Fab
             component={Link}

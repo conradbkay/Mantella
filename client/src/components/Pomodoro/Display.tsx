@@ -1,5 +1,4 @@
-import React from 'react'
-import { Button, Paper } from '@material-ui/core'
+import { Button, Paper } from '@mui/material'
 import { connect } from 'react-redux'
 import {
   resetPomodoroA,
@@ -9,12 +8,12 @@ import {
 import { TState } from '../../types/state'
 import { getAllTasks, id } from '../../utils/utilities'
 
-type OwnProps = {
+type ActionCreators = typeof actionCreators
+
+interface TProps extends ReturnType<typeof mapState>, ActionCreators {
   toggleWorking: () => void
   timeLeft: string
 }
-
-type TProps = ReturnType<typeof mapState> & typeof actionCreators & OwnProps
 
 const CDisplay = (props: TProps) => {
   const { pomodoro, timeLeft } = props
@@ -42,12 +41,13 @@ const CDisplay = (props: TProps) => {
         }}
       >
         <p style={{ display: 'inline', fontSize: 20 }}>
-          {pomodoro.selectingTask
-            ? 'Selecting Task...'
-            : pomodoro.selectedTaskId
-            ? props.tasks[id(props.tasks, pomodoro.selectedTaskId!)].name
-            : 'Select Task'
-          /* ? tasks[pomodoro.selectedTaskId].name : 'No Task Selected'} */
+          {
+            pomodoro.selectingTask
+              ? 'Selecting Task...'
+              : pomodoro.selectedTaskId
+              ? props.tasks[id(props.tasks, pomodoro.selectedTaskId!)].name
+              : 'Select Task'
+            /* ? tasks[pomodoro.selectedTaskId].name : 'No Task Selected'} */
           }
         </p>
         <Button
@@ -94,7 +94,4 @@ const actionCreators = {
   setTimeDev: setTimeDevA
 }
 
-export const Display = connect(
-  mapState,
-  actionCreators
-)(CDisplay)
+export const Display = connect(mapState, actionCreators)(CDisplay)

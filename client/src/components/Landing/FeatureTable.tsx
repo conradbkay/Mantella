@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Paper,
   Table,
@@ -6,26 +5,25 @@ import {
   TableRow,
   TableCell,
   TableBody
-} from '@material-ui/core'
-import { Check, Close, Traffic } from '@material-ui/icons'
+} from '@mui/material'
+import Check from '@mui/icons-material/Check'
+import Close from '@mui/icons-material/Close'
+import Traffic from '@mui/icons-material/Traffic'
+import { CSSProperties } from 'react'
 
 const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
-
 const features = [
-  // first in array is feature name, second is for Mantella, third is trello, fourth is kanbanFlow
+  ['Swimlanes', 'CHECK', 'NO', 'PRO'],
+  ['Pomodoro Timer', 'CHECK', 'NO', 'Extensions'],
+  ['Time Management Integration', 'CHECK', 'NO', 'Extensions'],
   ['Subtasks', 'CHECK', 'CHECK', 'CHECK'],
-  ['UI/UX', 'Material', 'Minimal', 'Simple'],
-  ['Multiple Projects', 'CHECK', 'CHECK', 'CHECK'],
   ['Filtering', 'CHECK', 'CHECK', 'CHECK'],
   ['Recurring Tasks', 'WIP', 'CHECK', 'CHECK'],
   ['Collapse Columns', 'CHECK', 'CHECK', 'NO'],
   ['Mobile Friendly', 'WIP', 'CHECK', 'CHECK'],
   ['Attach Photos', 'WIP', 'PRO', 'CHECK'],
   ['Comments', 'CHECK', 'NO', 'CHECK'],
-  ['Links', 'WIP', 'NO', 'CHECK'],
-  ['Swimlanes', 'CHECK', 'NO', 'PRO'],
-  ['Pomodoro Timer', 'CHECK', 'NO', 'Extensions'],
-  ['Time Management Integration', 'CHECK', 'NO', 'Extensions']
+  ['Links', 'WIP', 'NO', 'CHECK']
 ]
 
 const styles = {
@@ -36,7 +34,7 @@ const styles = {
     marginRight: 'auto',
     padding: 16,
     paddingBottom: 48
-  } as React.CSSProperties
+  } as CSSProperties
 }
 
 export const FeatureTable = () => (

@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -9,60 +8,31 @@ import {
   ListItem,
   ListItemText,
   ListItemAvatar
-} from '@material-ui/core'
+} from '@mui/material'
 import { connect } from 'react-redux'
-import { TProject } from '../../types/project'
 import { setProjectA } from '../../store/actions/project'
-import { Delete } from '@material-ui/icons'
-import {
-  DeleteProjectMutation,
-  DeleteProjectMutationVariables
-} from '../../graphql/types'
-import { GQL_DELETE_PROJECT } from '../../graphql/mutations/project'
-import { useMutation } from 'react-apollo'
+import Delete from '@mui/icons-material/Delete'
 import { openSnackbarA } from '../../store/actions/snackbar'
+import { useState } from 'react'
 
-type TProps = {
+type ActionCreators = typeof actionCreators
+
+interface Props extends ActionCreators {
   onClose: () => void
-  project: TProject
-} & typeof actionCreators
+  open: boolean
+  projectId: string
+}
 
-const CProjectSettings = (props: TProps) => {
-  const [hasClicked, setClicked] = React.useState(false)
+const CProjectSettings = (props: Props) => {
+  const [hasClicked, setClicked] = useState(false)
 
-  const [deleteProjectExec] = useMutation<
-    DeleteProjectMutation,
-    DeleteProjectMutationVariables
-  >(GQL_DELETE_PROJECT, {
-    onCompleted: ({ deleteProject }) => {
-      if (deleteProject && deleteProject.id) {
-        location.hash = '/dashboard'
-        props.setProject({ id: deleteProject.id, newProj: null })
-      }
-    },
-    onError: () => {
-      props.openSnackbar('Could not delete project', 'error')
-    }
-  })
-
-  /*
-  const [setCommentExec] = useMutation<
-    SetCommentMutation,
-    SetCommentMutationVariables
-  >(GQL_SET_COMMENT, {
-    onCompleted: ({ setComment }) => {}
-  })
-
-  const [setSubtaskExec] = useMutation<
-    SetSubtaskMutation,
-    SetSubtaskMutationVariables
-  >(GQL_SET_SUBTASK, {
-    onCompleted: ({ setSubtask }) => {}
-  })
-  */
+  const deleteProject = () => {
+    window.location.href = '/dashboard'
+    props.setProject({ id: props.projectId, newProj: null })
+  }
 
   return (
-    <Dialog onClose={props.onClose} open={true}>
+    <Dialog onClose={props.onClose} open={props.open}>
       <div style={{ minWidth: '500px' }} />
       <DialogTitle>Project Settings</DialogTitle>
       <DialogContent>
@@ -81,7 +51,7 @@ const CProjectSettings = (props: TProps) => {
             size="medium"
             onClick={() => {
               if (hasClicked) {
-                deleteProjectExec({ variables: { id: props.project.id } })
+                deleteProject()
               } else {
                 setClicked(true)
               }

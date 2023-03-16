@@ -1,5 +1,4 @@
-import React from 'react'
-import { Icon, Paper } from '@material-ui/core'
+import { Icon, Paper } from '@mui/material'
 
 const galleryOptions = [
   {
@@ -81,7 +80,8 @@ export const FeatureGallery = () => {
                 style={{
                   flexDirection: 'row',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  fontFamily: 'nunito'
                 }}
               >
                 <Icon

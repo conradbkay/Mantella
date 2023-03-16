@@ -1,21 +1,14 @@
-import { TaskProps, ProjectProps } from './models/Project'
-import uuid from 'uuid'
+import { v4 as uuid } from 'uuid'
+import { Project, Task } from './models/Project'
 
-/**
- * Default data that is used to add an example project when a user signs up
- */
-
-export const defaultTask: TaskProps = {
+export const defaultTask = {
   name: 'Task',
   points: 0,
   subTasks: [],
   timeWorkedOn: 0,
   comments: [],
-  id: undefined as any,
   color: '#FFFFFF',
-  progress: 0,
-  recurrance: null,
-  dueDate: null
+  assignedTo: []
 }
 
 export const tags = [
@@ -30,7 +23,7 @@ export const tags = [
   }
 ]
 
-export const taskObjects = (ids: any[]): TaskProps[] => [
+export const taskObjects = (ids: string[]): Task[] => [
   {
     ...defaultTask,
     id: ids[0],
@@ -112,38 +105,54 @@ export const taskObjects = (ids: any[]): TaskProps[] => [
   }
 ]
 
-export const projectData = (
-  ids: string[],
-  tasks: ProjectProps['tasks'],
-  newUserId: string,
-  projectId: string
-): ProjectProps => {
-  const listIds = [uuid(), uuid(), uuid()]
+export const generateIds = (length: number): string[] => {
+  let ids = []
+  for (let i = 0; i < length; i++) {
+    ids.push(uuid())
+  }
+  return ids
+}
 
+export const generateDefaultProject = (
+  newUser: { email: string; id: string; profileImg: string; username: string },
+  projectId: string
+): Project => {
+  const listIds = [uuid(), uuid(), uuid()]
+  const ids = generateIds(16)
+  const tasks = taskObjects(ids)
   return {
     name: 'Tutorial Project',
-    columns: [],
     lists: [
       {
         id: listIds[0],
         name: 'Fundementals',
-        taskIds: [ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]]
+        taskIds: [[ids[0], ids[1], ids[2], ids[3], ids[4], ids[5]], [], []]
       },
       {
         id: listIds[1],
         name: 'Setting Up',
-        taskIds: [ids[6], ids[7], ids[8], ids[9]]
+        taskIds: [[ids[6], ids[7], ids[8], ids[9]], [], []]
       },
       {
         id: listIds[2],
         name: 'Other Features',
-        taskIds: [ids[10], ids[11], ids[12], ids[13], ids[14]]
+        taskIds: [[ids[10], ids[11], ids[12], ids[13], ids[14]], [], []]
       }
     ],
-    ownerId: newUserId,
+    ownerId: newUser.id,
     id: projectId,
     tasks: tasks,
-    users: [newUserId],
-    security: null
+    users: [newUser]
+  }
+}
+
+export const generateGuestUser = (projectId: string, userId: string) => {
+  return {
+    id: userId,
+    email: uuid() + '.gmail.com',
+    username: 'Guest',
+    projects: [projectId],
+    profileImg:
+      'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
   }
 }

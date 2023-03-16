@@ -1,14 +1,25 @@
 import bcrypt from 'bcryptjs'
-import { Schema, model, Model, Document } from 'mongoose'
+import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose'
+import { Project } from './Project'
+@modelOptions({ options: { allowMixed: 0 } })
+export class User {
+  @prop()
+  public password?: string
+  @prop()
+  public username!: string
+  @prop()
+  public profileImg?: string
+  @prop()
+  public projects!: string[]
+  @prop()
+  public id!: string
+  @prop({ unique: true })
+  public email!: string
+}
 
-export const UserSchema = new Schema({
-  email: { type: String, unique: true },
-  password: { type: String },
-  username: { type: String, required: true },
-  profileImg: String,
-  projects: [String],
-  id: { type: String, required: true }
-})
+export type UserWithProjects = Omit<User, 'projects'> & {
+  projects: Project[]
+}
 
 export const getUserByEmail = async (email: string) => {
   return await UserModel.findOne({ email })
@@ -25,17 +36,4 @@ export const comparePassword = async (
   return await bcrypt.compare(candidatePassword, hash)
 }
 
-export interface UserProps {
-  email: string
-  password: string
-  username: string
-  profileImg?: string
-  projects: any
-  id: string
-}
-
-export const UserModel: Model<Document & UserProps> = model(
-  'User',
-  UserSchema,
-  'Users'
-)
+export const UserModel = getModelForClass(User)

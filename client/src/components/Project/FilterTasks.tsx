@@ -1,13 +1,9 @@
-import React from 'react'
-import { TFilterData } from './Project'
+import { TFilterData } from './types'
 import {
   Drawer,
   List,
   ListItem,
-  WithStyles,
   Theme,
-  createStyles,
-  withStyles,
   FormControl,
   InputLabel,
   Select,
@@ -16,37 +12,39 @@ import {
   Switch,
   Slider,
   ListItemText
-} from '@material-ui/core'
+} from '@mui/material'
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
-import { DateTimePicker } from 'react-widgets'
+import DatePicker from 'react-widgets/DatePicker'
 import { isArray } from 'lodash'
+import { useState } from 'react'
+import { makeStyles } from '@mui/styles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBarShift: {},
-    menuButton: {
-      marginLeft: 12,
-      marginRight: 20
-    },
-    drawer: {
-      minWidth: 400
-    },
-    drawerPaper: {},
-    toolbar: theme.mixins.toolbar
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  appBarShift: {},
+  menuButton: {
+    marginLeft: 12,
+    marginRight: 20
+  },
+  drawer: {
+    minWidth: 400
+  },
+  drawerPaper: {},
+  toolbar: theme.mixins.toolbar
+}))
 
-type TProps = {
+interface Props {
   filterData: TFilterData
   open: boolean
   changeFilter: (newFilter: TFilterData) => void
   handleClose: () => void
-} & WithStyles<typeof styles>
+}
 
-const CFilterTasks = (props: TProps) => {
-  const [custom, setCustom] = React.useState(false)
-  const { open, classes, handleClose, filterData, changeFilter } = props
+const FilterTasksComponent = (props: Props) => {
+  const [custom, setCustom] = useState(false)
+  const classes = useStyles()
+  const { open, handleClose, filterData, changeFilter } = props
   return (
     <div>
       <Drawer
@@ -155,7 +153,8 @@ const CFilterTasks = (props: TProps) => {
                     flexDirection: 'column'
                   }}
                 >
-                  <DateTimePicker
+                  <DatePicker
+                    includeTime
                     containerClassName="fullwidth gap"
                     value={(filterData.dueDate[0] as any) || undefined}
                     onChange={(date: Date | undefined) => {
@@ -182,7 +181,8 @@ const CFilterTasks = (props: TProps) => {
                       }
                     }}
                   />
-                  <DateTimePicker
+                  <DatePicker
+                    includeTime
                     containerClassName="fullwidth"
                     value={(filterData.dueDate[1] as any) || undefined}
                     onChange={(date: Date | undefined) => {
@@ -219,4 +219,4 @@ const CFilterTasks = (props: TProps) => {
   )
 }
 
-export const FilterTasks = withStyles(styles)(CFilterTasks)
+export const FilterTasks = FilterTasksComponent

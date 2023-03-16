@@ -1,11 +1,8 @@
-import React, { useState } from 'react'
-import withStyles from '@material-ui/core/styles/withStyles'
+import { useState, Fragment } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import MenuIcon from '@material-ui/icons/Menu'
+import MenuIcon from '@mui/icons-material/Menu'
 import {
   Theme,
-  WithStyles,
-  createStyles,
   IconButton,
   List,
   ListItem,
@@ -13,32 +10,27 @@ import {
   ListItemIcon,
   Drawer,
   Tab,
-  Avatar,
-  Tooltip,
   Button,
   Menu,
   Typography,
   Grid,
-  Toolbar,
   AppBar,
   Tabs
-} from '@material-ui/core'
+} from '@mui/material'
+import { Slide, useScrollTrigger } from '@mui/material'
+import { ReactElement } from 'react'
 import { Trail } from 'react-spring/renderprops'
-import {
-  HowToReg,
-  CalendarToday,
-  Help,
-  Settings,
-  Home
-} from '@material-ui/icons'
+import HowToReg from '@mui/icons-material/HowToReg'
+import CalendarToday from '@mui/icons-material/CalendarToday'
+import Help from '@mui/icons-material/Help'
+import Settings from '@mui/icons-material/Settings'
+import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
 import { ProjectFinder } from './ProjectFinder/ProjectFinder'
-
-/**
- * @todo Refresh changing tab is kinda slow
- */
+import { HoverableAvatar } from './utils/HoverableAvatar'
+import { makeStyles } from '@mui/styles'
 
 const noAuthItems = [
   {
@@ -68,58 +60,81 @@ const authItems = [
   }
 ]
 
-const styles = (theme: Theme) =>
-  createStyles({
-    appBar: {
-      position: 'relative',
-      boxShadow: 'none',
-      borderBottom: `1px solid ${theme.palette.grey['100']}`,
-      backgroundColor: 'white'
-    },
-    inline: {
-      display: 'inline'
-    },
-    flex: {
-      display: 'flex'
-    },
-    link: {
-      textDecoration: 'none',
-      color: 'inherit'
-    },
-    tagline: {
-      display: 'inline-block',
-      marginLeft: 10
-    },
-    iconContainer: {
-      display: 'none',
-      [theme.breakpoints.down('md')]: {
-        display: 'block',
-        marginLeft: 'auto'
-      }
-    },
-    tabContainer: {
-      marginLeft: 'auto',
-      [theme.breakpoints.down('md')]: {
-        display: 'none'
-      }
-    },
-    tabItem: {
-      paddingTop: 20,
-      paddingBottom: 20,
-      minWidth: 'auto'
-    },
-    iconButton: {}
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  appBar: {
+    borderBottom: `1px solid ${theme.palette.grey['300']}`,
+    backgroundColor: 'white'
+  },
+  fullHeight: {
+    height: '100%'
+  },
+  mainHeader: {
+    width: '100%',
+    padding: '0px 18px',
+    height: 81.5,
+    maxWidth: '100vw',
+    [theme.breakpoints.down('sm')]: {
+      padding: '0px 12px'
+    }
+  },
+  inline: {
+    display: 'inline'
+  },
+  flex: {
+    display: 'flex'
+  },
+  link: {
+    textDecoration: 'none',
+    color: 'inherit'
+  },
+  tagline: {
+    display: 'inline-block',
+    marginLeft: 10
+  },
+  iconContainer: {
+    display: 'none',
+    [theme.breakpoints.down('md')]: {
+      display: 'block',
+      marginLeft: 'auto'
+    }
+  },
+  tabContainer: {
+    height: '100%',
+    marginLeft: 'auto',
+    [theme.breakpoints.down('md')]: {
+      display: 'none'
+    }
+  },
+  tabItem: {
+    paddingTop: 20,
+    paddingBottom: 20,
+    minWidth: 'auto',
+    height: '100%'
+  },
+  iconButton: {}
+}))
 
-type TProps = WithStyles<typeof styles> &
-  RouteComponentProps &
-  ReturnType<typeof mapState>
+type HideOnScrollProps = {
+  children: ReactElement
+}
 
-const Topbar = (props: TProps) => {
+const HideOnScroll: React.FC<HideOnScrollProps> = ({ children }) => {
+  const trigger = useScrollTrigger()
+
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  )
+}
+
+interface Props extends RouteComponentProps, ReturnType<typeof mapState> {}
+
+const Topbar = (props: Props) => {
   const [drawer, setDrawer] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
 
-  const { classes } = props
+  const classes = useStyles()
 
   const MenuItems = props.authenticated !== null ? authItems : noAuthItems
 
@@ -129,13 +144,25 @@ const Topbar = (props: TProps) => {
 
   return (
     <>
-      <AppBar position="absolute" color="default" className={classes.appBar}>
-        <Toolbar style={{ minHeight: 64, padding: '0px 24px' }}>
-          <Grid container spacing={3} alignItems="center">
+      <HideOnScroll>
+        <AppBar
+          position="fixed"
+          color="default"
+          className={classes.appBar}
+          style={{
+            boxShadow: 'none'
+          }}
+        >
+          <Grid
+            container
+            spacing={3}
+            alignItems="center"
+            className={classes.mainHeader}
+          >
             <Grid
               item
               xs={12}
-              style={{ alignItems: 'center' }}
+              style={{ alignItems: 'center', height: '100%' }}
               className={classes.flex}
             >
               {props.authenticated !== null && (
@@ -167,29 +194,31 @@ const Topbar = (props: TProps) => {
               <div className={classes.inline}>
                 <Typography variant="h6" color="inherit" noWrap>
                   <Trail
-                    items={'Kanban Brawn'}
+                    items={'Mantella'}
                     from={{ transform: 'translate3d(0,-40px,0)' }}
                     to={{ transform: 'translate3d(0,0px,0)' }}
                   >
-                    {(item) => (trailProps) => (
-                      <a
-                        target="_blank"
-                        href="https://github.com/austin-UW/Mantella"
-                        style={{
-                          ...trailProps,
-                          color: 'black',
-                          textDecoration: 'none',
-                          paddingRight: 5
-                        }}
-                        className={classes.tagline}
-                      >
-                        Mantella
-                      </a>
-                    )}
+                    {(item) => (trailProps) =>
+                      (
+                        <a
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://github.com/USA-Kay/Mantella"
+                          style={{
+                            ...trailProps,
+                            color: 'black',
+                            textDecoration: 'none',
+                            paddingRight: 5
+                          }}
+                          className={classes.tagline}
+                        >
+                          Mantella
+                        </a>
+                      )}
                   </Trail>
                 </Typography>
               </div>
-              <React.Fragment>
+              <Fragment>
                 <div className={classes.iconContainer}>
                   <IconButton
                     onClick={() => setDrawer(true)}
@@ -204,11 +233,15 @@ const Topbar = (props: TProps) => {
                     value={value === -1 ? false : value}
                     indicatorColor="primary"
                     textColor="primary"
+                    classes={{ flexContainer: classes.fullHeight }}
+                    style={{ height: '100%' }}
                   >
                     {MenuItems.map((item, index) => (
                       <Tab
-                        disabled={location.hash.slice(1) === item.pathname}
-                        style={{ minWidth: 96 }}
+                        disabled={
+                          window.location.href.slice(1) === item.pathname
+                        }
+                        style={{ minWidth: 96, height: '100%' }}
                         key={index}
                         to={item.pathname}
                         component={NavLink}
@@ -220,24 +253,13 @@ const Topbar = (props: TProps) => {
                 </div>
 
                 {props.authenticated !== null && (
-                  <>
-                    <Tooltip title={`${props.authenticated.username}`}>
-                      <Avatar
-                        style={{
-                          margin: 'auto 10px',
-                          backgroundColor: '#0061ff'
-                        }}
-                      >
-                        {props.authenticated.username[0].toUpperCase()}
-                      </Avatar>
-                    </Tooltip>
-                  </>
+                  <HoverableAvatar user={props.authenticated} />
                 )}
-              </React.Fragment>
+              </Fragment>
             </Grid>
           </Grid>
-        </Toolbar>
-      </AppBar>
+        </AppBar>
+      </HideOnScroll>
       <Drawer anchor="right" open={drawer} onClose={() => setDrawer(false)}>
         <div style={{ width: 'auto' }}>
           <List>
@@ -266,6 +288,4 @@ const mapState = (state: TState) => ({
   authenticated: state.user
 })
 
-const Routed = withRouter(connect(mapState)(Topbar))
-
-export const Header = withStyles(styles)(Routed)
+export const Header = withRouter(connect(mapState)(Topbar))

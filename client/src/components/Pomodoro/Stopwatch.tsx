@@ -1,22 +1,23 @@
-import React, { CSSProperties, useEffect } from 'react'
+import { useEffect } from 'react'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../utils/utilities'
 import {
   tickStopwatchA,
   toggleStopwatchA,
   resetStopwatchA
 } from '../../store/actions/pomodoro'
-import { Button } from '@material-ui/core'
-import { Transition } from 'react-spring/renderprops'
-import { centerChildren } from '../styles/utils'
-import { PlayArrow, Pause } from '@material-ui/icons'
+import { Button } from '@mui/material'
+import Pause from '@mui/icons-material/Pause'
+import PlayArrow from '@mui/icons-material/PlayArrow'
 
-type TProps = ReturnType<typeof mapState> & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface Props extends ReturnType<typeof mapState>, ActionCreators {}
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
-const CStopwatch = (props: TProps) => {
+const CStopwatch = (props: Props) => {
   useEffect(() => {
     clearInterval(interval)
 
@@ -34,34 +35,11 @@ const CStopwatch = (props: TProps) => {
         style={{
           textAlign: 'center',
           fontSize: 28,
-          marginBottom: 10,
-          color: stopWatch.time >= stopWatch.highest ? '#FFD700' : 'black'
+          marginBottom: 10
         }}
       >
         {toDaysHHMMSS(stopWatch.time)}
       </div>
-      <Transition
-        items={stopWatch.time < stopWatch.highest}
-        from={{ opacity: 0 }}
-        enter={{ opacity: 1 }}
-        leave={{ opacity: 0 }}
-      >
-        {show => {
-          const style: CSSProperties = {
-            fontSize: 28,
-            color: '#444',
-            marginBottom: 10
-          }
-          return (
-            show &&
-            (transitionStyles => (
-              <div style={{ ...style, ...transitionStyles, ...centerChildren }}>
-                Best: {toDaysHHMMSS(stopWatch.highest)}
-              </div>
-            ))
-          )
-        }}
-      </Transition>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button onClick={() => reset()} style={{ marginRight: 4 }}>
           Reset
@@ -89,7 +67,4 @@ const actionCreators = {
   reset: resetStopwatchA
 }
 
-export const Stopwatch = connect(
-  mapState,
-  actionCreators
-)(CStopwatch)
+export const Stopwatch = connect(mapState, actionCreators)(CStopwatch)

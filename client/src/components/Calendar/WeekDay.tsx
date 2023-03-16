@@ -1,19 +1,11 @@
-import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { getDate, getDay, isPast, addHours } from 'date-fns'
+import { getDay } from 'date-fns'
 import { BaseTask } from '../Project/Task/Base'
-// import { TaskModal } from '../TaskModal/TaskModal'
-import { Theme, WithStyles, withStyles } from '@material-ui/core'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
-import React, { useState } from 'react'
-import { EditTaskModal } from '../Project/Task/Edit'
-
-type OwnProps = {
-  day: Date
-  index: 0 | 1 | 2 | 3 | 4 | 5 | 6
-  filteringProjects: string[]
-}
+import { useState } from 'react'
+import { EditTaskModal } from '../Project/Task/Edit/Edit'
+import { TTask } from '../../types/project'
 
 function sameDay(d1: Date, d2: Date) {
   return (
@@ -25,25 +17,16 @@ function sameDay(d1: Date, d2: Date) {
 
 const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const styles = (theme: Theme) => ({})
+interface Props extends ReturnType<typeof mapState> {
+  day: Date
+  index: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  filteringProjects: string[]
+  tasks: TTask[]
+}
 
-type TProps = OwnProps & ReturnType<typeof mapState> & WithStyles<typeof styles>
-
-const CWeekDay = (props: TProps) => {
-  const { day, tasks, index } = props
-  const hasPassed = isPast(addHours(day, 20))
+const CWeekDay = (props: Props) => {
+  const { day, index, tasks } = props
   const [editingTaskId, setEditingTaskId] = useState('')
-
-  const withDate = tasks.filter(
-    (task) =>
-      task.dueDate !== undefined &&
-      getDate(new Date(task.dueDate!)) === getDate(day)
-  )
-  if (withDate.length) {
-    withDate.sort(
-      (a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime()
-    )
-  }
 
   return (
     <div
@@ -65,49 +48,28 @@ const CWeekDay = (props: TProps) => {
         {day.getDate()}
         <div style={{ fontSize: '1.3rem' }}>{names[getDay(day)]}</div>
       </div>
-      <Droppable
-        isDropDisabled={hasPassed}
-        droppableId={day.getTime().toString()}
+
+      <div
+        style={{
+          marginTop: 93,
+          height: '100%'
+        }}
       >
-        {(provided, snapshot) => (
-          <div
-            style={{
-              backgroundColor: snapshot.isDraggingOver ? '#bae3ff' : 'white',
-              transition: 'background-color .2s ease',
-              marginTop: 93,
-              height: '100%'
-            }}
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {withDate.map((task, i) => (
-              <Draggable
-                key={task.id}
-                index={i}
-                draggableId={task.id.toString()}
-              >
-                {(prov, snap) => (
-                  <BaseTask
-                    project={
-                      props.projects[
-                        id(
-                          props.projects,
-                          getProjectIdFromTaskId(props.projects, task.id)
-                        )
-                      ]
-                    }
-                    openFunc={() => setEditingTaskId(task.id)}
-                    provided={prov}
-                    snapshot={snap}
-                    task={task}
-                  />
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+        {tasks.map((task, i) => (
+          <BaseTask
+            project={
+              props.projects[
+                id(
+                  props.projects,
+                  getProjectIdFromTaskId(props.projects, task.id)
+                )
+              ]
+            }
+            openFunc={() => setEditingTaskId(task.id)}
+            task={task}
+          />
+        ))}
+      </div>
       {editingTaskId && (
         <EditTaskModal
           taskId={editingTaskId}
@@ -119,11 +81,8 @@ const CWeekDay = (props: TProps) => {
   )
 }
 
-const mapState = (state: TState, ownProps: OwnProps) => ({
-  tasks: state.projects.reduce((accum, proj) => {
-    return [...accum, ...proj.tasks]
-  }, []),
+const mapState = (state: TState) => ({
   projects: state.projects
 })
 
-export const WeekDay = withStyles(styles)(connect(mapState)(CWeekDay))
+export const WeekDay = connect(mapState)(CWeekDay)

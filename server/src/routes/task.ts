@@ -1,201 +1,259 @@
-import { ProjectModel, TaskProps, ProjectProps } from '../models/Project'
-import { MutationResolvers } from '../graphql/types'
-import uuid from 'uuid'
+import { ProjectModel } from '../models/Project'
+import { v4 as uuid } from 'uuid'
+import {
+  createTaskReq,
+  createTaskRes,
+  deleteTaskReq,
+  deleteTaskRes,
+  dragTaskReq,
+  dragTaskRes,
+  editTaskReq,
+  editTaskRes,
+  setCommentReq,
+  setCommentRes,
+  setSubtaskReq,
+  setSubtaskRes
+} from './types'
+import { router } from './router'
+import { isAuthenticated } from '../passport'
+import { Request, Response } from 'express'
 
-const createTask: MutationResolvers['createTask'] = async (parent, obj) => {
+export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   const taskId = uuid()
 
-  const proj = await ProjectModel.findOne({ id: obj.projId })
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
 
   if (proj) {
     proj.tasks.push({
       id: taskId,
-      name: obj.taskInfo.name || 'Unnamed Task',
-      progress: 0,
-      points: obj.taskInfo.points || 0,
+      name: req.body.taskInfo.name || 'Unnamed Task',
+      points: req.body.taskInfo.points || 0,
       timeWorkedOn: 0,
-      color: obj.taskInfo.color || '#FFFFFF',
-      dueDate: obj.taskInfo.dueDate
-        ? new Date(obj.taskInfo.dueDate).toString()
-        : null,
-      subTasks: obj.taskInfo.subTasks
-        ? obj.taskInfo.subTasks.map((subT) => ({ ...subT, id: uuid() }))
+      color: req.body.taskInfo.color || '#FFFFFF',
+      dueDate: req.body.taskInfo.dueDate
+        ? new Date(req.body.taskInfo.dueDate).toString()
+        : undefined,
+      subTasks: req.body.taskInfo.subTasks
+        ? req.body.taskInfo.subTasks.map((subT: any) => ({
+            ...subT,
+            id: uuid()
+          }))
         : [],
       comments: [],
-      recurrance: null,
-      description: obj.taskInfo.description
-    } as TaskProps)
+      description: req.body.taskInfo.description,
+      assignedTo: []
+    })
 
-    const list = proj.lists.find((col) => col.id === obj.listId)!
-    list.taskIds = [...list.taskIds, taskId]
+    const list = proj.lists.find((col) => col.id === req.body.listId)!
+    list.taskIds[0] = [...list.taskIds[0], taskId]
 
-    // proj.columns[0].taskIds.push(taskId)
-
+    proj.markModified('tasks')
+    proj.markModified('lists')
     const newProj = await proj.save()
 
-    const pure: ProjectProps = await newProj.toObject()
+    const pure = newProj.toObject()
 
     if (pure) {
       const task = pure.tasks.find((tk) => taskId === tk.id)
-      return {
+      res.json({
         project: pure,
         task: task!
-      }
+      })
     }
+  } else {
+    throw new Error('proj id not exist')
   }
-  throw new Error('proj id not exist')
 }
-const editTask: MutationResolvers['editTask'] = async (parent, obj) => {
-  const project = await ProjectModel.findOne({ id: obj.projId })
+
+router.post('/createTask', isAuthenticated, createTask)
+
+export const editTask = async (req: editTaskReq, res: editTaskRes) => {
+  const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project) {
-    const task: TaskProps = project.tasks.find((tsk) => tsk.id === obj.taskId)!
+    const task = project.tasks.find((tsk) => tsk.id === req.body.taskId)!
 
-    task.name = obj.task.name || task.name
-    task.points = obj.task.points || task.points
-    task.dueDate = obj.task.dueDate || task.dueDate
-    // task.recurrance = obj.task.recurrance || task.recurrance
-    task.color = obj.task.color || task.color
-    task.description = obj.task.description
+    task.name = req.body.task.name || task.name
+    task.points = req.body.task.points || task.points
+    task.dueDate = req.body.task.dueDate || task.dueDate
+    // task.recurrance = req.body.task.recurrance || task.recurrance
+    task.color = req.body.task.color || task.color
+    task.description = req.body.task.description
+
+    project.markModified('tasks') // mongo won't notice that tasks were modified without this since it's so nested
 
     const newProj = await project.save()
     const pure = await newProj.toObject()
     if (pure) {
       if (task) {
-        return {
+        res.json({
           project: pure,
-          task: newProj.tasks.find((tsk) => tsk.id === obj.taskId)
-        }
+          task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
+        })
       } else {
         throw new Error('Task not created')
       }
     }
+  } else {
+    throw new Error('project not able to be updated')
   }
-  throw new Error('project not able to be updated')
 }
-const deleteTask: MutationResolvers['deleteTask'] = async (parent, obj) => {
-  const proj = await ProjectModel.findOne({ id: obj.projId })
+
+router.post('/editTask', isAuthenticated, editTask)
+
+export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
 
   if (proj) {
-    ;(proj.tasks.find((tsk) => tsk.id === obj.id) as any).remove()
+    ;(proj.tasks.find((tsk) => tsk.id === req.body.id) as any).remove()
 
-    proj.lists.map((list) => {
-      list.taskIds.splice(list.taskIds.indexOf(obj.id), 1)
+    proj.lists.forEach((list) => {
+      list.taskIds.forEach((ids, i) => {
+        if (ids.includes(req.body.id)) {
+          list.taskIds[i].splice(ids.indexOf(req.body.id), 1)
+        }
+      })
     })
 
     const newProj = await proj.save()
-    return { project: newProj.toObject(), task: null }
+    res.json({ project: newProj.toObject(), task: null })
+  } else {
+    throw new Error('project not defined')
   }
-
-  throw new Error('project not defined')
 }
 
-const dragTask: MutationResolvers['dragTask'] = async (
-  parent,
-  obj,
-  context
-) => {
-  const proj = await ProjectModel.findOne({ id: obj.projectId })
+router.post('/deleteTask', isAuthenticated, deleteTask)
+
+export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projectId })
 
   if (proj) {
-    const oldList =
-      proj.lists[proj.lists.findIndex((list) => list.id === obj.oldListId)]!
-    const newList =
-      proj.lists[proj.lists.findIndex((list) => list.id === obj.newListId)]!
+    const oldListIdx = proj.lists.findIndex(
+      (list) => list.id === req.body.oldListId
+    )
+    const newListIdx = proj.lists.findIndex(
+      (list) => list.id === req.body.newListId
+    )
 
-    const task = proj.tasks[proj.tasks.findIndex((tsk) => tsk.id === obj.id)]
+    proj.lists[oldListIdx].taskIds[req.body.oldListProgress] =
+      req.body.oldListReplaceIds
+    proj.lists[newListIdx].taskIds[req.body.newListProgress] =
+      req.body.newListReplaceIds
 
-    if (task) {
-      task.progress = obj.newProgress as 0 | 1 | 2
-    }
+    proj.markModified('lists') // mongoose does not watch subarrays this deep
 
-    oldList.taskIds = oldList.taskIds.filter((taskId) => taskId !== obj.id)
-    newList.taskIds.splice(obj.newIndex, 0, obj.id)
+    proj.save()
 
-    const newProj = await proj.save()
-
-    const pure = await newProj.toObject()
-
-    return {
-      project: pure as ProjectProps,
-      task: pure.tasks.find((tsk: any) => tsk.id === obj.id) as any
-    }
+    res.status(200)
+  } else {
+    throw new Error('project not defined')
   }
-
-  throw new Error('project not defined')
 }
 
-const setSubtask: MutationResolvers['setSubtask'] = async (parent, obj) => {
-  const proj = await ProjectModel.findOne({ id: obj.projId })
+router.post('/dragTask', isAuthenticated, dragTask)
+
+export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
   if (proj) {
-    const task: TaskProps = proj.tasks.find((tsk) => tsk.id === obj.taskId)!
-    const subTask: TaskProps['subTasks'][0] = task.subTasks.find(
-      (subT) => subT.id === obj.subtaskId
+    const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId)!
+    const subTask = task.subTasks.find(
+      (subT) => subT.id === req.body.subtaskId
     )!
 
     if (!subTask) {
       task.subTasks.push({
         completed: false,
-        name: obj.info!.name || 'Subtask',
-        id: obj.subtaskId!
+        name: req.body.info!.name || 'Subtask',
+        id: req.body.subtaskId!
       })
-    } else if (!obj.info) {
-      task.subTasks = task.subTasks.filter((sub) => sub.id !== obj.subtaskId)
+    } else if (!req.body.info) {
+      task.subTasks = task.subTasks.filter(
+        (sub) => sub.id !== req.body.subtaskId
+      )
     } else {
       subTask.completed =
-        obj.info!.completed !== null && obj.info!.completed !== undefined
-          ? obj.info!.completed
+        req.body.info!.completed !== null &&
+        req.body.info!.completed !== undefined
+          ? req.body.info!.completed
           : subTask.completed
 
       subTask.name =
-        obj.info!.name !== null && obj.info!.name !== undefined
-          ? obj.info!.name
+        req.body.info!.name !== null && req.body.info!.name !== undefined
+          ? req.body.info!.name
           : subTask.name
     }
 
     const newProj = await proj.save()
 
-    return newProj.tasks.find((tsk) => tsk.id === obj.taskId)!
+    res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)! })
+  } else {
+    throw new Error('project not defined')
   }
-
-  throw new Error('project not defined')
 }
 
-const setComment: MutationResolvers['setComment'] = async (parent, obj) => {
-  const proj = await ProjectModel.findOne({ id: obj.projId })
-  if (proj) {
-    const task: TaskProps = proj.tasks.find((tsk) => tsk.id === obj.taskId)!
+router.post('/setSubtask', isAuthenticated, setSubtask)
 
-    if (obj.commentId) {
-      const comment: TaskProps['comments'][0] = task.comments.find(
-        (com) => com.id === obj.commentId
+export const setComment = async (req: setCommentReq, res: setCommentRes) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
+  if (proj) {
+    const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId)!
+
+    if (req.body.commentId) {
+      const comment = task.comments.find(
+        (com) => com.id === req.body.commentId
       )!
 
-      if (!obj.description) {
+      if (!req.body.description) {
         ;(comment as any).remove()
       } else {
-        comment.comment = obj.description
+        comment.comment = req.body.description
       }
     } else {
       task.comments.push({
         dateAdded: new Date().toString(),
-        comment: obj.description || 'Comment',
+        comment: req.body.description || 'Comment',
         id: uuid()
       })
     }
     const newProj = await proj.save()
 
-    return newProj.tasks.find((tsk) => tsk.id === obj.taskId)!
+    res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)! })
+  } else {
+    throw new Error('project not defined')
+  }
+}
+
+router.post('/setComment', isAuthenticated, setComment)
+
+export const assignUserToTask = async (req: Request, res: Response) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projId })
+
+  if (!proj) {
+    throw new Error('Project does not exist')
   }
 
-  throw new Error('project not defined')
+  const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId)!
+
+  if (!task) {
+    throw new Error('task not in project')
+  }
+
+  if (!task.assignedTo) {
+    // legacy tasks
+    task.assignedTo = []
+  }
+
+  if (task.assignedTo.includes(req.body.userId)) {
+    task.assignedTo.splice(task.assignedTo.indexOf(req.body.userId), 1)
+  } else {
+    task.assignedTo.push(req.body.userId)
+  }
+
+  proj.markModified('tasks')
+
+  const newProj = await proj.save()
+
+  res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) })
 }
 
-export const taskMutations = {
-  createTask,
-  editTask,
-  deleteTask,
-  dragTask,
-  setSubtask,
-  setComment
-}
+router.post('/assignUserToTask', isAuthenticated, assignUserToTask)

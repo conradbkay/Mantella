@@ -1,38 +1,22 @@
-import React, { CSSProperties } from 'react'
+import { CSSProperties } from 'react'
 import { TProject } from '../../types/project'
-import {
-  Select,
-  MenuItem,
-  IconButton,
-  Theme,
-  createStyles,
-  WithStyles,
-  withStyles
-} from '@material-ui/core'
-import { NavigateBefore, NavigateNext } from '@material-ui/icons'
+import { Select, MenuItem, IconButton, Theme } from '@mui/material'
+import NavigateNext from '@mui/icons-material/NavigateNext'
+import NavigateBefore from '@mui/icons-material/NavigateBefore'
 import { format, addDays, subDays } from 'date-fns'
-
+import { makeStyles } from '@mui/styles'
 const mobilePx = 750
 
-const styles = (theme: Theme) =>
-  createStyles({
-    nav: {
-      [theme.breakpoints.up(mobilePx)]: {
-        ...boxStyle
-      },
-      [theme.breakpoints.down(mobilePx)]: {
-        marginRight: 'auto'
-      }
+const useStyles = makeStyles((theme: Theme) => ({
+  nav: {
+    [theme.breakpoints.up(mobilePx)]: {
+      ...boxStyle
+    },
+    [theme.breakpoints.down(mobilePx)]: {
+      marginRight: 'auto'
     }
-  })
-
-type OwnProps = {
-  projects: TProject[]
-  toggleProject: (id: string[]) => void
-  currIds: string[]
-  startDay: Date
-  setDate: (newDay: Date) => void
-}
+  }
+}))
 
 const boxStyle: CSSProperties = {
   alignItems: 'center',
@@ -41,12 +25,19 @@ const boxStyle: CSSProperties = {
   justifyContent: 'center'
 }
 
-type TProps = OwnProps & WithStyles<typeof styles>
+interface Props {
+  projects: TProject[]
+  toggleProject: (id: string[]) => void
+  currIds: string[]
+  startDay: Date
+  setDate: (newDay: Date) => void
+}
 
-const CWeekControls = (props: TProps) => {
+export const WeekControls = (props: Props) => {
   const { projects, toggleProject, currIds } = props
 
-  console.log(props)
+  const classes = useStyles()
+
   return (
     <div
       style={{
@@ -56,7 +47,7 @@ const CWeekControls = (props: TProps) => {
       <Select
         style={{ maxWidth: '30%', ...boxStyle }}
         value={currIds.length === 0 ? ['-1'] : currIds}
-        onChange={e => {
+        onChange={(e) => {
           const withoutAllProjects = (e.target.value as any).filter(
             (num: string) => num !== '-1'
           )
@@ -72,13 +63,13 @@ const CWeekControls = (props: TProps) => {
         multiple
       >
         <MenuItem value={-1}>All Projects</MenuItem>
-        {Object.values(projects).map(project => (
+        {Object.values(projects).map((project) => (
           <MenuItem key={project.id} value={project.id}>
             {project.name}
           </MenuItem>
         ))}
       </Select>
-      <div className={props.classes.nav}>
+      <div className={classes.nav}>
         <IconButton onClick={() => props.setDate(subDays(props.startDay, 6))}>
           <NavigateBefore />
         </IconButton>
@@ -96,5 +87,3 @@ const CWeekControls = (props: TProps) => {
     </div>
   )
 }
-
-export const WeekControls = withStyles(styles)(CWeekControls)

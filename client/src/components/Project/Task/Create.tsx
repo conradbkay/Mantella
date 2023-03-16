@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   Button,
   Dialog,
@@ -12,19 +12,14 @@ import {
   MenuItem,
   Select,
   TextField
-} from '@material-ui/core'
+} from '@mui/material'
 import { connect } from 'react-redux'
-import { GQL_CREATE_TASK } from '../../../graphql/mutations/task'
-import {
-  CreateTaskMutation,
-  CreateTaskMutationVariables
-} from '../../../graphql/types'
-import { useMutation } from 'react-apollo'
 import { setProjectA } from '../../../store/actions/project'
-import { Close } from '@material-ui/icons'
+import Close from '@mui/icons-material/Close'
 import { ChooseColor } from '../../utils/chooseColor'
 import { TProject } from '../../../types/project'
-import { DateTimePicker } from 'react-widgets'
+import DatePicker from 'react-widgets/DatePicker'
+import { APICreateTask } from '../../../API/task'
 const actionCreators = {
   setProject: setProjectA
 }
@@ -32,11 +27,12 @@ const actionCreators = {
 type OwnProps = {
   onClose: () => void
   project: TProject
-  columnId: string
   listId: string
 }
 
-type TProps = OwnProps & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface TProps extends OwnProps, ActionCreators {}
 
 export const CreateTask = connect(
   null,
@@ -46,43 +42,38 @@ export const CreateTask = connect(
   const [description, setDescription] = useState('')
   const [color, setColor] = useState('#FFFFFF')
   const [points, setPoints] = useState(0)
-  const [listId, setListId] = useState(props.project.lists[0].id)
+  const [listId, setListId] = useState(props.listId)
   const [dueDate, setDueDate] = useState(undefined as undefined | Date)
-  const [createTaskExec] = useMutation<
-    CreateTaskMutation,
-    CreateTaskMutationVariables
-  >(GQL_CREATE_TASK, {
-    onCompleted: ({ createTask }) => {
-      if (createTask && createTask.task && createTask.project) {
+
+  const createTaskExec = async () => {
+    try {
+      const res = await APICreateTask(props.project.id, listId, {
+        points,
+        color,
+        name,
+        description,
+        dueDate: dueDate ? dueDate.toString() : undefined
+      })
+      if (res && res.project) {
         props.setProject({
-          id: createTask.project.id,
-          newProj: createTask.project
+          id: res.project.id,
+          newProj: res.project
         })
       }
+    } catch (err) {
+      console.error(err)
+    } finally {
       props.onClose()
-    },
-    onError: () => props.onClose()
-  })
+    }
+  }
 
   return (
     <Dialog open={true} onClose={() => props.onClose()}>
       <form
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault()
 
-          createTaskExec({
-            variables: {
-              projId: props.project.id,
-              listId: listId,
-              taskInfo: {
-                points,
-                color,
-                name,
-                dueDate: dueDate ? dueDate.toString() : undefined,
-                description
-              }
-            }
-          })
+          await createTaskExec()
         }}
       >
         <DialogTitle>Create Task</DialogTitle>
@@ -179,11 +170,12 @@ export const CreateTask = connect(
             </FormControl>
           </div>
           <div style={{ display: 'flex', marginTop: 20 }}>
-            <DateTimePicker
+            <DatePicker
+              includeTime
               dropUp
               containerClassName="fullwidth"
               value={dueDate}
-              onChange={(date) => {
+              onChange={(date: any) => {
                 setDueDate(date)
               }}
             />

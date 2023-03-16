@@ -1,10 +1,8 @@
-import { TSnackbar } from '../types/state'
-
-import { TState } from '../types/state'
+import { TSnackbar, TState } from '../types/state'
 
 export const defaultSnackbar: TSnackbar = {
   open: false,
-  message: "YOU CAN'T SEE ME",
+  message: '',
   variant: 'success'
 }
 
@@ -15,7 +13,7 @@ export const defaultState: TState = {
     working: true,
     selectingTask: false,
     selectedTaskId: null,
-    currSeconds: 60 * 25, // will be reset to startSeconds when they click start either way
+    currSeconds: 60 * 25,
     breakSeconds: 60 * 5,
     workSeconds: 60 * 25,
     stopWatch: {

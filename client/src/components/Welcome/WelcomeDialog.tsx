@@ -1,14 +1,11 @@
 /* should greet them well instead of the snackbar */
-import React, { useEffect, useState } from 'react'
-import { Dialog, IconButton, Button } from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+import { useEffect, useState } from 'react'
+import { Dialog, IconButton, Button } from '@mui/material'
+import Close from '@mui/icons-material/Close'
 import { store } from '../../store/store'
 import { openSnackbarA } from '../../store/actions/snackbar'
 
-// make them each different backgroundColor to make them pop out
-
 export const WelcomeDialog = () => {
-  // need to figure out how to check whether they have been here
   const [open, setOpen] = useState(!localStorage.getItem('hasVisited'))
   // const [index, setIndex] = useState(0)
 
@@ -41,7 +38,6 @@ export const WelcomeDialog = () => {
             marginTop: 20
           }}
         >
-          {/* put icon between each section man */}
           Greetings, Welcome to Mantella, hello
           <a href="https://github.com/austin-UW/Mantella">Github Page</a>
         </p>
@@ -55,7 +51,7 @@ export const WelcomeDialog = () => {
             store.dispatch(openSnackbarA('Wise', 'standard'))
           }}
         >
-          Hello Kanban Brawn
+          Hello Mantella
         </Button>
       </div>
     </Dialog>

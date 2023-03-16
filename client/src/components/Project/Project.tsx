@@ -1,322 +1,216 @@
-import React, { useState } from 'react'
-import { connect } from 'react-redux'
-import {
-  WithStyles,
-  withStyles,
-  Theme,
-  createStyles,
-  Tooltip,
-  Paper,
-  AppBar,
-  Toolbar,
-  IconButton,
-  TableBody
-} from '@material-ui/core'
+import { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Paper, TableBody, SpeedDial, SpeedDialAction } from '@mui/material'
 import { TState } from '../../types/state'
-import { selectMemberA, setProjectA } from '../../store/actions/project'
-import { CreateColumn } from './CreateColumn'
-import {
-  Add,
-  FilterList,
-  Settings,
-  Equalizer,
-  Create
-} from '@material-ui/icons'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import { CreateColumn } from './CreateList'
+import Add from '@mui/icons-material/Add'
+import Create from '@mui/icons-material/Create'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
-import { ProjectSettings } from './ProjectSettings'
-import {
-  EditProjectMutation,
-  EditProjectMutationVariables,
-  DragTaskMutation,
-  DragTaskMutationVariables,
-  DeleteListMutation,
-  DeleteListMutationVariables,
-  EditListMutationVariables,
-  EditListMutation
-} from '../../graphql/types'
-import { openSnackbarA } from '../../store/actions/snackbar'
-import { GQL_EDIT_PROJECT } from '../../graphql/mutations/project'
 import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
-import { cloneDeep } from 'apollo-utilities'
-import { GQL_DRAG_TASK } from '../../graphql/mutations/task'
-import { useMutation } from 'react-apollo'
 import { CreateTask } from './Task/Create'
-import { EditTaskModal } from './Task/Edit'
-import { setListA } from '../../store/actions/list'
-import { GQL_DELETE_LIST, GQL_EDIT_LIST } from '../../graphql/mutations/list'
-import SpeedDial from '@material-ui/lab/SpeedDial'
-import SpeedDialAction from '@material-ui/lab/SpeedDialAction'
-import { FilterTasks } from './FilterTasks'
-import { setFilterA } from '../../store/actions/filter'
-import { ProjStats } from './Statistics'
+import { EditTaskModal } from './Task/Edit/Edit'
+import {
+  closestCorners,
+  defaultDropAnimationSideEffects,
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  DropAnimation,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import ProjectHeader from './ProjectHeader'
+import { BaseTask } from './Task/Base'
+import { APIDragTask } from '../../API/task'
+import { cloneDeep } from 'lodash'
+import { setProjectA } from '../../store/actions/project'
+import { arrayMove } from '@dnd-kit/sortable'
 
 /**
  * @todo add a filter menu with color, column, due date, label
  */
 
-type OwnProps = {
+type Props = {
   params: {
     id: string
   }
 }
 
-export const input: any = {
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
-  minWidth: '20%',
-  fontSize: 18,
-  outline: 'none',
-  backgroundColor: '#f5f5f5',
-  borderRadius: 4,
-  width: 'auto',
-  padding: 8,
-  border: '1px solid transparent',
-  '&:hover': {
-    backgroundColor: 'white'
-  },
-  '&:focus': {
-    borderColor: '#27b6ba'
-  }
-}
+export const taskDummyOpacity = '0.6'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    fab: {
-      position: 'fixed',
-      bottom: theme.spacing(2),
-      right: theme.spacing(2)
-    },
-    tooltip: {
-      fontSize: 18
-    },
-    appbar: {},
-    input: input
+const dropAnimationConfig: DropAnimation = {
+  sideEffects: defaultDropAnimationSideEffects({
+    styles: {
+      active: {
+        opacity: taskDummyOpacity
+      }
+    }
   })
-
-type TProps = ReturnType<typeof mapState> &
-  typeof actionCreators &
-  OwnProps &
-  WithStyles<typeof styles>
-
-export const getMobile = (window: Window) => {
-  return window.innerWidth <= 1000
 }
+export const PROJECT_BORDER_COLOR = '#aebacc' // light grey
+export const PROJECT_BORDER = '1px solid ' + PROJECT_BORDER_COLOR
 
-export type TFilterData = {
-  dueDate: 'all' | 'none' | 'today' | 'tomorrow' | [Date | null, Date | null]
-  color: string[]
-  points?: [number, number]
-}
+const PROGRESS_DISPLAYS = ['No Progress', 'In Progress', 'Complete']
 
-const CProject = (props: TProps) => {
-  const [editingTaskId, setEditingTaskId] = useState('')
-  const [settings, setSettings] = useState(false)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(getMobile(window))
-  const [collapsedLists, setCollapsedLists] = useState([] as string[])
-  const [editingList, setEditingList] = useState(['', ''])
-  const [stats, setStats] = useState(false)
+// when dragging to an empty list droppable.sortable will be empty
+const getDragEventData = ({ active, over }: DragOverEvent | DragEndEvent) => {
+  console.log(over?.data.current)
+  if (over && active.data.current) {
+    const taskId = active.id as string
+    const fromIdx = active.data.current.sortable.index
+    const [fromListId, fromProgress] =
+      active.data.current.sortable.containerId.split('|')
+    const [toListId, toProgress] = (over.id as string).includes('|')
+      ? (over.id as string).split('|')
+      : over.data.current!.sortable.containerId.split('|')
 
-  if (isMobile) {
+    const toIdx = over.data.current ? over.data.current.sortable.index : 0
+
+    return {
+      taskId,
+      toIdx,
+      fromIdx,
+      fromListId,
+      toListId,
+      toProgress: parseInt(toProgress),
+      fromProgress: parseInt(fromProgress)
+    }
   }
+  return null
+}
 
-  const [name, setName] = useState(
-    props.project ? props.project.name : undefined
-  )
+export const Project = (props: Props) => {
+  const [editingTaskId, setEditingTaskId] = useState('')
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [draggingId, setDraggingId] = useState(null as string | null)
 
-  const [filtering, setFiltering] = useState(false)
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const [deleteListExec] = useMutation<
-    DeleteListMutation,
-    DeleteListMutationVariables
-  >(GQL_DELETE_LIST, {})
-
-  const [dragTaskExec] = useMutation<
-    DragTaskMutation,
-    DragTaskMutationVariables
-  >(GQL_DRAG_TASK, {})
-
-  const draggo = (vars: DragTaskMutationVariables) => {
-    dragTaskExec({ variables: vars })
-  }
-
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return
-    }
-    if (
-      result.source.droppableId === result.destination.droppableId &&
-      result.source.index === result.destination.index
-    ) {
-      return
-    }
-
-    const [[fromListId], [toListId, toProgress]] = [
-      result.source.droppableId.split('DIVIDER'),
-      result.destination.droppableId.split('DIVIDER')
-    ]
-
-    const editProject = cloneDeep(props.project)
-
-    const fromList = editProject.lists[id(editProject.lists, fromListId)]
-
-    const toList = editProject.lists[id(editProject.lists, toListId)]
-
-    // react-beautiful-dnd will not give accurate index, because each droppable has only the tasks with the same progress/column
-    let actualIndex =
-      result.destination.index +
-      props.project.tasks.reduce((accum, task) => {
-        if (
-          task.progress < parseInt(toProgress, 10) &&
-          toList.taskIds.includes(task.id)
-        ) {
-          return accum + 1
-        }
-        return accum
-      }, 0)
-
-    if (
-      fromList.id === toList.id &&
-      props.project.tasks[id(props.project.tasks, result.draggableId)]
-        .progress !== parseInt(toProgress, 10)
-    ) {
-      const addingLater =
-        actualIndex >
-        fromList.taskIds.findIndex((taskId) => taskId === result.draggableId)
-
-      if (addingLater) {
-        actualIndex -= 1
-      }
-    }
-
-    if (actualIndex < 0) {
-      actualIndex = 0
-    }
-
-    // remove old taskId instance
-    fromList.taskIds = fromList.taskIds.filter(
-      (taskId) => taskId !== result.draggableId
-    )
-
-    // add new taskId instance
-    toList.taskIds.splice(actualIndex, 0, result.draggableId)
-
-    // change tasks column
-    editProject.tasks[
-      id(editProject.tasks, result.draggableId)
-    ].progress = parseInt(toProgress, 10)
-
-    // mutate store to save changes
-    props.setProject({ id: props.project.id, newProj: editProject })
-
-    draggo({
-      id: result.draggableId,
-      newIndex: actualIndex,
-      oldListId: fromListId,
-      newListId: toListId,
-      newProgress: parseInt(toProgress),
-      projectId: props.project.id
-    })
-
-    return
-  }
-
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-
-  React.useEffect(() => {
-    window.addEventListener('resize', () => {
-      setIsMobile(getMobile(window))
-      setWindowWidth(window.innerWidth)
-    })
-
-    return () =>
-      window.removeEventListener('resize', () => {
-        setIsMobile(getMobile(window))
-        setWindowWidth(window.innerWidth)
-      })
-  }, [])
-
-  const [editProjectExec] = useMutation<
-    EditProjectMutation,
-    EditProjectMutationVariables
-  >(GQL_EDIT_PROJECT, {})
-
-  const [editListExec] = useMutation<
-    EditListMutation,
-    EditListMutationVariables
-  >(GQL_EDIT_LIST, {
-    onCompleted: () => {
-      props.setList({
-        id: editingList[0],
-        projectId: props.project.id,
-        newList: { name: editingList[1] }
-      })
-      setEditingList(['', ''])
+  const { project } = useSelector((state: TState) => {
+    return {
+      project: state.projects[id(state.projects, props.params.id)]
     }
   })
 
-  const { classes, project } = props
+  const dispatch = useDispatch()
+
+  const onDragStart = (event: DragStartEvent) => {
+    setDraggingId(event.active.id as string)
+  }
+
+  const onDragOver = (event: DragOverEvent) => {
+    const data = getDragEventData(event)
+
+    if (event.over && event.active.id !== event.over.id && data) {
+      const {
+        fromListId,
+        toListId,
+        toProgress,
+        fromProgress,
+        toIdx,
+        fromIdx,
+        taskId
+      } = data
+
+      const editLists = cloneDeep(project.lists)
+
+      const [fromList, toList] = [
+        editLists[id(editLists, fromListId)],
+        editLists[id(editLists, toListId)]
+      ]
+
+      console.log(fromIdx, toIdx)
+
+      if (fromListId === toListId && fromProgress === toProgress) {
+        fromList.taskIds[fromProgress] = arrayMove(
+          fromList.taskIds[fromProgress],
+          fromIdx,
+          toIdx
+        )
+      } else {
+        fromList.taskIds[fromProgress].splice(fromIdx, 1)
+        toList.taskIds[toProgress].splice(
+          fromIdx > toIdx ? toIdx + 1 : toIdx,
+          0,
+          taskId
+        )
+      }
+
+      dispatch(
+        setProjectA({
+          id: project.id,
+          newProj: { ...project, lists: editLists }
+        })
+      )
+    }
+  }
+
+  const onDragEnd = (event: DragEndEvent) => {
+    const data = getDragEventData(event)
+
+    if (data) {
+      const { fromListId, toListId, toProgress, fromProgress, toIdx, taskId } =
+        data
+
+      APIDragTask({
+        projectId: project.id,
+        oldListId: fromListId,
+        newListId: toListId,
+        id: taskId,
+        newProgress: toProgress,
+        oldProgress: fromProgress,
+        newIndex: toIdx
+      })
+    }
+    setDraggingId(null)
+  }
+
+  const onDragCancel = () => {
+    setDraggingId(null)
+  }
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8
+      }
+    })
+  )
+
   if (project) {
     return (
-      <div>
+      <>
         <Helmet>
           <style type="text/css">{` body { background-color: #1d364c; }`}</style>
         </Helmet>
-        <AppBar color="default" className={classes.appbar} position="static">
-          <Toolbar>
-            <input
-              style={{ width: `${windowWidth - 300}px` }}
-              className={classes.input}
-              value={name}
-              onBlur={() =>
-                editProjectExec({
-                  variables: {
-                    newProj: { name: name || 'newname' },
-                    id: project.id
-                  }
-                })
-              }
-              onChange={(e: any) => setName(e.target.value)}
-            />
-            <div style={{ marginLeft: 'auto' }}>
-              <IconButton onClick={() => setFiltering(true)}>
-                <FilterList />
-              </IconButton>
-              <IconButton
-                onClick={() => setSettings(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Settings />
-              </IconButton>
-              <IconButton
-                onClick={() => setStats(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Equalizer />
-              </IconButton>
-            </div>
-          </Toolbar>
-        </AppBar>
-        <Paper
-          style={{
-            margin: 20,
-            padding: 20,
-            paddingBottom: 80,
-            minHeight: 'calc(100vh - 328px)'
-          }}
+        <DndContext
+          sensors={sensors}
+          autoScroll={false}
+          onDragStart={onDragStart}
+          collisionDetection={closestCorners}
+          onDragOver={onDragOver}
+          onDragEnd={onDragEnd}
+          onDragCancel={onDragCancel}
         >
-          <DragDropContext onDragEnd={onDragEnd}>
+          <ProjectHeader project={project} />
+
+          <Paper
+            style={{
+              margin: 20,
+              padding: '20px 20px 40px',
+              minHeight: 'calc(100vh - 328px)'
+            }}
+          >
             <table
               style={{
-                tableLayout: 'fixed',
                 width: '100%',
-                borderCollapse: 'separate'
+                tableLayout: 'fixed' // faster render,
               }}
             >
               <TableBody>
@@ -327,77 +221,35 @@ const CProject = (props: TProps) => {
                       style={{
                         width: '100%',
                         backgroundColor: '#f2f2f2',
-                        borderLeft: col ? 'none' : '1px solid #aebacc',
-                        borderRight: '1px solid #aebacc',
-                        borderTop: '1px solid #aebacc',
+                        borderLeft: col ? 'none' : PROJECT_BORDER,
+                        borderRight: PROJECT_BORDER,
+                        borderTop: PROJECT_BORDER,
                         textAlign: 'center',
                         padding: 8,
                         fontSize: 20
                       }}
                     >
-                      {col === 0
-                        ? 'No Progress'
-                        : col === 1
-                        ? 'In Progress'
-                        : 'Complete'}
+                      {PROGRESS_DISPLAYS[col]}
                     </td>
                   ))}
                 </tr>
                 {project.lists.map((list) => (
                   <tr
                     style={{
-                      verticalAlign: 'top',
                       display: 'flex'
                     }}
                     key={list.id}
                   >
-                    {[0, 1, 2].map((progress, i) => (
+                    {[0, 1, 2].map((progress) => (
                       <ProjectCell
-                        filter={props.filterData}
-                        confirmEditingList={() =>
-                          editListExec({
-                            variables: {
-                              id: list.id,
-                              projectId: project.id,
-                              newList: { name: editingList[1] }
-                            }
-                          })
-                        }
-                        setEditingList={(id) => setEditingList(id)}
-                        editingName={
-                          progress === 0
-                            ? list.id === editingList[0]
-                              ? editingList[1]
-                              : ''
-                            : ''
-                        }
+                        draggingId={draggingId}
                         setCreating={(id) => setCreating(id)}
-                        deleteList={(listId) => {
-                          props.setList({
-                            id: listId,
-                            projectId: props.project.id,
-                            newList: null
-                          })
-                          deleteListExec({
-                            variables: {
-                              projectId: props.project.id,
-                              id: list.id
-                            }
-                          })
+                        openFunc={(tId: string) => {
+                          console.log('open')
+                          //setEditingTaskId(tId)
                         }}
-                        collapseList={(listId) => {
-                          if (collapsedLists.includes(listId)) {
-                            setCollapsedLists(
-                              collapsedLists.filter((lId) => listId !== lId)
-                            )
-                          } else {
-                            setCollapsedLists([...collapsedLists, listId])
-                          }
-                        }}
-                        collapsedLists={collapsedLists}
-                        openFunc={(tId: string) => setEditingTaskId(tId)}
-                        key={i}
-                        progress={progress}
+                        key={list.id + progress}
+                        progress={progress as 0 | 1 | 2}
                         list={list}
                         project={project}
                       />
@@ -406,94 +258,66 @@ const CProject = (props: TProps) => {
                 ))}
               </TableBody>
             </table>
-          </DragDropContext>
-          {creating && (
-            <CreateTask
-              onClose={() => setCreating('')}
-              project={props.project}
-              listId={props.project.lists[0].id}
-              columnId={creating}
-            />
-          )}
-          {dialogOpen && (
-            <CreateColumn
-              onClose={() => setDialogOpen(false)}
-              project={project}
-            />
-          )}
-        </Paper>
+          </Paper>
 
-        <Tooltip
-          placement="left"
-          classes={{ tooltip: classes.tooltip }}
-          title="Add List"
+          <DragOverlay dropAnimation={dropAnimationConfig}>
+            {draggingId ? (
+              <BaseTask
+                project={project}
+                task={project.tasks[id(project.tasks, draggingId)]}
+                openFunc={() => null}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+
+        <SpeedDial
+          open={fab}
+          ariaLabel="create list/create task"
+          onClick={() => setDialogOpen(true)}
+          onClose={() => setFab(false)}
+          onOpen={() => setFab(true)}
+          color="primary"
+          style={{
+            position: 'fixed',
+            bottom: 16,
+            right: 16
+          }}
+          direction="up"
+          icon={<Add />}
         >
-          <SpeedDial
-            open={fab}
-            ariaLabel="create list/create task"
-            onClick={() => setDialogOpen(true)}
-            onClose={() => setFab(false)}
-            onOpen={() => setFab(true)}
-            color="primary"
-            className={classes.fab}
-            direction="up"
-            icon={<Add />}
-          >
-            <SpeedDialAction
-              icon={<Create />}
-              tooltipTitle="Create Task"
-              onClick={(e) => {
-                e.stopPropagation()
-                setCreating(project.lists[0].id)
-              }}
-            />
-          </SpeedDial>
-        </Tooltip>
-        {settings && (
-          <ProjectSettings
-            project={props.project}
-            onClose={() => setSettings(false)}
+          <SpeedDialAction
+            icon={<Create />}
+            tooltipTitle="Create Task"
+            onClick={(e: any) => {
+              e.stopPropagation()
+              setCreating(project.lists[0].id)
+            }}
+          />
+        </SpeedDial>
+
+        {creating && (
+          <CreateTask
+            onClose={() => setCreating('')}
+            project={project}
+            listId={creating}
+          />
+        )}
+        {dialogOpen && (
+          <CreateColumn
+            onClose={() => setDialogOpen(false)}
+            project={project}
           />
         )}
         {editingTaskId && (
           <EditTaskModal
             taskId={editingTaskId}
             onClose={() => setEditingTaskId('')}
-            projectId={props.project.id}
+            projectId={project.id}
           />
         )}
-        <FilterTasks
-          open={filtering}
-          filterData={props.filterData}
-          changeFilter={(newFilter) => props.setFilter(newFilter)}
-          handleClose={() => setFiltering(false)}
-        />
-        <ProjStats
-          projectId={project.id}
-          open={stats}
-          handleClose={() => setStats(false)}
-        />
-      </div>
+      </>
     )
   }
   return <NoMatch />
 }
-
-const mapState = (state: TState, ownProps: OwnProps) => {
-  return {
-    project: state.projects[id(state.projects, ownProps.params.id)],
-    filterData: state.filter
-  }
-}
-
-const actionCreators = {
-  setProject: setProjectA,
-  selectMember: selectMemberA,
-  openSnackbar: openSnackbarA,
-  setList: setListA,
-  setFilter: setFilterA
-}
-
-export const Project = withStyles(styles)(
-  connect(mapState, actionCreators)(CProject)
-)

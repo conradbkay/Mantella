@@ -1,16 +1,23 @@
+export type TProjectUser = {
+  username: string
+  email: string
+  id: string
+  profileImg: string
+}
+
 export interface TProject {
   id: string
   name: string
   ownerId: string
   lists: Array<{
-    taskIds: string[]
+    taskIds: [string[], string[], string[]]
     name: string
     id: string
   }>
 
   tasks: TTask[]
 
-  users: string[]
+  users: TProjectUser[]
 
   security?: {
     public: boolean
@@ -27,7 +34,7 @@ export interface TTask {
   timeWorkedOn: number
   color: string
   dueDate?: string | null // date
-
+  assignedTo?: string[] | null
   comments: Array<{
     id: string
     comment: string

@@ -1,14 +1,16 @@
-import React from 'react'
 import { setLengthA } from '../../store/actions/pomodoro'
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
-import { Button } from '@material-ui/core'
-import { Add, Remove } from '@material-ui/icons'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { Button } from '@mui/material'
+import Add from '@mui/icons-material/Add'
+import Remove from '@mui/icons-material/Remove'
+import { toDaysHHMMSS } from '../../utils/utilities'
 
-type TProps = ReturnType<typeof mapState> & typeof actionCreators
+type ActionCreators = typeof actionCreators
 
-const CControls = (props: TProps) => {
+interface Props extends ReturnType<typeof mapState>, ActionCreators {}
+
+const CControls = (props: Props) => {
   const { workTime, breakTime } = props
 
   return (
@@ -72,7 +74,4 @@ const actionCreators = {
   setLengthA
 }
 
-export const Controls = connect(
-  mapState,
-  actionCreators
-)(CControls)
+export const Controls = connect(mapState, actionCreators)(CControls)

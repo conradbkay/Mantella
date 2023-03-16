@@ -1,80 +1,119 @@
-import React, { useState } from 'react'
+import { ChangeEvent, CSSProperties, useState } from 'react'
 import { TList, TProject } from '../../../types/project'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { BaseTask } from '../Task/Base'
-import {
-  createStyles,
-  IconButton,
-  Menu as MuiMenu,
-  MenuItem,
-  Theme,
-  WithStyles,
-  withStyles
-} from '@material-ui/core'
+import { IconButton, Menu as MuiMenu, MenuItem } from '@mui/material'
 import { id } from '../../../utils/utilities'
-import { Menu, Add } from '@material-ui/icons'
-import { input, TFilterData } from '../Project'
-import { filterTask, filterTasks } from '../../../utils/filterTasks'
-const styles = (theme: Theme) =>
-  createStyles({
-    input: input
-  })
+import Menu from '@mui/icons-material/Menu'
+import Add from '@mui/icons-material/Add'
+import { filterTask /*filterTasks*/ } from '../../../utils/filterTasks'
+import { input } from '../styles'
+import { useDroppable } from '@dnd-kit/core'
+import DraggableTask from '../Task/Draggable'
+import { PROJECT_BORDER, PROJECT_BORDER_COLOR } from '../Project'
+import { TState } from '../../../types/state'
+import { useDispatch, useSelector } from 'react-redux'
+import { setListA } from '../../../store/actions/list'
+import { SortableContext } from '@dnd-kit/sortable'
 
-type OwnProps = {
-  progress: number // 0, 1, or 2
-  list: TList
+interface Props {
   project: TProject
-  filter: TFilterData
-  collapseList: (id: string) => void
-  collapsedLists: string[]
+  list: TList
+  progress: 0 | 1 | 2
+  draggingId?: string | null
   openFunc: (id: string) => void
-  deleteList: (id: string) => void
   setCreating: (id: string) => void
-  editingName: string
-  setEditingList: (id: [string, string]) => void
-  confirmEditingList: () => void
 }
-type TProps = OwnProps & WithStyles<typeof styles>
 
-export const ProjectCell = withStyles(styles)((props: TProps) => {
-  let tasks = props.list.taskIds
-    .map((taskId) => props.project.tasks[id(props.project.tasks, taskId)])
-    .filter((task) => {
-      return task.progress === props.progress
-    })
+const getCellStyles = ({
+  project,
+  list,
+  progress,
+  collapsed
+}: {
+  project: TProject
+  list: TList
+  progress: number
+  collapsed: boolean
+}): CSSProperties => {
+  const isLastColumn = progress === 2
+  const isFirstColumn = progress === 0
+  const isFinalRow =
+    project.lists.findIndex((projList) => projList.id === list.id) ===
+    project.lists.length - 1
+  return {
+    borderTop: PROJECT_BORDER,
+    borderRight: `1px ${
+      isLastColumn ? 'solid' : 'dashed'
+    } ${PROJECT_BORDER_COLOR}`,
+    borderBottom: isFinalRow ? PROJECT_BORDER : undefined,
+    borderLeft: isFirstColumn ? PROJECT_BORDER : undefined,
+    width: '100%',
+    padding: collapsed ? '0px 8px' : 8,
+    maxHeight: collapsed ? 100 : undefined, //'60vh',
+    overflowY: 'auto',
+    maxWidth: '100%',
+    display: 'flex',
+    flexDirection: 'column'
+  }
+}
 
-  if (props.progress === 2) {
-    tasks = tasks
+export const ProjectCell = ({
+  project,
+  list,
+  progress,
+  openFunc,
+  draggingId,
+  setCreating
+}: Props) => {
+  const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
+  const [deletingList, setDeletingList] = useState(false)
+  const [editingList, setEditingList] = useState(['', ''])
+  const [collapsed, setCollapsed] = useState(false)
+
+  const { filter } = useSelector((state: TState) => ({
+    filter: state.filter
+  }))
+
+  const dispatch = useDispatch()
+
+  const editList = () => {
+    dispatch(
+      setListA({
+        id: editingList[0],
+        projectId: project.id,
+        newList: { name: editingList[1] }
+      })
+    )
+    setEditingList(['', ''])
   }
 
-  const [anchorEl, setAnchorEl] = useState(null as any)
-  const [deletingList, setDeletingList] = useState(null as any)
+  let tasks = list.taskIds[progress].map(
+    (taskId) => project.tasks[id(project.tasks, taskId)]
+  )
+  // TODO: For now tasks cannot be dragged if tasks are filtered out
+  //const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
 
-  const disableDrag = tasks.length !== filterTasks(tasks, props.filter).length
+  const editingName =
+    progress === 0 && list.id === editingList[0] ? editingList[1] : ''
 
+  const { setNodeRef } = useDroppable({ id: `${list.id}|${progress}` })
+
+  const deleteList = () => {
+    dispatch(
+      setListA({
+        id: list.id,
+        projectId: project.id,
+        newList: null
+      })
+    )
+  }
+
+  // TODO: make background color change when dragging task, same for task changing when dragging user on
   return (
-    <td
-      style={{
-        borderRight: `1px ${props.progress !== 2 ? 'dashed' : 'solid'} #aebacc`,
-        borderBottom:
-          props.project.lists.findIndex((list) => props.list.id === list.id) ===
-          props.project.lists.length - 1
-            ? '1px solid #aebacc'
-            : undefined,
-        borderTop: '1px solid #aebacc',
-        borderLeft:
-          props.progress === 0
-            ? `1px ${props.progress ? 'dashed' : 'solid'} #aebacc`
-            : undefined,
-        width: '100%',
-        padding: props.collapsedLists.includes(props.list.id) ? '0px 8px' : 8,
-        maxHeight: props.collapsedLists.includes(props.list.id) ? 100 : '60vh',
-        overflowY: 'auto'
-      }}
-    >
-      {props.progress === 0 && (
+    <td style={getCellStyles({ project, collapsed, list, progress })}>
+      {progress === 0 && (
         <div style={{ display: 'flex', margin: 4 }}>
-          {props.collapsedLists.includes(props.list.id) && (
+          {collapsed && (
             <h2
               style={{
                 fontSize: 16,
@@ -85,20 +124,17 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
               [Collapsed]
             </h2>
           )}
-          {props.editingName ? (
+          {editingName ? (
             <input
-              style={{ width: '100%' }}
-              className={props.classes.input}
-              value={props.editingName}
-              onBlur={() => props.confirmEditingList()}
-              onChange={(e: any) =>
-                props.setEditingList([props.list.id, e.target.value])
+              style={{ width: '100%', ...input }}
+              value={editingName}
+              onBlur={() => editList()}
+              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                setEditingList([list.id, e.target.value])
               }
             />
           ) : (
-            <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>
-              {props.list.name}
-            </h2>
+            <h2 style={{ margin: 'auto 0px', fontSize: 18 }}>{list.name}</h2>
           )}
           <IconButton
             onClick={(e) => setAnchorEl(e.currentTarget)}
@@ -106,13 +142,11 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
           >
             <Menu />
           </IconButton>
-          {!props.collapsedLists.includes(props.list.id) && (
+          {!collapsed && (
             <IconButton
               color="primary"
               style={{ marginLeft: 8 }}
-              onClick={
-                () => props.setCreating('string') /* TODO: add columns */
-              }
+              onClick={() => setCreating(list.id)}
             >
               <Add />
             </IconButton>
@@ -126,16 +160,14 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
             <MenuItem
               onClick={() => {
                 setAnchorEl(null)
-                props.collapseList(props.list.id)
+                setCollapsed(true)
               }}
             >
-              {props.collapsedLists.includes(props.list.id)
-                ? 'Uncollapse'
-                : 'Collapse'}
+              {collapsed ? 'Uncollapse' : 'Collapse'}
             </MenuItem>
             <MenuItem
               onClick={() => {
-                props.setEditingList([props.list.id, props.list.name])
+                setEditingList([list.id, list.name])
                 setAnchorEl(null)
               }}
             >
@@ -143,12 +175,13 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
             </MenuItem>
             <MenuItem
               onClick={() => {
-                if (deletingList && props.project.lists.length > 1) {
+                if (deletingList && project.lists.length > 1) {
                   setAnchorEl(null)
-                  props.deleteList(props.list.id)
+                  deleteList()
                 } else {
+                  const DOUBLE_CLICK_TIMEOUT = 4000
                   setDeletingList(true)
-                  setTimeout(() => setDeletingList(false), 4000) // dont have confirm message forever
+                  setTimeout(() => setDeletingList(false), DOUBLE_CLICK_TIMEOUT)
                 }
               }}
             >
@@ -161,54 +194,36 @@ export const ProjectCell = withStyles(styles)((props: TProps) => {
           </MuiMenu>
         </div>
       )}
-      <Droppable
-        isDropDisabled={props.collapsedLists.includes(props.list.id)}
-        droppableId={`${props.list.id}DIVIDER${props.progress}`}
+      <SortableContext
+        id={`${list.id}|${progress}`}
+        items={tasks}
+        strategy={(() => {}) as any}
       >
-        {(dropProvided, dropSnapshot) => {
-          return (
-            <div
-              style={{
-                flexDirection: 'column',
-                display: 'flex',
-                minHeight: props.collapsedLists.includes(props.list.id)
-                  ? 0
-                  : 78,
-                // height: `calc(100% - ${props.progress ? '78px' : '178px'})`,
-                backgroundColor: 'white',
-                paddingBottom: props.collapsedLists.includes(props.list.id)
-                  ? 0
-                  : 78 // needed for dragging to bottom of list
-              }}
-              {...dropProvided.droppableProps}
-              ref={dropProvided.innerRef}
-            >
-              {!props.collapsedLists.includes(props.list.id)
-                ? tasks.map((task, i) => (
-                    <Draggable
-                      isDragDisabled={disableDrag}
-                      draggableId={task.id}
-                      index={i}
-                      key={task.id}
-                    >
-                      {(dragProvided, dragSnapshot) => (
-                        <BaseTask
-                          hidden={!filterTask(task, props.filter)}
-                          openFunc={() => props.openFunc(task.id)}
-                          project={props.project}
-                          task={task}
-                          provided={dragProvided}
-                          snapshot={dragSnapshot}
-                        />
-                      )}
-                    </Draggable>
-                  ))
-                : null}
-              {dropProvided.placeholder}
-            </div>
-          )
-        }}
-      </Droppable>
+        <div ref={setNodeRef} style={{ height: '100%' }}>
+          <div
+            style={{
+              flexDirection: 'column',
+              display: 'flex',
+              minHeight: collapsed ? 0 : 78,
+              height: '100%'
+            }}
+          >
+            {!collapsed
+              ? tasks.map((task, i) => (
+                  <DraggableTask task={task} key={task.id}>
+                    <BaseTask
+                      isDragging={draggingId === task.id}
+                      hidden={!filterTask(task, filter)}
+                      openFunc={() => openFunc(task.id)}
+                      project={project}
+                      task={task}
+                    />
+                  </DraggableTask>
+                ))
+              : null}
+          </div>
+        </div>
+      </SortableContext>
     </td>
   )
-})
+}

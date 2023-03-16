@@ -1,54 +1,43 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import {
-  withStyles,
-  createStyles,
-  Theme,
-  WithStyles,
-  DialogTitle,
-  IconButton,
-  Tabs,
-  Tab,
-  Card
-} from '@material-ui/core'
-import { Close, Settings } from '@material-ui/icons'
+import { Theme, DialogTitle, IconButton, Tabs, Tab, Card } from '@mui/material'
+import Close from '@mui/icons-material/Close'
+import Settings from '@mui/icons-material/Settings'
 import { toggleTimerA, tickA } from '../../store/actions/pomodoro'
-import { toDaysHHMMSS } from '../../utils/convertToTime'
+import { toDaysHHMMSS } from '../../utils/utilities'
 import { Swal } from './Swal'
 import { Controls } from './Controls'
 import { Display } from './Display'
 import { Stopwatch } from './Stopwatch'
 import { TState } from '../../types/state'
 import { getProjectIdFromTaskId, getAllTasks } from '../../utils/utilities'
+import { makeStyles } from '@mui/styles'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    card: {
-      position: 'fixed',
-      bottom: theme.spacing(4),
-      outline: 'none',
-      left: theme.spacing(4),
-      maxWidth: 700,
-      minWidth: 300,
-      zIndex: 1099,
-      backgroundColor: '#f2f2f2'
-    },
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500]
-    }
-  })
-// i do not
-interface OwnProps {
+const useStyles = makeStyles((theme: Theme) => ({
+  card: {
+    position: 'fixed',
+    bottom: theme.spacing(4),
+    outline: 'none',
+    left: theme.spacing(4),
+    maxWidth: 700,
+    minWidth: 300,
+    zIndex: 1099,
+    backgroundColor: '#f2f2f2'
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  }
+}))
+
+type ActionCreators = typeof actionCreators
+
+interface TProps extends ReturnType<typeof mapState>, ActionCreators {
   open: boolean
   stateFunc(next: boolean): void
 }
-type TProps = ReturnType<typeof mapState> &
-  typeof actionCreators &
-  OwnProps &
-  WithStyles<typeof styles>
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
@@ -57,7 +46,7 @@ const CPomodoro = (props: TProps) => {
 
   const pomodoro = props.pomodoro
 
-  React.useEffect(() => {
+  useEffect(() => {
     clearInterval(interval)
 
     interval = setInterval(() => {
@@ -87,7 +76,8 @@ const CPomodoro = (props: TProps) => {
     props.toggleTimer()
   }
 
-  const { open, classes, stateFunc } = props
+  const classes = useStyles()
+  const { open, stateFunc } = props
   const time = toDaysHHMMSS(pomodoro.currSeconds)
 
   Swal(pomodoro, stateFunc, () => toggleWorking())
@@ -130,7 +120,4 @@ const actionCreators = {
   tick: tickA
 }
 
-export const Pomodoro = connect(
-  mapState,
-  actionCreators
-)(withStyles(styles)(CPomodoro))
+export const Pomodoro = connect(mapState, actionCreators)(CPomodoro)

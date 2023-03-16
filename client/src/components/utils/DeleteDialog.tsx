@@ -1,23 +1,19 @@
-import * as React from 'react'
 import {
   Dialog,
   DialogContent,
   DialogContentText,
   Button,
   Theme,
-  createStyles,
-  WithStyles,
   IconButton,
-  withStyles,
   DialogTitle,
   TextField,
   Grid
-} from '@material-ui/core'
-import { Close } from '@material-ui/icons'
+} from '@mui/material'
+import Close from '@mui/icons-material/Close'
+import { useState } from 'react'
+import { makeStyles } from '@mui/styles'
 
-type TProps = OwnProps & WithStyles<typeof styles>
-
-interface OwnProps {
+interface Props {
   id: string
   name: 'Project' | 'Column' | 'Content'
   inputName?: string
@@ -25,25 +21,26 @@ interface OwnProps {
   deleteFunc(id: string): void
 }
 
-const styles = (theme: Theme) =>
-  createStyles({
-    closeButton: {
-      position: 'absolute',
-      right: theme.spacing(1),
-      top: theme.spacing(1),
-      color: theme.palette.grey[500]
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500]
+  }
+}))
 
-const CDeleteColumnDialog = (props: TProps) => {
-  const [confirm, setConfirm] = React.useState('')
+const DeleteColumnDialogComponent = (props: Props) => {
+  const [confirm, setConfirm] = useState('')
 
   const onSubmit = () => {
     props.deleteFunc(props.id)
     props.onClose() // need this so it doesn't delete another column
   }
 
-  const { onClose, classes, name, inputName } = props
+  const classes = useStyles()
+
+  const { onClose, name, inputName } = props
   return (
     <Dialog open={true} onClose={onClose}>
       <DialogTitle>Delete {inputName ? inputName : name}</DialogTitle>
@@ -66,7 +63,7 @@ const CDeleteColumnDialog = (props: TProps) => {
             style={{ margin: 4, marginBottom: 20 }}
             fullWidth
             value={confirm}
-            onChange={e => setConfirm(e.target.value)}
+            onChange={(e) => setConfirm(e.target.value)}
             label={`Please type in the name of the ${name} to confirm.`}
           />
         )}
@@ -93,4 +90,4 @@ const CDeleteColumnDialog = (props: TProps) => {
   )
 }
 
-export const DeleteDialog = withStyles(styles)(CDeleteColumnDialog)
+export const DeleteDialog = DeleteColumnDialogComponent

@@ -1,9 +1,10 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "outDir": "./build/",
-    "module": "ESNext",
+    "module": "CommonJS",
+    "types" : ["node", "jest"],
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "allowJs": true,
@@ -13,8 +14,15 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "noEmitHelpers": true,
-    "lib": ["dom", "es6", "es2016", "es2017"],
-    "rootDirs": ["src", "../client/src/graphql"],
+    "lib": [
+      "dom",
+      "es6",
+      "es2016",
+      "es2017"
+    ],
+    "rootDirs": [
+      "src"
+    ],
     "target": "es2017",
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -29,7 +37,10 @@
     "watch": true,
     "sourceMap": true,
     "removeComments": false,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
-  "exclude": ["node_modules", "build", "scripts", "webpack"]
+  "include": ["src"],
+  "exclude": ["**/node_modules", "**/.*/"]
 }

@@ -2,7 +2,7 @@ import createNextState, { Draft } from 'immer'
 import { Reducer } from 'redux'
 import { TState } from '../../types/state'
 import { TAction, ReducerCases } from '../actions/types'
-
+// TODO: redux toolkit
 /**
  * An *case reducer* is a reducer function for a speficic action type. Case
  * reducers can be composed to full reducers using `createReducer()`.

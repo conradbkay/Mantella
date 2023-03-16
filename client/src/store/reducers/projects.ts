@@ -26,17 +26,16 @@ const SET_LIST = (
   let changing = projects[id(projects, action.projectId)].lists
 
   if (action.newList) {
-    if(changing.filter(list => list.id === action.id).length) {
+    if (changing.filter((list) => list.id === action.id).length) {
       changing[id(changing, action.id)] = {
-        ...changing[id(changing, action.id)], 
+        ...changing[id(changing, action.id)],
         ...action.newList
       }
-    }
-    else {
+    } else {
       changing.push({
-        taskIds: action.newList.taskIds || [],
+        taskIds: (action.newList.taskIds as any) || [[], [], []],
         name: action.newList.name || 'List',
-        id: action.id,
+        id: action.id
       })
     }
   } else {

@@ -1,4 +1,4 @@
-import { TFilterData } from './../../components/Project/Project'
+import { TFilterData } from './../../components/Project/types'
 
 export const setFilterA = (newFilter: TFilterData) => ({
   type: 'SET_FILTER',

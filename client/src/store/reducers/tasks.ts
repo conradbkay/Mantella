@@ -13,13 +13,18 @@ const SET_TASK = (
   if (action.newTask === null) {
     // REFERENCE CLEANUP
 
-    project.lists.map(list => {
-      if (list.taskIds.includes(action.id)) {
-        list.taskIds.splice(list.taskIds.indexOf(action.id), 1)
-      }
+    project.lists.forEach((list) => {
+      list.taskIds.forEach((taskIds, i) => {
+        if (taskIds.includes(action.id)) {
+          list.taskIds[i].splice(taskIds.indexOf(action.id), 1)
+        }
+      })
     })
 
-    project.tasks.splice(project.tasks.findIndex(tsk => tsk.id === action.id), 1)
+    project.tasks.splice(
+      project.tasks.findIndex((tsk) => tsk.id === action.id),
+      1
+    )
   } else {
     tasks[id(tasks, action.id)] = {
       ...action.newTask
@@ -27,7 +32,10 @@ const SET_TASK = (
   }
 }
 
-const SET_SUBTASK = (projects: TProject[], action: ReturnType<typeof setSubtaskA>) => {
+const SET_SUBTASK = (
+  projects: TProject[],
+  action: ReturnType<typeof setSubtaskA>
+) => {
   const project = projects[id(projects, action.projectId)]
   const task = project.tasks[id(project.tasks, action.taskId)]
 

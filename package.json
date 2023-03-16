@@ -1,42 +1,51 @@
 {
-  "name": "kanbanbrawn-master",
+  "name": "mantella",
   "version": "1.0.0",
-  "description": "Bugs: Editing a created task to have more points doesn't increase your current points Proposals:",
+  "description": "Fully-fledged task manager",
   "main": "./server/src/index.ts",
   "scripts": {
-    "start": "cd server && npm i && nodemon",
-    "server": "npm start --prefix server",
-    "build": "npm i --prefix server && cd client && npm install && npm run build",
-    "client": "npm start --prefix client",
-    "gen": "npm run graphql-gen --prefix server && npm run graphql-gen --prefix client",
-    "git-fix": "find .git/objects/ -type f -empty | xargs rm && git fetch -p && git fsck --full"
+    "start": "npm start --prefix server",
+    "client": "npm start --prefix client"
   },
   "engines": {
-    "node": "10.16.1",
-    "npm": "6.9.0"
+    "node": "16.13.0",
+    "npm": "8.1.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/austin-UW/KanbanBrawn.git"
+    "url": "git+https://github.com/austin-UW/Mantella.git"
   },
   "author": "ak",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/austin-UW/KanbanBrawn/issues"
+    "url": "https://github.com/austin-UW/Mantella/issues"
   },
   "homepage": "https://mantella.herokuapp.com",
   "dependencies": {
-    "@playlyfe/gql": "^2.6.1",
-    "@types/node": "^12.6.9",
-    "apollo": "^2.15.0",
-    "concurrently": "^4.1.0",
-    "copyfiles": "^2.1.0",
-    "moment": "^2.24.0",
-    "nodemon": "^1.19.1",
-    "react-scripts": "^2.1.8",
-    "typescript": "^3.5.3"
-  },
-  "devDependencies": {
-    "gh-pages": "^3.1.0"
+    "nodemon": "^2.0.15",
+    "@typegoose/typegoose": "^9.2.0",
+    "bcrypt-nodejs": "^0.0.3",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-jwt": "^8.4.1",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.0",
+    "mongodb-memory-server": "^8.11.5",
+    "mongoose": "^6.7.2",
+    "morgan": "^1.10.0",
+    "node-fetch": "^3.3.0",
+    "passport": "^0.6.0",
+    "passport-github": "^1.1.0",
+    "passport-local": "^1.0.0",
+    "reflect-metadata": "^0.1.13",
+    "session-file-store": "^1.5.0",
+    "throng": "^5.0.0",
+    "uuid": "^9.0.0"
   }
 }

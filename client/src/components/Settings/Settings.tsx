@@ -1,39 +1,31 @@
-import React from 'react'
 import {
   Theme,
-  createStyles,
-  WithStyles,
-  withStyles,
   ListSubheader,
   ListItem,
   ListItemText,
   Button
-} from '@material-ui/core'
-import { List } from '@material-ui/core'
-
+} from '@mui/material'
+import { List } from '@mui/material'
+import { makeStyles } from '@mui/styles'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-import { Mutation, MutationResult } from 'react-apollo'
+import { APILogout } from '../../API/auth'
 import { openSnackbarA } from '../../store/actions/snackbar'
-import { LogoutMutation, LogoutMutationVariables } from '../../graphql/types'
-import { GQL_LOGOUT } from '../../graphql/mutations/auth'
 
-const styles = (theme: Theme) =>
-  createStyles({
-    root: {
-      maxWidth: 1000,
-      marginLeft: 'auto',
-      marginRight: 'auto',
-      backgroundColor: theme.palette.background.paper,
-      width: '95%',
-      marginTop: 50
-    }
-  })
+const useStyles = makeStyles((theme: Theme) => ({
+  root: {
+    maxWidth: 1000,
+    backgroundColor: theme.palette.background.paper,
+    width: '95%'
+  }
+}))
 
-type TProps = WithStyles<typeof styles> & typeof actionCreators
+type ActionCreators = typeof actionCreators
+
+interface TProps extends ActionCreators {}
 
 const CSettings = (props: TProps) => {
-  const { classes } = props
+  const classes = useStyles()
   return (
     <>
       <div>
@@ -43,40 +35,25 @@ const CSettings = (props: TProps) => {
         <List
           subheader={<ListSubheader>Data</ListSubheader>}
           className={classes.root}
+          style={{ margin: 'auto', marginTop: 80 }}
         >
           <ListItem>
             <ListItemText
               primary="Log Out"
               secondary="This action cannot be undone"
             />
-            <Mutation
-              mutation={GQL_LOGOUT}
-              onCompleted={() => {
-                location.href = '#/'
-                location.reload()
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                APILogout()
               }}
-              onError={() => {
-                props.openSnackbar('You are stuck here forever, oops!', 'error')
+              style={{
+                marginLeft: 'auto'
               }}
             >
-              {(
-                logout: (args: { variables: LogoutMutationVariables }) => any,
-                result: MutationResult<LogoutMutation>
-              ) => {
-                return (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => logout({ variables: {} })}
-                    style={{
-                      marginLeft: 'auto'
-                    }}
-                  >
-                    Log Out
-                  </Button>
-                )
-              }}
-            </Mutation>
+              Log Out
+            </Button>
           </ListItem>
         </List>
       </div>
@@ -88,7 +65,4 @@ const actionCreators = {
   openSnackbar: openSnackbarA
 }
 
-export const Settings = connect(
-  null,
-  { ...actionCreators }
-)(withStyles(styles)(CSettings))
+export const Settings = connect(null, { ...actionCreators })(CSettings)
