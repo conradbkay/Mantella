@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setProjectA } from '../../store/actions/project'
 import { TState } from '../../types/state'
 import { setFilterA } from '../../store/actions/filter'
+import { APIEditProject } from '../../API/project'
 
 type Props = {
   project: TProject
@@ -55,14 +56,16 @@ const ProjectHeader = memo(
             <input
               style={{ ...input, width: /*`${windowWidth - 300}px`*/ 200 }}
               value={name}
-              onBlur={() =>
+              onBlur={() => {
                 dispatch(
                   setProjectA({
                     id: project.id,
                     newProj: { ...project, name: name || 'newname' }
                   })
                 )
-              }
+
+                APIEditProject(project.id, { name: name || 'newname' })
+              }}
               onChange={(e: any) => setName(e.target.value)}
             />
             <div style={{ marginLeft: 'auto', display: 'flex' }}>

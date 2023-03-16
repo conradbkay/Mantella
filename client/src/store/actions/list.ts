@@ -1,7 +1,7 @@
 export const setListA = (args: {
   id: string
   projectId: string
-  newList: { taskIds?: string[]; name?: string } | null
+  newList: { taskIds?: [string[], string[], string[]]; name?: string } | null
 }) => ({
   type: 'SET_LIST',
   id: args.id,

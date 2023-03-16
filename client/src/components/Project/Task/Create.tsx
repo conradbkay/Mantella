@@ -27,7 +27,6 @@ const actionCreators = {
 type OwnProps = {
   onClose: () => void
   project: TProject
-  columnId: string
   listId: string
 }
 
@@ -43,7 +42,7 @@ export const CreateTask = connect(
   const [description, setDescription] = useState('')
   const [color, setColor] = useState('#FFFFFF')
   const [points, setPoints] = useState(0)
-  const [listId, setListId] = useState(props.project.lists[0].id)
+  const [listId, setListId] = useState(props.listId)
   const [dueDate, setDueDate] = useState(undefined as undefined | Date)
 
   const createTaskExec = async () => {

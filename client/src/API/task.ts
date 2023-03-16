@@ -17,6 +17,7 @@ export type DragTaskInfo = {
   newListId: string
   id: string
   newProgress: number
+  oldProgress: number
   newIndex: number
 }
 

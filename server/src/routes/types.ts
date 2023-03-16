@@ -60,7 +60,7 @@ export type editListReq = Req<{
   projId: string
   newList: {
     name: string
-    taskIds: string[]
+    taskIds: [string[], string[], string[]]
   }
 }>
 export type editListRes = Response<{}>
@@ -141,10 +141,11 @@ export type deleteTaskRes = Response<{}>
 export type dragTaskReq = Req<{
   projectId: string
   oldListId: string
+  oldListProgress: number
+  oldListReplaceIds: string[]
   newListId: string
-  newProgress: number
-  newIndex: number
-  id: string
+  newListProgress: number
+  newListReplaceIds: string[]
 }>
 export type dragTaskRes = Response<{}>
 

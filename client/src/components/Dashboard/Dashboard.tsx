@@ -81,8 +81,10 @@ export const Dashboard = connect(mapState)(
           <div style={{ margin: '0px 40px' }}>
             {props.projects.map((project, i) => {
               const cols = [0, 0, 0]
-              project.tasks.forEach((task) => {
-                cols[task.progress]++
+              project.lists.forEach((list) => {
+                list.taskIds.forEach((ids, i) => {
+                  cols[i] += ids.length
+                })
               })
 
               const color = betterColors.splice(i, 1)[0]

@@ -10,7 +10,7 @@ export interface TProject {
   name: string
   ownerId: string
   lists: Array<{
-    taskIds: string[]
+    taskIds: [string[], string[], string[]]
     name: string
     id: string
   }>

@@ -17,7 +17,6 @@ router.post('/login', passport.authenticate('local', { session: true }), login)
 router.post('/cookieLogin', isAuthenticated, login)
 router.post('/guestLogin', guestLogin)
 
-import './column'
 import './list'
 import './project'
 import './task'

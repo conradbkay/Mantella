@@ -51,7 +51,6 @@ type OwnProps = {
   onClose: () => void
   taskId: string
   projectId: string
-  open: boolean
 }
 
 /** todo:
@@ -86,7 +85,7 @@ export const EditTaskModal = connect(
   )
 
   const ownerListId = project.lists.find((list) =>
-    list.taskIds.includes(task.id)
+    list.taskIds.flat(1).includes(task.id)
   )!.id
 
   const [listId, setListId] = useState(ownerListId)
@@ -165,11 +164,22 @@ export const EditTaskModal = connect(
     if (listId !== ownerListId) {
       let newIndex = 0
 
+      let progress = 0
+
+      project.lists.forEach((list) => {
+        list.taskIds.forEach((ids, i) => {
+          if (ids.includes(task.id)) {
+            progress = i
+          }
+        })
+      })
+
       dragTask({
         oldListId: ownerListId,
         newListId: listId,
         newIndex,
-        newProgress: task.progress,
+        newProgress: progress,
+        oldProgress: progress,
         projectId: props.projectId,
         id: task.id
       })
@@ -178,7 +188,7 @@ export const EditTaskModal = connect(
 
   return (
     <div>
-      <Dialog open={props.open} onClose={() => props.onClose()}>
+      <Dialog open onClose={() => props.onClose()}>
         <form
           onSubmit={(e) => {
             confirmChanges()

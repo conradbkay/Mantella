@@ -14,9 +14,11 @@ const SET_TASK = (
     // REFERENCE CLEANUP
 
     project.lists.forEach((list) => {
-      if (list.taskIds.includes(action.id)) {
-        list.taskIds.splice(list.taskIds.indexOf(action.id), 1)
-      }
+      list.taskIds.forEach((taskIds, i) => {
+        if (taskIds.includes(action.id)) {
+          list.taskIds[i].splice(taskIds.indexOf(action.id), 1)
+        }
+      })
     })
 
     project.tasks.splice(

@@ -1,5 +1,5 @@
 import { ChangeEvent, CSSProperties, useState } from 'react'
-import { TList, TProject, TTask } from '../../../types/project'
+import { TList, TProject } from '../../../types/project'
 import { BaseTask } from '../Task/Base'
 import { IconButton, Menu as MuiMenu, MenuItem } from '@mui/material'
 import { id } from '../../../utils/utilities'
@@ -22,19 +22,6 @@ interface Props {
   draggingId?: string | null
   openFunc: (id: string) => void
   setCreating: (id: string) => void
-}
-
-const getCellTasks = (
-  tasks: TTask[],
-  taskIds: string[],
-  progress: 0 | 1 | 2
-): TTask[] => {
-  const listTasks = taskIds.map((taskId) => tasks[id(tasks, taskId)])
-
-  const cellTasks = listTasks.filter((task) => {
-    return task.progress === progress
-  })
-  return cellTasks
 }
 
 const getCellStyles = ({
@@ -100,7 +87,9 @@ export const ProjectCell = ({
     setEditingList(['', ''])
   }
 
-  let tasks = getCellTasks(project.tasks, list.taskIds, progress)
+  let tasks = list.taskIds[progress].map(
+    (taskId) => project.tasks[id(project.tasks, taskId)]
+  )
   // TODO: For now tasks cannot be dragged if tasks are filtered out
   //const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
 
@@ -157,7 +146,7 @@ export const ProjectCell = ({
             <IconButton
               color="primary"
               style={{ marginLeft: 8 }}
-              onClick={() => setCreating('string')}
+              onClick={() => setCreating(list.id)}
             >
               <Add />
             </IconButton>
@@ -216,8 +205,7 @@ export const ProjectCell = ({
               flexDirection: 'column',
               display: 'flex',
               minHeight: collapsed ? 0 : 78,
-              height: '100%',
-              backgroundColor: draggingId ? '#E8FBFF' : 'white'
+              height: '100%'
             }}
           >
             {!collapsed
