@@ -112,7 +112,7 @@ app.use('/api/', router)
 app.use(express.static(path.join(__dirname, '../../client/build/index.html')))
 
 app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../../client/build', 'index.html'))
+  res.sendFile(path.join(__dirname, '../../client/build', req.path))
 })
 
 app.use((err: Error, req: any, res: any, next: any) => {

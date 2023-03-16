@@ -88,7 +88,7 @@ app.use('/api/', router_1.router);
   app.get('/*', redirectionFilter)*/
 app.use(express_1.default.static(path_1.default.join(__dirname, '../../client/build/index.html')));
 app.get('/*', function (req, res) {
-    res.sendFile(path_1.default.join(__dirname, '../../client/build', 'index.html'));
+    res.sendFile(path_1.default.join(__dirname, '../../client/build', req.path));
 });
 app.use((err, req, res, next) => {
     console.error('Error: ', err);
