@@ -45,7 +45,6 @@ const register = async (req, res) => {
         });
     }
     catch (err) {
-        console.log(err);
         throw new Error('Could not register, is that email address already in use?');
     }
 };

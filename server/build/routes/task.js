@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assignUserToTask = exports.setComment = exports.setSubtask = exports.dragTask = exports.deleteTask = exports.editTask = exports.createTask = void 0;
+exports.assignUserToTask = exports.setComment = exports.setSubtask = exports.replaceListIds = exports.dragTask = exports.deleteTask = exports.editTask = exports.createTask = void 0;
 const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
 const router_1 = require("./router");
@@ -102,10 +102,27 @@ const dragTask = async (req, res) => {
     if (proj) {
         const oldListIdx = proj.lists.findIndex((list) => list.id === req.body.oldListId);
         const newListIdx = proj.lists.findIndex((list) => list.id === req.body.newListId);
-        proj.lists[oldListIdx].taskIds[req.body.oldListProgress] =
+        proj.lists[oldListIdx].taskIds[req.body.oldProgress] =
             req.body.oldListReplaceIds;
-        proj.lists[newListIdx].taskIds[req.body.newListProgress] =
+        proj.lists[newListIdx].taskIds[req.body.newProgress] =
             req.body.newListReplaceIds;
+        proj.markModified('lists'); // mongoose does not watch subarrays this deep
+        const newProj = await proj.save();
+        res.json({ project: newProj.toObject() });
+    }
+    else {
+        throw new Error('project not defined');
+    }
+};
+exports.dragTask = dragTask;
+router_1.router.post('/dragTask', passport_1.isAuthenticated, exports.dragTask);
+const replaceListIds = async (req, res) => {
+    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
+    if (proj) {
+        for (let list of req.body.lists) {
+            const listIdx = proj.lists.findIndex((l) => l.id === list.id);
+            proj.lists[listIdx].taskIds = list.taskIds;
+        }
         proj.markModified('lists'); // mongoose does not watch subarrays this deep
         await proj.save();
         res.json({ message: 'success' });
@@ -114,8 +131,8 @@ const dragTask = async (req, res) => {
         throw new Error('project not defined');
     }
 };
-exports.dragTask = dragTask;
-router_1.router.post('/dragTask', passport_1.isAuthenticated, exports.dragTask);
+exports.replaceListIds = replaceListIds;
+router_1.router.post('/replaceListIds', passport_1.isAuthenticated, exports.replaceListIds);
 const setSubtask = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (proj) {

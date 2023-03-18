@@ -1,15 +1,13 @@
-import { CSSProperties, useState } from 'react'
+import { useState } from 'react'
 import { Provider } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
 
 import { store } from './store/store'
-import { Pomodoro } from './components/Pomodoro/Pomodoro'
 import { AuthRender } from './components/Auth/Auth'
 import { CreateProject } from './components/createProject/CreateProject'
 import { NoMatch } from './components/NoMatch/NoMatch'
-import { Fab, CircularProgress } from '@mui/material'
-import Timer from '@mui/icons-material/Timer'
+import { CircularProgress } from '@mui/material'
 import { About } from './components/Landing/About'
 import { Header } from './components/Header'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
@@ -37,15 +35,7 @@ const theme = createTheme({
   }
 })
 
-const fabStyle: CSSProperties = {
-  position: 'fixed',
-  bottom: theme.spacing(2),
-  left: theme.spacing(2),
-  zIndex: 999
-}
-
 const Router = () => {
-  const [open, setOpen] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
   window.onload = async () => {
@@ -66,15 +56,7 @@ const Router = () => {
     <BrowserRouter>
       <Header />
       <div style={{ marginTop: 58.5 /* headerHeight */ }} />
-      <Pomodoro open={open} stateFunc={(bool: boolean) => setOpen(bool)} />
       {/* <WelcomeDialog /> */}
-      {!open && (
-        <>
-          <Fab style={fabStyle} color="secondary" onClick={() => setOpen(true)}>
-            <Timer />
-          </Fab>
-        </>
-      )}
       {loaded ? (
         <Switch>
           <PrivateRoute

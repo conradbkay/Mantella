@@ -11,6 +11,8 @@ import FilterList from '@mui/icons-material/FilterList'
 import { useState } from 'react'
 import Equalizer from '@mui/icons-material/Equalizer'
 import { TProject } from '../../types/project'
+import { Pomodoro } from '../Pomodoro/Pomodoro'
+import Timer from '@mui/icons-material/Timer'
 
 const listItems = [
   { title: 'Chat', Icon: Chat },
@@ -18,7 +20,8 @@ const listItems = [
   { title: 'Settings', Icon: Settings },
   { title: 'Members', Icon: Person },
   { title: 'Filter', Icon: FilterList },
-  { title: 'Statistics', Icon: Equalizer }
+  { title: 'Statistics', Icon: Equalizer },
+  { title: 'Pomodoro', Icon: Timer }
 ]
 
 export const Sidebar = ({ project }: { project: TProject }) => {
@@ -63,6 +66,8 @@ export const Sidebar = ({ project }: { project: TProject }) => {
             <div>chat </div>
           ) : open === 'Statistics' ? (
             <ProjStats project={project} />
+          ) : open === 'Pomodoro' ? (
+            <Pomodoro />
           ) : null}
         </div>
       </div>

@@ -49,11 +49,4 @@ Dark mode
 
 Changing task list to other project doesn't work
 
-Vscode style left bar to save room for user dragging with:
-Chat,
-Pomodoro,
-Members (manage)
-Filtering
-Settings
-
 View modes in project header (calendar, list, kanban, table, global)

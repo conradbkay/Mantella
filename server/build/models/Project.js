@@ -28,6 +28,10 @@ tslib_1.__decorate([
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),
     tslib_1.__metadata("design:type", Array)
+], Project.prototype, "history", void 0);
+tslib_1.__decorate([
+    (0, typegoose_1.prop)(),
+    tslib_1.__metadata("design:type", Array)
 ], Project.prototype, "users", void 0);
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),

@@ -54,6 +54,7 @@ const generateDefaultProject = (newUser, projectId) => {
     const ids = (0, exports.generateIds)(16);
     const tasks = (0, exports.taskObjects)(ids);
     return {
+        history: [],
         name: 'Tutorial Project',
         lists: [
             {
