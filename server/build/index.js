@@ -14,9 +14,12 @@ const passport_local_1 = require("passport-local");
 const express_session_1 = tslib_1.__importDefault(require("express-session"));
 const uuid_1 = require("uuid");
 require("reflect-metadata");
+const http_1 = tslib_1.__importDefault(require("http"));
+const Chat_1 = require("./models/Chat");
 const debug = require('debug');
 const FileStore = require('session-file-store')(express_session_1.default);
 const compression = require('compression');
+const { Server } = require('socket.io');
 require('dotenv').config(); // Injects .env variables into process.env object
 // eslint-disable-next-line import/first
 debug('ts-express:server');
@@ -41,6 +44,30 @@ app.use((0, cors_1.default)({
         return callback(null, true);
     }
 }));
+const server = http_1.default.createServer();
+const io = new Server(server);
+io.on('connection', (socket) => {
+    socket.on('send_message', async ({ chatId, message, userId }) => {
+        const messageObj = {
+            message,
+            senderId: userId,
+            createdAt: new Date().getTime(),
+            id: (0, uuid_1.v4)()
+        };
+        io.in(chatId).emit('message', messageObj);
+        // save to project
+        const chat = await Chat_1.ChatModel.findOne({ id: chatId });
+        if (chat) {
+            chat.messages.push(messageObj);
+        }
+    });
+    socket.on('login', ({ chatId }) => {
+        socket.join(chatId);
+    });
+});
+server.listen(3000, () => {
+    console.log('websocket listening on port 3000');
+});
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)(process.env.PRIVATE));

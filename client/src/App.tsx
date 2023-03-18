@@ -19,6 +19,11 @@ import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings/Settings'
 import { CalendarWeek } from './components/Calendar/Week'
 import { APICookieLogin } from './API/auth'
+import io from 'socket.io-client'
+
+const socket = io('http://localhost:3000', {
+  transports: ['websocket', 'polling']
+})
 
 const secondary = '#0336FF'
 const primary = '#00838f'
@@ -93,7 +98,7 @@ const Router = () => {
             exact
             path="/project/:id"
             component={Project}
-            componentProps={{}}
+            componentProps={{ socket }}
           />
           <PrivateRoute
             exact

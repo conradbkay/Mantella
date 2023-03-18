@@ -6,6 +6,7 @@ const bcryptjs_1 = tslib_1.__importDefault(require("bcryptjs"));
 const User_1 = require("../models/User");
 const Project_1 = require("../models/Project");
 const data_1 = require("../data");
+const Chat_1 = require("../models/Chat");
 const login = async (req, res, next) => {
     try {
         const projects = await Project_1.ProjectModel.find({
@@ -25,15 +26,19 @@ const register = async (req, res) => {
     try {
         const salt = await bcryptjs_1.default.genSalt(SALT_LENGTH);
         const password = await bcryptjs_1.default.hash(req.body.password, salt);
-        const [projectId, userId] = (0, data_1.generateIds)(2);
+        const [projectId, userId, chatId] = (0, data_1.generateIds)(3);
         const [project, newUser] = await Promise.all([
             Project_1.ProjectModel.create((0, data_1.generateDefaultProject)({
                 id: userId,
                 email: req.body.email,
                 username: req.body.username,
                 profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId)),
-            await User_1.UserModel.create(Object.assign(Object.assign({}, (0, data_1.generateGuestUser)(projectId, userId)), { password, email: req.body.email, username: req.body.username }))
+            }, projectId, chatId)),
+            await User_1.UserModel.create(Object.assign(Object.assign({}, (0, data_1.generateGuestUser)(projectId, userId)), { password, email: req.body.email, username: req.body.username })),
+            await Chat_1.ChatModel.create({
+                id: chatId,
+                messages: []
+            })
         ]);
         req.login(newUser, (err) => {
             if (err) {
@@ -66,15 +71,19 @@ const logout = async (req, res) => {
 exports.logout = logout;
 const guestLogin = async (req, res) => {
     try {
-        const [projectId, userId] = (0, data_1.generateIds)(2);
+        const [projectId, userId, chatId] = (0, data_1.generateIds)(3);
         const [project, user] = await Promise.all([
             Project_1.ProjectModel.create((0, data_1.generateDefaultProject)({
                 email: 'No Email Registered',
                 username: 'Guest',
                 id: userId,
                 profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId)),
-            await User_1.UserModel.create((0, data_1.generateGuestUser)(projectId, userId))
+            }, projectId, chatId)),
+            await User_1.UserModel.create((0, data_1.generateGuestUser)(projectId, userId)),
+            await Chat_1.ChatModel.create({
+                id: chatId,
+                messages: []
+            })
         ]);
         res.json({
             user: Object.assign(Object.assign({}, user.toObject()), { projects: [project.toObject()] })

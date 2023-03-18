@@ -14,6 +14,7 @@ import {
   registerResObj
 } from './types'
 import { NextFunction, Request, Response } from 'express'
+import { ChatModel } from '../models/Chat'
 
 export const login = async (
   req: loginReq,
@@ -45,7 +46,7 @@ export const register = async (req: registerReq, res: registerRes) => {
     const salt = await bcrypt.genSalt(SALT_LENGTH)
     const password = await bcrypt.hash(req.body.password, salt)
 
-    const [projectId, userId] = generateIds(2)
+    const [projectId, userId, chatId] = generateIds(3)
 
     const [project, newUser] = await Promise.all([
       ProjectModel.create(
@@ -57,7 +58,8 @@ export const register = async (req: registerReq, res: registerRes) => {
             profileImg:
               'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
           },
-          projectId
+          projectId,
+          chatId
         )
       ),
       await UserModel.create({
@@ -65,6 +67,10 @@ export const register = async (req: registerReq, res: registerRes) => {
         password,
         email: req.body.email,
         username: req.body.username
+      }),
+      await ChatModel.create({
+        id: chatId,
+        messages: []
       })
     ])
 
@@ -103,7 +109,7 @@ export const logout = async (req: Request, res: Response) => {
 
 export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
   try {
-    const [projectId, userId] = generateIds(2)
+    const [projectId, userId, chatId] = generateIds(3)
 
     const [project, user] = await Promise.all([
       ProjectModel.create(
@@ -115,10 +121,15 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
             profileImg:
               'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
           },
-          projectId
+          projectId,
+          chatId
         )
       ),
-      await UserModel.create(generateGuestUser(projectId, userId))
+      await UserModel.create(generateGuestUser(projectId, userId)),
+      await ChatModel.create({
+        id: chatId,
+        messages: []
+      })
     ])
 
     res.json({

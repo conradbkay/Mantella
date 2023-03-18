@@ -6,7 +6,7 @@ type OwnProps = {
 
 export const ProjStats = ({ project }: OwnProps) => {
   return (
-    <div>
+    <div style={{ minWidth: 400 }}>
       <p>hi</p>
       Track productivity and figure out where your time goes
     </div>

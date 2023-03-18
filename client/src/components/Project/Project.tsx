@@ -32,6 +32,7 @@ import { setProjectA } from '../../store/actions/project'
 import { arrayMove } from '@dnd-kit/sortable'
 import { APIReplaceListIds } from '../../API/list'
 import { Sidebar } from './Sidebar'
+import { Socket } from 'socket.io-client'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -41,6 +42,7 @@ type Props = {
   params: {
     id: string
   }
+  socket: Socket
 }
 
 export const taskDummyOpacity = '0.6'
@@ -210,8 +212,8 @@ export const Project = (props: Props) => {
           onDragCancel={onDragCancel}
         >
           <ProjectHeader deleteMode={Boolean(draggingId)} project={project} />
-          <div style={{ display: 'flex' }}>
-            <Sidebar project={project} />
+          <div style={{ display: 'flex', minHeight: 'calc(100vh - 124px)' }}>
+            <Sidebar project={project} socket={props.socket} />
             <Paper
               style={{
                 margin: 20,

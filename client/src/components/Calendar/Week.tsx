@@ -81,7 +81,7 @@ const CWeek = (props: TProps) => {
 
   return (
     <>
-      <div style={{ margin: 20 }}>
+      <div style={{ margin: '68px 20px 20px 20px' }}>
         <WeekControls
           startDay={days[0]}
           currIds={filterProjectId}
@@ -106,11 +106,11 @@ const CWeek = (props: TProps) => {
           </div>
         </div>
       </div>
-      {weekEmpty && (
+      {weekEmpty ? (
         <h1 style={{ margin: '20px auto', textAlign: 'center' }}>
           You have no tasks with due dates
         </h1>
-      )}
+      ) : null}
     </>
   )
 }

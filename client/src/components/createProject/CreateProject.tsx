@@ -47,7 +47,7 @@ const CCreateProject = (props: CreateProjectProps) => {
         <style type="text/css">{` body { background-color: #1d364c; }`}</style>
       </Helmet>
       <main
-        style={{ margin: 'auto', marginTop: 64 }}
+        style={{ margin: 'auto', marginTop: 80 }}
         className={classes.layout}
       >
         <form

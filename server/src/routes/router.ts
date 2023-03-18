@@ -19,4 +19,5 @@ router.post('/guestLogin', guestLogin)
 
 import './list'
 import './project'
+import './chat'
 import './task'

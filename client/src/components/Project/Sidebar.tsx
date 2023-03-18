@@ -13,6 +13,8 @@ import Equalizer from '@mui/icons-material/Equalizer'
 import { TProject } from '../../types/project'
 import { Pomodoro } from '../Pomodoro/Pomodoro'
 import Timer from '@mui/icons-material/Timer'
+import { Socket } from 'socket.io-client'
+import { ProjectChat } from './Chat'
 
 const listItems = [
   { title: 'Chat', Icon: Chat },
@@ -24,7 +26,13 @@ const listItems = [
   { title: 'Pomodoro', Icon: Timer }
 ]
 
-export const Sidebar = ({ project }: { project: TProject }) => {
+export const Sidebar = ({
+  project,
+  socket
+}: {
+  project: TProject
+  socket: Socket
+}) => {
   const [open, setOpen] = useState(null as null | string)
 
   return (
@@ -54,8 +62,19 @@ export const Sidebar = ({ project }: { project: TProject }) => {
           ))}
         </List>
         <div
-          style={{ backgroundColor: 'white', height: '100%', maxWidth: 400 }}
+          style={{
+            backgroundColor: 'white',
+            height: '100%',
+            maxWidth: 400,
+            borderLeft: '1px solid #EEEEEE'
+          }}
         >
+          <ProjectChat
+            users={project.users}
+            socket={socket}
+            chatId={project.chatId}
+            open={open === 'Chat'}
+          />
           {open === 'Filter' ? (
             <FilterTasks />
           ) : open === 'Members' ? (
@@ -64,8 +83,6 @@ export const Sidebar = ({ project }: { project: TProject }) => {
             <ProjectSettings projectId={project.id} />
           ) : open === 'Calendar' ? (
             <div>hi</div>
-          ) : open === 'Chat' ? (
-            <div>chat </div>
           ) : open === 'Statistics' ? (
             <ProjStats project={project} />
           ) : open === 'Pomodoro' ? (

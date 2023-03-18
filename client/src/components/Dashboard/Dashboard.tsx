@@ -19,7 +19,7 @@ import Add from '@mui/icons-material/Add'
 const root: CSSProperties = {
   display: 'flex',
   flexDirection: 'row',
-  margin: 40
+  margin: '80px 24px 0 24px'
 }
 
 const mapState = (state: TState) => ({
