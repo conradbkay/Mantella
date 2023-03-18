@@ -34,6 +34,8 @@ export class Project {
     description?: string
   }>
   @prop()
+  public history!: Array<{}> // most recent first
+  @prop()
   public users!: Array<{
     id: string
     profileImg: string

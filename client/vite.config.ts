@@ -4,11 +4,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import viteTsconfigPaths from 'vite-tsconfig-paths'
 import svgrPlugin from 'vite-plugin-svgr'
+//import ssr from 'vite-plugin-ssr/plugin'
 import eslint from 'vite-plugin-eslint'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), viteTsconfigPaths(), svgrPlugin(), eslint()],
+  plugins: [react(), viteTsconfigPaths(), svgrPlugin(), eslint() /*ssr()*/],
   build: {
     outDir: 'build'
   },

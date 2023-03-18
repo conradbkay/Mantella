@@ -1,9 +1,6 @@
 import {
-  Dialog,
-  DialogTitle,
   DialogContent,
   Button,
-  DialogActions,
   Typography,
   ListItem,
   ListItemText,
@@ -18,8 +15,6 @@ import { useState } from 'react'
 type ActionCreators = typeof actionCreators
 
 interface Props extends ActionCreators {
-  onClose: () => void
-  open: boolean
   projectId: string
 }
 
@@ -32,42 +27,35 @@ const CProjectSettings = (props: Props) => {
   }
 
   return (
-    <Dialog onClose={props.onClose} open={props.open}>
-      <div style={{ minWidth: '500px' }} />
-      <DialogTitle>Project Settings</DialogTitle>
-      <DialogContent>
-        <Typography style={{ fontSize: 20 }}>
-          <span style={{ color: 'red', marginRight: 8 }}>Danger Zone!</span>
-        </Typography>
-        <ListItem>
-          <ListItemAvatar>
-            <Delete />
-          </ListItemAvatar>
-          <ListItemText
-            primary="Delete this project"
-            secondary="Once deleted, projects cannot be restored"
-          />
-          <Button
-            size="medium"
-            onClick={() => {
-              if (hasClicked) {
-                deleteProject()
-              } else {
-                setClicked(true)
-              }
-            }}
-            color="primary"
-            variant={hasClicked ? 'contained' : 'outlined'}
-            style={{ marginLeft: 16, maxHeight: 36, marginTop: 'auto' }}
-          >
-            {hasClicked ? 'Confirm' : 'Delete'}
-          </Button>
-        </ListItem>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={props.onClose}>Continue</Button>
-      </DialogActions>
-    </Dialog>
+    <DialogContent>
+      <Typography style={{ fontSize: 20 }}>
+        <span style={{ color: 'red', marginRight: 8 }}>Danger Zone!</span>
+      </Typography>
+      <ListItem>
+        <ListItemAvatar>
+          <Delete />
+        </ListItemAvatar>
+        <ListItemText
+          primary="Delete this project"
+          secondary="Once deleted, projects cannot be restored"
+        />
+        <Button
+          size="medium"
+          onClick={() => {
+            if (hasClicked) {
+              deleteProject()
+            } else {
+              setClicked(true)
+            }
+          }}
+          color="primary"
+          variant={hasClicked ? 'contained' : 'outlined'}
+          style={{ marginLeft: 16, maxHeight: 36, marginTop: 'auto' }}
+        >
+          {hasClicked ? 'Confirm' : 'Delete'}
+        </Button>
+      </ListItem>
+    </DialogContent>
   )
 }
 

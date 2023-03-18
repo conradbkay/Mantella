@@ -19,6 +19,7 @@ import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import { registerA, loginA } from '../../store/actions/auth'
 import { APILogin, APIRegister } from '../../API/auth'
+import { useHistory } from 'react-router'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
   return <TextField margin="dense" fullWidth required {...inputProps} />
@@ -53,10 +54,11 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState('')
 
+  const navigate = useHistory()
   const classes = useFormStyles()
 
   return (
-    <div style={{ margin: 20 }}>
+    <div style={{ padding: 20 }}>
       <Helmet>
         <style type="text/css">{` body { background-color: #1d364c; }`}</style>
       </Helmet>
@@ -73,7 +75,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               })
               if (user) {
                 register(user)
-                window.location.href = '/project/' + user.projects[0].id
+                navigate.push('/project/' + user.projects[0].id)
               } else {
                 openSnackbar(
                   'User with that Email already exists, Sorry!',
@@ -130,18 +132,20 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               name="password"
               type={showPassword ? 'text' : 'password'}
               id="password"
-              endAdornment={
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
               value={password}
               onChange={(e: any) => setPassword(e.target.value)}
             />

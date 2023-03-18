@@ -1,9 +1,7 @@
 import {
   Button,
-  Dialog,
   DialogContent,
   DialogContentText,
-  DialogTitle,
   List,
   ListItem,
   ListItemAvatar,
@@ -18,33 +16,30 @@ import { useDispatch, useSelector } from 'react-redux'
 import { APIShareProject } from '../../API/project'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { TState } from '../../types/state'
-import { id } from '../../utils/utilities'
 import Delete from '@mui/icons-material/Delete'
 import { setProjectA } from '../../store/actions/project'
+import { TProject } from '../../types/project'
 type Props = {
-  onClose: () => void
-  projectId: string
-  open: boolean
+  project: TProject
 }
 
 // TODO: open={props.open}
-export const ShareProject = ({ onClose, projectId, open }: Props) => {
+export const ShareProject = ({ project }: Props) => {
   const [senderEmail, setSenderEmail] = useState('')
   const dispatch = useDispatch()
-  const project = useSelector(
-    (state: TState) => state.projects[id(state.projects, projectId)]
-  )
+
   const user = useSelector((state: TState) => state.user)
 
   const submit = async () => {
     try {
-      const res = await APIShareProject({ email: senderEmail, projectId })
+      const res = await APIShareProject({
+        email: senderEmail,
+        projectId: project.id
+      })
 
-      const project = res[1]
+      const newProj = res[1]
 
-      dispatch(setProjectA({ id: project.id, newProj: project }))
-
-      onClose()
+      dispatch(setProjectA({ id: newProj.id, newProj }))
 
       dispatch(openSnackbarA('User invited', 'success'))
     } catch (err) {
@@ -58,64 +53,56 @@ export const ShareProject = ({ onClose, projectId, open }: Props) => {
   }
 
   return (
-    <Dialog maxWidth={'xs'} onClose={onClose} open={open}>
-      <DialogTitle>Share Project</DialogTitle>
-      <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-        <DialogContentText style={{ marginBottom: 0 }}>
-          Members
-        </DialogContentText>
-        <List>
-          {project.users.map((member) => (
-            <ListItem key={member.id}>
-              <ListItemAvatar>
-                <img
-                  alt="profile"
-                  style={{ borderRadius: '50%' }}
-                  width={32}
-                  height={32}
-                  src={member.profileImg}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={member.username}
-                secondary={member.email}
+    <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
+      <DialogContentText style={{ marginBottom: 0 }}>Members</DialogContentText>
+      <List>
+        {project.users.map((member) => (
+          <ListItem key={member.id}>
+            <ListItemAvatar>
+              <img
+                alt="profile"
+                style={{ borderRadius: '50%' }}
+                width={32}
+                height={32}
+                src={member.profileImg}
               />
-              <ListItemSecondaryAction>
-                <IconButton
-                  disabled={project.ownerId !== user!.id}
-                  edge="end"
-                  aria-label="delete"
-                >
-                  <Delete />
-                </IconButton>
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
-        <Typography style={{ fontSize: 16 }}>
-          Enter the invitee's email address that was used to join Mantella, they
-          will automatically have access when they sign in
-        </Typography>
-        <div style={{ display: 'flex', padding: '16px 0' }}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="johnsmith@email.com"
-            type="email"
-            style={{ flexGrow: 1 }}
-            value={senderEmail}
-            onChange={(e) => setSenderEmail(e.target.value)}
-          />
-          <Button
-            onClick={() => submit()}
-            style={{ height: '100%', margin: 'auto 0 auto 8px' }}
-            variant="contained"
-            color="primary"
-          >
-            Send
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+            </ListItemAvatar>
+            <ListItemText primary={member.username} secondary={member.email} />
+            <ListItemSecondaryAction>
+              <IconButton
+                disabled={project.ownerId !== user!.id}
+                edge="end"
+                aria-label="delete"
+              >
+                <Delete />
+              </IconButton>
+            </ListItemSecondaryAction>
+          </ListItem>
+        ))}
+      </List>
+      <Typography style={{ fontSize: 16 }}>
+        Enter the invitee's email address that was used to join Mantella, they
+        will automatically have access when they sign in
+      </Typography>
+      <div style={{ display: 'flex', padding: '16px 0' }}>
+        <TextField
+          variant="outlined"
+          size="small"
+          placeholder="johnsmith@email.com"
+          type="email"
+          style={{ flexGrow: 1 }}
+          value={senderEmail}
+          onChange={(e) => setSenderEmail(e.target.value)}
+        />
+        <Button
+          onClick={() => submit()}
+          style={{ height: '100%', margin: 'auto 0 auto 8px' }}
+          variant="contained"
+          color="primary"
+        >
+          Send
+        </Button>
+      </div>
+    </DialogContent>
   )
 }

@@ -141,10 +141,10 @@ export type deleteTaskRes = Response<{}>
 export type dragTaskReq = Req<{
   projectId: string
   oldListId: string
-  oldListProgress: number
+  oldProgress: number
   oldListReplaceIds: string[]
   newListId: string
-  newListProgress: number
+  newProgress: number
   newListReplaceIds: string[]
 }>
 export type dragTaskRes = Response<{}>

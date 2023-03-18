@@ -11,14 +11,14 @@ export const APICreateTask = async (
   return res.data
 }
 
-export type DragTaskInfo = {
+type DragTaskInfo = {
   projectId: string
   oldListId: string
-  newListId: string
-  id: string
-  newProgress: number
   oldProgress: number
-  newIndex: number
+  oldListReplaceIds: string[]
+  newListId: string
+  newProgress: number
+  newListReplaceIds: string[]
 }
 
 export const APIDragTask = async (info: DragTaskInfo) => {

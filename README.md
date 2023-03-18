@@ -39,4 +39,21 @@ Instead of saying "Jan 1 1:50" say "Today at 1:50" or "Due in 30 minutes"
 
 Allow link as [http://mantella.herokuapp.com?action=autoTrial] which would automatically create a guest account which has all premium features for 7 days. Migration of guest accounts should be added when this is added
 
+Edit history from git style diffs
+
 Remove people from projects is not functional
+
+Search bar smooth scroll to task
+
+Dark mode
+
+Changing task list to other project doesn't work
+
+Vscode style left bar to save room for user dragging with:
+Chat,
+Pomodoro,
+Members (manage)
+Filtering
+Settings
+
+View modes in project header (calendar, list, kanban, table, global)

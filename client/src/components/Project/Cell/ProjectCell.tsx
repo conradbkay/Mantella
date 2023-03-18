@@ -110,7 +110,10 @@ export const ProjectCell = ({
 
   // TODO: make background color change when dragging task, same for task changing when dragging user on
   return (
-    <td style={getCellStyles({ project, collapsed, list, progress })}>
+    <td
+      className="anim-height"
+      style={getCellStyles({ project, collapsed, list, progress })}
+    >
       {progress === 0 && (
         <div style={{ display: 'flex', margin: 4 }}>
           {collapsed && (
@@ -174,6 +177,7 @@ export const ProjectCell = ({
               Edit
             </MenuItem>
             <MenuItem
+              disabled={project.lists.length === 1}
               onClick={() => {
                 if (deletingList && project.lists.length > 1) {
                   setAnchorEl(null)

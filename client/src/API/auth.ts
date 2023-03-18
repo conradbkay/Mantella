@@ -1,32 +1,34 @@
 import axios from 'axios'
 
-export const APILogin = async (
-  email?: string,
-  password?: string,
-  isCookie?: boolean
-) => {
+export const APILogin = async (email: string, password: string) => {
   try {
-    const res = await axios.post(
-      isCookie ? '/cookieLogin' : '/login',
-      {
-        email,
-        password
-      },
-      { withCredentials: true }
-    )
+    const res = await axios.post('/login', {
+      email,
+      password
+    })
     return res.data.user
   } catch (err) {
     console.error(err)
   }
 }
 
-export const APIRegister = async (data: {
+export const APICookieLogin = async () => {
+  try {
+    const res = await axios.post('/cookieLogin', {}, { withCredentials: true })
+
+    return res.data.user
+  } catch (err) {
+    // an error just means they don't have a login session
+  }
+}
+
+export const APIRegister = async (registerData: {
   email: string
   username: string
   password: string
 }) => {
   try {
-    const res = await axios.post('/register', data)
+    const res = await axios.post('/register', registerData)
     return res.data.user
   } catch (err) {
     console.error(err)
@@ -42,6 +44,7 @@ export const APIGuestLogin = async () => {
   }
 }
 
+// side effect of page refresh
 export const APILogout = async () => {
   try {
     await axios.post('/logout')

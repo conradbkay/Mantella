@@ -74,11 +74,16 @@ export const getAllTasks = (projects: TProject[]): TTask[] => {
   return tasks
 }
 
-export const getAllListsArr = (projects: TProject[]): TList[] => {
-  let lists: TList[] = []
+type TListWithProjectIds = TList & { projectId: string }
+
+export const getAllListsArr = (projects: TProject[]): TListWithProjectIds[] => {
+  let lists: TListWithProjectIds[] = []
 
   projects.forEach((project) => {
-    lists = [...lists, ...project.lists]
+    lists = [
+      ...lists,
+      ...project.lists.map((list) => ({ ...list, projectId: project.id }))
+    ]
   })
 
   return lists

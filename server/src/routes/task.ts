@@ -135,10 +135,31 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
       (list) => list.id === req.body.newListId
     )
 
-    proj.lists[oldListIdx].taskIds[req.body.oldListProgress] =
+    proj.lists[oldListIdx].taskIds[req.body.oldProgress] =
       req.body.oldListReplaceIds
-    proj.lists[newListIdx].taskIds[req.body.newListProgress] =
+    proj.lists[newListIdx].taskIds[req.body.newProgress] =
       req.body.newListReplaceIds
+
+    proj.markModified('lists') // mongoose does not watch subarrays this deep
+
+    const newProj = await proj.save()
+
+    res.json({ project: newProj.toObject() })
+  } else {
+    throw new Error('project not defined')
+  }
+}
+
+router.post('/dragTask', isAuthenticated, dragTask)
+
+export const replaceListIds = async (req: Request, res: Response) => {
+  const proj = await ProjectModel.findOne({ id: req.body.projectId })
+
+  if (proj) {
+    for (let list of req.body.lists) {
+      const listIdx = proj.lists.findIndex((l) => l.id === list.id)
+      proj.lists[listIdx].taskIds = list.taskIds
+    }
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
 
@@ -150,7 +171,7 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
   }
 }
 
-router.post('/dragTask', isAuthenticated, dragTask)
+router.post('/replaceListIds', isAuthenticated, replaceListIds)
 
 export const setSubtask = async (req: setSubtaskReq, res: setSubtaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })

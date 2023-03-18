@@ -121,6 +121,7 @@ export const generateDefaultProject = (
   const ids = generateIds(16)
   const tasks = taskObjects(ids)
   return {
+    history: [],
     name: 'Tutorial Project',
     lists: [
       {

@@ -25,7 +25,7 @@ import { formatDueDate } from '../../../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
 import { TComment, TSubtask, TTask } from '../../../../types/project'
-import { APIDragTask, DragTaskInfo, APIEditTask } from '../../../../API/task'
+import { APIDragTask, APIEditTask } from '../../../../API/task'
 import { Description } from './DescriptionEditor'
 import { convertToRaw, EditorState } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './getEditorState'
@@ -141,10 +141,33 @@ export const EditTaskModal = connect(
     props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
   }
 
-  const dragTask = async (info: DragTaskInfo) => {
-    const newProject = await APIDragTask(info)
+  const dragTask = async () => {
+    let progress = 0
 
-    props.setProject({ id: project.id, newProj: newProject.project })
+    project.lists.forEach((list) => {
+      list.taskIds.forEach((ids, i) => {
+        if (ids.includes(task.id)) {
+          progress = i
+        }
+      })
+    })
+
+    const data = await APIDragTask({
+      projectId: project.id,
+      oldListId: ownerListId,
+      newListId: listId,
+      oldProgress: progress,
+      newProgress: progress,
+      oldListReplaceIds: project.lists[id(project.lists, ownerListId)].taskIds[
+        progress
+      ].filter((id) => id !== task.id),
+      newListReplaceIds: [
+        task.id,
+        ...project.lists[id(project.lists, listId)].taskIds[progress]
+      ]
+    })
+
+    props.setProject({ id: project.id, newProj: data.project })
   }
 
   const confirmChanges = () => {
@@ -162,27 +185,7 @@ export const EditTaskModal = connect(
     APIEditTask(taskWithDescription, props.projectId)
 
     if (listId !== ownerListId) {
-      let newIndex = 0
-
-      let progress = 0
-
-      project.lists.forEach((list) => {
-        list.taskIds.forEach((ids, i) => {
-          if (ids.includes(task.id)) {
-            progress = i
-          }
-        })
-      })
-
-      dragTask({
-        oldListId: ownerListId,
-        newListId: listId,
-        newIndex,
-        newProgress: progress,
-        oldProgress: progress,
-        projectId: props.projectId,
-        id: task.id
-      })
+      dragTask()
     }
   }
 
@@ -244,7 +247,7 @@ export const EditTaskModal = connect(
             editorState={editorState}
             setEditorState={setEditorState}
           />
-          <div style={{ display: 'flex', marginTop: 8 }}>
+          <div style={{ display: 'flex', margin: '12px 4px 8px 6px' }}>
             <ChooseColor
               color={task.color || '#FFFFFF'}
               onChange={(color: string) => {
@@ -253,44 +256,52 @@ export const EditTaskModal = connect(
             />
 
             <div style={{ width: 24 }} />
-
-            <FormControl fullWidth>
-              <Select
-                fullWidth
-                value={listId}
-                onChange={(e) => {
-                  setListId(e.target.value as any)
-                }}
-              >
-                {getAllListsArr(props.projects).map((list, i) => {
-                  return (
-                    <MenuItem key={list.id} value={list.id}>
-                      <pre>
-                        <em>{list.name}</em> of{' '}
-                        {
-                          props.projects[id(props.projects, props.projectId)]
-                            .name
-                        }
-                      </pre>
-                    </MenuItem>
-                  )
-                })}
-              </Select>
-              <FormHelperText>Task's List</FormHelperText>
-            </FormControl>
-          </div>
-          <div style={{ display: 'flex', marginTop: 8 }}>
-            <DatePicker
-              includeTime
-              containerClassName="fullwidth"
-              value={task.dueDate ? new Date(task.dueDate) : undefined}
-              onChange={(date: Date | undefined) => {
-                setTask({
-                  ...task,
-                  dueDate: date ? date.toString() : null
-                })
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column'
               }}
-            />
+            >
+              <FormControl fullWidth>
+                <FormHelperText>Task's List</FormHelperText>
+
+                <Select
+                  fullWidth
+                  value={listId}
+                  onChange={(e) => {
+                    setListId(e.target.value as any)
+                  }}
+                >
+                  {getAllListsArr(props.projects).map((list) => {
+                    return (
+                      <MenuItem key={list.id} value={list.id}>
+                        <pre>
+                          <em>{list.name}</em> of{' '}
+                          {
+                            props.projects[id(props.projects, list.projectId)]
+                              .name
+                          }
+                        </pre>
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </FormControl>
+              <FormControl style={{ marginTop: 8, marginLeft: 'auto' }}>
+                <FormHelperText>Due Date</FormHelperText>
+                <DatePicker
+                  includeTime
+                  containerClassName="fullwidth"
+                  value={task.dueDate ? new Date(task.dueDate) : undefined}
+                  onChange={(date: Date | undefined) => {
+                    setTask({
+                      ...task,
+                      dueDate: date ? date.toString() : null
+                    })
+                  }}
+                />
+              </FormControl>
+            </div>
           </div>
 
           <Typography

@@ -1,25 +1,17 @@
-import Equalizer from '@mui/icons-material/Equalizer'
-import FilterList from '@mui/icons-material/FilterList'
-import Send from '@mui/icons-material/Send'
-import Settings from '@mui/icons-material/Settings'
-import { AppBar, Toolbar, IconButton } from '@mui/material'
+import { AppBar, Toolbar } from '@mui/material'
 import { input } from './styles'
 import DraggableAvatar from './Task/DraggableAvatar'
 import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'
-import { FilterTasks } from './FilterTasks'
-import { ProjectSettings } from './ProjectSettings'
-import { ProjStats } from './Statistics'
-import { ShareProject } from './ShareProject'
-import { useDispatch, useSelector } from 'react-redux'
+
+import { useDispatch } from 'react-redux'
 import { setProjectA } from '../../store/actions/project'
-import { TState } from '../../types/state'
-import { setFilterA } from '../../store/actions/filter'
 import { APIEditProject } from '../../API/project'
 
 type Props = {
   project: TProject
+  deleteMode: boolean // when dragging a task, whole header becomes a trash can
 }
 
 const ProjectHeader = memo(
@@ -27,14 +19,7 @@ const ProjectHeader = memo(
     //const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [name, setName] = useState(project ? project.name : undefined)
 
-    const [settings, setSettings] = useState(false)
-    const [sharing, setSharing] = useState(false)
-    const [stats, setStats] = useState(false)
-    const [filtering, setFiltering] = useState(false)
-
     const dispatch = useDispatch()
-
-    const filterData = useSelector((state: TState) => state.filter)
 
     /*useEffect(() => {
       window.addEventListener('resize', () => {
@@ -80,52 +65,9 @@ const ProjectHeader = memo(
                   ))}
                 </div>
               </div>
-              <IconButton onClick={() => setFiltering(true)}>
-                <FilterList />
-              </IconButton>
-              <IconButton
-                onClick={() => setSettings(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Settings />
-              </IconButton>
-              <IconButton
-                onClick={() => setStats(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Equalizer />
-              </IconButton>
-              <IconButton
-                onClick={() => setSharing(true)}
-                style={{ marginLeft: 8 }}
-              >
-                <Send />
-              </IconButton>
             </div>
           </Toolbar>
         </AppBar>
-
-        <FilterTasks
-          open={filtering}
-          filterData={filterData}
-          changeFilter={(newFilter) => dispatch(setFilterA(newFilter))}
-          handleClose={() => setFiltering(false)}
-        />
-        <ProjStats
-          projectId={project.id}
-          open={stats}
-          handleClose={() => setStats(false)}
-        />
-        <ProjectSettings
-          open={settings}
-          projectId={project.id}
-          onClose={() => setSettings(false)}
-        />
-        <ShareProject
-          open={sharing}
-          projectId={project.id}
-          onClose={() => setSharing(false)}
-        />
       </>
     )
   },

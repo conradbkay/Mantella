@@ -56,6 +56,7 @@ export const Dashboard = connect(mapState)(
 
           {tasks.map((task, i) => (
             <BaseTask
+              key={task.id}
               style={{}}
               project={
                 props.projects[

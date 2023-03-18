@@ -20,13 +20,14 @@ import { PrivateRoute } from './components/utils/PrivateRoute'
 import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings/Settings'
 import { CalendarWeek } from './components/Calendar/Week'
-import { APILogin } from './API/auth'
+import { APICookieLogin } from './API/auth'
 
 const secondary = '#0336FF'
 const primary = '#00838f'
 
 const theme = createTheme({
   palette: {
+    //mode: 'dark',
     primary: {
       main: primary
     },
@@ -49,7 +50,7 @@ const Router = () => {
 
   window.onload = async () => {
     try {
-      const loginRes = await APILogin(undefined, undefined, true)
+      const loginRes = await APICookieLogin()
 
       if (loginRes) {
         store.dispatch(loginA(loginRes) as any)

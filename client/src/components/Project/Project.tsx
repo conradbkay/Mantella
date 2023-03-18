@@ -20,16 +20,18 @@ import {
   DragOverlay,
   DragStartEvent,
   DropAnimation,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors
 } from '@dnd-kit/core'
 import ProjectHeader from './ProjectHeader'
 import { BaseTask } from './Task/Base'
-import { APIDragTask } from '../../API/task'
 import { cloneDeep } from 'lodash'
 import { setProjectA } from '../../store/actions/project'
 import { arrayMove } from '@dnd-kit/sortable'
+import { APIReplaceListIds } from '../../API/list'
+import { Sidebar } from './Sidebar'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -59,7 +61,6 @@ const PROGRESS_DISPLAYS = ['No Progress', 'In Progress', 'Complete']
 
 // when dragging to an empty list droppable.sortable will be empty
 const getDragEventData = ({ active, over }: DragOverEvent | DragEndEvent) => {
-  console.log(over?.data.current)
   if (over && active.data.current) {
     const taskId = active.id as string
     const fromIdx = active.data.current.sortable.index
@@ -82,6 +83,22 @@ const getDragEventData = ({ active, over }: DragOverEvent | DragEndEvent) => {
     }
   }
   return null
+}
+
+// necessary to allow clicking AND dragging tasks
+class MyPointerSensor extends PointerSensor {
+  static activators = [
+    {
+      eventName: 'onPointerDown' as any,
+      handler: ({ nativeEvent }: any) => {
+        if (!nativeEvent.isPrimary || nativeEvent.button !== 0) {
+          return false
+        }
+
+        return true
+      }
+    }
+  ]
 }
 
 export const Project = (props: Props) => {
@@ -125,8 +142,6 @@ export const Project = (props: Props) => {
         editLists[id(editLists, toListId)]
       ]
 
-      console.log(fromIdx, toIdx)
-
       if (fromListId === toListId && fromProgress === toProgress) {
         fromList.taskIds[fromProgress] = arrayMove(
           fromList.taskIds[fromProgress],
@@ -155,18 +170,13 @@ export const Project = (props: Props) => {
     const data = getDragEventData(event)
 
     if (data) {
-      const { fromListId, toListId, toProgress, fromProgress, toIdx, taskId } =
-        data
-
-      APIDragTask({
-        projectId: project.id,
-        oldListId: fromListId,
-        newListId: toListId,
-        id: taskId,
-        newProgress: toProgress,
-        oldProgress: fromProgress,
-        newIndex: toIdx
-      })
+      APIReplaceListIds(
+        project.id,
+        project.lists.map((list) => ({
+          id: list.id,
+          taskIds: list.taskIds
+        }))
+      )
     }
     setDraggingId(null)
   }
@@ -176,11 +186,12 @@ export const Project = (props: Props) => {
   }
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MyPointerSensor, {
       activationConstraint: {
         distance: 8
       }
-    })
+    }),
+    useSensor(KeyboardSensor)
   )
 
   if (project) {
@@ -198,67 +209,68 @@ export const Project = (props: Props) => {
           onDragEnd={onDragEnd}
           onDragCancel={onDragCancel}
         >
-          <ProjectHeader project={project} />
-
-          <Paper
-            style={{
-              margin: 20,
-              padding: '20px 20px 40px',
-              minHeight: 'calc(100vh - 328px)'
-            }}
-          >
-            <table
+          <ProjectHeader deleteMode={Boolean(draggingId)} project={project} />
+          <div style={{ display: 'flex' }}>
+            <Sidebar project={project} />
+            <Paper
               style={{
-                width: '100%',
-                tableLayout: 'fixed' // faster render,
+                margin: 20,
+                padding: '20px 20px 40px',
+                minHeight: 'calc(100vh - 328px)'
               }}
             >
-              <TableBody>
-                <tr style={{ display: 'flex' }}>
-                  {[0, 1, 2].map((col) => (
-                    <td
-                      key={col}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#f2f2f2',
-                        borderLeft: col ? 'none' : PROJECT_BORDER,
-                        borderRight: PROJECT_BORDER,
-                        borderTop: PROJECT_BORDER,
-                        textAlign: 'center',
-                        padding: 8,
-                        fontSize: 20
-                      }}
-                    >
-                      {PROGRESS_DISPLAYS[col]}
-                    </td>
-                  ))}
-                </tr>
-                {project.lists.map((list) => (
-                  <tr
-                    style={{
-                      display: 'flex'
-                    }}
-                    key={list.id}
-                  >
-                    {[0, 1, 2].map((progress) => (
-                      <ProjectCell
-                        draggingId={draggingId}
-                        setCreating={(id) => setCreating(id)}
-                        openFunc={(tId: string) => {
-                          console.log('open')
-                          //setEditingTaskId(tId)
+              <table
+                style={{
+                  width: '100%',
+                  tableLayout: 'fixed' // faster render,
+                }}
+              >
+                <TableBody>
+                  <tr style={{ display: 'flex' }}>
+                    {[0, 1, 2].map((col) => (
+                      <td
+                        key={col}
+                        style={{
+                          width: '100%',
+                          backgroundColor: '#f2f2f2',
+                          borderLeft: col ? 'none' : PROJECT_BORDER,
+                          borderRight: PROJECT_BORDER,
+                          borderTop: PROJECT_BORDER,
+                          textAlign: 'center',
+                          padding: 8,
+                          fontSize: 20
                         }}
-                        key={list.id + progress}
-                        progress={progress as 0 | 1 | 2}
-                        list={list}
-                        project={project}
-                      />
+                      >
+                        {PROGRESS_DISPLAYS[col]}
+                      </td>
                     ))}
                   </tr>
-                ))}
-              </TableBody>
-            </table>
-          </Paper>
+                  {project.lists.map((list) => (
+                    <tr
+                      style={{
+                        display: 'flex'
+                      }}
+                      key={list.id}
+                    >
+                      {[0, 1, 2].map((progress) => (
+                        <ProjectCell
+                          draggingId={draggingId}
+                          setCreating={(id) => setCreating(id)}
+                          openFunc={(tId: string) => {
+                            setEditingTaskId(tId)
+                          }}
+                          key={list.id + progress}
+                          progress={progress as 0 | 1 | 2}
+                          list={list}
+                          project={project}
+                        />
+                      ))}
+                    </tr>
+                  ))}
+                </TableBody>
+              </table>
+            </Paper>
+          </div>
 
           <DragOverlay dropAnimation={dropAnimationConfig}>
             {draggingId ? (
@@ -270,7 +282,6 @@ export const Project = (props: Props) => {
             ) : null}
           </DragOverlay>
         </DndContext>
-
         <SpeedDial
           open={fab}
           ariaLabel="create list/create task"

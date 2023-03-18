@@ -134,13 +134,12 @@ const CBaseTask = memo((props: TaskProps) => {
           backgroundColor: task.color || 'white',
           border,
           borderBottom: 'border',
-          color: 'black',
+          color: props.isDragging ? 'gray' : 'black',
           opacity: props.isDragging ? taskDummyOpacity : undefined,
-          //color: snapshot ? (snapshot.isDragging ? 'gray' : 'black') : 'black',
           outline: 'none',
           ...(props.style || {})
         }}
-        onMouseDown={() => {
+        onClick={() => {
           if (isSelectingTask) {
             props.selectPomodoroTask(task.id.toString())
           } else {
