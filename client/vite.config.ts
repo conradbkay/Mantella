@@ -14,7 +14,7 @@ export default defineConfig({
     outDir: 'build'
   },
   define: {
-    //global: {}
+    global: process.env.NODE_ENV === 'production' ? undefined : {}
   },
   server: {
     open: true,

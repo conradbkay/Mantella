@@ -53,7 +53,9 @@ export const Sidebar = ({ project }: { project: TProject }) => {
             </Tooltip>
           ))}
         </List>
-        <div style={{ backgroundColor: 'white', height: '100%' }}>
+        <div
+          style={{ backgroundColor: 'white', height: '100%', maxWidth: 400 }}
+        >
           {open === 'Filter' ? (
             <FilterTasks />
           ) : open === 'Members' ? (
@@ -67,7 +69,7 @@ export const Sidebar = ({ project }: { project: TProject }) => {
           ) : open === 'Statistics' ? (
             <ProjStats project={project} />
           ) : open === 'Pomodoro' ? (
-            <Pomodoro />
+            <Pomodoro onClose={() => setOpen(null)} />
           ) : null}
         </div>
       </div>
