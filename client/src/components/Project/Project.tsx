@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Paper, TableBody, SpeedDial, SpeedDialAction } from '@mui/material'
+import {
+  Paper,
+  TableBody,
+  SpeedDial,
+  SpeedDialAction,
+  useTheme
+} from '@mui/material'
 import { TState } from '../../types/state'
 import { CreateColumn } from './CreateList'
 import Add from '@mui/icons-material/Add'
@@ -11,7 +17,9 @@ import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell/ProjectCell'
 import { CreateTask } from './Task/Create'
 import { EditTaskModal } from './Task/Edit/Edit'
+import Color from 'color'
 import {
+  rectIntersection,
   closestCorners,
   defaultDropAnimationSideEffects,
   DndContext,
@@ -56,7 +64,7 @@ const dropAnimationConfig: DropAnimation = {
     }
   })
 }
-export const PROJECT_BORDER_COLOR = '#aebacc' // light grey
+export const PROJECT_BORDER_COLOR = '#6E6E6E'
 export const PROJECT_BORDER = '1px solid ' + PROJECT_BORDER_COLOR
 
 const PROGRESS_DISPLAYS = ['No Progress', 'In Progress', 'Complete']
@@ -103,6 +111,33 @@ class MyPointerSensor extends PointerSensor {
   ]
 }
 
+// we want closestCorners for everything but the trash, while needs to be closestCenter
+const customCollisionDetection = ({
+  droppableContainers,
+  ...args
+}: any): any => {
+  const rectIntersectionCollisions = rectIntersection({
+    ...args,
+    droppableContainers: droppableContainers.filter(
+      ({ id }: any) => id === 'trash'
+    )
+  })
+
+  // Collision detection algorithms return an array of collisions
+  if (rectIntersectionCollisions.length > 0) {
+    // The trash is intersecting, return early
+    return rectIntersectionCollisions
+  }
+
+  // Compute other collisions
+  return closestCorners({
+    ...args,
+    droppableContainers: droppableContainers.filter(
+      ({ id }: any) => id !== 'trash'
+    )
+  })
+}
+
 export const Project = (props: Props) => {
   const [editingTaskId, setEditingTaskId] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -124,63 +159,72 @@ export const Project = (props: Props) => {
   }
 
   const onDragOver = (event: DragOverEvent) => {
-    const data = getDragEventData(event)
+    if (event.over && event.over.id === 'trash') {
+      console.log('delete')
+    } else {
+      const data = getDragEventData(event)
 
-    if (event.over && event.active.id !== event.over.id && data) {
-      const {
-        fromListId,
-        toListId,
-        toProgress,
-        fromProgress,
-        toIdx,
-        fromIdx,
-        taskId
-      } = data
-
-      const editLists = cloneDeep(project.lists)
-
-      const [fromList, toList] = [
-        editLists[id(editLists, fromListId)],
-        editLists[id(editLists, toListId)]
-      ]
-
-      if (fromListId === toListId && fromProgress === toProgress) {
-        fromList.taskIds[fromProgress] = arrayMove(
-          fromList.taskIds[fromProgress],
+      if (event.over && event.active.id !== event.over.id && data) {
+        const {
+          fromListId,
+          toListId,
+          toProgress,
+          fromProgress,
+          toIdx,
           fromIdx,
-          toIdx
-        )
-      } else {
-        fromList.taskIds[fromProgress].splice(fromIdx, 1)
-        toList.taskIds[toProgress].splice(
-          fromIdx > toIdx ? toIdx + 1 : toIdx,
-          0,
           taskId
+        } = data
+
+        const editLists = cloneDeep(project.lists)
+
+        const [fromList, toList] = [
+          editLists[id(editLists, fromListId)],
+          editLists[id(editLists, toListId)]
+        ]
+
+        if (fromListId === toListId && fromProgress === toProgress) {
+          fromList.taskIds[fromProgress] = arrayMove(
+            fromList.taskIds[fromProgress],
+            fromIdx,
+            toIdx
+          )
+        } else {
+          fromList.taskIds[fromProgress].splice(fromIdx, 1)
+          toList.taskIds[toProgress].splice(
+            fromIdx > toIdx ? toIdx + 1 : toIdx,
+            0,
+            taskId
+          )
+        }
+
+        dispatch(
+          setProjectA({
+            id: project.id,
+            newProj: { ...project, lists: editLists }
+          })
         )
       }
-
-      dispatch(
-        setProjectA({
-          id: project.id,
-          newProj: { ...project, lists: editLists }
-        })
-      )
     }
   }
 
   const onDragEnd = (event: DragEndEvent) => {
-    const data = getDragEventData(event)
+    if (event.over && event.over.id === 'trash') {
+      console.log('delete')
+    } else {
+      const data = getDragEventData(event)
 
-    if (data) {
-      APIReplaceListIds(
-        project.id,
-        project.lists.map((list) => ({
-          id: list.id,
-          taskIds: list.taskIds
-        }))
-      )
+      if (data) {
+        APIReplaceListIds(
+          project.id,
+          project.lists.map((list) => ({
+            id: list.id,
+            taskIds: list.taskIds
+          }))
+        )
+      }
+
+      setDraggingId(null)
     }
-    setDraggingId(null)
   }
 
   const onDragCancel = () => {
@@ -196,6 +240,8 @@ export const Project = (props: Props) => {
     useSensor(KeyboardSensor)
   )
 
+  const theme = useTheme()
+
   if (project) {
     return (
       <>
@@ -206,12 +252,12 @@ export const Project = (props: Props) => {
           sensors={sensors}
           autoScroll={false}
           onDragStart={onDragStart}
-          collisionDetection={closestCorners}
+          collisionDetection={customCollisionDetection}
           onDragOver={onDragOver}
           onDragEnd={onDragEnd}
           onDragCancel={onDragCancel}
         >
-          <ProjectHeader deleteMode={Boolean(draggingId)} project={project} />
+          <ProjectHeader deleteMode={draggingId !== null} project={project} />
           <div style={{ display: 'flex', minHeight: 'calc(100vh - 124px)' }}>
             <Sidebar project={project} socket={props.socket} />
             <Paper
@@ -234,11 +280,19 @@ export const Project = (props: Props) => {
                         key={col}
                         style={{
                           width: '100%',
-                          backgroundColor: '#f2f2f2',
+                          backgroundColor: new Color(
+                            theme.palette.background.paper
+                          )
+                            .lighten(0.7)
+                            .hex()
+                            .toString(),
                           borderLeft: col ? 'none' : PROJECT_BORDER,
                           borderRight: PROJECT_BORDER,
                           borderTop: PROJECT_BORDER,
+                          borderTopLeftRadius: col ? 0 : 4,
+                          borderTopRightRadius: col === 2 ? 4 : 0,
                           textAlign: 'center',
+                          color: theme.palette.text.secondary,
                           padding: 8,
                           fontSize: 20
                         }}

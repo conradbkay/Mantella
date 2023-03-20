@@ -6,9 +6,9 @@ import { FilterTasks } from './FilterTasks'
 import { ProjectSettings } from './ProjectSettings'
 import { ProjStats } from './Statistics'
 import { ShareProject } from './ShareProject'
-import { Drawer, IconButton, List, Tooltip } from '@mui/material'
+import { IconButton, List, Tooltip, useTheme } from '@mui/material'
 import FilterList from '@mui/icons-material/FilterList'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import Equalizer from '@mui/icons-material/Equalizer'
 import { TProject } from '../../types/project'
 import { Pomodoro } from '../Pomodoro/Pomodoro'
@@ -26,70 +26,95 @@ const listItems = [
   { title: 'Pomodoro', Icon: Timer }
 ]
 
-export const Sidebar = ({
-  project,
-  socket
-}: {
-  project: TProject
-  socket: Socket
-}) => {
-  const [open, setOpen] = useState(null as null | string)
+export const Sidebar = memo(
+  ({ project, socket }: { project: TProject; socket: Socket }) => {
+    const [open, setOpen] = useState(null as null | string)
+    const theme = useTheme()
 
-  return (
-    <Drawer
-      variant="permanent"
-      PaperProps={{
-        style: {
-          backgroundColor: '#f5f5f5',
-          borderTop: '1px solid #EEEEEE',
-          position: 'relative'
-        }
-      }}
-    >
-      <div style={{ display: 'flex', height: '100%' }}>
-        <List style={{ flexDirection: 'column', display: 'flex', padding: 8 }}>
-          {listItems.map(({ title, Icon }, i) => (
-            <Tooltip placement="right" key={i} title={title}>
-              <IconButton
-                onClick={() =>
-                  setOpen((prev) => (prev === title ? null : title))
-                }
-                style={{ margin: '8px 0', width: 48, height: 48 }}
-              >
-                <Icon style={{ width: 28, height: 28 }} />
-              </IconButton>
-            </Tooltip>
-          ))}
-        </List>
-        <div
-          style={{
-            backgroundColor: 'white',
-            height: '100%',
-            maxWidth: 400,
-            borderLeft: '1px solid #EEEEEE'
-          }}
-        >
-          <ProjectChat
-            users={project.users}
-            socket={socket}
-            chatId={project.chatId}
-            open={open === 'Chat'}
-          />
-          {open === 'Filter' ? (
-            <FilterTasks />
-          ) : open === 'Members' ? (
-            <ShareProject project={project} />
-          ) : open === 'Settings' ? (
-            <ProjectSettings projectId={project.id} />
-          ) : open === 'Calendar' ? (
-            <div>hi</div>
-          ) : open === 'Statistics' ? (
-            <ProjStats project={project} />
-          ) : open === 'Pomodoro' ? (
-            <Pomodoro onClose={() => setOpen(null)} />
-          ) : null}
+    return (
+      <div
+        style={{
+          backgroundColor: theme.palette.background.paper,
+          backgroundImage:
+            'linear-gradient(rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.09))' // todo: light mode
+        }}
+      >
+        <div style={{ display: 'flex', height: '100%' }}>
+          <List style={{ flexDirection: 'column', display: 'flex' }}>
+            {listItems.map(({ title, Icon }, i) => (
+              <Tooltip placement="right" key={i} title={title}>
+                <div
+                  style={{
+                    padding: 8,
+                    borderLeft:
+                      open === title
+                        ? '2px solid ' + theme.palette.text.primary
+                        : undefined
+                  }}
+                >
+                  <IconButton
+                    onClick={() =>
+                      setOpen((prev) => (prev === title ? null : title))
+                    }
+                    style={{
+                      width: 48,
+                      height: 48,
+                      marginLeft: open === title ? -2 : undefined
+                    }}
+                  >
+                    <Icon
+                      style={{
+                        width: 28,
+                        height: 28,
+                        color:
+                          open === title
+                            ? theme.palette.text.primary
+                            : theme.palette.text.secondary
+                      }}
+                    />
+                  </IconButton>
+                </div>
+              </Tooltip>
+            ))}
+          </List>
+          <div
+            style={{
+              backgroundColor: theme.palette.background.paper,
+              height: '100%',
+              maxWidth: 400,
+              borderLeft: open
+                ? '1px solid ' + theme.palette.divider
+                : undefined
+            }}
+          >
+            <ProjectChat
+              users={project.users}
+              socket={socket}
+              chatId={project.chatId}
+              open={open === 'Chat'}
+            />
+            {open === 'Filter' ? (
+              <FilterTasks />
+            ) : open === 'Members' ? (
+              <ShareProject project={project} />
+            ) : open === 'Settings' ? (
+              <ProjectSettings projectId={project.id} />
+            ) : open === 'Calendar' ? (
+              <div>hi</div>
+            ) : open === 'Statistics' ? (
+              <ProjStats project={project} />
+            ) : open === 'Pomodoro' ? (
+              <Pomodoro onClose={() => setOpen(null)} />
+            ) : null}
+          </div>
         </div>
       </div>
-    </Drawer>
-  )
-}
+    )
+  },
+  (oldProps, newProps) => {
+    return (
+      oldProps.project.id === newProps.project.id &&
+      oldProps.socket === newProps.socket
+    )
+  }
+)

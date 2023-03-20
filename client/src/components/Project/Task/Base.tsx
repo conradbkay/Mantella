@@ -6,7 +6,7 @@ import {
   selectPomodoroTaskA,
   toggleTimerA
 } from '../../../store/actions/pomodoro'
-import { LinearProgress, Badge, IconButton } from '@mui/material'
+import { LinearProgress, Badge, IconButton, useTheme } from '@mui/material'
 import { formatDueDate } from '../../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../../utils/utilities'
 import PlayArrow from '@mui/icons-material/PlayArrow'
@@ -110,8 +110,6 @@ const CBaseTask = memo((props: TaskProps) => {
   const { task, isSelectingTask, openFunc } = props
   const MIN_HEIGHT = 20
 
-  const border = '1px solid rgba(0, 0, 0, 0.12)'
-
   const classes = useStyles()
 
   // TODO: don't use if isn't a draggable Task already
@@ -123,6 +121,12 @@ const CBaseTask = memo((props: TaskProps) => {
     }
   })
 
+  const theme = useTheme()
+
+  const border = '1px solid ' + theme.palette.divider
+
+  const TimeIcon = props.isCurrentTask ? Pause : PlayArrow
+
   return task ? (
     <div style={{ width: '100%' }}>
       <div
@@ -131,10 +135,17 @@ const CBaseTask = memo((props: TaskProps) => {
         style={{
           display: props.hidden ? 'none' : undefined,
           minHeight: MIN_HEIGHT,
-          backgroundColor: task.color || 'white',
+          backgroundColor:
+            task.color && task.color !== '#FFFFFF'
+              ? task.color
+              : theme.palette.background.paper,
+          backgroundImage:
+            'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))', // todo: light mode
           border,
-          borderBottom: 'border',
-          color: props.isDragging ? 'gray' : 'black',
+          cursor: 'pointer',
+          color: props.isDragging
+            ? theme.palette.text.disabled
+            : theme.palette.text.secondary,
           opacity: props.isDragging ? taskDummyOpacity : undefined,
           outline: 'none',
           ...(props.style || {})
@@ -173,12 +184,14 @@ const CBaseTask = memo((props: TaskProps) => {
                 style={{
                   fontSize: 18,
                   maxWidth: '94%',
-                  color: /*snapshot && snapshot.isDragging ? 'gray' :*/ 'black',
+                  color: props.isDragging
+                    ? theme.palette.text.disabled
+                    : theme.palette.text.secondary,
                   marginLeft: 4,
                   marginTop: 4
                 }}
               >
-                <div style={{ display: 'flex' }}>
+                <div style={{ display: 'flex', userSelect: 'none' }}>
                   {task.name ? task.name : 'Unnamed Task'}
                 </div>
               </span>
@@ -322,27 +335,18 @@ const CBaseTask = memo((props: TaskProps) => {
                   Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}
                 </span>
               )}
-              {!props.isCurrentTask ? (
-                <PlayArrow
-                  style={{ marginLeft: 'auto' }}
-                  className={classes.play}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    props.selectPomodoroTask(task.id)
-                    props.toggleTimer()
-                  }}
-                />
-              ) : (
-                <Pause
-                  style={{ marginLeft: 'auto' }}
-                  className={classes.play}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    props.selectPomodoroTask(task.id)
-                    props.toggleTimer()
-                  }}
-                />
-              )}
+              <TimeIcon
+                style={{
+                  marginLeft: 'auto',
+                  color: theme.palette.text.secondary
+                }}
+                className={classes.play}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  props.selectPomodoroTask(task.id)
+                  props.toggleTimer()
+                }}
+              />
             </div>
           </div>
         </Badge>

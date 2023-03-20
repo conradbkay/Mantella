@@ -37,7 +37,7 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 Instead of saying "Jan 1 1:50" say "Today at 1:50" or "Due in 30 minutes"
 
-Allow link as [http://mantella.herokuapp.com?action=autoTrial] which would automatically create a guest account which has all premium features for 7 days. Migration of guest accounts should be added when this is added
+Allow link as [http://mantella.herokuapp.com?action=autoTrial] which would automatically create a guest account which has all premium features for 7 days. Migration of guest accounts to proper account should be added after this is added (settings -> set email/password)
 
 Edit history from git style diffs
 
@@ -47,6 +47,20 @@ Search bar smooth scroll to task
 
 Dark mode
 
+Chat with specific user, even groups
+
 Changing task list to other project doesn't work
 
 View modes in project header (calendar, list, kanban, table, global)
+
+Timeline view, slider due dates or drag and drop along timeline
+
+Separate projects into iterations
+
+SSR
+
+make register redirect not weird, simulate login
+
+vscode style indicator for active project tab 
+
+double task border

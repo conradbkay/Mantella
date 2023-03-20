@@ -3,7 +3,8 @@ import {
   ListSubheader,
   ListItem,
   ListItemText,
-  Button
+  Button,
+  useTheme
 } from '@mui/material'
 import { List } from '@mui/material'
 import { makeStyles } from '@mui/styles'
@@ -11,6 +12,7 @@ import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import { APILogout } from '../../API/auth'
 import { openSnackbarA } from '../../store/actions/snackbar'
+import Color from 'color'
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -26,11 +28,17 @@ interface TProps extends ActionCreators {}
 
 const CSettings = (props: TProps) => {
   const classes = useStyles()
+  const theme = useTheme()
   return (
     <>
       <div>
         <Helmet>
-          <style>{'body { background-color: #eeeeee; }'}</style>
+          <style>{`body { background-color: ${new Color(
+            theme.palette.background.paper
+          )
+            .lighten(0.5)
+            .hex()
+            .toString()}; }`}</style>
         </Helmet>
         <List
           subheader={<ListSubheader>Data</ListSubheader>}
@@ -39,6 +47,7 @@ const CSettings = (props: TProps) => {
         >
           <ListItem>
             <ListItemText
+              style={{ color: theme.palette.text.primary }}
               primary="Log Out"
               secondary="This action cannot be undone"
             />

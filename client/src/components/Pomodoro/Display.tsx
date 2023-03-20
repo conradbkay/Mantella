@@ -36,7 +36,6 @@ const CDisplay = (props: TProps) => {
           minHeight: 36,
           marginBottom: 10,
           marginTop: 5,
-          backgroundColor: 'white',
           padding: 10
         }}
       >

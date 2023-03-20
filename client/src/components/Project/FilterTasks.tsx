@@ -31,7 +31,6 @@ const FilterTasksComponent = () => {
           <ListItemText
             style={{
               borderRadius: 8,
-              backgroundColor: '#FFFEAF',
               padding: 8
             }}
           >
