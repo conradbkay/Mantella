@@ -16,7 +16,6 @@ import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
   list: {
-    backgroundColor: '#FAFAFA',
     margin: '25px auto 0px auto',
     borderRadius: 0,
     width: '100%'
@@ -68,7 +67,18 @@ const CProjectSearch = (props: TProps) => {
       />
       <List
         className={classes.list}
-        subheader={<ListSubheader component="div">Projects</ListSubheader>}
+        subheader={
+          <ListSubheader
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              fontSize: 16,
+              marginTop: 8
+            }}
+            component="div"
+          >
+            Projects
+          </ListSubheader>
+        }
       >
         {projects.map((project, i) => {
           const isLink = project.id === ('create-project' as any)

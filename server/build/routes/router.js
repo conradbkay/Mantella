@@ -19,5 +19,6 @@ exports.router.post('/cookieLogin', passport_1.isAuthenticated, auth_1.login);
 exports.router.post('/guestLogin', auth_1.guestLogin);
 require("./list");
 require("./project");
+require("./chat");
 require("./task");
 //# sourceMappingURL=router.js.map

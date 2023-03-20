@@ -11,10 +11,13 @@ import { Strategy } from 'passport-local'
 import session from 'express-session'
 import { v4 as uuid } from 'uuid'
 import 'reflect-metadata'
+import http from 'http'
+import { ChatModel } from './models/Chat'
 
 const debug = require('debug')
 const FileStore = require('session-file-store')(session)
 const compression = require('compression')
+const { Server } = require('socket.io')
 
 require('dotenv').config() // Injects .env variables into process.env object
 // eslint-disable-next-line import/first
@@ -52,6 +55,38 @@ app.use(
     }
   })
 )
+
+const server = http.createServer()
+
+const io = new Server(server)
+
+io.on('connection', (socket: any) => {
+  socket.on('send_message', async ({ chatId, message, userId }: any) => {
+    const messageObj = {
+      message,
+      senderId: userId,
+      createdAt: new Date().getTime(),
+      id: uuid()
+    }
+
+    io.in(chatId).emit('message', messageObj)
+    // save to project
+
+    const chat = await ChatModel.findOne({ id: chatId })
+
+    if (chat) {
+      chat.messages.push(messageObj)
+    }
+  })
+
+  socket.on('login', ({ chatId }: any) => {
+    socket.join(chatId)
+  })
+})
+
+server.listen(3000, () => {
+  console.log('websocket listening on port 3000')
+})
 
 app.use(morgan('dev'))
 app.use(express.json())

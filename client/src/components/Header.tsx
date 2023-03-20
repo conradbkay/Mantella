@@ -15,7 +15,8 @@ import {
   Typography,
   Grid,
   AppBar,
-  Tabs
+  Tabs,
+  useTheme
 } from '@mui/material'
 import { Slide, useScrollTrigger } from '@mui/material'
 import { ReactElement } from 'react'
@@ -62,7 +63,7 @@ const authItems = [
 
 const useStyles = makeStyles((theme: Theme) => ({
   appBar: {
-    borderBottom: `1px solid ${theme.palette.grey['300']}`,
+    borderBottom: `1px solid ${theme.palette.divider}`,
     backgroundColor: 'white'
   },
   fullHeight: {
@@ -142,6 +143,8 @@ const Topbar = (props: Props) => {
     props.location.pathname
   )
 
+  const theme = useTheme()
+
   return (
     <>
       <HideOnScroll>
@@ -206,7 +209,7 @@ const Topbar = (props: Props) => {
                           href="https://github.com/USA-Kay/Mantella"
                           style={{
                             ...trailProps,
-                            color: 'black',
+                            color: theme.palette.text.secondary,
                             textDecoration: 'none',
                             paddingRight: 5
                           }}

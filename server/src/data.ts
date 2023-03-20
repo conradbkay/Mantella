@@ -115,12 +115,14 @@ export const generateIds = (length: number): string[] => {
 
 export const generateDefaultProject = (
   newUser: { email: string; id: string; profileImg: string; username: string },
-  projectId: string
+  projectId: string,
+  chatId: string
 ): Project => {
   const listIds = [uuid(), uuid(), uuid()]
   const ids = generateIds(16)
   const tasks = taskObjects(ids)
   return {
+    chatId,
     history: [],
     name: 'Tutorial Project',
     lists: [

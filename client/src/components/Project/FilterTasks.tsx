@@ -26,12 +26,11 @@ const FilterTasksComponent = () => {
   const filterData = useSelector((state: TState) => state.filter)
   return (
     <div>
-      <List style={{ minWidth: 300, marginTop: 8 }}>
+      <List style={{ minWidth: 400, marginTop: 8 }}>
         <ListItem>
           <ListItemText
             style={{
               borderRadius: 8,
-              backgroundColor: '#FFFEAF',
               padding: 8
             }}
           >

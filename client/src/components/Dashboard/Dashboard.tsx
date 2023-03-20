@@ -4,7 +4,8 @@ import {
   CardActions,
   Fab,
   Tooltip,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material'
 import { CSSProperties, useState } from 'react'
 import { connect } from 'react-redux'
@@ -19,7 +20,7 @@ import Add from '@mui/icons-material/Add'
 const root: CSSProperties = {
   display: 'flex',
   flexDirection: 'row',
-  margin: 40
+  padding: '12px 24px'
 }
 
 const mapState = (state: TState) => ({
@@ -41,8 +42,10 @@ export const Dashboard = connect(mapState)(
     const tasks = getAllTasks(props.projects)
     let betterColors = genColors()
 
+    const theme = useTheme()
+
     return (
-      <div style={root}>
+      <div style={{ ...root, backgroundColor: theme.palette.background.paper }}>
         <div
           style={{
             display: 'flex',
@@ -50,7 +53,11 @@ export const Dashboard = connect(mapState)(
             textAlign: 'center'
           }}
         >
-          <Typography variant="h5" gutterBottom style={{ fontWeight: 600 }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            style={{ fontWeight: 600, color: theme.palette.text.secondary }}
+          >
             Your Tasks
           </Typography>
 
@@ -75,7 +82,11 @@ export const Dashboard = connect(mapState)(
           <Typography
             variant="h5"
             gutterBottom
-            style={{ fontWeight: 600, textAlign: 'center' }}
+            style={{
+              fontWeight: 600,
+              textAlign: 'center',
+              color: theme.palette.text.secondary
+            }}
           >
             Projects
           </Typography>
@@ -104,10 +115,15 @@ export const Dashboard = connect(mapState)(
                   }}
                   key={project.id}
                 >
-                  <Typography gutterBottom variant="h5" component="h2">
+                  <Typography
+                    gutterBottom
+                    variant="h5"
+                    component="h2"
+                    style={{ color: 'black' }}
+                  >
                     {project.name}
                   </Typography>
-                  <ul>
+                  <ul style={{ color: 'black' }}>
                     <div>
                       <span style={{ fontWeight: 500 }}>
                         {project.tasks.length}
