@@ -18,7 +18,7 @@ export const registerA = (user: any) => {
     if (user) {
       const authUser = transformUser(user)
 
-      dispatch(openSnackbarA('Registered! Welcome To Mantella!', 'success'))
+      //dispatch(openSnackbarA('Registered! Welcome To Mantella!', 'success'))
 
       dispatch({ type: 'REGISTER', user: authUser })
 

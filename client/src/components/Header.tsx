@@ -29,7 +29,7 @@ import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
-import { ProjectFinder } from './ProjectFinder/ProjectFinder'
+import { ProjectFinder } from './ProjectFinder'
 import { HoverableAvatar } from './utils/HoverableAvatar'
 import { makeStyles } from '@mui/styles'
 

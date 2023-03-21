@@ -14,9 +14,9 @@ import Create from '@mui/icons-material/Create'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { id } from '../../utils/utilities'
-import { ProjectCell } from './Cell/ProjectCell'
-import { CreateTask } from './Task/Create'
-import { EditTaskModal } from './Task/Edit/Edit'
+import { ProjectCell } from './ProjectCell'
+import { CreateTask } from '../Task/Create'
+import { EditTaskModal } from '../Task/Edit'
 import Color from 'color'
 import {
   rectIntersection,
@@ -34,13 +34,15 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import ProjectHeader from './ProjectHeader'
-import { BaseTask } from './Task/Base'
+import { BaseTask } from '../Task/Base'
 import { cloneDeep } from 'lodash'
 import { setProjectA } from '../../store/actions/project'
 import { arrayMove } from '@dnd-kit/sortable'
 import { APIReplaceListIds } from '../../API/list'
 import { Sidebar } from './Sidebar'
 import { Socket } from 'socket.io-client'
+import { setTaskA } from '../../store/actions/task'
+import { APIDeleteTask } from '../../API/task'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -142,6 +144,7 @@ export const Project = (props: Props) => {
   const [editingTaskId, setEditingTaskId] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [draggingId, setDraggingId] = useState(null as string | null)
+  const [overTrash, setOverTrash] = useState(false)
 
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
@@ -160,7 +163,9 @@ export const Project = (props: Props) => {
 
   const onDragOver = (event: DragOverEvent) => {
     if (event.over && event.over.id === 'trash') {
-      console.log('delete')
+      if (!overTrash) {
+        setOverTrash(true)
+      }
     } else {
       const data = getDragEventData(event)
 
@@ -210,6 +215,10 @@ export const Project = (props: Props) => {
   const onDragEnd = (event: DragEndEvent) => {
     if (event.over && event.over.id === 'trash') {
       console.log('delete')
+      dispatch(
+        setTaskA({ id: draggingId!, projectId: project.id, newTask: null })
+      )
+      APIDeleteTask(draggingId!, project.id)
     } else {
       const data = getDragEventData(event)
 
@@ -225,10 +234,15 @@ export const Project = (props: Props) => {
 
       setDraggingId(null)
     }
+
+    if (overTrash) {
+      setOverTrash(false)
+    }
   }
 
   const onDragCancel = () => {
     setDraggingId(null)
+    setOverTrash(false)
   }
 
   const sensors = useSensors(
@@ -270,7 +284,8 @@ export const Project = (props: Props) => {
               <table
                 style={{
                   width: '100%',
-                  tableLayout: 'fixed' // faster render,
+                  borderCollapse: 'collapse',
+                  tableLayout: 'fixed'
                 }}
               >
                 <TableBody>

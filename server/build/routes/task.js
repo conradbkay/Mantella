@@ -79,8 +79,7 @@ router_1.router.post('/editTask', passport_1.isAuthenticated, exports.editTask);
 const deleteTask = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (proj) {
-        ;
-        proj.tasks.find((tsk) => tsk.id === req.body.id).remove();
+        proj.tasks = proj.tasks.filter((task) => task.id !== req.body.id);
         proj.lists.forEach((list) => {
             list.taskIds.forEach((ids, i) => {
                 if (ids.includes(req.body.id)) {
@@ -88,6 +87,8 @@ const deleteTask = async (req, res) => {
                 }
             });
         });
+        proj.markModified('tasks');
+        proj.markModified('lists');
         const newProj = await proj.save();
         res.json({ project: newProj.toObject(), task: null });
     }

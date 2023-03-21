@@ -1,15 +1,13 @@
 export const colors = {
-  White: '#FFFFFF',
-  Blue: '#c3ddff',
-  Red: '#ffccd6',
-  Yellow: '#F4F022',
-  Orange: '#ffe7b6',
-  Purple: '#e2d2f2',
-  cyan: '#dbfff2',
-  Green: '#dcffc2',
-  Magenta: '#ffe8ff',
-  Brown: '#f1d6c2',
-  Gray: '#D9D9D9'
+  Default: '#121212',
+  Blue: '#005BD2',
+  Red: '#C20026',
+  Orange: '#C38300',
+  Purple: '#7B39BC',
+  cyan: '#00A86C',
+  Green: '#3D8F00',
+  Magenta: '#B52DB5',
+  Black: '#000000'
 }
 
 export type TColor = typeof colors

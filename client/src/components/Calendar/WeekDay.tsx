@@ -1,10 +1,10 @@
 import { connect } from 'react-redux'
 import { TState } from '../../types/state'
 import { getDay } from 'date-fns'
-import { BaseTask } from '../Project/Task/Base'
+import { BaseTask } from '../Task/Base'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { useState } from 'react'
-import { EditTaskModal } from '../Project/Task/Edit/Edit'
+import { EditTaskModal } from '../Task/Edit'
 import { TTask } from '../../types/project'
 
 function sameDay(d1: Date, d2: Date) {

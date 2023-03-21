@@ -105,8 +105,7 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
   const proj = await ProjectModel.findOne({ id: req.body.projId })
 
   if (proj) {
-    ;(proj.tasks.find((tsk) => tsk.id === req.body.id) as any).remove()
-
+    proj.tasks = proj.tasks.filter((task) => task.id !== req.body.id)
     proj.lists.forEach((list) => {
       list.taskIds.forEach((ids, i) => {
         if (ids.includes(req.body.id)) {
@@ -114,7 +113,8 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
         }
       })
     })
-
+    proj.markModified('tasks')
+    proj.markModified('lists')
     const newProj = await proj.save()
     res.json({ project: newProj.toObject(), task: null })
   } else {

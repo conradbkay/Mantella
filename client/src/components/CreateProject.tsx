@@ -6,16 +6,16 @@ import {
   CircularProgress,
   Paper
 } from '@mui/material'
-import { useFormStyles } from '../styles/formStyles'
+import { useFormStyles } from './styles/formStyles'
 import CalendarTodayRounded from '@mui/icons-material/CalendarTodayRounded'
 import { connect } from 'react-redux'
-import { Change } from '../../types/types'
-import { TState } from '../../types/state'
+import { Change } from '../types/types'
+import { TState } from '../types/state'
 import { useState } from 'react'
-import { openSnackbarA } from '../../store/actions/snackbar'
-import { setProjectA } from '../../store/actions/project'
+import { openSnackbarA } from '../store/actions/snackbar'
+import { setProjectA } from '../store/actions/project'
 import Helmet from 'react-helmet'
-import { APICreateProject } from '../../API/project'
+import { APICreateProject } from '../API/project'
 
 type CreateProjectProps = typeof actionCreators & ReturnType<typeof mapState>
 

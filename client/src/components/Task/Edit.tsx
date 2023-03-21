@@ -13,19 +13,19 @@ import {
 } from '@mui/material'
 import uuid from 'uuid'
 import { connect } from 'react-redux'
-import { TState } from '../../../../types/state'
-import { id, getAllListsArr } from '../../../../utils/utilities'
-import { setTaskA } from '../../../../store/actions/task'
-import { ChooseColor } from '../../../utils/chooseColor'
-import { setProjectA } from '../../../../store/actions/project'
+import { TState } from '../../types/state'
+import { id, getAllListsArr } from '../../utils/utilities'
+import { setTaskA } from '../../store/actions/task'
+import { ChooseColor } from '../utils/chooseColor'
+import { setProjectA } from '../../store/actions/project'
 import DatePicker from 'react-widgets/DatePicker'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
-import { formatDueDate } from '../../../../utils/formatDueDate'
+import { formatDueDate } from '../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
-import { TComment, TSubtask, TTask } from '../../../../types/project'
-import { APIDragTask, APIEditTask } from '../../../../API/task'
+import { TComment, TSubtask, TTask } from '../../types/project'
+import { APIDeleteTask, APIDragTask, APIEditTask } from '../../API/task'
 import { Description } from './DescriptionEditor'
 import { convertToRaw, EditorState } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './getEditorState'
@@ -139,6 +139,7 @@ export const EditTaskModal = connect(
 
   const deleteTask = () => {
     props.setTask({ id: task.id, projectId: props.projectId, newTask: null })
+    APIDeleteTask(task.id, props.projectId)
   }
 
   const dragTask = async () => {

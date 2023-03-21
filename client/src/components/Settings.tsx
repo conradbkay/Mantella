@@ -10,8 +10,8 @@ import { List } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-import { APILogout } from '../../API/auth'
-import { openSnackbarA } from '../../store/actions/snackbar'
+import { APILogout } from '../API/auth'
+import { openSnackbarA } from '../store/actions/snackbar'
 import Color from 'color'
 
 const useStyles = makeStyles((theme: Theme) => ({

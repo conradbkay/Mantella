@@ -11,14 +11,14 @@ import {
   InputAdornment
 } from '@mui/material'
 import LockOpen from '@mui/icons-material/LockOpen'
-import { useFormStyles } from '../styles/formStyles'
-import { openSnackbarA } from '../../store/actions/snackbar'
+import { useFormStyles } from './styles/formStyles'
+import { openSnackbarA } from '../store/actions/snackbar'
 import { Link } from 'react-router-dom'
 import Helmet from 'react-helmet'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import { registerA, loginA } from '../../store/actions/auth'
-import { APILogin, APIRegister } from '../../API/auth'
+import { registerA, loginA } from '../store/actions/auth'
+import { APILogin, APIRegister } from '../API/auth'
 import { useHistory } from 'react-router'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {

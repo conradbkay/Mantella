@@ -28,7 +28,7 @@ const taskObjects = (ids) => [
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[2], name: 'Tasks are part of lists, drag this task into another list' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[3], name: 'Lists can be assigned to projects and reordered' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[4], name: 'Projects can be created at any time, you can have as many projects as you want!' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[5], name: 'You can add colors to Tasks', color: '#c3ddff' }),
+    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[5], name: 'You can add colors to Tasks', color: '#005BD2' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[6], name: 'Tasks can be assigned a Point importance', points: 2 }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[7], name: 'Create a list by pressing the large + button within a project' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[8], name: 'Tasks can be dragged into different lists or reordered within a list' }),

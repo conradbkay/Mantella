@@ -1,4 +1,4 @@
-import { IconButton, TextField } from '@mui/material'
+import { IconButton, TextField, useTheme } from '@mui/material'
 import { useState, useEffect } from 'react'
 import { Socket } from 'socket.io-client'
 import Send from '@mui/icons-material/Send'
@@ -31,10 +31,13 @@ export const ProjectChat = ({
 
   const userId = useSelector((state: TState) => state.user!.id)
 
+  useEffect(() => {
+    // hydrate chat
+  }, [])
+
   // Runs whenever a socket event is recieved from the server
   useEffect(() => {
     socket.on('message', (data) => {
-      console.log(data)
       setMessagesReceived((state) => [
         ...state,
         {
@@ -71,6 +74,8 @@ export const ProjectChat = ({
     setMessage('')
   }
 
+  const theme = useTheme()
+
   return open ? (
     <div
       style={{
@@ -90,11 +95,14 @@ export const ProjectChat = ({
             style={{
               margin: 12,
               display: 'flex',
+              color: theme.palette.text.primary,
               flexDirection: 'column',
               width: '100%'
             }}
           >
-            <div style={{ textAlign: 'end' }}>
+            <div
+              style={{ textAlign: 'end', color: theme.palette.text.secondary }}
+            >
               {formatDateFromTimestamp(msg.createdAt)}
             </div>
             <p>{msg.message}</p>

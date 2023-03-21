@@ -1,5 +1,5 @@
 import { useSortable } from '@dnd-kit/sortable'
-import { TTask } from '../../../types/project'
+import { TTask } from '../../types/project'
 import { CSS } from '@dnd-kit/utilities'
 
 type Props = {

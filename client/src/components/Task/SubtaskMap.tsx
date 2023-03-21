@@ -1,7 +1,7 @@
 import CheckBox from '@mui/icons-material/CheckBox'
 import CheckBoxOutlineBlankOutlined from '@mui/icons-material/CheckBoxOutlineBlankOutlined'
 import { Transition, animated } from 'react-spring/renderprops'
-import { TSubtask } from '../../../types/project'
+import { TSubtask } from '../../types/project'
 
 export const SubtaskMap = ({
   subTasks,

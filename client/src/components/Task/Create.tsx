@@ -14,12 +14,12 @@ import {
   TextField
 } from '@mui/material'
 import { connect } from 'react-redux'
-import { setProjectA } from '../../../store/actions/project'
+import { setProjectA } from '../../store/actions/project'
 import Close from '@mui/icons-material/Close'
-import { ChooseColor } from '../../utils/chooseColor'
-import { TProject } from '../../../types/project'
+import { ChooseColor } from '../utils/chooseColor'
+import { TProject } from '../../types/project'
 import DatePicker from 'react-widgets/DatePicker'
-import { APICreateTask } from '../../../API/task'
+import { APICreateTask } from '../../API/task'
 const actionCreators = {
   setProject: setProjectA
 }

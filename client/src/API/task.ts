@@ -53,3 +53,12 @@ export const APIAssignUserToTask = async ({
 
   return data.task
 }
+
+export const APIDeleteTask = async (taskId: string, projectId: string) => {
+  const { data } = await axios.post('/deleteTask', {
+    id: taskId,
+    projId: projectId
+  })
+
+  return data.task
+}

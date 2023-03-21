@@ -1,7 +1,7 @@
 import { Checkbox, IconButton, TextField } from '@mui/material'
 import Delete from '@mui/icons-material/Delete'
 
-import { TSubtask } from '../../../../types/project'
+import { TSubtask } from '../../types/project'
 
 type Props = {
   setSubtask: (id: string, toMergeSubtask?: Partial<TSubtask>) => void

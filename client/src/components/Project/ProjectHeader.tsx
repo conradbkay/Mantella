@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, useTheme } from '@mui/material'
 import { input } from './styles'
-import DraggableAvatar from './Task/DraggableAvatar'
+import DraggableAvatar from '../Task/DraggableAvatar'
 import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'

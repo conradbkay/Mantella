@@ -45,8 +45,6 @@ Remove people from projects is not functional
 
 Search bar smooth scroll to task
 
-Dark mode
-
 Chat with specific user, even groups
 
 Changing task list to other project doesn't work
@@ -61,6 +59,8 @@ SSR
 
 make register redirect not weird, simulate login
 
-vscode style indicator for active project tab 
-
 double task border
+
+Notetaker
+
+deleting task makes snackbar show undo button with circular timer

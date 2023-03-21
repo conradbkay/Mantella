@@ -49,7 +49,7 @@ export const taskObjects = (ids: string[]): Task[] => [
     ...defaultTask,
     id: ids[5],
     name: 'You can add colors to Tasks',
-    color: '#c3ddff'
+    color: '#005BD2'
   },
   {
     ...defaultTask,

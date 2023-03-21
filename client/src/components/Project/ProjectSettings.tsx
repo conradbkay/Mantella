@@ -1,10 +1,10 @@
 import {
-  DialogContent,
   Button,
   Typography,
   ListItem,
   ListItemText,
-  ListItemAvatar
+  ListItemAvatar,
+  useTheme
 } from '@mui/material'
 import { connect } from 'react-redux'
 import { setProjectA } from '../../store/actions/project'
@@ -26,12 +26,21 @@ const CProjectSettings = (props: Props) => {
     props.setProject({ id: props.projectId, newProj: null })
   }
 
+  const theme = useTheme()
+
   return (
-    <DialogContent>
-      <Typography style={{ fontSize: 20 }}>
+    <div
+      style={{
+        width: 400,
+        display: 'flex',
+        flexDirection: 'column',
+        paddingTop: 16
+      }}
+    >
+      <Typography style={{ fontSize: 20, textAlign: 'center' }}>
         <span style={{ color: 'red', marginRight: 8 }}>Danger Zone!</span>
       </Typography>
-      <ListItem>
+      <ListItem style={{ color: theme.palette.text.secondary }}>
         <ListItemAvatar>
           <Delete />
         </ListItemAvatar>
@@ -50,12 +59,12 @@ const CProjectSettings = (props: Props) => {
           }}
           color="primary"
           variant={hasClicked ? 'contained' : 'outlined'}
-          style={{ marginLeft: 16, maxHeight: 36, marginTop: 'auto' }}
+          style={{ maxHeight: 36, margin: 'auto' }}
         >
           {hasClicked ? 'Confirm' : 'Delete'}
         </Button>
       </ListItem>
-    </DialogContent>
+    </div>
   )
 }
 

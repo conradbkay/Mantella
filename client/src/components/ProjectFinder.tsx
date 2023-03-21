@@ -10,8 +10,8 @@ import {
 } from '@mui/material'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { formalize } from '../../utils/utilities'
-import { TState } from '../../types/state'
+import { formalize } from '../utils/utilities'
+import { TState } from '../types/state'
 import { makeStyles } from '@mui/styles'
 
 const useStyles = makeStyles(() => ({
