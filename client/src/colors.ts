@@ -1,7 +1,7 @@
 export const colors = {
   Default: '#121212',
-  Blue: '#005BD2',
   Red: '#C20026',
+  Blue: '#005BD2',
   Orange: '#C38300',
   Purple: '#7B39BC',
   cyan: '#00A86C',

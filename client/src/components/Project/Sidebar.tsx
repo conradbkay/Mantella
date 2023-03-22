@@ -1,7 +1,6 @@
 import Settings from '@mui/icons-material/Settings'
 import Person from '@mui/icons-material/Person'
 import Chat from '@mui/icons-material/Chat'
-import Calendar from '@mui/icons-material/CalendarMonth'
 import { FilterTasks } from './FilterTasks'
 import { ProjectSettings } from './ProjectSettings'
 import { ProjStats } from './Statistics'
@@ -18,7 +17,6 @@ import { ProjectChat } from './Chat'
 
 const listItems = [
   { title: 'Chat', Icon: Chat },
-  { title: 'Calendar', Icon: Calendar },
   { title: 'Settings', Icon: Settings },
   { title: 'Members', Icon: Person },
   { title: 'Filter', Icon: FilterList },
@@ -99,8 +97,6 @@ export const Sidebar = memo(
               <ShareProject project={project} />
             ) : open === 'Settings' ? (
               <ProjectSettings projectId={project.id} />
-            ) : open === 'Calendar' ? (
-              <div>hi</div>
             ) : open === 'Statistics' ? (
               <ProjStats project={project} />
             ) : open === 'Pomodoro' ? (

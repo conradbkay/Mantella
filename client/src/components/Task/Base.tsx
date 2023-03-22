@@ -137,7 +137,9 @@ const CBaseTask = memo((props: TaskProps) => {
               ? task.color
               : theme.palette.background.paper,
           backgroundImage:
-            'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))', // todo: light mode
+            theme.palette.mode === 'dark'
+              ? 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))'
+              : undefined,
           border,
           cursor: 'pointer',
           color: props.isDragging

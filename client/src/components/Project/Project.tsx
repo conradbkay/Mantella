@@ -163,6 +163,10 @@ export const Project = (props: Props) => {
 
   const onDragOver = (event: DragOverEvent) => {
     if (event.over && event.over.id === 'trash') {
+      /**
+       * @todo I can't think of a good way to remove the task from redux
+       * maybe we store a copy of the project in this component like the editTask component and save those to both redux and the server, possibly with better D&D performance. Even then,
+       */
       if (!overTrash) {
         setOverTrash(true)
       }

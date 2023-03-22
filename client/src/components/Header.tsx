@@ -1,6 +1,7 @@
-import { useState, Fragment } from 'react'
+import { useState, Fragment, useContext } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
+import { ColorModeContext } from '../App'
 import {
   Theme,
   IconButton,
@@ -29,6 +30,8 @@ import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { TState } from '../types/state'
+import Brightness4Icon from '@mui/icons-material/Brightness4'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
 import { ProjectFinder } from './ProjectFinder'
 import { HoverableAvatar } from './utils/HoverableAvatar'
 import { makeStyles } from '@mui/styles'
@@ -143,6 +146,8 @@ const Topbar = (props: Props) => {
     props.location.pathname
   )
 
+  const colorMode = useContext(ColorModeContext)
+
   const theme = useTheme()
 
   return (
@@ -230,7 +235,6 @@ const Topbar = (props: Props) => {
                     <MenuIcon />
                   </IconButton>
                 </div>
-
                 <div className={classes.tabContainer}>
                   <Tabs
                     value={value === -1 ? false : value}
@@ -254,10 +258,20 @@ const Topbar = (props: Props) => {
                     ))}
                   </Tabs>
                 </div>
-
                 {props.authenticated !== null && (
                   <HoverableAvatar user={props.authenticated} />
                 )}
+                <IconButton
+                  sx={{ ml: 1 }}
+                  onClick={colorMode.toggleColorMode}
+                  color="inherit"
+                >
+                  {theme.palette.mode === 'dark' ? (
+                    <Brightness7Icon />
+                  ) : (
+                    <Brightness4Icon />
+                  )}
+                </IconButton>
               </Fragment>
             </Grid>
           </Grid>

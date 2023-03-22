@@ -186,8 +186,10 @@ export const kickUserFromProject = async (
 
     if (modifiedTasks) {
       project.markModified('tasks')
-      project = await project.save()
     }
+
+    project.markModified('users')
+    project = await project.save()
 
     res.json({ project: project.toObject() })
   } else {

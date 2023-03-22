@@ -76,6 +76,7 @@ io.on('connection', (socket: any) => {
 
     if (chat) {
       chat.messages.push(messageObj)
+      await chat.save()
     }
   })
 

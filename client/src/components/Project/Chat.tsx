@@ -1,4 +1,9 @@
-import { IconButton, TextField, useTheme } from '@mui/material'
+import {
+  IconButton,
+  TextField,
+  useTheme,
+  CircularProgress
+} from '@mui/material'
 import { useState, useEffect } from 'react'
 import { Socket } from 'socket.io-client'
 import Send from '@mui/icons-material/Send'
@@ -7,6 +12,7 @@ import { TProject } from '../../types/project'
 import { HoverableAvatar } from '../utils/HoverableAvatar'
 import { useSelector } from 'react-redux'
 import { TState } from '../../types/state'
+import axios from 'axios'
 
 type Message = {
   id: string
@@ -14,6 +20,12 @@ type Message = {
   createdAt: number
   senderId: string
 }
+
+/**
+ * ideas:
+ * hover own message to delete, others to reply to
+ * notifications for new messages
+ */
 
 export const ProjectChat = ({
   socket,
@@ -28,12 +40,22 @@ export const ProjectChat = ({
 }) => {
   const [messagesRecieved, setMessagesReceived] = useState([] as Message[])
   const [connected, setConnected] = useState(false)
-
+  const [loading, setLoading] = useState(true)
   const userId = useSelector((state: TState) => state.user!.id)
 
   useEffect(() => {
-    // hydrate chat
-  }, [])
+    const func = async () => {
+      try {
+        const res = await axios.post(`/chat`, { id: chatId })
+        setMessagesReceived(res.data.chat.messages)
+      } catch (err) {
+        console.log(err)
+      }
+      setLoading(false)
+    }
+
+    func()
+  }, [chatId])
 
   // Runs whenever a socket event is recieved from the server
   useEffect(() => {
@@ -85,6 +107,7 @@ export const ProjectChat = ({
         flexDirection: 'column'
       }}
     >
+      {loading && <CircularProgress style={{ margin: 'auto' }} />}
       {messagesRecieved.map((msg, i) => (
         <div key={msg.id} style={{ display: 'flex' }}>
           <HoverableAvatar

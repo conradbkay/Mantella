@@ -29,8 +29,9 @@ const mapState = (state: TState) => ({
 
 const genColors = () => {
   let betterColors: any = { ...colors }
-  delete betterColors.White
+  delete betterColors.Default
   delete betterColors.Brown
+  delete betterColors.Black
   delete betterColors.Yellow
   return Object.values(betterColors)
 }
@@ -99,10 +100,12 @@ export const Dashboard = connect(mapState)(
                 })
               })
 
+              console.log(betterColors)
               const color = betterColors.splice(i, 1)[0]
               if (!betterColors.length) {
                 betterColors = genColors()
               }
+              console.log(color)
 
               return (
                 <Card
@@ -119,11 +122,11 @@ export const Dashboard = connect(mapState)(
                     gutterBottom
                     variant="h5"
                     component="h2"
-                    style={{ color: 'black' }}
+                    style={{ color: theme.palette.text.secondary }}
                   >
                     {project.name}
                   </Typography>
-                  <ul style={{ color: 'black' }}>
+                  <ul style={{ color: theme.palette.text.secondary }}>
                     <div>
                       <span style={{ fontWeight: 500 }}>
                         {project.tasks.length}

@@ -5,17 +5,27 @@ import { Button } from '@mui/material'
 import Add from '@mui/icons-material/Add'
 import Remove from '@mui/icons-material/Remove'
 import { toDaysHHMMSS } from '../../utils/utilities'
+import { useTheme } from '@mui/material'
 
 type ActionCreators = typeof actionCreators
 
 interface Props extends ReturnType<typeof mapState>, ActionCreators {}
-
+// TODO: big minus and little minus, (10 sec/1 min, 1min/5min)
 const CControls = (props: Props) => {
   const { workTime, breakTime } = props
 
+  const theme = useTheme()
+
   return (
     <>
-      <div style={{ textAlign: 'center', fontSize: 18, margin: 10 }}>
+      <div
+        style={{
+          textAlign: 'center',
+          fontSize: 18,
+          margin: 10,
+          color: theme.palette.text.secondary
+        }}
+      >
         Break Time: {toDaysHHMMSS(breakTime)}
       </div>
       <div style={{ display: 'flex' }}>
@@ -39,7 +49,8 @@ const CControls = (props: Props) => {
         style={{
           textAlign: 'center',
           fontSize: 18,
-          margin: 10
+          margin: 10,
+          color: theme.palette.text.secondary
         }}
       >
         Work Time: {toDaysHHMMSS(workTime)}

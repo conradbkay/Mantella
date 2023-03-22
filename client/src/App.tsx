@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState, createContext } from 'react'
 import { Provider } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
@@ -25,20 +25,10 @@ const socket = io('http://localhost:3000', {
   transports: ['websocket', 'polling']
 })
 
-const secondary = '#0336FF'
+const secondary = '#cc1100'
 const primary = '#00838f'
 
-const theme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: primary
-    },
-    secondary: {
-      main: secondary
-    }
-  }
-})
+export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
 const Router = () => {
   const [loaded, setLoaded] = useState(false)
@@ -141,12 +131,40 @@ const Router = () => {
 }
 
 export const Wrapper = () => {
+  const [mode, setMode] = useState<'light' | 'dark'>('dark')
+  const colorMode = useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+      }
+    }),
+    []
+  )
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: {
+            main: primary
+          },
+          secondary: {
+            main: secondary
+          }
+        }
+      }),
+    [mode]
+  )
+
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <SnackbarRoot />
-        <Router />
-      </ThemeProvider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <SnackbarRoot />
+          <Router />
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </Provider>
   )
 }

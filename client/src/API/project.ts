@@ -50,6 +50,8 @@ export const APIDeleteProject = async (projectId: string) => {
   }
 }
 
-export const APIKickUser = async (projectId: string, userId: string) => {
-  // TODO
+export const APIKickUser = async (projectId: string, kickingId: string) => {
+  const res = await axios.post('/kickUser', { projectId, userId: kickingId })
+
+  return res.data
 }

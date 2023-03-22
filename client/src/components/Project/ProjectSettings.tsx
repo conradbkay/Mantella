@@ -57,7 +57,7 @@ const CProjectSettings = (props: Props) => {
               setClicked(true)
             }
           }}
-          color="primary"
+          color="secondary"
           variant={hasClicked ? 'contained' : 'outlined'}
           style={{ maxHeight: 36, margin: 'auto' }}
         >

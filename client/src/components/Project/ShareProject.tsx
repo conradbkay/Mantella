@@ -9,11 +9,12 @@ import {
   TextField,
   Typography,
   IconButton,
+  useTheme,
   ListItemSecondaryAction
 } from '@mui/material'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { APIShareProject } from '../../API/project'
+import { APIKickUser, APIShareProject } from '../../API/project'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { TState } from '../../types/state'
 import Delete from '@mui/icons-material/Delete'
@@ -29,6 +30,7 @@ export const ShareProject = ({ project }: Props) => {
   const dispatch = useDispatch()
 
   const user = useSelector((state: TState) => state.user)
+  const theme = useTheme()
 
   const submit = async () => {
     try {
@@ -52,9 +54,29 @@ export const ShareProject = ({ project }: Props) => {
     }
   }
 
+  const kickUser = async (kickingId: string) => {
+    try {
+      const res = await APIKickUser(project.id, kickingId)
+
+      dispatch(setProjectA({ id: res.project.id, newProj: res.project }))
+    } catch (err) {
+      dispatch(openSnackbarA('User could not be kicked', 'error'))
+    }
+  }
+
   return (
-    <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-      <DialogContentText style={{ marginBottom: 0 }}>Members</DialogContentText>
+    <DialogContent
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: 352 /* 24px padding twice */
+      }}
+    >
+      <DialogContentText
+        style={{ marginBottom: 0, color: theme.palette.text.secondary }}
+      >
+        Members
+      </DialogContentText>
       <List>
         {project.users.map((member) => (
           <ListItem key={member.id}>
@@ -67,10 +89,17 @@ export const ShareProject = ({ project }: Props) => {
                 src={member.profileImg}
               />
             </ListItemAvatar>
-            <ListItemText primary={member.username} secondary={member.email} />
+            <ListItemText
+              style={{ color: theme.palette.text.primary }}
+              primary={member.username}
+              secondary={member.email}
+            />
             <ListItemSecondaryAction>
               <IconButton
-                disabled={project.ownerId !== user!.id}
+                onClick={() => kickUser(member.id)}
+                disabled={
+                  project.ownerId !== user!.id || member.id === user!.id
+                }
                 edge="end"
                 aria-label="delete"
               >
@@ -80,7 +109,7 @@ export const ShareProject = ({ project }: Props) => {
           </ListItem>
         ))}
       </List>
-      <Typography style={{ fontSize: 16 }}>
+      <Typography style={{ fontSize: 16, color: theme.palette.text.secondary }}>
         Enter the invitee's email address that was used to join Mantella, they
         will automatically have access when they sign in
       </Typography>

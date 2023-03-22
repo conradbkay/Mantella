@@ -7,7 +7,7 @@ import {
   toggleStopwatchA,
   resetStopwatchA
 } from '../../store/actions/pomodoro'
-import { Button } from '@mui/material'
+import { Button, useTheme } from '@mui/material'
 import Pause from '@mui/icons-material/Pause'
 import PlayArrow from '@mui/icons-material/PlayArrow'
 
@@ -28,6 +28,8 @@ const CStopwatch = (props: Props) => {
     }, 1000)
   })
 
+  const theme = useTheme()
+
   const { stopWatch, reset } = props
   return (
     <div style={{ margin: 10 }}>
@@ -35,7 +37,8 @@ const CStopwatch = (props: Props) => {
         style={{
           textAlign: 'center',
           fontSize: 28,
-          marginBottom: 10
+          marginBottom: 10,
+          color: theme.palette.text.secondary
         }}
       >
         {toDaysHHMMSS(stopWatch.time)}

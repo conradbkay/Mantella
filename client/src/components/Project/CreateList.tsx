@@ -7,7 +7,6 @@ import {
   TextField,
   DialogActions,
   Button,
-  Theme,
   IconButton
 } from '@mui/material'
 import Close from '@mui/icons-material/Close'
@@ -15,7 +14,6 @@ import { Change } from '../../types/types'
 import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
-import { makeStyles } from '@mui/styles'
 import { APICreateList } from '../../API/list'
 
 type ActionCreators = typeof actionCreators
@@ -24,19 +22,8 @@ interface Props extends ActionCreators {
   project: TProject
   onClose(): void
 }
-
-const useStyles = makeStyles((theme: Theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500]
-  }
-}))
-
 const CCreateColumn = (props: Props) => {
   const { project, onClose } = props
-  const classes = useStyles()
 
   const [name, setName] = useState('')
 
@@ -58,7 +45,10 @@ const CCreateColumn = (props: Props) => {
         }}
       >
         <DialogTitle>Create List</DialogTitle>
-        <IconButton className={classes.closeButton} onClick={onClose}>
+        <IconButton
+          style={{ position: 'absolute', top: 12, right: 12 }}
+          onClick={onClose}
+        >
           <Close />
         </IconButton>
         <DialogContent>

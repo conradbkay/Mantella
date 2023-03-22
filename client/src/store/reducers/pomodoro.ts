@@ -93,12 +93,12 @@ const SET_LENGTH_MINUTES = (
   const slice = action.operationType === 'WORK' ? 'workSeconds' : 'breakSeconds'
 
   const changingCurrent =
-    (action.type === 'CHANGE_WORK_TIME' && pom.working) ||
-    (action.type === 'CHANGE_BREAK_TIME' && !pom.working)
+    (action.operationType === 'WORK' && pom.working) ||
+    (action.operationType === 'BREAK' && !pom.working)
 
   const result = pom[slice] + action.minutes * 60
 
-  if (result >= 0) {
+  if (result > 0) {
     const newSeconds = changingCurrent
       ? pom.currSeconds + action.minutes * 60
       : pom.currSeconds

@@ -26,6 +26,14 @@ export const createChat = async (req: Request, res: Response) => {
 
 router.post('/createChat', isAuthenticated, createChat)
 
+export const getChat = async (req: Request, res: Response) => {
+  const chat = await ChatModel.findOne({ id: req.body.id })
+
+  res.json({ chat })
+}
+
+router.post('/chat', isAuthenticated, getChat)
+
 export const sendMessage = async (req: Request, res: Response) => {
   const messageId = uuid()
 

@@ -7,6 +7,7 @@ import {
   MenuItem,
   FormControlLabel,
   Switch,
+  useTheme,
   Slider,
   ListItemText
 } from '@mui/material'
@@ -22,6 +23,7 @@ import { setFilterA } from '../../store/actions/filter'
 
 const FilterTasksComponent = () => {
   const [custom, setCustom] = useState(false)
+  const theme = useTheme()
   const dispatch = useDispatch()
   const filterData = useSelector((state: TState) => state.filter)
   return (
@@ -30,14 +32,28 @@ const FilterTasksComponent = () => {
         <ListItem>
           <ListItemText
             style={{
-              borderRadius: 8,
-              padding: 8
+              color: theme.palette.text.secondary
             }}
           >
+            {/* todo: fix drag and drop for this */}
             Sorted or Filtered Tasks cannot be dragged
           </ListItemText>
         </ListItem>
-        <ListItem style={{ padding: '0px 32px', marginTop: 32 }}>
+        <ListItem
+          style={{
+            padding: '0px 32px',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <ListItemText
+            style={{
+              padding: 8,
+              color: theme.palette.text.secondary
+            }}
+          >
+            Points
+          </ListItemText>
           <Slider
             min={0}
             max={50}
@@ -72,7 +88,11 @@ const FilterTasksComponent = () => {
           />
         </ListItem>
         <FormControlLabel
-          style={{ margin: '0px auto' }}
+          style={{
+            margin: '0px auto',
+            color: theme.palette.text.secondary,
+            padding: '0px 16px'
+          }}
           control={
             <Switch
               disableRipple
