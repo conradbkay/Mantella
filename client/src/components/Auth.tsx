@@ -86,7 +86,6 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
               const user = await APILogin(email, password)
               if (user) {
                 login(user)
-                //window.location.href = '/calendar'
               } else {
                 openSnackbar('Could not login', 'error')
               }

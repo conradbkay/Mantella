@@ -11,6 +11,7 @@ import { setProjectA } from '../../store/actions/project'
 import Delete from '@mui/icons-material/Delete'
 import { openSnackbarA } from '../../store/actions/snackbar'
 import { useState } from 'react'
+import { useHistory } from 'react-router'
 
 type ActionCreators = typeof actionCreators
 
@@ -20,10 +21,11 @@ interface Props extends ActionCreators {
 
 const CProjectSettings = (props: Props) => {
   const [hasClicked, setClicked] = useState(false)
+  const navigate = useHistory()
 
   const deleteProject = () => {
-    window.location.href = '/dashboard'
     props.setProject({ id: props.projectId, newProj: null })
+    navigate.push('/dashboard')
   }
 
   const theme = useTheme()

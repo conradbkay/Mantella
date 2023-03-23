@@ -7,6 +7,7 @@ import { loginA } from '../../store/actions/auth'
 import { connect } from 'react-redux'
 import { APIGuestLogin } from '../../API/auth'
 import makeStyles from '@mui/styles/makeStyles'
+import { useHistory } from 'react-router'
 
 const useStyles = makeStyles((theme: Theme) => ({
   heroContent: {
@@ -58,11 +59,13 @@ export const About = connect(
 )((props: Props) => {
   const { login } = props
 
+  const navigate = useHistory()
+
   const loginAsGuest = async () => {
     const res = await APIGuestLogin()
     if (res) {
       login(res)
-      window.location.href = '/project/' + res.projects[0].id
+      navigate.push('/project/' + res.projects[0].id)
     }
   }
 

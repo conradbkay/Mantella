@@ -132,6 +132,12 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
       })
     ])
 
+    req.login(user, (err: any) => {
+      if (err) {
+        console.log('could not passport login during signup', err)
+      }
+    })
+
     res.json({
       user: {
         ...user.toObject(),

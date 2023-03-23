@@ -16,12 +16,13 @@ import { openSnackbarA } from '../store/actions/snackbar'
 import { setProjectA } from '../store/actions/project'
 import Helmet from 'react-helmet'
 import { APICreateProject } from '../API/project'
-
+import { useHistory } from 'react-router'
 type CreateProjectProps = typeof actionCreators & ReturnType<typeof mapState>
 
 const CCreateProject = (props: CreateProjectProps) => {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigate = useHistory()
   const onCompleted = async () => {
     setLoading(true)
     const res = await APICreateProject(name || 'Untitled Project')
@@ -31,7 +32,7 @@ const CCreateProject = (props: CreateProjectProps) => {
         newProj: res
       })
 
-      window.location.href = '/project/' + res.id
+      navigate.push('/project/' + res.id)
       props.openSnackbar('Project Created Successfully', 'success')
     } else {
       props.openSnackbar('Project Could Not Be Created', 'warning')

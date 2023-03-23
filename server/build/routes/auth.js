@@ -85,6 +85,11 @@ const guestLogin = async (req, res) => {
                 messages: []
             })
         ]);
+        req.login(user, (err) => {
+            if (err) {
+                console.log('could not passport login during signup', err);
+            }
+        });
         res.json({
             user: Object.assign(Object.assign({}, user.toObject()), { projects: [project.toObject()] })
         });
