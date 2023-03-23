@@ -1,4 +1,10 @@
-import { Theme, SnackbarContent, Snackbar, IconButton } from '@mui/material'
+import {
+  Theme,
+  SnackbarContent,
+  Snackbar,
+  IconButton,
+  Button
+} from '@mui/material'
 
 import { connect } from 'react-redux'
 
@@ -21,7 +27,7 @@ type Classes = {
 const getClassSnackbarVariant = (variant: TVariant, classes: Classes) => {
   if (variant === 'success') {
     return classes.success
-  } else if (variant === 'warning') {
+  } else if (variant === 'warning' || variant === 'undo') {
     return classes.warning
   } else if (variant === 'error') {
     return classes.error
@@ -34,9 +40,9 @@ const FULL_WIDTH_POINT_PX = 960
 const AUTO_HIDE_POINT_MS = 3000
 
 const useStyles = makeStyles((theme: Theme) => ({
-  success: { backgroundColor: '#43A047' }, // what a nice green
+  success: { backgroundColor: '#43A047' },
   warning: { backgroundColor: '#FFA000' },
-  standard: {},
+  standard: { backgroundColor: theme.palette.primary.dark },
   error: { backgroundColor: theme.palette.error.dark },
   close: { width: 24, height: 24 },
   message: { display: 'flex', alignItems: 'center' },
@@ -57,7 +63,8 @@ const SnackbarComponent = (props: TProps) => {
     success: CheckCircleIcon,
     warning: WarningIcon,
     error: ErrorIcon,
-    standard: Info
+    standard: Info,
+    undo: WarningIcon
   }
   const { open, message, variant, closeSnackbar } = props
   const classes = useStyles()
@@ -70,7 +77,7 @@ const SnackbarComponent = (props: TProps) => {
       open={open}
       style={{ marginBottom: 20 }}
       className={classes.snackbar}
-      autoHideDuration={AUTO_HIDE_POINT_MS}
+      autoHideDuration={variant === 'undo' ? 5000 : AUTO_HIDE_POINT_MS}
       onClose={closeSnackbar}
     >
       <SnackbarContent
@@ -82,11 +89,16 @@ const SnackbarComponent = (props: TProps) => {
           </span>
         }
         action={[
+          variant === 'undo' ? (
+            <Button onClick={() => window.location.reload()}>Undo</Button>
+          ) : null,
           <IconButton
             key="close"
             color="inherit"
             className={classes.icon}
-            onClick={closeSnackbar}
+            onClick={() => {
+              closeSnackbar()
+            }}
           >
             <CloseIcon className={classes.close} />
           </IconButton>

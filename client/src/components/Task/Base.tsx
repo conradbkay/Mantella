@@ -246,8 +246,13 @@ const CBaseTask = memo((props: TaskProps) => {
                         }}
                       >
                         {task.comments.map((comment) => (
-                          <div key={comment.id} style={{ color: 'black' }}>
-                            <span style={{ color: 'rgba(0, 0, 0, 0.70)' }}>
+                          <div
+                            key={comment.id}
+                            style={{ color: theme.palette.text.primary }}
+                          >
+                            <span
+                              style={{ color: theme.palette.text.secondary }}
+                            >
                               {
                                 formatDueDate(
                                   {
@@ -276,7 +281,7 @@ const CBaseTask = memo((props: TaskProps) => {
                     marginLeft: 6,
                     color: isBefore(new Date(task.dueDate), new Date())
                       ? '#d32f24'
-                      : 'black'
+                      : theme.palette.text.primary
                   }}
                 >
                   {formatDate}
@@ -330,7 +335,9 @@ const CBaseTask = memo((props: TaskProps) => {
                 </IconButton>
               )}
               {task.timeWorkedOn !== 0 && (
-                <span style={{ alignSelf: 'center' }}>
+                <span
+                  style={{ alignSelf: 'center', fontSize: 13, marginLeft: 6 }}
+                >
                   Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}
                 </span>
               )}

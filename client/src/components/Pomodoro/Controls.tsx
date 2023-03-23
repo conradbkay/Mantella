@@ -37,6 +37,21 @@ const CControls = (props: Props) => {
           <Add />
         </Button>
         <Button
+          onClick={() => props.setLengthA({ type: 'BREAK', byMinutes: 1 / 6 })}
+          color="secondary"
+          style={{ width: '50%', marginLeft: 8, marginRight: 4 }}
+        >
+          <Add style={{ fontSize: 18 }} />
+        </Button>
+        <Button
+          onClick={() => props.setLengthA({ type: 'BREAK', byMinutes: -1 / 6 })}
+          color="primary"
+          fullWidth
+          style={{ width: '50%', marginLeft: 4, marginRight: 8 }}
+        >
+          <Remove style={{ fontSize: 18 }} />
+        </Button>
+        <Button
           onClick={() => props.setLengthA({ type: 'BREAK', byMinutes: -1 })}
           color="primary"
           fullWidth
@@ -62,6 +77,21 @@ const CControls = (props: Props) => {
           style={{ width: '100%', marginLeft: 8, marginRight: 4 }}
         >
           <Add />
+        </Button>
+        <Button
+          onClick={() => props.setLengthA({ type: 'WORK', byMinutes: 1 })}
+          color="secondary"
+          style={{ width: '50%', marginLeft: 8, marginRight: 4 }}
+        >
+          <Add style={{ fontSize: 18 }} />
+        </Button>
+        <Button
+          onClick={() => props.setLengthA({ type: 'WORK', byMinutes: -1 })}
+          color="primary"
+          fullWidth
+          style={{ width: '50%', marginLeft: 4, marginRight: 8 }}
+        >
+          <Remove style={{ fontSize: 18 }} />
         </Button>
         <Button
           onClick={() => props.setLengthA({ type: 'WORK', byMinutes: -5 })}

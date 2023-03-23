@@ -31,12 +31,7 @@ export type TProfiles = {
   [id: string]: TProfile
 }
 
-export type TVariant =
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'standard'
-  | string /* delete|id*/
+export type TVariant = 'success' | 'warning' | 'error' | 'standard' | 'undo'
 
 export type TSnackbar = {
   open: boolean

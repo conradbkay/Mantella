@@ -43,6 +43,7 @@ import { Sidebar } from './Sidebar'
 import { Socket } from 'socket.io-client'
 import { setTaskA } from '../../store/actions/task'
 import { APIDeleteTask } from '../../API/task'
+import { openSnackbarA } from '../../store/actions/snackbar'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -164,7 +165,7 @@ export const Project = (props: Props) => {
   const onDragOver = (event: DragOverEvent) => {
     if (event.over && event.over.id === 'trash') {
       /**
-       * @todo I can't think of a good way to remove the task from redux
+       * @todo I can't think of a good way to remove the task from redux so it doesn't show when hovering delete
        * maybe we store a copy of the project in this component like the editTask component and save those to both redux and the server, possibly with better D&D performance. Even then,
        */
       if (!overTrash) {
@@ -218,11 +219,14 @@ export const Project = (props: Props) => {
 
   const onDragEnd = (event: DragEndEvent) => {
     if (event.over && event.over.id === 'trash') {
-      console.log('delete')
+      dispatch(openSnackbarA('Task deleted', 'undo'))
       dispatch(
         setTaskA({ id: draggingId!, projectId: project.id, newTask: null })
       )
-      APIDeleteTask(draggingId!, project.id)
+      // they will have 5 seconds to undo with the snackbar by reloading the page
+      setTimeout(() => {
+        APIDeleteTask(draggingId!, project.id)
+      }, 5500)
     } else {
       const data = getDragEventData(event)
 
@@ -235,9 +239,8 @@ export const Project = (props: Props) => {
           }))
         )
       }
-
-      setDraggingId(null)
     }
+    setDraggingId(null)
 
     if (overTrash) {
       setOverTrash(false)
