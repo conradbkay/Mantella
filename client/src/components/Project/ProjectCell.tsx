@@ -12,9 +12,10 @@ import DraggableTask from '../Task/Draggable'
 import { PROJECT_BORDER, PROJECT_BORDER_COLOR } from './Project'
 import { TState } from '../../types/state'
 import { useDispatch, useSelector } from 'react-redux'
-import { setListA } from '../../store/actions/list'
+import { setListA, setListIdxA } from '../../store/actions/list'
 import { SortableContext } from '@dnd-kit/sortable'
-
+import ArrowDownward from '@mui/icons-material/ArrowDownward'
+import ArrowUpward from '@mui/icons-material/ArrowUpward'
 interface Props {
   project: TProject
   list: TList
@@ -104,6 +105,12 @@ export const ProjectCell = memo(
       )
     }
 
+    const setListIdx = (id: string, offset: number) => {
+      dispatch(setListIdxA({ id, offset, projectId: project.id }))
+      setAnchorEl(null)
+      // TODO: api call
+    }
+
     const theme = useTheme()
 
     // TODO: make background color change when dragging task, same for task changing when dragging user on
@@ -170,6 +177,12 @@ export const ProjectCell = memo(
               onClose={() => setAnchorEl(null)}
             >
               <MenuItem
+                disabled={id(project.lists, list.id) === 0}
+                onClick={() => setListIdx(list.id, -1)}
+              >
+                <ArrowUpward />
+              </MenuItem>
+              <MenuItem
                 onClick={() => {
                   setAnchorEl(null)
                   setCollapsed((prev) => !prev)
@@ -206,6 +219,14 @@ export const ProjectCell = memo(
                 ) : (
                   'Delete'
                 )}
+              </MenuItem>
+              <MenuItem
+                onClick={() => setListIdx(list.id, 1)}
+                disabled={
+                  id(project.lists, list.id) === project.lists.length - 1
+                }
+              >
+                <ArrowDownward />
               </MenuItem>
             </MuiMenu>
           </div>

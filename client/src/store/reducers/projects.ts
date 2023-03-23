@@ -3,7 +3,7 @@ import { defaultState } from '../defaultState'
 import { createReducer } from './createReducer'
 import { TState } from '../../types/state'
 import { setProjectA, setProjectsA } from '../actions/project'
-import { setListA } from '../actions/list'
+import { setListA, setListIdxA } from '../actions/list'
 import { ReducerCases } from '../actions/types'
 import { taskCases } from './tasks'
 import { id } from '../../utils/utilities'
@@ -42,9 +42,24 @@ const SET_LIST = (
     changing.splice(id(changing, action.id), 1)
   }
 }
+
+const SET_LIST_IDX = (
+  projects: TProject[],
+  action: ReturnType<typeof setListIdxA>
+) => {
+  let changing = projects[id(projects, action.projectId)].lists
+
+  const fromIndex = id(changing, action.id)
+
+  const element = changing.splice(fromIndex, 1)[0]
+
+  changing.splice(fromIndex + action.offset, 0, element)
+}
+
 const projectCases: ReducerCases<TProject[]> = {
   SET_PROJECT,
   SET_LIST,
+  SET_LIST_IDX,
   SET_PROJECTS: (projects, action: ReturnType<typeof setProjectsA>) => {
     return action.projects
   }

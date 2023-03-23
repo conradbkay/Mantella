@@ -16,6 +16,7 @@ import {
 import { Request, Response } from 'express'
 import { router } from './router'
 import { isAuthenticated } from '../passport'
+import { ChatModel } from '../models/Chat'
 
 export const createProject = async (
   req: createProjectReq,
@@ -23,6 +24,7 @@ export const createProject = async (
 ) => {
   const creatingId = uuid()
   const listId = uuid()
+  const chatId = uuid()
 
   if (req.user) {
     ;(req.user as any).projects.push(creatingId)
@@ -48,11 +50,13 @@ export const createProject = async (
           }
         ],
         tasks: [],
+        chatId: chatId,
         enrolledUsers: [],
         columnOrder: [listId],
         isPrivate: false
       }),
-      (req.user as any).save()
+      (req.user as any).save(),
+      ChatModel.create({ id: chatId, messages: [], projectId: creatingId })
     ])
     res.json({ project: created.toObject() })
   } else {

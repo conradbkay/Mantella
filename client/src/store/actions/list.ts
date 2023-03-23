@@ -9,4 +9,17 @@ export const setListA = (args: {
   newList: args.newList
 })
 
-export type ListAction = ReturnType<typeof setListA>
+export const setListIdxA = (args: {
+  id: string
+  offset: number
+  projectId: string
+}) => ({
+  type: 'SET_LIST_IDX',
+  id: args.id,
+  offset: args.offset,
+  projectId: args.projectId
+})
+
+export type ListAction =
+  | ReturnType<typeof setListA>
+  | ReturnType<typeof setListIdxA>
