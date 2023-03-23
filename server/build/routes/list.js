@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createList = exports.deleteList = exports.editList = void 0;
+exports.setListIdx = exports.createList = exports.deleteList = exports.editList = void 0;
 const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
 const router_1 = require("./router");
@@ -62,4 +62,21 @@ const createList = async (req, res) => {
 };
 exports.createList = createList;
 router_1.router.post('/createList', passport_1.isAuthenticated, exports.createList);
+const setListIdx = async (req, res) => {
+    const project = await Project_1.ProjectModel.findOne({ id: req.body.projId });
+    if (project) {
+        const list = project.lists.find((l) => l.id === req.body.id);
+        const idx = project.lists.indexOf(list);
+        const element = project.lists.splice(idx, 1)[0];
+        project.lists.splice(idx + req.body.offset, 0, element);
+        project.markModified('lists');
+        await project.save();
+        res.json({ id: req.body.id });
+    }
+    else {
+        throw new Error('proj not found');
+    }
+};
+exports.setListIdx = setListIdx;
+router_1.router.post('/setListIdx', passport_1.isAuthenticated, exports.setListIdx);
 //# sourceMappingURL=list.js.map
