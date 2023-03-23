@@ -24,7 +24,6 @@ type Props = {
   project: TProject
 }
 
-// TODO: open={props.open}
 export const ShareProject = ({ project }: Props) => {
   const [senderEmail, setSenderEmail] = useState('')
   const dispatch = useDispatch()

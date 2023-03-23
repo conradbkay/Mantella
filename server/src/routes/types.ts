@@ -120,7 +120,7 @@ export type removeMemberFromProjectRes = Response<{}>
 // TASK
 export type createTaskReq = Req<{
   projId: string
-  taskInfo: any // TODO: optional type of task
+  taskInfo: any
   listId: string
 }>
 export type createTaskRes = Response<{}>
@@ -128,7 +128,7 @@ export type createTaskRes = Response<{}>
 export type editTaskReq = Req<{
   taskId: string
   projId: string
-  task: any // TODO
+  task: any
 }>
 export type editTaskRes = Response<{}>
 
