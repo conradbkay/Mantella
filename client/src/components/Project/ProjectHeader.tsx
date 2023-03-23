@@ -1,10 +1,15 @@
-import { AppBar, Toolbar, useTheme } from '@mui/material'
+import {
+  AppBar,
+  Toolbar,
+  useTheme,
+  ToggleButton,
+  ToggleButtonGroup
+} from '@mui/material'
 import { input } from './styles'
 import DraggableAvatar from '../Task/DraggableAvatar'
 import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'
-
 import { useDispatch } from 'react-redux'
 import { setProjectA } from '../../store/actions/project'
 import { APIEditProject } from '../../API/project'
@@ -12,11 +17,13 @@ import Delete from '@mui/icons-material/Delete'
 
 type Props = {
   project: TProject
+  viewType: string
+  setViewType: (newType: string) => void
   deleteMode: boolean // when dragging a task, whole header becomes a trash can
 }
 
 const ProjectHeader = memo(
-  ({ project, deleteMode }: Props) => {
+  ({ project, deleteMode, viewType, setViewType }: Props) => {
     //const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [name, setName] = useState(project ? project.name : undefined)
 
@@ -86,6 +93,23 @@ const ProjectHeader = memo(
                   }}
                   onChange={(e: any) => setName(e.target.value)}
                 />
+                <ToggleButtonGroup
+                  color="primary"
+                  style={{ marginLeft: 16 }}
+                  value={viewType}
+                  size="small"
+                  exclusive
+                  onChange={(e, newVal) => {
+                    if (newVal) {
+                      setViewType(newVal)
+                    }
+                  }}
+                >
+                  <ToggleButton value="kanban">Kanban</ToggleButton>
+                  <ToggleButton value="list">List</ToggleButton>
+                  <ToggleButton value="calendar">Calendar</ToggleButton>
+                </ToggleButtonGroup>
+
                 <div style={{ marginLeft: 'auto', display: 'flex' }}>
                   <div ref={setNodeRef}>
                     <div
@@ -110,7 +134,8 @@ const ProjectHeader = memo(
     const same =
       oldProps.project.users === newProps.project.users &&
       oldProps.project.name === newProps.project.name &&
-      oldProps.deleteMode === newProps.deleteMode
+      oldProps.deleteMode === newProps.deleteMode &&
+      oldProps.viewType === newProps.viewType
 
     return same
   }

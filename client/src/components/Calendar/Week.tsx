@@ -81,7 +81,7 @@ const CWeek = (props: TProps) => {
 
   return (
     <>
-      <div style={{ margin: '68px 20px 20px 20px' }}>
+      <div>
         <WeekControls
           startDay={days[0]}
           currIds={filterProjectId}

@@ -100,12 +100,10 @@ export const Dashboard = connect(mapState)(
                 })
               })
 
-              console.log(betterColors)
               const color = betterColors.splice(i, 1)[0]
               if (!betterColors.length) {
                 betterColors = genColors()
               }
-              console.log(color)
 
               return (
                 <Card

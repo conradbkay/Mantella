@@ -54,7 +54,7 @@ const getCellStyles = ({
     width: '100%',
     padding: collapsed ? '0px 8px' : 8,
     maxHeight: collapsed ? 100 : undefined, //'60vh',
-    overflowY: 'auto',
+    overflowY: 'hidden',
     maxWidth: '100%',
     display: 'flex',
     flexDirection: 'column'

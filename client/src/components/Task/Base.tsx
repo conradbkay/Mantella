@@ -109,7 +109,6 @@ const CBaseTask = memo((props: TaskProps) => {
 
   const classes = useStyles()
 
-  // TODO: don't use if isn't a draggable Task already
   const { setNodeRef } = useDroppable({
     id: /*'ASSIGNED|' + */ task.id,
     data: {

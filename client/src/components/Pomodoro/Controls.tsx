@@ -10,7 +10,7 @@ import { useTheme } from '@mui/material'
 type ActionCreators = typeof actionCreators
 
 interface Props extends ReturnType<typeof mapState>, ActionCreators {}
-// TODO: big minus and little minus, (10 sec/1 min, 1min/5min)
+
 const CControls = (props: Props) => {
   const { workTime, breakTime } = props
 

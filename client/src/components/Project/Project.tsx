@@ -18,6 +18,8 @@ import { ProjectCell } from './ProjectCell'
 import { CreateTask } from '../Task/Create'
 import { EditTaskModal } from '../Task/Edit'
 import Color from 'color'
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
+
 import {
   rectIntersection,
   closestCorners,
@@ -44,6 +46,7 @@ import { Socket } from 'socket.io-client'
 import { setTaskA } from '../../store/actions/task'
 import { APIDeleteTask } from '../../API/task'
 import { openSnackbarA } from '../../store/actions/snackbar'
+import { CalendarWeek } from '../Calendar/Week'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -146,6 +149,9 @@ export const Project = (props: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [draggingId, setDraggingId] = useState(null as string | null)
   const [overTrash, setOverTrash] = useState(false)
+  const [viewType, setViewType] = useState<'kanban' | 'list' | 'calendar'>(
+    'kanban'
+  )
 
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
@@ -278,75 +284,112 @@ export const Project = (props: Props) => {
           onDragEnd={onDragEnd}
           onDragCancel={onDragCancel}
         >
-          <ProjectHeader deleteMode={draggingId !== null} project={project} />
+          <ProjectHeader
+            setViewType={(newType: string) => {
+              setViewType(newType as any)
+            }}
+            viewType={viewType}
+            deleteMode={draggingId !== null}
+            project={project}
+          />
           <div style={{ display: 'flex', minHeight: 'calc(100vh - 124px)' }}>
             <Sidebar project={project} socket={props.socket} />
             <Paper
               style={{
                 margin: 20,
+                width: '100%',
                 padding: '20px 20px 40px',
                 minHeight: 'calc(100vh - 328px)'
               }}
             >
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  tableLayout: 'fixed'
-                }}
-              >
-                <TableBody>
-                  <tr style={{ display: 'flex' }}>
-                    {[0, 1, 2].map((col) => (
-                      <td
-                        key={col}
-                        style={{
-                          width: '100%',
-                          backgroundColor: new Color(
-                            theme.palette.background.paper
-                          )
-                            .lighten(0.7)
-                            .hex()
-                            .toString(),
-                          borderLeft: col ? 'none' : PROJECT_BORDER,
-                          borderRight: PROJECT_BORDER,
-                          borderTop: PROJECT_BORDER,
-                          borderTopLeftRadius: col ? 0 : 4,
-                          borderTopRightRadius: col === 2 ? 4 : 0,
-                          textAlign: 'center',
-                          color: theme.palette.text.secondary,
-                          padding: 8,
-                          fontSize: 20
-                        }}
-                      >
-                        {PROGRESS_DISPLAYS[col]}
-                      </td>
-                    ))}
-                  </tr>
-                  {project.lists.map((list) => (
-                    <tr
-                      style={{
-                        display: 'flex'
-                      }}
-                      key={list.id}
-                    >
-                      {[0, 1, 2].map((progress) => (
-                        <ProjectCell
-                          draggingId={draggingId}
-                          setCreating={(id) => setCreating(id)}
-                          openFunc={(tId: string) => {
-                            setEditingTaskId(tId)
+              {viewType === 'kanban' ? (
+                <table
+                  style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    tableLayout: 'fixed'
+                  }}
+                >
+                  <TableBody>
+                    <tr style={{ display: 'flex' }}>
+                      {[0, 1, 2].map((col) => (
+                        <td
+                          key={col}
+                          style={{
+                            width: '100%',
+                            backgroundColor: new Color(
+                              theme.palette.background.paper
+                            )
+                              .lighten(0.7)
+                              .hex()
+                              .toString(),
+                            borderLeft: col ? 'none' : PROJECT_BORDER,
+                            borderRight: PROJECT_BORDER,
+                            borderTop: PROJECT_BORDER,
+                            borderTopLeftRadius: col ? 0 : 4,
+                            borderTopRightRadius: col === 2 ? 4 : 0,
+                            color: theme.palette.text.secondary,
+                            padding: 8,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            fontSize: 20
                           }}
-                          key={list.id + progress}
-                          progress={progress as 0 | 1 | 2}
-                          list={list}
-                          project={project}
-                        />
+                        >
+                          <CheckCircleOutline
+                            style={{
+                              paddingRight: 8,
+                              color:
+                                col === 2
+                                  ? theme.palette.success.main
+                                  : col
+                                  ? theme.palette.warning.main
+                                  : undefined
+                            }}
+                          />
+                          {PROGRESS_DISPLAYS[col]}
+                        </td>
                       ))}
                     </tr>
+                    {project.lists.map((list) => (
+                      <tr
+                        style={{
+                          display: 'flex'
+                        }}
+                        key={list.id}
+                      >
+                        {[0, 1, 2].map((progress) => (
+                          <ProjectCell
+                            draggingId={draggingId}
+                            setCreating={(id) => setCreating(id)}
+                            openFunc={(tId: string) => {
+                              setEditingTaskId(tId)
+                            }}
+                            key={list.id + progress}
+                            progress={progress as 0 | 1 | 2}
+                            list={list}
+                            project={project}
+                          />
+                        ))}
+                      </tr>
+                    ))}
+                  </TableBody>
+                </table>
+              ) : viewType === 'list' ? (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {project.tasks.map((task, i) => (
+                    <BaseTask
+                      key={task.id}
+                      style={{}}
+                      project={project}
+                      openFunc={() => setEditingTaskId(task.id)}
+                      task={task}
+                    />
                   ))}
-                </TableBody>
-              </table>
+                </div>
+              ) : (
+                <CalendarWeek />
+              )}
             </Paper>
           </div>
 

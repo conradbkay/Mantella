@@ -19,7 +19,29 @@ import { Project } from './components/Project/Project'
 import { Settings } from './components/Settings'
 import { CalendarWeek } from './components/Calendar/Week'
 import { APICookieLogin } from './API/auth'
+import { useTheme } from '@mui/material'
 import io from 'socket.io-client'
+
+const AllCalendarWeek = () => {
+  const theme = useTheme()
+  return (
+    <div
+      style={{
+        height: 'calc(100vh - 58.5px)',
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        backgroundImage:
+          theme.palette.mode === 'dark'
+            ? 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))'
+            : undefined
+      }}
+    >
+      <div style={{ padding: '20px 50px 0px 50px' }}>
+        <CalendarWeek />
+      </div>
+    </div>
+  )
+}
 
 const socket = io('http://localhost:3000', {
   transports: ['websocket', 'polling']
@@ -63,7 +85,7 @@ const Router = () => {
           <PrivateRoute
             exact
             path="/calendar"
-            component={CalendarWeek}
+            component={AllCalendarWeek}
             componentProps={{}}
           />
           <PublicOnlyRoute

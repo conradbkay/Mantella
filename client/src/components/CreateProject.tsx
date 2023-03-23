@@ -65,9 +65,9 @@ const CCreateProject = (props: CreateProjectProps) => {
             <Avatar className={classes.avatar}>
               <CalendarTodayRounded />
             </Avatar>
-            <Typography style={{ fontSize: 17 }}>Create Project</Typography>
+            <Typography style={{ fontSize: 19 }}>Create Project</Typography>
             {loading && <CircularProgress style={{ margin: '4px auto' }} />}
-            <div style={{ display: 'flex', width: '100%' }}>
+            <div style={{ display: 'flex', width: '100%', marginTop: 8 }}>
               <TextField
                 autoFocus
                 label="Project Name"
