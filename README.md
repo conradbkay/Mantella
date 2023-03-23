@@ -71,3 +71,5 @@ Merge project header into actual header?
 Wire components together
 
 More nice animations with react-spring, dark to light mode is jarring for example
+
+In list view, mave task show checkmark outlined depending on progress

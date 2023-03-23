@@ -31,3 +31,17 @@ export const APIDeleteList = async ({
 
   return res.data
 }
+
+export const APISetListIdx = async ({
+  id,
+  offset,
+  projId
+}: {
+  id: string
+  offset: number
+  projId: string
+}) => {
+  const res = await axios.post('/setListIdx', { id, offset, projId })
+
+  return res.data
+}

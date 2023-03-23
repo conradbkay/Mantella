@@ -16,7 +16,7 @@ import { setListA, setListIdxA } from '../../store/actions/list'
 import { SortableContext } from '@dnd-kit/sortable'
 import ArrowDownward from '@mui/icons-material/ArrowDownward'
 import ArrowUpward from '@mui/icons-material/ArrowUpward'
-import { APIDeleteList } from '../../API/list'
+import { APIDeleteList, APISetListIdx } from '../../API/list'
 interface Props {
   project: TProject
   list: TList
@@ -111,7 +111,7 @@ export const ProjectCell = memo(
     const setListIdx = (id: string, offset: number) => {
       dispatch(setListIdxA({ id, offset, projectId: project.id }))
       setAnchorEl(null)
-      // TODO: api call
+      APISetListIdx({ id, offset, projId: project.id })
     }
 
     const theme = useTheme()

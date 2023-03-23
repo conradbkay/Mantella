@@ -9,6 +9,7 @@ import {
   editListReq,
   editListRes
 } from './types'
+import { Request, Response } from 'express'
 import { isAuthenticated } from '../passport'
 
 export const editList = async (req: editListReq, res: editListRes) => {
@@ -79,3 +80,24 @@ export const createList = async (req: createListReq, res: createListRes) => {
 }
 
 router.post('/createList', isAuthenticated, createList)
+
+export const setListIdx = async (req: Request, res: Response) => {
+  const project = await ProjectModel.findOne({ id: req.body.projId as any })
+
+  if (project) {
+    const list = project.lists.find((l) => l.id === req.body.id)
+    const idx = project.lists.indexOf(list!)
+
+    const element = project.lists.splice(idx, 1)[0]
+
+    project.lists.splice(idx + req.body.offset, 0, element!)
+    project.markModified('lists')
+    await project.save()
+
+    res.json({ id: req.body.id })
+  } else {
+    throw new Error('proj not found')
+  }
+}
+
+router.post('/setListIdx', isAuthenticated, setListIdx)
