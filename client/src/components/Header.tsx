@@ -28,13 +28,13 @@ import Help from '@mui/icons-material/Help'
 import Settings from '@mui/icons-material/Settings'
 import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
-import { connect } from 'react-redux'
-import { TState } from '../types/state'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
 import { ProjectFinder } from './ProjectFinder'
 import { HoverableAvatar } from './utils/HoverableAvatar'
 import { makeStyles } from '@mui/styles'
+import { useAppSelector } from '../store/hooks'
+import { selectUser } from '../store/user'
 
 const noAuthItems = [
   {
@@ -132,15 +132,16 @@ const HideOnScroll: React.FC<HideOnScrollProps> = ({ children }) => {
   )
 }
 
-interface Props extends RouteComponentProps, ReturnType<typeof mapState> {}
+interface Props extends RouteComponentProps {}
 
-const Topbar = (props: Props) => {
+export const Header = withRouter((props: Props) => {
   const [drawer, setDrawer] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
 
+  const authenticated = useAppSelector(selectUser)
   const classes = useStyles()
 
-  const MenuItems = props.authenticated !== null ? authItems : noAuthItems
+  const MenuItems = authenticated !== null ? authItems : noAuthItems
 
   const value = MenuItems.map((menuItem) => menuItem.pathname).indexOf(
     props.location.pathname
@@ -173,7 +174,7 @@ const Topbar = (props: Props) => {
               style={{ alignItems: 'center', height: '100%' }}
               className={classes.flex}
             >
-              {props.authenticated !== null && (
+              {authenticated !== null && (
                 <>
                   <Button
                     style={{
@@ -258,13 +259,14 @@ const Topbar = (props: Props) => {
                     ))}
                   </Tabs>
                 </div>
-                {props.authenticated !== null && (
-                  <HoverableAvatar user={props.authenticated} />
+                {authenticated !== null && (
+                  <HoverableAvatar user={authenticated} />
                 )}
                 <IconButton
                   sx={{ ml: 1 }}
                   onClick={colorMode.toggleColorMode}
                   color="inherit"
+                  aria-hidden="true"
                 >
                   {theme.palette.mode === 'dark' ? (
                     <Brightness7Icon />
@@ -299,10 +301,4 @@ const Topbar = (props: Props) => {
       </Drawer>
     </>
   )
-}
-
-const mapState = (state: TState) => ({
-  authenticated: state.user
 })
-
-export const Header = withRouter(connect(mapState)(Topbar))

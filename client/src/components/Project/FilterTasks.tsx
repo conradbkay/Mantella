@@ -19,8 +19,7 @@ import { isArray } from 'lodash'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { TState } from '../../types/state'
-import { setFilterA } from '../../store/actions/filter'
-
+import { SET_FILTER } from '../../store/filter'
 const FilterTasksComponent = () => {
   const [custom, setCustom] = useState(false)
   const theme = useTheme()
@@ -59,7 +58,7 @@ const FilterTasksComponent = () => {
             max={50}
             onChange={(e, val: any) => {
               dispatch(
-                setFilterA({
+                SET_FILTER({
                   ...filterData,
                   points: val
                 })
@@ -75,7 +74,7 @@ const FilterTasksComponent = () => {
             color={filterData.color[0] || '#FFFFFF' /* TODO: me */}
             onChange={(color: any) => {
               dispatch(
-                setFilterA({
+                SET_FILTER({
                   ...filterData,
                   color: color.length
                     ? color.includes('all') && color.length > 1
@@ -100,7 +99,7 @@ const FilterTasksComponent = () => {
               checked={custom}
               onChange={() => {
                 dispatch(
-                  setFilterA({
+                  SET_FILTER({
                     ...filterData,
                     dueDate: [null, null]
                   })
@@ -121,7 +120,7 @@ const FilterTasksComponent = () => {
                 value={filterData.dueDate}
                 onChange={(e) =>
                   dispatch(
-                    setFilterA({
+                    SET_FILTER({
                       ...filterData,
                       dueDate: e.target.value as any
                     })
@@ -158,7 +157,7 @@ const FilterTasksComponent = () => {
                   onChange={(date: Date | undefined) => {
                     if (!date) {
                       dispatch(
-                        setFilterA({
+                        SET_FILTER({
                           ...filterData,
                           dueDate: [null, filterData.dueDate[1] as any]
                         })
@@ -170,7 +169,7 @@ const FilterTasksComponent = () => {
                       )
                     ) {
                       dispatch(
-                        setFilterA({
+                        SET_FILTER({
                           ...filterData,
                           dueDate: [
                             date,
@@ -190,7 +189,7 @@ const FilterTasksComponent = () => {
                   onChange={(date: Date | undefined) => {
                     if (!date) {
                       dispatch(
-                        setFilterA({
+                        SET_FILTER({
                           ...filterData,
                           dueDate: [filterData.dueDate[0] as any, null]
                         })
@@ -202,7 +201,7 @@ const FilterTasksComponent = () => {
                       )
                     ) {
                       dispatch(
-                        setFilterA({
+                        SET_FILTER({
                           ...filterData,
                           dueDate: [
                             isDate(filterData.dueDate[0])

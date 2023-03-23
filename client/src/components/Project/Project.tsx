@@ -8,7 +8,7 @@ import {
   useTheme
 } from '@mui/material'
 import { TState } from '../../types/state'
-import { CreateColumn } from './CreateList'
+import { CreateList } from './CreateList'
 import Add from '@mui/icons-material/Add'
 import Create from '@mui/icons-material/Create'
 import { NoMatch } from '../NoMatch/NoMatch'
@@ -38,15 +38,14 @@ import {
 import ProjectHeader from './ProjectHeader'
 import { BaseTask } from '../Task/Base'
 import { cloneDeep } from 'lodash'
-import { setProjectA } from '../../store/actions/project'
 import { arrayMove } from '@dnd-kit/sortable'
 import { APIReplaceListIds } from '../../API/list'
 import { Sidebar } from './Sidebar'
 import { Socket } from 'socket.io-client'
-import { setTaskA } from '../../store/actions/task'
 import { APIDeleteTask } from '../../API/task'
-import { openSnackbarA } from '../../store/actions/snackbar'
 import { CalendarWeek } from '../Calendar/Week'
+import { OPEN_SNACKBAR } from '../../store/snackbar'
+import { SET_PROJECT, SET_TASK } from '../../store/projects'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -214,9 +213,9 @@ export const Project = (props: Props) => {
         }
 
         dispatch(
-          setProjectA({
+          SET_PROJECT({
             id: project.id,
-            newProj: { ...project, lists: editLists }
+            project: { ...project, lists: editLists }
           })
         )
       }
@@ -225,9 +224,9 @@ export const Project = (props: Props) => {
 
   const onDragEnd = (event: DragEndEvent) => {
     if (event.over && event.over.id === 'trash') {
-      dispatch(openSnackbarA('Task deleted', 'undo'))
+      dispatch(OPEN_SNACKBAR({ message: 'Task deleted', variant: 'undo' }))
       dispatch(
-        setTaskA({ id: draggingId!, projectId: project.id, newTask: null })
+        SET_TASK({ id: draggingId!, projectId: project.id, newTask: undefined })
       )
       // they will have 5 seconds to undo with the snackbar by reloading the page
       setTimeout(() => {
@@ -436,10 +435,7 @@ export const Project = (props: Props) => {
           />
         )}
         {dialogOpen && (
-          <CreateColumn
-            onClose={() => setDialogOpen(false)}
-            project={project}
-          />
+          <CreateList onClose={() => setDialogOpen(false)} project={project} />
         )}
         {editingTaskId && (
           <EditTaskModal

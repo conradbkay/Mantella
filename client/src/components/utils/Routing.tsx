@@ -1,33 +1,32 @@
 import { Route, Redirect, RouteProps } from 'react-router'
-import { connect } from 'react-redux'
-import { TState } from '../../types/state'
+import { useAppSelector } from '../../store/hooks'
+import { selectUser } from '../../store/user'
 
-const mapState = (state: TState) => ({
-  user: state.user
-})
-
-interface TProps extends ReturnType<typeof mapState>, RouteProps {
+interface TProps extends RouteProps {
   component: any
   componentProps: any
 }
 
-export const PublicOnlyRoute = connect(mapState)(
-  ({ component: PropComponent, componentProps, user, ...rest }: TProps) => {
-    return (
-      <Route
-        {...rest}
-        render={(props) =>
-          user === null ? (
-            <PropComponent
-              {...componentProps}
-              params={props.match.params}
-              {...componentProps}
-            />
-          ) : (
-            <Redirect to="/dashboard" />
-          )
-        }
-      />
-    )
-  }
-)
+export const PublicOnlyRoute = ({
+  component: PropComponent,
+  componentProps,
+  ...rest
+}: TProps) => {
+  const user = useAppSelector(selectUser)
+  return (
+    <Route
+      {...rest}
+      render={(props) =>
+        user === null ? (
+          <PropComponent
+            {...componentProps}
+            params={props.match.params}
+            {...componentProps}
+          />
+        ) : (
+          <Redirect to="/dashboard" />
+        )
+      }
+    />
+  )
+}

@@ -15,11 +15,11 @@ import {
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { APIKickUser, APIShareProject } from '../../API/project'
-import { openSnackbarA } from '../../store/actions/snackbar'
 import { TState } from '../../types/state'
 import Delete from '@mui/icons-material/Delete'
-import { setProjectA } from '../../store/actions/project'
 import { TProject } from '../../types/project'
+import { OPEN_SNACKBAR } from '../../store/snackbar'
+import { SET_PROJECT } from '../../store/projects'
 type Props = {
   project: TProject
 }
@@ -40,15 +40,16 @@ export const ShareProject = ({ project }: Props) => {
 
       const newProj = res[1]
 
-      dispatch(setProjectA({ id: newProj.id, newProj }))
+      dispatch(SET_PROJECT({ id: newProj.id, project: newProj }))
 
-      dispatch(openSnackbarA('User invited', 'success'))
+      dispatch(OPEN_SNACKBAR({ message: 'User invited', variant: 'success' }))
     } catch (err) {
       dispatch(
-        openSnackbarA(
-          'User could not be invited, did you enter the correct email?',
-          'error'
-        )
+        OPEN_SNACKBAR({
+          message:
+            'User could not be invited, did you enter the correct email?',
+          variant: 'error'
+        })
       )
     }
   }
@@ -57,9 +58,11 @@ export const ShareProject = ({ project }: Props) => {
     try {
       const res = await APIKickUser(project.id, kickingId)
 
-      dispatch(setProjectA({ id: res.project.id, newProj: res.project }))
+      dispatch(SET_PROJECT({ id: res.project.id, project: res.project }))
     } catch (err) {
-      dispatch(openSnackbarA('User could not be kicked', 'error'))
+      dispatch(
+        OPEN_SNACKBAR({ message: 'User could not be kicked', variant: 'error' })
+      )
     }
   }
 

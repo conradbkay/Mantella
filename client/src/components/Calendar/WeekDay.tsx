@@ -1,11 +1,11 @@
-import { connect } from 'react-redux'
-import { TState } from '../../types/state'
 import { getDay } from 'date-fns'
 import { BaseTask } from '../Task/Base'
 import { getProjectIdFromTaskId, id } from '../../utils/utilities'
 import { useState } from 'react'
 import { EditTaskModal } from '../Task/Edit'
 import { TTask } from '../../types/project'
+import { useAppSelector } from '../../store/hooks'
+import { selectProjects } from '../../store/projects'
 
 function sameDay(d1: Date, d2: Date) {
   return (
@@ -17,16 +17,17 @@ function sameDay(d1: Date, d2: Date) {
 
 const names = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-interface Props extends ReturnType<typeof mapState> {
+type Props = {
   day: Date
   index: 0 | 1 | 2 | 3 | 4 | 5 | 6
   filteringProjects: string[]
   tasks: TTask[]
 }
 
-const CWeekDay = (props: Props) => {
+export const WeekDay = (props: Props) => {
   const { day, index, tasks } = props
   const [editingTaskId, setEditingTaskId] = useState('')
+  const projects = useAppSelector(selectProjects)
 
   return (
     <div
@@ -58,12 +59,7 @@ const CWeekDay = (props: Props) => {
         {tasks.map((task, i) => (
           <BaseTask
             project={
-              props.projects[
-                id(
-                  props.projects,
-                  getProjectIdFromTaskId(props.projects, task.id)
-                )
-              ]
+              projects[id(projects, getProjectIdFromTaskId(projects, task.id))]
             }
             openFunc={() => setEditingTaskId(task.id)}
             task={task}
@@ -74,15 +70,9 @@ const CWeekDay = (props: Props) => {
         <EditTaskModal
           taskId={editingTaskId}
           onClose={() => setEditingTaskId('')}
-          projectId={getProjectIdFromTaskId(props.projects, editingTaskId)}
+          projectId={getProjectIdFromTaskId(projects, editingTaskId)}
         />
       )}
     </div>
   )
 }
-
-const mapState = (state: TState) => ({
-  projects: state.projects
-})
-
-export const WeekDay = connect(mapState)(CWeekDay)

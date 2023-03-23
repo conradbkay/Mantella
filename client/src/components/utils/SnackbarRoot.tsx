@@ -6,17 +6,15 @@ import {
   Button
 } from '@mui/material'
 
-import { connect } from 'react-redux'
-
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
 import CloseIcon from '@mui/icons-material/Close'
-import { closeSnackbarA } from '../../store/actions/snackbar'
 import { TVariant } from '../../types/state'
-import { TState } from '../../types/state'
 import Info from '@mui/icons-material/Info'
 import { makeStyles } from '@mui/styles'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { CLOSE_SNACKBAR, selectSnackbar } from '../../store/snackbar'
 
 type Classes = {
   success: string
@@ -54,10 +52,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-type ActionCreators = typeof actionCreators
-interface TProps extends ReturnType<typeof mapState>, ActionCreators {}
-
-const SnackbarComponent = (props: TProps) => {
+export const SnackbarRoot = () => {
   // Find what Icon to use for snackbar by variant
   const variantIcon = {
     success: CheckCircleIcon,
@@ -66,8 +61,9 @@ const SnackbarComponent = (props: TProps) => {
     standard: Info,
     undo: WarningIcon
   }
-  const { open, message, variant, closeSnackbar } = props
+  const { open, message, variant } = useAppSelector(selectSnackbar)
   const classes = useStyles()
+  const dispatch = useAppDispatch()
   const backgroundClass: string = getClassSnackbarVariant(variant, classes)
 
   const Icon = variantIcon[variant]
@@ -78,7 +74,7 @@ const SnackbarComponent = (props: TProps) => {
       style={{ marginBottom: 20 }}
       className={classes.snackbar}
       autoHideDuration={variant === 'undo' ? 5000 : AUTO_HIDE_POINT_MS}
-      onClose={closeSnackbar}
+      onClose={() => dispatch(CLOSE_SNACKBAR())}
     >
       <SnackbarContent
         className={backgroundClass}
@@ -97,7 +93,7 @@ const SnackbarComponent = (props: TProps) => {
             color="inherit"
             className={classes.icon}
             onClick={() => {
-              closeSnackbar()
+              dispatch(CLOSE_SNACKBAR())
             }}
           >
             <CloseIcon className={classes.close} />
@@ -107,15 +103,3 @@ const SnackbarComponent = (props: TProps) => {
     </Snackbar>
   )
 }
-
-const mapState = ({ snackbar }: TState) => ({
-  open: snackbar.open,
-  message: snackbar.message,
-  variant: snackbar.variant
-})
-
-const actionCreators = {
-  closeSnackbar: closeSnackbarA
-}
-
-export const SnackbarRoot = connect(mapState, actionCreators)(SnackbarComponent)

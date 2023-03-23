@@ -1,36 +1,34 @@
 import { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { TState } from '../../types/state'
 import { toDaysHHMMSS } from '../../utils/utilities'
-import {
-  tickStopwatchA,
-  toggleStopwatchA,
-  resetStopwatchA
-} from '../../store/actions/pomodoro'
 import { Button, useTheme } from '@mui/material'
 import Pause from '@mui/icons-material/Pause'
 import PlayArrow from '@mui/icons-material/PlayArrow'
-
-type ActionCreators = typeof actionCreators
-
-interface Props extends ReturnType<typeof mapState>, ActionCreators {}
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import {
+  RESET_STOPWATCH,
+  selectPomodoro,
+  TICK_STOPWATCH,
+  TOGGLE_STOPWATCH
+} from '../../store/pomodoro'
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
-const CStopwatch = (props: Props) => {
+export const Stopwatch = () => {
+  const stopWatch = useAppSelector(selectPomodoro).stopWatch
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
     clearInterval(interval)
 
     interval = setInterval(() => {
-      if (!props.stopWatch.paused) {
-        props.tickStopwatch()
+      if (!stopWatch.paused) {
+        dispatch(TICK_STOPWATCH())
       }
     }, 1000)
   })
 
   const theme = useTheme()
 
-  const { stopWatch, reset } = props
   return (
     <div style={{ margin: 10 }}>
       <div
@@ -44,10 +42,13 @@ const CStopwatch = (props: Props) => {
         {toDaysHHMMSS(stopWatch.time)}
       </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button onClick={() => reset()} style={{ marginRight: 4 }}>
+        <Button
+          onClick={() => dispatch(RESET_STOPWATCH())}
+          style={{ marginRight: 4 }}
+        >
           Reset
         </Button>
-        <Button onClick={props.toggleStopwatch} color="secondary">
+        <Button onClick={() => dispatch(TOGGLE_STOPWATCH)} color="secondary">
           {stopWatch.paused ? (
             <PlayArrow style={{ marginRight: 4 }} />
           ) : (
@@ -59,15 +60,3 @@ const CStopwatch = (props: Props) => {
     </div>
   )
 }
-
-const mapState = (state: TState) => ({
-  stopWatch: state.pomodoro.stopWatch
-})
-
-const actionCreators = {
-  tickStopwatch: tickStopwatchA,
-  toggleStopwatch: toggleStopwatchA,
-  reset: resetStopwatchA
-}
-
-export const Stopwatch = connect(mapState, actionCreators)(CStopwatch)

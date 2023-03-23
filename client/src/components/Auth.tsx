@@ -1,5 +1,4 @@
 import { ComponentProps, useState } from 'react'
-import { connect } from 'react-redux'
 import {
   Paper,
   Grid,
@@ -12,14 +11,17 @@ import {
 } from '@mui/material'
 import LockOpen from '@mui/icons-material/LockOpen'
 import { useFormStyles } from './styles/formStyles'
-import { openSnackbarA } from '../store/actions/snackbar'
 import { Link } from 'react-router-dom'
 import Helmet from 'react-helmet'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import { registerA, loginA } from '../store/actions/auth'
 import { APILogin, APIRegister } from '../API/auth'
 import { useHistory } from 'react-router'
+import { useAppDispatch } from '../store/hooks'
+import { transformUser } from '../store/auth'
+import { OPEN_SNACKBAR } from '../store/snackbar'
+import { SET_PROJECTS } from '../store/projects'
+import { LOGIN, REGISTER } from '../store/user'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
   return <TextField margin="dense" fullWidth required {...inputProps} />
@@ -41,13 +43,11 @@ const socialProviders = [
   }
 ]
 
-type ActionCreators = typeof actionCreators
-
-interface Props extends ActionCreators {
+interface Props {
   authType: 'Register' | 'Login'
 }
 
-const Auth = ({ authType, openSnackbar, register, login }: Props) => {
+export const AuthRender = ({ authType }: Props) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmText, setConfirmText] = useState('')
@@ -56,6 +56,7 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
 
   const navigate = useHistory()
   const classes = useFormStyles()
+  const dispatch = useAppDispatch()
 
   return (
     <div style={{ padding: 20 }}>
@@ -74,20 +75,34 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
                 username
               })
               if (user) {
-                register(user)
+                const authUser = transformUser(user)
+
+                dispatch(REGISTER({ user: authUser }))
+
+                dispatch(SET_PROJECTS(user.projects))
                 navigate.push('/project/' + user.projects[0].id)
               } else {
-                openSnackbar(
-                  'User with that Email already exists, Sorry!',
-                  'error'
+                dispatch(
+                  OPEN_SNACKBAR({
+                    message: 'User with that Email already exists, Sorry!',
+                    variant: 'error'
+                  })
                 )
               }
             } else {
               const user = await APILogin(email, password)
               if (user) {
-                login(user)
+                const authUser = transformUser(user)
+
+                dispatch(LOGIN({ user: authUser }))
+                dispatch(SET_PROJECTS(user.projects))
               } else {
-                openSnackbar('Could not login', 'error')
+                dispatch(
+                  OPEN_SNACKBAR({
+                    message: 'Could not login',
+                    variant: 'error'
+                  })
+                )
               }
             }
           }}
@@ -202,11 +217,3 @@ const Auth = ({ authType, openSnackbar, register, login }: Props) => {
     </div>
   )
 }
-
-const actionCreators = {
-  openSnackbar: openSnackbarA,
-  register: registerA,
-  login: loginA
-}
-
-export const AuthRender = connect(null, actionCreators)(Auth)

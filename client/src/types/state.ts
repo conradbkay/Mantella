@@ -43,7 +43,7 @@ export type TAuthUser = TProfile
 
 export type TState = {
   snackbar: TSnackbar
-  isLoading: boolean
+  loading: boolean
   pomodoro: TPomodoro
   user: TAuthUser | null
   projects: TProject[]

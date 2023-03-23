@@ -1,5 +1,5 @@
 import { APIAssignUserToTask } from '../../API/task'
-import { setTaskA } from '../../store/actions/task'
+import { SET_TASK } from '../../store/projects'
 import { store } from '../../store/store'
 
 const { dispatch } = store
@@ -13,7 +13,7 @@ export const dragUser = async (result: any, projId: string) => {
     })
 
     dispatch(
-      setTaskA({
+      SET_TASK({
         id: newTask.id,
         newTask,
         projectId: projId
@@ -38,7 +38,7 @@ export const dragFromTask = async (result: any, projId: string) => {
     })
 
     dispatch(
-      setTaskA({
+      SET_TASK({
         id: newTask.id,
         newTask,
         projectId: projId

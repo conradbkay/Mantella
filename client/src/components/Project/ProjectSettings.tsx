@@ -6,25 +6,23 @@ import {
   ListItemAvatar,
   useTheme
 } from '@mui/material'
-import { connect } from 'react-redux'
-import { setProjectA } from '../../store/actions/project'
 import Delete from '@mui/icons-material/Delete'
-import { openSnackbarA } from '../../store/actions/snackbar'
 import { useState } from 'react'
 import { useHistory } from 'react-router'
+import { useAppDispatch } from '../../store/hooks'
+import { SET_PROJECT } from '../../store/projects'
 
-type ActionCreators = typeof actionCreators
-
-interface Props extends ActionCreators {
+type Props = {
   projectId: string
 }
 
-const CProjectSettings = (props: Props) => {
+export const ProjectSettings = ({ projectId }: Props) => {
   const [hasClicked, setClicked] = useState(false)
   const navigate = useHistory()
+  const dispatch = useAppDispatch()
 
   const deleteProject = () => {
-    props.setProject({ id: props.projectId, newProj: null })
+    dispatch(SET_PROJECT({ id: projectId, project: undefined }))
     navigate.push('/dashboard')
   }
 
@@ -69,10 +67,3 @@ const CProjectSettings = (props: Props) => {
     </div>
   )
 }
-
-const actionCreators = {
-  setProject: setProjectA,
-  openSnackbar: openSnackbarA
-}
-
-export const ProjectSettings = connect(null, actionCreators)(CProjectSettings)

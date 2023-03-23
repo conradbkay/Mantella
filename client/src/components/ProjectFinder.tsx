@@ -9,10 +9,10 @@ import {
   Typography
 } from '@mui/material'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
-import { connect } from 'react-redux'
 import { formalize } from '../utils/utilities'
-import { TState } from '../types/state'
 import { makeStyles } from '@mui/styles'
+import { useAppSelector } from '../store/hooks'
+import { selectProjects } from '../store/projects'
 
 const useStyles = makeStyles(() => ({
   list: {
@@ -22,18 +22,18 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-interface TProps extends ReturnType<typeof mapState>, RouteComponentProps {
+interface TProps extends RouteComponentProps {
   variant?: 'menu'
   noButton?: true
   onClick?(): void
 }
 
-const CProjectSearch = (props: TProps) => {
+export const ProjectFinder = withRouter((props: TProps) => {
   const [search, setSearch] = useState('')
-
+  const rawProjects = useAppSelector(selectProjects)
   const classes = useStyles()
 
-  let projects = [...Object.values(props.projects)]
+  let projects = [...Object.values(rawProjects)]
 
   projects = projects.filter((project) => {
     const myString: string = formalize(project.name)
@@ -115,12 +115,4 @@ const CProjectSearch = (props: TProps) => {
       </div>
     </div>
   )
-}
-
-const mapState = (state: TState) => {
-  return {
-    projects: state.projects
-  }
-}
-
-export const ProjectFinder = withRouter(connect(mapState)(CProjectSearch))
+})

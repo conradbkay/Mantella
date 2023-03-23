@@ -1,22 +1,28 @@
 import { Button, Paper } from '@mui/material'
-import { connect } from 'react-redux'
-import {
-  resetPomodoroA,
-  setTimeDevA,
-  toggleSelectingTaskA
-} from '../../store/actions/pomodoro'
-import { TState } from '../../types/state'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { getAllTasks, id } from '../../utils/utilities'
+import { useMemo } from 'react'
+import {
+  RESET_POMODORO,
+  TOGGLE_SELECTING_TASK,
+  TOGGLE_STOPWATCH
+} from '../../store/pomodoro'
 
-type ActionCreators = typeof actionCreators
-
-interface TProps extends ReturnType<typeof mapState>, ActionCreators {
+type Props = {
   toggleWorking: () => void
   timeLeft: string
 }
 
-const CDisplay = (props: TProps) => {
-  const { pomodoro, timeLeft } = props
+export const Display = ({ timeLeft }: Props) => {
+  const { pomodoro, projects } = useAppSelector((state) => ({
+    pomodoro: state.pomodoro,
+    projects: state.projects
+  }))
+
+  const dispatch = useAppDispatch()
+
+  const tasks = useMemo(() => getAllTasks(projects), [projects])
+
   const buttonText = `${pomodoro.paused ? 'Start' : 'Stop'} ${
     pomodoro.working ? 'Work' : 'Break'
   }`
@@ -44,7 +50,7 @@ const CDisplay = (props: TProps) => {
             pomodoro.selectingTask
               ? 'Selecting Task...'
               : pomodoro.selectedTaskId
-              ? props.tasks[id(props.tasks, pomodoro.selectedTaskId!)].name
+              ? tasks[id(tasks, pomodoro.selectedTaskId!)].name
               : 'Select Task'
             /* ? tasks[pomodoro.selectedTaskId].name : 'No Task Selected'} */
           }
@@ -52,7 +58,7 @@ const CDisplay = (props: TProps) => {
         <Button
           color="secondary"
           style={{ float: 'right', marginLeft: 5 }}
-          onClick={() => props.toggleSelectingTask()}
+          onClick={() => dispatch(TOGGLE_SELECTING_TASK())}
         >
           {pomodoro.selectingTask
             ? 'Cancel'
@@ -66,7 +72,7 @@ const CDisplay = (props: TProps) => {
       </Paper>
       <div style={{ display: 'flex' }}>
         <Button
-          onClick={props.toggleWorking}
+          onClick={() => dispatch(TOGGLE_STOPWATCH())}
           color="primary"
           fullWidth
           variant="outlined"
@@ -74,23 +80,14 @@ const CDisplay = (props: TProps) => {
           {buttonText}
         </Button>
         <div style={{ width: 8 }} />
-        <Button onClick={props.reset} color="secondary" fullWidth>
+        <Button
+          onClick={() => dispatch(RESET_POMODORO())}
+          color="secondary"
+          fullWidth
+        >
           Reset
         </Button>
       </div>
     </div>
   )
 }
-
-const mapState = (state: TState) => ({
-  pomodoro: state.pomodoro,
-  tasks: getAllTasks(state.projects)
-})
-
-const actionCreators = {
-  reset: resetPomodoroA,
-  toggleSelectingTask: toggleSelectingTaskA,
-  setTimeDev: setTimeDevA
-}
-
-export const Display = connect(mapState, actionCreators)(CDisplay)

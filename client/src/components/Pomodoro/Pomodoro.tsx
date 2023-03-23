@@ -1,42 +1,45 @@
 import { useEffect } from 'react'
-import { connect } from 'react-redux'
-import { toggleTimerA, tickA } from '../../store/actions/pomodoro'
 import { toDaysHHMMSS } from '../../utils/utilities'
 import { Swal } from './Swal'
 import { Controls } from './Controls'
 import { Display } from './Display'
 import { Stopwatch } from './Stopwatch'
-import { TState } from '../../types/state'
-import { getProjectIdFromTaskId, getAllTasks } from '../../utils/utilities'
+import { getProjectIdFromTaskId } from '../../utils/utilities'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { TICK } from '../../store/projects'
+import { TOGGLE_TIMER, TICK as POM_TICK } from '../../store/pomodoro'
 
-type ActionCreators = typeof actionCreators
-
-interface TProps extends ReturnType<typeof mapState>, ActionCreators {
+type Props = {
   onClose: () => void
 }
 
 let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
-const CPomodoro = ({
-  onClose,
-  pomodoro,
-  tick,
-  projects,
-  toggleTimer
-}: TProps) => {
+export const Pomodoro = ({ onClose }: Props) => {
+  const { projects, pomodoro } = useAppSelector((state) => ({
+    projects: state.projects,
+    pomodoro: state.pomodoro
+  }))
+
+  const dispatch = useAppDispatch()
+
   useEffect(() => {
     clearInterval(interval)
 
     interval = setInterval(() => {
       if (!pomodoro.paused) {
         if (pomodoro.selectedTaskId && pomodoro.working) {
-          tick({
-            taskId: pomodoro.selectedTaskId,
-            projectId: getProjectIdFromTaskId(projects, pomodoro.selectedTaskId)
-          })
-        } else {
-          tick({})
+          dispatch(
+            TICK({
+              taskId: pomodoro.selectedTaskId,
+              projectId: getProjectIdFromTaskId(
+                projects,
+                pomodoro.selectedTaskId
+              )
+            })
+          )
         }
+        dispatch(POM_TICK())
       }
       // set tab title
       document.title = pomodoro.paused
@@ -48,7 +51,7 @@ const CPomodoro = ({
   })
 
   const toggleWorking = () => {
-    toggleTimer()
+    dispatch(TOGGLE_TIMER())
   }
 
   const time = toDaysHHMMSS(pomodoro.currSeconds)
@@ -63,16 +66,3 @@ const CPomodoro = ({
     </div>
   )
 }
-
-const mapState = (state: TState) => ({
-  pomodoro: state.pomodoro,
-  projects: state.projects,
-  tasks: getAllTasks(state.projects)
-})
-
-const actionCreators = {
-  toggleTimer: toggleTimerA,
-  tick: tickA
-}
-
-export const Pomodoro = connect(mapState, actionCreators)(CPomodoro)

@@ -11,9 +11,9 @@ import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'
 import { useDispatch } from 'react-redux'
-import { setProjectA } from '../../store/actions/project'
 import { APIEditProject } from '../../API/project'
 import Delete from '@mui/icons-material/Delete'
+import { SET_PROJECT } from '../../store/projects'
 
 type Props = {
   project: TProject
@@ -83,9 +83,9 @@ const ProjectHeader = memo(
                   value={name}
                   onBlur={() => {
                     dispatch(
-                      setProjectA({
+                      SET_PROJECT({
                         id: project.id,
-                        newProj: { ...project, name: name || 'newname' }
+                        project: { ...project, name: name || 'newname' }
                       })
                     )
 

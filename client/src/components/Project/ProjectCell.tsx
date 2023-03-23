@@ -12,11 +12,11 @@ import DraggableTask from '../Task/Draggable'
 import { PROJECT_BORDER, PROJECT_BORDER_COLOR } from './Project'
 import { TState } from '../../types/state'
 import { useDispatch, useSelector } from 'react-redux'
-import { setListA, setListIdxA } from '../../store/actions/list'
 import { SortableContext } from '@dnd-kit/sortable'
 import ArrowDownward from '@mui/icons-material/ArrowDownward'
 import ArrowUpward from '@mui/icons-material/ArrowUpward'
 import { APIDeleteList, APISetListIdx } from '../../API/list'
+import { SET_LIST, SET_LIST_IDX } from '../../store/projects'
 interface Props {
   project: TProject
   list: TList
@@ -76,7 +76,7 @@ export const ProjectCell = memo(
 
     const editList = () => {
       dispatch(
-        setListA({
+        SET_LIST({
           id: editingList[0],
           projectId: project.id,
           newList: { name: editingList[1] }
@@ -98,10 +98,10 @@ export const ProjectCell = memo(
 
     const deleteList = () => {
       dispatch(
-        setListA({
+        SET_LIST({
           id: list.id,
           projectId: project.id,
-          newList: null
+          newList: undefined
         })
       )
 
@@ -109,7 +109,7 @@ export const ProjectCell = memo(
     }
 
     const setListIdx = (id: string, offset: number) => {
-      dispatch(setListIdxA({ id, offset, projectId: project.id }))
+      dispatch(SET_LIST_IDX({ id, offset, projectId: project.id }))
       setAnchorEl(null)
       APISetListIdx({ id, offset, projId: project.id })
     }

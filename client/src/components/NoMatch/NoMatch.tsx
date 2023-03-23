@@ -1,16 +1,8 @@
 import './styles.css'
 import { Link } from 'react-router-dom'
 import { Button } from '@mui/material'
-import { TState } from '../../types/state'
-import { connect } from 'react-redux'
 
-const mapState = (state: TState) => ({
-  user: state.user
-})
-
-type TProps = ReturnType<typeof mapState>
-
-export const NoMatch = connect(mapState)((props: TProps) => (
+export const NoMatch = () => (
   <div className="all">
     <section className="error-container">
       <span className="four">
@@ -26,7 +18,7 @@ export const NoMatch = connect(mapState)((props: TProps) => (
         <Button
           color="secondary"
           style={{ width: 250 }}
-          to={props.user ? '/dashboard' : '/'}
+          to={'/'}
           component={Link}
           variant="contained"
         >
@@ -35,4 +27,4 @@ export const NoMatch = connect(mapState)((props: TProps) => (
       </div>
     </section>
   </div>
-))
+)

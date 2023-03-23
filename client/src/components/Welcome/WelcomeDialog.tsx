@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { Dialog, IconButton, Button } from '@mui/material'
 import Close from '@mui/icons-material/Close'
 import { store } from '../../store/store'
-import { openSnackbarA } from '../../store/actions/snackbar'
+import { OPEN_SNACKBAR } from '../../store/snackbar'
 
 export const WelcomeDialog = () => {
   const [open, setOpen] = useState(!localStorage.getItem('hasVisited'))
@@ -48,7 +48,9 @@ export const WelcomeDialog = () => {
           variant="outlined"
           onClick={() => {
             setOpen(false)
-            store.dispatch(openSnackbarA('Wise', 'standard'))
+            store.dispatch(
+              OPEN_SNACKBAR({ message: 'Wise', variant: 'standard' })
+            )
           }}
         >
           Hello Mantella

@@ -1,7 +1,5 @@
 import { Button } from '@mui/material'
 import { id } from '../../utils/utilities'
-import { setTaskA } from '../../store/actions/task'
-import { setProjectA } from '../../store/actions/project'
 import { useDispatch, useSelector } from 'react-redux'
 import Delete from '@mui/icons-material/Delete'
 import { TTask } from '../../types/project'
@@ -9,6 +7,7 @@ import { APIDeleteTask, APIDragTask, APIEditTask } from '../../API/task'
 //import { convertToRaw } from 'draft-js'
 import { EditTaskBase } from './EditBase'
 import { TState } from '../../types/state'
+import { SET_PROJECT, SET_TASK } from '../../store/projects'
 
 type OwnProps = {
   onClose: () => void
@@ -41,7 +40,11 @@ export const EditTaskModal = (props: OwnProps) => {
 
   const deleteTask = () => {
     dispatch(
-      setTaskA({ id: props.taskId, projectId: props.projectId, newTask: null })
+      SET_TASK({
+        id: props.taskId,
+        projectId: props.projectId,
+        newTask: undefined
+      })
     )
     APIDeleteTask(props.taskId, props.projectId)
   }
@@ -72,7 +75,7 @@ export const EditTaskModal = (props: OwnProps) => {
       ]
     })
 
-    dispatch(setProjectA({ id: project.id, newProj: data.project }))
+    dispatch(SET_PROJECT({ id: project.id, project: data.project }))
   }
 
   const confirmChanges = (task: TTask, listId: string) => {
@@ -82,7 +85,7 @@ export const EditTaskModal = (props: OwnProps) => {
     // }
 
     dispatch(
-      setTaskA({
+      SET_TASK({
         id: props.taskId,
         projectId: props.projectId,
         newTask: task

@@ -24,6 +24,7 @@
     "@mui/material": "^5.11.11",
     "@mui/styles": "^5.11.11",
     "@mui/system": "^5.11.11",
+    "@reduxjs/toolkit": "^1.9.3",
     "@types/react-color": "^3.0.6",
     "@types/react-widgets": "^4.4.7",
     "@types/redux-immutable-state-invariant": "^2.1.2",

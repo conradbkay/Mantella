@@ -1,4 +1,3 @@
-import { connect } from 'react-redux'
 import {
   Dialog,
   DialogTitle,
@@ -11,21 +10,21 @@ import {
 } from '@mui/material'
 import Close from '@mui/icons-material/Close'
 import { Change } from '../../types/types'
-import { setListA } from '../../store/actions/list'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
 import { APICreateList } from '../../API/list'
+import { useAppDispatch } from '../../store/hooks'
+import { SET_LIST } from '../../store/projects'
 
-type ActionCreators = typeof actionCreators
-
-interface Props extends ActionCreators {
+interface Props {
   project: TProject
   onClose(): void
 }
-const CCreateColumn = (props: Props) => {
-  const { project, onClose } = props
 
+export const CreateList = ({ project, onClose }: Props) => {
   const [name, setName] = useState('')
+
+  const dispatch = useAppDispatch()
 
   return (
     <Dialog open={true} onClose={onClose}>
@@ -35,11 +34,13 @@ const CCreateColumn = (props: Props) => {
 
           const list = await APICreateList(project.id, name || 'List')
 
-          props.setList({
-            id: list.id,
-            projectId: project.id,
-            newList: list
-          })
+          dispatch(
+            SET_LIST({
+              id: list.id,
+              projectId: project.id,
+              newList: list
+            })
+          )
 
           onClose()
         }}
@@ -78,9 +79,3 @@ const CCreateColumn = (props: Props) => {
     </Dialog>
   )
 }
-
-const actionCreators = {
-  setList: setListA
-}
-// rename
-export const CreateColumn = connect(null, actionCreators)(CCreateColumn)

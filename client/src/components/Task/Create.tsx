@@ -1,22 +1,15 @@
 import { Button } from '@mui/material'
-import { connect } from 'react-redux'
-import { setProjectA } from '../../store/actions/project'
 import { TProject, TTask } from '../../types/project'
 import { APICreateTask } from '../../API/task'
 import { EditTaskBase } from './EditBase'
-const actionCreators = {
-  setProject: setProjectA
-}
+import { SET_PROJECT } from '../../store/projects'
+import { useAppDispatch } from '../../store/hooks'
 
 type OwnProps = {
   onClose: () => void
   project: TProject
   listId: string
 }
-
-type ActionCreators = typeof actionCreators
-
-interface TProps extends OwnProps, ActionCreators {}
 
 const defaultTask: TTask = {
   name: '',
@@ -31,10 +24,9 @@ const defaultTask: TTask = {
   assignedTo: []
 }
 
-export const CreateTask = connect(
-  null,
-  actionCreators
-)((props: TProps) => {
+export const CreateTask = (props: OwnProps) => {
+  const dispatch = useAppDispatch()
+
   const createTaskExec = async (task: TTask, listId: string) => {
     try {
       const res = await APICreateTask(props.project.id, listId, {
@@ -45,10 +37,12 @@ export const CreateTask = connect(
         dueDate: task.dueDate ? task.dueDate.toString() : undefined
       })
       if (res && res.project) {
-        props.setProject({
-          id: res.project.id,
-          newProj: res.project
-        })
+        dispatch(
+          SET_PROJECT({
+            id: res.project.id,
+            project: res.project
+          })
+        )
       }
     } catch (err) {
       console.error(err)
@@ -71,4 +65,4 @@ export const CreateTask = connect(
       }
     />
   )
-})
+}

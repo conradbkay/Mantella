@@ -24,7 +24,7 @@ export const defaultState: TState = {
     }
   },
   snackbar: defaultSnackbar,
-  isLoading: false,
+  loading: false,
   projects: [],
   filter: {
     dueDate: [null, null],

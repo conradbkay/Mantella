@@ -8,34 +8,46 @@ import {
 } from '@mui/material'
 import { useFormStyles } from './styles/formStyles'
 import CalendarTodayRounded from '@mui/icons-material/CalendarTodayRounded'
-import { connect } from 'react-redux'
 import { Change } from '../types/types'
-import { TState } from '../types/state'
 import { useState } from 'react'
-import { openSnackbarA } from '../store/actions/snackbar'
-import { setProjectA } from '../store/actions/project'
 import Helmet from 'react-helmet'
 import { APICreateProject } from '../API/project'
 import { useHistory } from 'react-router'
-type CreateProjectProps = typeof actionCreators & ReturnType<typeof mapState>
+import { SET_PROJECT } from '../store/projects'
+import { OPEN_SNACKBAR } from '../store/snackbar'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { selectUser } from '../store/user'
 
-const CCreateProject = (props: CreateProjectProps) => {
+export const CreateProject = () => {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useHistory()
+  const dispatch = useAppDispatch()
+  const user = useAppSelector(selectUser)
+
   const onCompleted = async () => {
     setLoading(true)
     const res = await APICreateProject(name || 'Untitled Project')
     if (res && res.id) {
-      props.setProject({
+      SET_PROJECT({
         id: res.id,
-        newProj: res
+        project: res
       })
 
       navigate.push('/project/' + res.id)
-      props.openSnackbar('Project Created Successfully', 'success')
+      dispatch(
+        OPEN_SNACKBAR({
+          message: 'Project Created Successfully',
+          variant: 'success'
+        })
+      )
     } else {
-      props.openSnackbar('Project Could Not Be Created', 'warning')
+      dispatch(
+        OPEN_SNACKBAR({
+          message: 'Project Could Not Be Created',
+          variant: 'warning'
+        })
+      )
     }
     setLoading(false)
   }
@@ -55,10 +67,15 @@ const CCreateProject = (props: CreateProjectProps) => {
           onSubmit={(e) => {
             e.preventDefault()
 
-            if (props.user) {
+            if (user) {
               onCompleted()
             } else {
-              props.openSnackbar("You havn't logged in, silly goose", 'warning')
+              dispatch(
+                OPEN_SNACKBAR({
+                  message: "You havn't logged in, silly goose",
+                  variant: 'warning'
+                })
+              )
             }
           }}
         >
@@ -94,13 +111,3 @@ const CCreateProject = (props: CreateProjectProps) => {
     </>
   )
 }
-
-const mapState = (state: TState) => ({
-  user: state.user
-})
-const actionCreators = {
-  openSnackbar: openSnackbarA,
-  setProject: setProjectA
-}
-
-export const CreateProject = connect(mapState, actionCreators)(CCreateProject)

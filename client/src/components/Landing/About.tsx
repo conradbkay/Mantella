@@ -3,11 +3,13 @@ import { Typography, Button, Grid } from '@mui/material'
 import { FeatureTable } from './FeatureTable'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
-import { loginA } from '../../store/actions/auth'
-import { connect } from 'react-redux'
 import { APIGuestLogin } from '../../API/auth'
 import makeStyles from '@mui/styles/makeStyles'
 import { useHistory } from 'react-router'
+import { transformUser } from '../../store/auth'
+import { useAppDispatch } from '../../store/hooks'
+import { SET_PROJECTS } from '../../store/projects'
+import { LOGIN } from '../../store/user'
 
 const useStyles = makeStyles((theme: Theme) => ({
   heroContent: {
@@ -43,28 +45,20 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-const actionCreators = {
-  login: loginA
+type Props = {
+  showLinkedin?: boolean
 }
 
-type ActionCreators = typeof actionCreators
-
-interface Props extends ActionCreators {
-  showLinkedIn?: boolean
-}
-
-export const About = connect(
-  null,
-  actionCreators
-)((props: Props) => {
-  const { login } = props
-
+export const About = ({ showLinkedin }: Props) => {
   const navigate = useHistory()
-
+  const dispatch = useAppDispatch()
   const loginAsGuest = async () => {
     const res = await APIGuestLogin()
     if (res) {
-      login(res)
+      const authUser = transformUser(res)
+
+      dispatch(LOGIN({ user: authUser }))
+      dispatch(SET_PROJECTS(res.projects))
       navigate.push('/project/' + res.projects[0].id)
     }
   }
@@ -115,7 +109,7 @@ export const About = connect(
         </Grid>
       </Grid>
       <div style={{ margin: '20px 0' }}>
-        {props.showLinkedIn && (
+        {showLinkedin && (
           <>
             <Typography variant="h4" align="center" gutterBottom>
               The Team
@@ -149,4 +143,4 @@ export const About = connect(
       </div>
     </div>
   )
-})
+}

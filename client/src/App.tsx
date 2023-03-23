@@ -11,7 +11,6 @@ import { CircularProgress } from '@mui/material'
 import { About } from './components/Landing/About'
 import { Header } from './components/Header'
 import { SnackbarRoot } from './components/utils/SnackbarRoot'
-import { loginA } from './store/actions/auth'
 import { Dashboard } from './components/Dashboard'
 import { PublicOnlyRoute } from './components/utils/Routing'
 import { PrivateRoute } from './components/utils/PrivateRoute'
@@ -21,6 +20,10 @@ import { CalendarWeek } from './components/Calendar/Week'
 import { APICookieLogin } from './API/auth'
 import { useTheme } from '@mui/material'
 import io from 'socket.io-client'
+import { useAppDispatch } from './store/hooks'
+import { transformUser } from './store/auth'
+import { SET_PROJECTS } from './store/projects'
+import { LOGIN } from './store/user'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
@@ -54,13 +57,17 @@ export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
 const Router = () => {
   const [loaded, setLoaded] = useState(false)
+  const dispatch = useAppDispatch()
 
   window.onload = async () => {
     try {
       const loginRes = await APICookieLogin()
 
       if (loginRes) {
-        store.dispatch(loginA(loginRes) as any)
+        const authUser = transformUser(loginRes)
+
+        dispatch(LOGIN({ user: authUser }))
+        dispatch(SET_PROJECTS(loginRes.projects))
       }
 
       setLoaded(true)

@@ -1,17 +1,12 @@
 import { useState } from 'react'
 import { Theme } from '@mui/material'
-import { setTaskA } from '../../store/actions/task'
-import { connect } from 'react-redux'
-import { TState } from '../../types/state'
 import { subDays, addDays } from 'date-fns'
 import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
 import { makeStyles } from '@mui/styles'
 import { TTask } from '../../types/project'
-
-type ActionCreators = typeof actionCreators
-
-interface TProps extends ReturnType<typeof mapState>, ActionCreators {}
+import { useAppSelector } from '../../store/hooks'
+import { selectProjects } from '../../store/projects'
 
 /** Gets the day behind the passed date, the passed date, and the 5 dates after passed date */
 const getDays = (start: Date): Date[] => {
@@ -39,11 +34,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-const CWeek = (props: TProps) => {
+export const CalendarWeek = () => {
   const [filterProjectId, setFilterProjectId] = useState(['-1'])
   const [baseDay, setBaseDay] = useState(new Date())
 
-  const allTasks = props.projects.reduce((tasks, project) => {
+  const projects = useAppSelector(selectProjects)
+
+  const allTasks = projects.reduce((tasks, project) => {
     return [...tasks, ...project.tasks]
   }, [])
 
@@ -85,7 +82,7 @@ const CWeek = (props: TProps) => {
         <WeekControls
           startDay={days[0]}
           currIds={filterProjectId}
-          projects={props.projects}
+          projects={projects}
           toggleProject={(projId: string[]) => {
             setFilterProjectId(projId)
           }}
@@ -114,13 +111,3 @@ const CWeek = (props: TProps) => {
     </>
   )
 }
-
-const mapState = (state: TState) => ({
-  projects: state.projects
-})
-
-const actionCreators = {
-  setTask: setTaskA
-}
-
-export const CalendarWeek = connect(mapState, actionCreators)(CWeek)

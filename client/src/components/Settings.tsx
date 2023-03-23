@@ -9,9 +9,7 @@ import {
 import { List } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { Helmet } from 'react-helmet'
-import { connect } from 'react-redux'
 import { APILogout } from '../API/auth'
-import { openSnackbarA } from '../store/actions/snackbar'
 import Color from 'color'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -22,11 +20,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-type ActionCreators = typeof actionCreators
-
-interface TProps extends ActionCreators {}
-
-const CSettings = (props: TProps) => {
+export const Settings = () => {
   const classes = useStyles()
   const theme = useTheme()
   return (
@@ -69,9 +63,3 @@ const CSettings = (props: TProps) => {
     </>
   )
 }
-
-const actionCreators = {
-  openSnackbar: openSnackbarA
-}
-
-export const Settings = connect(null, { ...actionCreators })(CSettings)
