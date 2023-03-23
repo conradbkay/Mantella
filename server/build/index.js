@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
         const chat = await Chat_1.ChatModel.findOne({ id: chatId });
         if (chat) {
             chat.messages.push(messageObj);
+            await chat.save();
         }
     });
     socket.on('login', ({ chatId }) => {

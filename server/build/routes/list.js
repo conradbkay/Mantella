@@ -29,8 +29,8 @@ router_1.router.post('/editList', passport_1.isAuthenticated, exports.editList);
 const deleteList = async (req, res) => {
     const project = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (project && project.lists.length > 1) {
-        ;
-        project.lists.find((l) => l.id === req.body.id).remove();
+        project.lists = project.lists.filter((list) => list.id !== req.body.id);
+        project.markModified('lists');
         await project.save();
         res.json({ id: req.body.id });
     }

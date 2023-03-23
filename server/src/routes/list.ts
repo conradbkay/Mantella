@@ -41,8 +41,8 @@ export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project && project.lists.length > 1) {
-    ;(project.lists.find((l) => l.id === req.body.id) as any).remove()
-
+    project.lists = project.lists.filter((list) => list.id !== req.body.id)
+    project.markModified('lists')
     await project.save()
 
     res.json({ id: req.body.id })

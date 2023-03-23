@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMessage = exports.createChat = void 0;
+exports.sendMessage = exports.getChat = exports.createChat = void 0;
 const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
 const router_1 = require("./router");
@@ -25,6 +25,12 @@ const createChat = async (req, res) => {
 };
 exports.createChat = createChat;
 router_1.router.post('/createChat', passport_1.isAuthenticated, exports.createChat);
+const getChat = async (req, res) => {
+    const chat = await Chat_1.ChatModel.findOne({ id: req.body.id });
+    res.json({ chat });
+};
+exports.getChat = getChat;
+router_1.router.post('/chat', passport_1.isAuthenticated, exports.getChat);
 const sendMessage = async (req, res) => {
     const messageId = (0, uuid_1.v4)();
     const chat = await Chat_1.ChatModel.findOne({ id: req.body.chatId });

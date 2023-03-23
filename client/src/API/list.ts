@@ -19,3 +19,15 @@ export const APIReplaceListIds = async (
   })
   return res.data
 }
+
+export const APIDeleteList = async ({
+  projId,
+  id
+}: {
+  projId: string
+  id: string
+}) => {
+  const res = await axios.post('/deleteList', { projId, id })
+
+  return res.data
+}

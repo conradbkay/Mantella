@@ -6,9 +6,11 @@ const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
+const Chat_1 = require("../models/Chat");
 const createProject = async (req, res) => {
     const creatingId = (0, uuid_1.v4)();
     const listId = (0, uuid_1.v4)();
+    const chatId = (0, uuid_1.v4)();
     if (req.user) {
         ;
         req.user.projects.push(creatingId);
@@ -33,11 +35,13 @@ const createProject = async (req, res) => {
                     }
                 ],
                 tasks: [],
+                chatId: chatId,
                 enrolledUsers: [],
                 columnOrder: [listId],
                 isPrivate: false
             }),
-            req.user.save()
+            req.user.save(),
+            Chat_1.ChatModel.create({ id: chatId, messages: [], projectId: creatingId })
         ]);
         res.json({ project: created.toObject() });
     }
@@ -139,8 +143,9 @@ const kickUserFromProject = async (req, res) => {
         }
         if (modifiedTasks) {
             project.markModified('tasks');
-            project = await project.save();
         }
+        project.markModified('users');
+        project = await project.save();
         res.json({ project: project.toObject() });
     }
     else {

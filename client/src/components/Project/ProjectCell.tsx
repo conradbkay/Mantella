@@ -16,6 +16,7 @@ import { setListA, setListIdxA } from '../../store/actions/list'
 import { SortableContext } from '@dnd-kit/sortable'
 import ArrowDownward from '@mui/icons-material/ArrowDownward'
 import ArrowUpward from '@mui/icons-material/ArrowUpward'
+import { APIDeleteList } from '../../API/list'
 interface Props {
   project: TProject
   list: TList
@@ -103,6 +104,8 @@ export const ProjectCell = memo(
           newList: null
         })
       )
+
+      APIDeleteList({ id: list.id, projId: project.id })
     }
 
     const setListIdx = (id: string, offset: number) => {
