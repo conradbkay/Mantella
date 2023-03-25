@@ -46,7 +46,7 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { APIReplaceListIds } from '../../API/list'
 import { Sidebar } from './Sidebar'
 import { Socket } from 'socket.io-client'
-import { APIDeleteTask } from '../../API/task'
+import { APIAssignUserToTask, APIDeleteTask } from '../../API/task'
 import { CalendarWeek } from '../Calendar/Week'
 import { OPEN_SNACKBAR } from '../../store/snackbar'
 import { SET_PROJECT, SET_TASK } from '../../store/projects'
@@ -192,7 +192,10 @@ export const Project = (props: Props) => {
   const dispatch = useDispatch()
 
   const onDragStart = (event: DragStartEvent) => {
-    setDraggingId(event.active.id as string)
+    if ((event.active.id as any).slice(0, 4) === 'user') {
+    } else {
+      setDraggingId(event.active.id as string)
+    }
   }
 
   const onDragOver = (event: DragOverEvent) => {
@@ -204,6 +207,7 @@ export const Project = (props: Props) => {
       if (!overTrash) {
         setOverTrash(true)
       }
+    } else if (event.over && (event.active.id as any).slice(0, 4) === 'user') {
     } else {
       const data = getDragEventData(event)
 
@@ -260,6 +264,31 @@ export const Project = (props: Props) => {
       setTimeout(() => {
         APIDeleteTask(draggingId!, project.id)
       }, 5500)
+    } else if (event.over && (event.active.id as any).slice(0, 4) === 'user') {
+      const task = project.tasks[id(project.tasks, event.over.id as string)]
+      const userId = (event.active.id as string).slice(5)
+
+      let newAssigned = [...(task.assignedTo || [])]
+
+      if (newAssigned.includes(userId)) {
+        newAssigned.splice(newAssigned.indexOf(userId), 1)
+      } else {
+        newAssigned.push(userId)
+      }
+
+      dispatch(
+        SET_TASK({
+          id: event.over.id as string,
+          projectId: project.id,
+          newTask: { assignedTo: newAssigned }
+        })
+      )
+
+      APIAssignUserToTask({
+        userId,
+        taskId: event.over.id as string,
+        projId: project.id
+      })
     } else {
       const data = getDragEventData(event)
 

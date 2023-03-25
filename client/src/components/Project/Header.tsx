@@ -120,16 +120,10 @@ const ProjectHeader = memo(
                   >
                     Create Task
                   </Button>
-                  <div ref={setNodeRef}>
-                    <div
-                      style={{
-                        display: 'flex'
-                      }}
-                    >
-                      {project.users.map((user, i) => (
-                        <DraggableAvatar user={user} key={user.id} />
-                      ))}
-                    </div>
+                  <div ref={setNodeRef} style={{ display: 'flex' }}>
+                    {project.users.map((user, i) => (
+                      <DraggableAvatar user={user} key={user.id} />
+                    ))}
                   </div>
                 </div>
               </>

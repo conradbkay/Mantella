@@ -1,5 +1,5 @@
 import { Tooltip, Avatar } from '@mui/material'
-import { TProjectUser } from '../types/project'
+import { TProjectUser } from '../../types/project'
 
 export const HoverableAvatar = ({ user }: { user: TProjectUser }) => {
   return (

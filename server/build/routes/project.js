@@ -125,14 +125,14 @@ const kickUserFromProject = async (req, res) => {
         if (!project) {
             throw new Error('Project does not exist');
         }
-        if (project.ownerId !== id) {
+        if (project.ownerId !== req.user.id) {
             throw new Error('You cannot kick members from this project');
         }
-        await User_1.UserModel.findOneAndUpdate({ id: id }, {
-            $pull: {
-                projects: project
-            }
-        });
+        const kicking = await User_1.UserModel.findOne({ id });
+        if (!kicking) {
+            throw new Error('User does not exist');
+        }
+        kicking.projects = kicking.projects.filter((proj) => proj !== project.id);
         project.users.splice(project.users.findIndex((user) => user.id === id), 1);
         let modifiedTasks = false;
         for (let i = 0; i < project.tasks.length; i++) {
@@ -146,6 +146,8 @@ const kickUserFromProject = async (req, res) => {
         }
         project.markModified('users');
         project = await project.save();
+        kicking.markModified('projects');
+        await kicking.save();
         res.json({ project: project.toObject() });
     }
     else {

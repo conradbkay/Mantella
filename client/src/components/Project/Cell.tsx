@@ -236,7 +236,7 @@ export const ProjectCell = memo(
         )}
         <SortableContext
           id={`${list.id}|${progress}`}
-          items={tasks}
+          items={tasks.map((task) => task.id)}
           strategy={(() => {}) as any}
         >
           <div ref={setNodeRef} style={{ height: '100%' }}>

@@ -19,8 +19,7 @@ import { selectProjects } from '../store/projects'
 
 const root: CSSProperties = {
   display: 'flex',
-  flexDirection: 'row',
-  padding: '12px 24px'
+  flexDirection: 'row'
 }
 
 const genColors = () => {
@@ -133,7 +132,14 @@ export const Dashboard = () => {
                   </div>
                 </ul>
                 <CardActions style={{ justifyContent: 'flex-end' }}>
-                  <Button component={Link} to={`/project/${project.id}`}>
+                  <Button
+                    component={Link}
+                    to={`/project/${project.id}`}
+                    style={{
+                      color: theme.palette.text.primary,
+                      marginRight: -12
+                    }}
+                  >
                     View
                   </Button>
                 </CardActions>

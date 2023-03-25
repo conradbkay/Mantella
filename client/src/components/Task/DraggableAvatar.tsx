@@ -1,6 +1,7 @@
-import { useDraggable } from '@dnd-kit/core'
 import { TProjectUser, TTask } from '../../types/project'
 import { HoverableAvatar } from '../HoverableAvatar'
+import { CSS } from '@dnd-kit/utilities'
+import { useDraggable } from '@dnd-kit/core'
 
 type Props = {
   task?: TTask
@@ -8,20 +9,18 @@ type Props = {
 }
 
 const DraggableAvatar = ({ task, user }: Props) => {
-  const { setNodeRef } = useDraggable({
-    id: task ? task.id : user.id,
-    data: {
-      type: 'user'
-    }
+  const { setNodeRef, listeners, attributes, transform } = useDraggable({
+    id: task ? 'user|' + task.id : 'user|' + user.id
   })
 
+  const style = {
+    // using .Transform causes short elements to get stretched
+    transform: CSS.Translate.toString(transform),
+    display: 'flex'
+  }
+
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        display: 'flex'
-      }}
-    >
+    <div ref={setNodeRef} {...listeners} {...attributes} style={style}>
       <HoverableAvatar user={user} />
     </div>
   )

@@ -71,7 +71,11 @@ const projectSlice = createSlice({
       projects,
       {
         payload
-      }: PayloadAction<{ projectId: string; newTask?: TTask; id: string }>
+      }: PayloadAction<{
+        projectId: string
+        newTask?: Partial<TTask>
+        id: string
+      }>
     ) => {
       const project = projects[id(projects, payload.projectId)]
       const tasks = project.tasks
@@ -92,6 +96,7 @@ const projectSlice = createSlice({
         )
       } else {
         tasks[id(tasks, payload.id)] = {
+          ...tasks[id(tasks, payload.id)],
           ...cloneDeep(payload.newTask)!
         }
       }
