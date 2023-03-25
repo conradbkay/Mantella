@@ -14,12 +14,15 @@ import {
 import { ChooseColor } from '../utils/chooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
-import DatePicker from 'react-widgets/DatePicker'
 import { isArray } from 'lodash'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { TState } from '../../types/state'
 import { SET_FILTER } from '../../store/filter'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+
 const FilterTasksComponent = () => {
   const [custom, setCustom] = useState(false)
   const theme = useTheme()
@@ -150,70 +153,72 @@ const FilterTasksComponent = () => {
                   flexDirection: 'column'
                 }}
               >
-                <DatePicker
-                  includeTime
-                  containerClassName="fullwidth gap"
-                  value={(filterData.dueDate[0] as any) || undefined}
-                  onChange={(date: Date | undefined) => {
-                    if (!date) {
-                      dispatch(
-                        SET_FILTER({
-                          ...filterData,
-                          dueDate: [null, filterData.dueDate[1] as any]
-                        })
-                      )
-                    } else if (
-                      !isBefore(
-                        date,
-                        (filterData.dueDate[1] as any) || new Date()
-                      )
-                    ) {
-                      dispatch(
-                        SET_FILTER({
-                          ...filterData,
-                          dueDate: [
-                            date,
-                            isDate(filterData.dueDate[1])
-                              ? (filterData.dueDate[1] as Date)
-                              : addDays(new Date(), 1)
-                          ]
-                        })
-                      )
-                    }
-                  }}
-                />
-                <DatePicker
-                  includeTime
-                  containerClassName="fullwidth"
-                  value={(filterData.dueDate[1] as any) || undefined}
-                  onChange={(date: Date | undefined) => {
-                    if (!date) {
-                      dispatch(
-                        SET_FILTER({
-                          ...filterData,
-                          dueDate: [filterData.dueDate[0] as any, null]
-                        })
-                      )
-                    } else if (
-                      !isBefore(
-                        (filterData.dueDate[0] as any) || new Date(),
-                        date
-                      )
-                    ) {
-                      dispatch(
-                        SET_FILTER({
-                          ...filterData,
-                          dueDate: [
-                            isDate(filterData.dueDate[0])
-                              ? (filterData.dueDate[0] as Date)
-                              : addDays(new Date(), 1),
-                            date
-                          ]
-                        })
-                      )
-                    }
-                  }}
-                />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    ampm={false}
+                    label="Due Date"
+                    value={(filterData.dueDate[0] as any) || null}
+                    onChange={(date) => {
+                      if (!date) {
+                        dispatch(
+                          SET_FILTER({
+                            ...filterData,
+                            dueDate: [null, filterData.dueDate[1] as any]
+                          })
+                        )
+                      } else if (
+                        !isBefore(
+                          date,
+                          (filterData.dueDate[1] as any) || new Date()
+                        )
+                      ) {
+                        dispatch(
+                          SET_FILTER({
+                            ...filterData,
+                            dueDate: [
+                              date,
+                              isDate(filterData.dueDate[1])
+                                ? (filterData.dueDate[1] as Date)
+                                : addDays(new Date(), 1)
+                            ]
+                          })
+                        )
+                      }
+                    }}
+                  />
+                  <DateTimePicker
+                    ampm={false}
+                    label="Due Date"
+                    value={(filterData.dueDate[1] as any) || null}
+                    onChange={(date) => {
+                      if (!date) {
+                        dispatch(
+                          SET_FILTER({
+                            ...filterData,
+                            dueDate: [filterData.dueDate[0] as any, null]
+                          })
+                        )
+                      } else if (
+                        !isBefore(
+                          (filterData.dueDate[0] as any) || new Date(),
+                          date
+                        )
+                      ) {
+                        dispatch(
+                          SET_FILTER({
+                            ...filterData,
+                            dueDate: [
+                              isDate(filterData.dueDate[0])
+                                ? (filterData.dueDate[0] as Date)
+                                : addDays(new Date(), 1),
+                              date
+                            ]
+                          })
+                        )
+                      }
+                    }}
+                  />
+                </LocalizationProvider>
               </div>
             )
           )}

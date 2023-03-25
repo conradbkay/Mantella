@@ -34,6 +34,7 @@ export interface TTask {
   points: number
   timeWorkedOn: number
   color: string
+  createdAt: string // date
   dueDate?: string | null // date
   assignedTo?: string[] | null
   comments: Array<{

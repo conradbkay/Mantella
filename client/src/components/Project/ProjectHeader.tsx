@@ -3,7 +3,8 @@ import {
   Toolbar,
   useTheme,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
+  Button
 } from '@mui/material'
 import { input } from './styles'
 import DraggableAvatar from '../Task/DraggableAvatar'
@@ -19,11 +20,12 @@ type Props = {
   project: TProject
   viewType: string
   setViewType: (newType: string) => void
+  setCreating: () => void
   deleteMode: boolean // when dragging a task, whole header becomes a trash can
 }
 
 const ProjectHeader = memo(
-  ({ project, deleteMode, viewType, setViewType }: Props) => {
+  ({ project, deleteMode, viewType, setViewType, setCreating }: Props) => {
     //const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [name, setName] = useState(project ? project.name : undefined)
 
@@ -111,6 +113,13 @@ const ProjectHeader = memo(
                 </ToggleButtonGroup>
 
                 <div style={{ marginLeft: 'auto', display: 'flex' }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setCreating()}
+                    style={{ marginRight: 8 }}
+                  >
+                    Create Task
+                  </Button>
                   <div ref={setNodeRef}>
                     <div
                       style={{

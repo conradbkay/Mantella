@@ -5,7 +5,11 @@ import {
   TableBody,
   SpeedDial,
   SpeedDialAction,
-  useTheme
+  useTheme,
+  FormControl,
+  Select,
+  InputLabel,
+  MenuItem
 } from '@mui/material'
 import { TState } from '../../types/state'
 import { CreateList } from './CreateList'
@@ -46,10 +50,31 @@ import { APIDeleteTask } from '../../API/task'
 import { CalendarWeek } from '../Calendar/Week'
 import { OPEN_SNACKBAR } from '../../store/snackbar'
 import { SET_PROJECT, SET_TASK } from '../../store/projects'
+import { TTask } from '../../types/project'
 
 /**
  * @todo add a filter menu with color, column, due date, label
  */
+
+const sortTasks = (sortType: string, tasks: TTask[]) => {
+  if (sortType === 'default') {
+    return tasks
+  }
+
+  return [...tasks].sort((a, b) => {
+    if (sortType === 'points') {
+      return b.points - a.points
+    } else if (sortType === 'due date') {
+      // overdue, then due, then no date date
+      return (
+        (a.dueDate ? new Date(a.dueDate).getTime() : Infinity) -
+        (b.dueDate ? new Date(b.dueDate).getTime() : Infinity)
+      )
+    } else {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    }
+  })
+}
 
 type Props = {
   params: {
@@ -151,6 +176,9 @@ export const Project = (props: Props) => {
   const [viewType, setViewType] = useState<'kanban' | 'list' | 'calendar'>(
     'kanban'
   )
+  const [listSort, setListSort] = useState<
+    'default' | 'points' | 'due date' | 'newest'
+  >('default')
 
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
@@ -284,6 +312,7 @@ export const Project = (props: Props) => {
           onDragCancel={onDragCancel}
         >
           <ProjectHeader
+            setCreating={() => setCreating(project.lists[0].id)}
             setViewType={(newType: string) => {
               setViewType(newType as any)
             }}
@@ -376,8 +405,32 @@ export const Project = (props: Props) => {
                 </table>
               ) : viewType === 'list' ? (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {project.tasks.map((task, i) => (
+                  <FormControl
+                    style={{
+                      marginBottom: 16,
+                      maxWidth: 350,
+                      marginLeft: 'auto'
+                    }}
+                  >
+                    <InputLabel variant="standard">Sort By</InputLabel>
+                    <Select
+                      variant="standard"
+                      value={listSort}
+                      label="Sort By"
+                      onChange={(e) => setListSort(e.target.value as any)}
+                    >
+                      {['Default', 'Points', 'Due Date', 'Newest'].map(
+                        (order, i) => (
+                          <MenuItem key={i} value={order.toLowerCase()}>
+                            {order}
+                          </MenuItem>
+                        )
+                      )}
+                    </Select>
+                  </FormControl>
+                  {sortTasks(listSort, project.tasks).map((task, i) => (
                     <BaseTask
+                      showProgress
                       key={task.id}
                       style={{}}
                       project={project}

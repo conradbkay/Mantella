@@ -14,7 +14,6 @@ import {
 import uuid from 'uuid'
 import { id, getAllListsArr } from '../../utils/utilities'
 import { ChooseColor } from '../utils/chooseColor'
-import DatePicker from 'react-widgets/DatePicker'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
 import { formatDueDate } from '../../utils/formatDueDate'
@@ -26,6 +25,9 @@ import { EditorState } from 'draft-js'
 import { getEditorStateFromTaskDescription } from './getEditorState'
 import { TState } from '../../types/state'
 import { useSelector } from 'react-redux'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 
 type OwnProps = {
   onClose: () => void
@@ -197,20 +199,21 @@ export const EditTaskBase = (props: OwnProps) => {
                   })}
                 </Select>
               </FormControl>
-              <FormControl style={{ marginTop: 8, marginLeft: 'auto' }}>
-                <FormHelperText>Due Date</FormHelperText>
-                <DatePicker
-                  includeTime
-                  containerClassName="fullwidth"
-                  value={task.dueDate ? new Date(task.dueDate) : undefined}
-                  onChange={(date: Date | undefined) => {
-                    setTask({
-                      ...task,
-                      dueDate: date ? date.toString() : null
-                    })
-                  }}
-                />
-              </FormControl>
+              <div style={{ marginTop: 8, marginLeft: 'auto' }}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DateTimePicker
+                    ampm={false}
+                    label="Due Date"
+                    value={task.dueDate ? new Date(task.dueDate) : null}
+                    onChange={(date) => {
+                      setTask({
+                        ...task,
+                        dueDate: date ? date.toString() : null
+                      })
+                    }}
+                  />
+                </LocalizationProvider>
+              </div>
             </div>
           </div>
 

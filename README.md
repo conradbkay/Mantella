@@ -49,8 +49,7 @@ Chat with specific user, even groups
 
 Changing task list to other project doesn't work
 
-View modes in project header (calendar, list, table, global, task)
-Task has sortability
+Task view needs sortability
 
 Timeline view, slider due dates or drag and drop along timeline
 
@@ -58,18 +57,8 @@ Separate projects into iterations
 
 SSR
 
-make register redirect not weird, simulate login
-
-double task border
-
 Notetaker
-
-deleting task makes snackbar show undo button with circular timer
-
-Merge project header into actual header?
 
 Wire components together
 
 More nice animations with react-spring, dark to light mode is jarring for example
-
-In list view, mave task show checkmark outlined depending on progress

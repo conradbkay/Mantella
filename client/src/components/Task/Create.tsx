@@ -16,6 +16,7 @@ const defaultTask: TTask = {
   points: 0,
   subTasks: [],
   id: '',
+  createdAt: new Date().toString(),
   progress: 0,
   timeWorkedOn: 0,
   comments: [],

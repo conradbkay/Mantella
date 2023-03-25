@@ -10,6 +10,7 @@ const createTask = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (proj) {
         proj.tasks.push({
+            createdAt: new Date().toString(),
             id: taskId,
             name: req.body.taskInfo.name || 'Unnamed Task',
             points: req.body.taskInfo.points || 0,

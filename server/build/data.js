@@ -9,7 +9,8 @@ exports.defaultTask = {
     timeWorkedOn: 0,
     comments: [],
     color: '#FFFFFF',
-    assignedTo: []
+    assignedTo: [],
+    createdAt: new Date().toString()
 };
 exports.tags = [
     { name: 'error', color: '#ffccd6' },

@@ -21,6 +21,7 @@ export class Project {
     points: number
     timeWorkedOn: number
     color: string
+    createdAt: string
     dueDate?: string
     comments: Array<{
       comment: string

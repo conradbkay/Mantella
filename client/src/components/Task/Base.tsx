@@ -22,6 +22,7 @@ import { taskDummyOpacity } from '../Project/Project'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { SELECT_POMODORO_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
 import { SET_SUBTASK } from '../../store/projects'
+import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -50,8 +51,21 @@ interface OwnProps {
   task: TTask
   hidden?: boolean
   openFunc(): void
+  showProgress?: boolean
   isDraggingUser?: boolean
   style?: any
+}
+
+const getProgress = (id: string, project: TProject) => {
+  for (let i = 0; i < project.lists.length; i++) {
+    for (let j = 0; j < project.lists[i].taskIds.length; j++) {
+      if (project.lists[i].taskIds[j].includes(id)) {
+        return j
+      }
+    }
+  }
+
+  return 0
 }
 
 const useStyles = makeStyles(() => ({
@@ -89,6 +103,7 @@ export const BaseTask = memo(
     isDragging,
     hidden,
     style,
+    showProgress,
     isDraggingUser
   }: OwnProps) => {
     const dispatch = useAppDispatch()
@@ -184,6 +199,18 @@ export const BaseTask = memo(
                   alignItems: 'center'
                 }}
               >
+                {showProgress && (
+                  <CheckCircleOutline
+                    style={{
+                      marginLeft: 4,
+                      color: [
+                        undefined,
+                        theme.palette.warning.main,
+                        theme.palette.success.main
+                      ][getProgress(task.id, project)]
+                    }}
+                  />
+                )}
                 <span
                   id={task.id}
                   style={{
@@ -282,7 +309,7 @@ export const BaseTask = memo(
                   }
                 </Transition>
               )}
-              {task.dueDate && task.progress !== 2 && (
+              {task.dueDate && getProgress(task.id, project) !== 2 && (
                 <>
                   <div
                     style={{

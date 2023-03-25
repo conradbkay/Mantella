@@ -8,7 +8,8 @@ export const defaultTask = {
   timeWorkedOn: 0,
   comments: [],
   color: '#FFFFFF',
-  assignedTo: []
+  assignedTo: [],
+  createdAt: new Date().toString()
 }
 
 export const tags = [
