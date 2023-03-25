@@ -18,7 +18,7 @@ import Create from '@mui/icons-material/Create'
 import { NoMatch } from '../NoMatch/NoMatch'
 import Helmet from 'react-helmet'
 import { id } from '../../utils/utilities'
-import { ProjectCell } from './ProjectCell'
+import { ProjectCell } from './Cell'
 import { CreateTask } from '../Task/Create'
 import { EditTaskModal } from '../Task/Edit'
 import Color from 'color'
@@ -39,7 +39,7 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core'
-import ProjectHeader from './ProjectHeader'
+import ProjectHeader from './Header'
 import { BaseTask } from '../Task/Base'
 import { cloneDeep } from 'lodash'
 import { arrayMove } from '@dnd-kit/sortable'

@@ -158,17 +158,17 @@ export const kickUserFromProject = async (
       throw new Error('Project does not exist')
     }
 
-    if (project.ownerId !== id) {
+    if (project.ownerId !== (req.user as any).id) {
       throw new Error('You cannot kick members from this project')
     }
 
-    await UserModel.findOneAndUpdate(
-      { id: id },
-      {
-        $pull: {
-          projects: project
-        }
-      }
+    const kicking = await UserModel.findOne({ id })
+
+    if (!kicking) {
+      throw new Error('User does not exist')
+    }
+    kicking.projects = kicking.projects.filter(
+      (proj: any) => proj !== project!.id
     )
 
     project.users.splice(
@@ -194,7 +194,8 @@ export const kickUserFromProject = async (
 
     project.markModified('users')
     project = await project.save()
-
+    kicking.markModified('projects')
+    await kicking.save()
     res.json({ project: project.toObject() })
   } else {
     throw new Error('User not signed in')

@@ -37,23 +37,15 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 Allow link as [http://mantella.herokuapp.com?action=autoTrial] which would automatically create a guest account which has all premium features for 7 days. Migration of guest accounts to proper account should be added after this is added (settings -> set email/password)
 
-Edit history from git style diffs
-
-Remove people from projects is not functional
+Websocket for every update
+Look into operational transformation
+Edit history from diffs
 
 Search bar smooth scroll to task
 
 Chat with specific user, even groups
 
 Changing task list to other project doesn't work
-
-Task view needs sortability
-
-Timeline view, slider due dates or drag and drop along timeline
-
-Separate projects into iterations
-
-SSR
 
 Notetaker
 

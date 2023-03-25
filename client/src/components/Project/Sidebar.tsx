@@ -2,9 +2,9 @@ import Settings from '@mui/icons-material/Settings'
 import Person from '@mui/icons-material/Person'
 import Chat from '@mui/icons-material/Chat'
 import { FilterTasks } from './FilterTasks'
-import { ProjectSettings } from './ProjectSettings'
+import { ProjectSettings } from './Settings'
 import { ProjStats } from './Statistics'
-import { ShareProject } from './ShareProject'
+import { ShareProject } from './Share'
 import { IconButton, List, Tooltip, useTheme } from '@mui/material'
 import FilterList from '@mui/icons-material/FilterList'
 import { memo, useState } from 'react'
@@ -105,12 +105,6 @@ export const Sidebar = memo(
           </div>
         </div>
       </div>
-    )
-  },
-  (oldProps, newProps) => {
-    return (
-      oldProps.project.id === newProps.project.id &&
-      oldProps.socket === newProps.socket
     )
   }
 )
