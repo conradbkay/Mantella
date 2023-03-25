@@ -1,19 +1,19 @@
-import { format, isPast } from 'date-fns'
+import { isPast } from 'date-fns'
 import { TTask } from '../types/project'
 import { toDaysHHMMSS } from './utilities'
-import { formatDistance } from 'date-fns'
+import { formatDistanceToNowStrict } from 'date-fns'
 
 // Jan 1st 12:02 am
-const baseFormat = (date: Date): string => format(date, 'MMM do h:mm a')
+const baseFormat = (date: Date): string => formatDistanceToNowStrict(date)
 
 const overdueFormat = (date: Date): string => {
-  return 'Overdue by ' + formatDistance(new Date(), date)
+  return 'Overdue by ' + formatDistanceToNowStrict(date)
 }
 
 const formatDueDateString = (date: Date, hasOver?: boolean): string => {
   return isPast(date) && hasOver
     ? overdueFormat(date)
-    : 'Due ' + baseFormat(date)
+    : 'Due in ' + baseFormat(date)
 }
 
 export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {

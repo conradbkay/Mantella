@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react'
 import { Dialog, IconButton, Button } from '@mui/material'
 import Close from '@mui/icons-material/Close'
-import { store } from '../../store/store'
-import { OPEN_SNACKBAR } from '../../store/snackbar'
+import { store } from '../store/store'
+import { OPEN_SNACKBAR } from '../store/snackbar'
 
 export const WelcomeDialog = () => {
   const [open, setOpen] = useState(!localStorage.getItem('hasVisited'))

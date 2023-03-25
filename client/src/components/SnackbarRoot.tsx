@@ -10,11 +10,11 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import WarningIcon from '@mui/icons-material/Warning'
 import ErrorIcon from '@mui/icons-material/Error'
 import CloseIcon from '@mui/icons-material/Close'
-import { TVariant } from '../../types/state'
+import { TVariant } from '../types/state'
 import Info from '@mui/icons-material/Info'
 import { makeStyles } from '@mui/styles'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { CLOSE_SNACKBAR, selectSnackbar } from '../../store/snackbar'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { CLOSE_SNACKBAR, selectSnackbar } from '../store/snackbar'
 
 type Classes = {
   success: string

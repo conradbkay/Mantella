@@ -1,30 +1,29 @@
 import { Route, Redirect, RouteProps } from 'react-router'
-import { useAppSelector } from '../../store/hooks'
-import { selectUser } from '../../store/user'
-
+import { useAppSelector } from '../store/hooks'
+import { selectUser } from '../store/user'
 interface TProps extends RouteProps {
   component: any
   componentProps: any
 }
 
-export const PublicOnlyRoute = ({
+export const PrivateRoute = ({
   component: PropComponent,
   componentProps,
   ...rest
 }: TProps) => {
   const user = useAppSelector(selectUser)
+
   return (
     <Route
       {...rest}
       render={(props) =>
-        user === null ? (
+        user !== null ? (
           <PropComponent
-            {...componentProps}
             params={props.match.params}
-            {...componentProps}
+            {...(componentProps as (typeof PropComponent)['props'])}
           />
         ) : (
-          <Redirect to="/dashboard" />
+          <Redirect to="/login" />
         )
       }
     />

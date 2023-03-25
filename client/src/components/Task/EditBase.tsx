@@ -13,7 +13,7 @@ import {
 } from '@mui/material'
 import uuid from 'uuid'
 import { id, getAllListsArr } from '../../utils/utilities'
-import { ChooseColor } from '../utils/chooseColor'
+import { ChooseColor } from '../ChooseColor'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
 import { formatDueDate } from '../../utils/formatDueDate'

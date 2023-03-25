@@ -11,7 +11,7 @@ import {
   Slider,
   ListItemText
 } from '@mui/material'
-import { ChooseColor } from '../utils/chooseColor'
+import { ChooseColor } from '../ChooseColor'
 import { isDate, addDays } from 'date-fns'
 import isBefore from 'date-fns/esm/fp/isBefore/index.js'
 import { isArray } from 'lodash'

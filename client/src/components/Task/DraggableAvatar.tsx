@@ -1,6 +1,6 @@
 import { useDraggable } from '@dnd-kit/core'
 import { TProjectUser, TTask } from '../../types/project'
-import { HoverableAvatar } from '../utils/HoverableAvatar'
+import { HoverableAvatar } from '../HoverableAvatar'
 
 type Props = {
   task?: TTask

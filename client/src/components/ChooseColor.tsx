@@ -1,5 +1,5 @@
 import { TwitterPicker } from 'react-color'
-import { colors } from '../../colors'
+import { colors } from '../colors'
 type OwnProps = {
   color: string
   onChange(color: string | string[]): void
