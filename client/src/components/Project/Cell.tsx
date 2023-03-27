@@ -56,6 +56,7 @@ const getCellStyles = ({
     maxHeight: collapsed ? 100 : undefined, //'60vh',
     overflowY: 'hidden',
     maxWidth: '100%',
+    overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column'
   }
@@ -239,7 +240,7 @@ export const ProjectCell = memo(
           items={tasks.map((task) => task.id)}
           strategy={(() => {}) as any}
         >
-          <div ref={setNodeRef} style={{ height: '100%' }}>
+          <div ref={setNodeRef} style={{ height: '100%', maxWidth: '100%' }}>
             <div
               style={{
                 flexDirection: 'column',

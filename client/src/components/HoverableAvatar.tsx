@@ -1,12 +1,18 @@
 import { Tooltip, Avatar } from '@mui/material'
 import { TProjectUser } from '../../types/project'
 
-export const HoverableAvatar = ({ user }: { user: TProjectUser }) => {
+export const HoverableAvatar = ({
+  user,
+  noMargin
+}: {
+  user: TProjectUser
+  noMargin?: boolean
+}) => {
   return (
     <Tooltip title={`${user.username}`}>
       <Avatar
         style={{
-          margin: 'auto 10px'
+          margin: noMargin ? 'auto 4px auto 4px' : 'auto 10px'
         }}
       >
         <span style={{ position: 'absolute' }}>

@@ -29,10 +29,12 @@ export const CreateProject = () => {
     setLoading(true)
     const res = await APICreateProject(name || 'Untitled Project')
     if (res && res.id) {
-      SET_PROJECT({
-        id: res.id,
-        project: res
-      })
+      dispatch(
+        SET_PROJECT({
+          id: res.id,
+          project: res
+        })
+      )
 
       navigate.push('/project/' + res.id)
       dispatch(

@@ -149,7 +149,7 @@ const customCollisionDetection = ({
   const rectIntersectionCollisions = rectIntersection({
     ...args,
     droppableContainers: droppableContainers.filter(
-      ({ id }: any) => id === 'trash'
+      ({ id }: any) => id === 'trash' || id.split('|').length > 2
     )
   })
 
@@ -264,6 +264,55 @@ export const Project = (props: Props) => {
       setTimeout(() => {
         APIDeleteTask(draggingId!, project.id)
       }, 5500)
+    } else if ((event.active.id as string).split('|').length === 3) {
+      const [, taskId, userId] = (event.active.id as string).split('|')
+
+      const remove = () => {
+        dispatch(
+          SET_TASK({
+            id: taskId,
+            projectId: project.id,
+            newTask: {
+              assignedTo: (
+                project.tasks[id(project.tasks, taskId)].assignedTo || []
+              ).filter((id: string) => id !== userId)
+            }
+          })
+        )
+        APIAssignUserToTask({
+          userId,
+          taskId,
+          projId: project.id
+        })
+      }
+      if (
+        !event.over ||
+        (taskId !== event.over.id && event.over.id === 'users')
+      ) {
+        remove()
+      } else if (taskId !== event.over.id) {
+        // to another task, or to a list
+        const task = project.tasks.find((task) => task.id === event.over!.id)
+        remove()
+
+        if (task && (!task.assignedTo || !task.assignedTo.includes(userId))) {
+          dispatch(
+            SET_TASK({
+              id: event.over.id as string,
+              projectId: project.id,
+              newTask: {
+                assignedTo: [...(task.assignedTo || []), userId]
+              }
+            })
+          )
+
+          APIAssignUserToTask({
+            userId,
+            taskId: event.over.id as string,
+            projId: project.id
+          })
+        }
+      }
     } else if (event.over && (event.active.id as any).slice(0, 4) === 'user') {
       const task = project.tasks[id(project.tasks, event.over.id as string)]
       const userId = (event.active.id as string).slice(5)

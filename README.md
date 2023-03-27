@@ -27,7 +27,7 @@ We are using `Node.js` to run server-side javascript with `Express` as the RESTf
 
 ### Client
 
-The client is running on `React.js` which means that our UI is divided into components, and state update is automatically reflected in the DOM. State can be local in the component, or in the `Redux` store which can be thought of as a god object. `Material-ui` is used as a UI framework and although large is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
+The client is running on `React.js` which means that our UI is divided into components, and state update is automatically reflected in the DOM. State can be local in the component, or in the `Redux` store which can be thought of as a god object. `Material-ui` is used as a UI framework and although large, is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
 
 ## Direction
 
@@ -43,16 +43,26 @@ Edit history from diffs
 
 Search bar smooth scroll to task
 
-Chat with specific user, even groups
-
-Changing task list to other project doesn't work
-
 Notetaker
 
 Wire components together
 
-More nice animations with react-spring, dark to light mode is jarring for example
+Animations with react-spring, dark to light mode is jarring for example
 
-drag user to task
+"List view" that actually shows lists, separate from "tasks"
 
-"List view" actually shows lists
+dragging user doesn't show, as if z-index is too low
+
+See how feasable mobile (probably sideways orientation) would be
+
+Chat:
+Message with specific user, even groups
+
+Settings:
+Persistent default theme
+
+Project members:
+privileges for certain members, transfer to owner
+
+Statistics:
+Track who completes task and when

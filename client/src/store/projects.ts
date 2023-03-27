@@ -17,7 +17,11 @@ const projectSlice = createSlice({
       { payload }: PayloadAction<{ project?: TProject; id: string }>
     ) => {
       if (payload.project) {
-        projects[id(projects, payload.id)] = payload.project
+        if (projects.findIndex((project) => project.id === payload.id) === -1) {
+          projects.push(payload.project)
+        } else {
+          projects[id(projects, payload.id)] = payload.project
+        }
       } else {
         delete projects[id(projects, payload.id)]
       }

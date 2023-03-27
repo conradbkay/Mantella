@@ -211,6 +211,21 @@ export const BaseTask = memo(
                     }}
                   />
                 )}
+                <div
+                  style={{
+                    display: 'flex'
+                  }}
+                >
+                  {task.assignedTo &&
+                    task.assignedTo.map((userId, i) => (
+                      <DraggableAvatar
+                        noMargin
+                        key={userId}
+                        task={task}
+                        user={project.users[id(project.users, userId)]}
+                      />
+                    ))}
+                </div>
                 <span
                   id={task.id}
                   style={{
@@ -329,20 +344,6 @@ export const BaseTask = memo(
                   cursor: 'pointer'
                 }}
               >
-                <div
-                  style={{
-                    display: 'flex'
-                  }}
-                >
-                  {task.assignedTo &&
-                    task.assignedTo.map((userId, i) => (
-                      <DraggableAvatar
-                        key={userId}
-                        task={task}
-                        user={project.users[id(project.users, userId)]}
-                      />
-                    ))}
-                </div>
                 {Object.values(task.comments).length !== 0 && (
                   <IconButton
                     className={classes.play}

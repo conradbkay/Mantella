@@ -6,11 +6,12 @@ import { useDraggable } from '@dnd-kit/core'
 type Props = {
   task?: TTask
   user: TProjectUser
+  noMargin?: boolean
 }
 
-const DraggableAvatar = ({ task, user }: Props) => {
+const DraggableAvatar = ({ task, user, noMargin }: Props) => {
   const { setNodeRef, listeners, attributes, transform } = useDraggable({
-    id: task ? 'user|' + task.id : 'user|' + user.id
+    id: task ? 'user|' + task.id + '|' + user.id : 'user|' + user.id
   })
 
   const style = {
@@ -21,7 +22,7 @@ const DraggableAvatar = ({ task, user }: Props) => {
 
   return (
     <div ref={setNodeRef} {...listeners} {...attributes} style={style}>
-      <HoverableAvatar user={user} />
+      <HoverableAvatar noMargin user={user} />
     </div>
   )
 }

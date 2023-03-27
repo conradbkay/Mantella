@@ -1,5 +1,5 @@
 import { cloneDeep } from 'lodash'
-import { TProject, TTask, TList } from '../types/project'
+import { TProject, TTask } from '../types/project'
 
 export const toDaysHHMMSS = (s: number, verbose?: true): string => {
   let result = ''
@@ -72,21 +72,6 @@ export const getAllTasks = (projects: TProject[]): TTask[] => {
   })
 
   return tasks
-}
-
-type TListWithProjectIds = TList & { projectId: string }
-
-export const getAllListsArr = (projects: TProject[]): TListWithProjectIds[] => {
-  let lists: TListWithProjectIds[] = []
-
-  projects.forEach((project) => {
-    lists = [
-      ...lists,
-      ...project.lists.map((list) => ({ ...list, projectId: project.id }))
-    ]
-  })
-
-  return lists
 }
 
 export const getProjectIdFromTaskId = (

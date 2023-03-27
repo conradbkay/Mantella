@@ -12,7 +12,7 @@ import {
   IconButton
 } from '@mui/material'
 import uuid from 'uuid'
-import { id, getAllListsArr } from '../../utils/utilities'
+import { id } from '../../utils/utilities'
 import { ChooseColor } from '../ChooseColor'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
@@ -54,6 +54,8 @@ export const EditTaskBase = (props: OwnProps) => {
   )
 
   const projects = useSelector((state: TState) => state.projects)
+
+  const project = projects[id(projects, props.projectId)]
 
   const [listId, setListId] = useState(props.ownerListId)
 
@@ -187,12 +189,11 @@ export const EditTaskBase = (props: OwnProps) => {
                     setListId(e.target.value as any)
                   }}
                 >
-                  {getAllListsArr(projects).map((list) => {
+                  {project.lists.map((list) => {
                     return (
                       <MenuItem key={list.id} value={list.id}>
                         <pre>
-                          <em>{list.name}</em> of{' '}
-                          {projects[id(projects, list.projectId)].name}
+                          <em>{list.name}</em>
                         </pre>
                       </MenuItem>
                     )

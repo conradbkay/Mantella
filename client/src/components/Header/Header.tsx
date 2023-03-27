@@ -1,7 +1,7 @@
 import { useState, Fragment, useContext } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import MenuIcon from '@mui/icons-material/Menu'
-import { ColorModeContext } from '../App'
+import { ColorModeContext } from '../../App'
 import {
   Theme,
   IconButton,
@@ -30,11 +30,12 @@ import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
-import { ProjectFinder } from './ProjectFinder'
-import { HoverableAvatar } from './HoverableAvatar'
+import { ProjectFinder } from '../ProjectFinder'
+import { HoverableAvatar } from '../HoverableAvatar'
 import { makeStyles } from '@mui/styles'
-import { useAppSelector } from '../store/hooks'
-import { selectUser } from '../store/user'
+import { useAppSelector } from '../../store/hooks'
+import { selectUser } from '../../store/user'
+import { HeaderSearchBar } from './SearchBar'
 
 const noAuthItems = [
   {
@@ -98,13 +99,12 @@ const useStyles = makeStyles((theme: Theme) => ({
   iconContainer: {
     display: 'none',
     [theme.breakpoints.down('md')]: {
-      display: 'block',
-      marginLeft: 'auto'
+      display: 'block'
     }
   },
   tabContainer: {
     height: '100%',
-    marginLeft: 'auto',
+    marginLeft: 8,
     [theme.breakpoints.down('md')]: {
       display: 'none'
     }
@@ -236,6 +236,7 @@ export const Header = withRouter((props: Props) => {
                     <MenuIcon />
                   </IconButton>
                 </div>
+                <HeaderSearchBar />
                 <div className={classes.tabContainer}>
                   <Tabs
                     value={value === -1 ? false : value}
