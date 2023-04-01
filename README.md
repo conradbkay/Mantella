@@ -72,3 +72,5 @@ dragging from task user to task with same user assigned is bugged
 
 Recurring tasks:
 when they drag to completed, it should go back to no progress when the due date passes, so do a check for that on login perhaps
+
+deleting project causes error

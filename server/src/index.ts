@@ -93,10 +93,12 @@ app.use(express.json())
 app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
 const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
+app.enable('trust proxy') // heroku
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',
     resave: true,
+    proxy: true, // required for heroku
     saveUninitialized: false,
     cookie: {
       secure: true,

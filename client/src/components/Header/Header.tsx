@@ -237,7 +237,10 @@ export const Header = withRouter((props: Props) => {
                   </IconButton>
                 </div>
                 {authenticated !== null && <HeaderSearchBar />}
-                <div className={classes.tabContainer}>
+                <div
+                  className={classes.tabContainer}
+                  style={{ marginLeft: authenticated ? undefined : 'auto' }}
+                >
                   <Tabs
                     value={value === -1 ? false : value}
                     indicatorColor="primary"
