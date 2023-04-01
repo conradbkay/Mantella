@@ -146,6 +146,7 @@ export const ProjectCell = memo(
               </h2>
             )}
             <IconButton
+              aria-label="list menu"
               onClick={(e) => setAnchorEl(e.currentTarget)}
               style={{
                 marginLeft: 'auto',
@@ -156,6 +157,7 @@ export const ProjectCell = memo(
             </IconButton>
             {!collapsed && (
               <IconButton
+                aria-label="create task"
                 color="primary"
                 style={{ marginLeft: 8 }}
                 onClick={() => setCreating(list.id)}

@@ -346,6 +346,7 @@ export const BaseTask = memo(
               >
                 {Object.values(task.comments).length !== 0 && (
                   <IconButton
+                    aria-label="show comments"
                     className={classes.play}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -357,6 +358,7 @@ export const BaseTask = memo(
                 )}
                 {Object.values(task.subTasks).length !== 0 && (
                   <IconButton
+                    aria-label="show subtasks"
                     style={{ marginRight: 8 }}
                     className={classes.play}
                     onClick={(e) => {

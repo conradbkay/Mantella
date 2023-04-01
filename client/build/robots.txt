@@ -78,6 +78,3 @@ User-agent: Yeti
 User-agent: YioopBot
 User-agent: yoozBot
 User-agent: YoudaoBot
-Disallow:
-User-agent: *
-Disallow: /

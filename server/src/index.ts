@@ -93,12 +93,14 @@ app.use(express.json())
 app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
 const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
-app.enable('trust proxy') // heroku
+if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy') // heroku
+}
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',
     resave: false,
-    proxy: true, // required for heroku
+    proxy: process.env.NODE_ENV == 'production' ? true : false, // required for heroku
     saveUninitialized: false,
     cookie: {
       secure: true,
