@@ -66,6 +66,7 @@ const ProjectHeader = memo(
             ) : (
               <>
                 <input
+                  aria-label="project name"
                   style={{
                     ...input(theme),
                     width: /*`${windowWidth - 300}px`*/ 200

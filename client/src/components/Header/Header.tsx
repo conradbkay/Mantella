@@ -270,7 +270,7 @@ export const Header = withRouter((props: Props) => {
                   sx={{ ml: 1 }}
                   onClick={colorMode.toggleColorMode}
                   color="inherit"
-                  aria-hidden="true"
+                  aria-label="toggle dark mode"
                 >
                   {theme.palette.mode === 'dark' ? (
                     <Brightness7Icon />

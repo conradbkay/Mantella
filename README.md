@@ -74,3 +74,5 @@ Recurring tasks:
 when they drag to completed, it should go back to no progress when the due date passes, so do a check for that on login perhaps
 
 deleting project causes error
+
+chat websocket doesn't work on heroku

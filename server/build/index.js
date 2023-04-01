@@ -76,7 +76,7 @@ const WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 app.enable('trust proxy'); // heroku
 app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
-    resave: true,
+    resave: false,
     proxy: true,
     saveUninitialized: false,
     cookie: {

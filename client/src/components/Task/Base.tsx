@@ -392,6 +392,7 @@ export const BaseTask = memo(
           </Badge>
           {task.subTasks.length !== 0 && (
             <LinearProgress
+              aria-label="subtasks"
               style={{
                 borderRadius: 0
               }}

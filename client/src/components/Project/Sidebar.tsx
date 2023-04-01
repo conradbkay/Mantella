@@ -5,7 +5,7 @@ import { FilterTasks } from './FilterTasks'
 import { ProjectSettings } from './Settings'
 import { ProjStats } from './Statistics'
 import { ShareProject } from './Share'
-import { IconButton, List, Tooltip, useTheme } from '@mui/material'
+import { IconButton, Tooltip, useTheme } from '@mui/material'
 import FilterList from '@mui/icons-material/FilterList'
 import { memo, useState } from 'react'
 import Equalizer from '@mui/icons-material/Equalizer'
@@ -38,10 +38,17 @@ export const Sidebar = memo(
         }}
       >
         <div style={{ display: 'flex', height: '100%' }}>
-          <List style={{ flexDirection: 'column', display: 'flex' }}>
+          <div
+            style={{
+              flexDirection: 'column',
+              display: 'flex',
+              padding: '8px 0'
+            }}
+          >
             {listItems.map(({ title, Icon }, i) => (
               <Tooltip placement="right" key={i} title={title}>
                 <div
+                  aria-label={undefined}
                   style={{
                     padding: 8,
                     borderLeft:
@@ -59,6 +66,7 @@ export const Sidebar = memo(
                       height: 48,
                       marginLeft: open === title ? -2 : undefined
                     }}
+                    aria-label={title}
                   >
                     <Icon
                       style={{
@@ -74,7 +82,7 @@ export const Sidebar = memo(
                 </div>
               </Tooltip>
             ))}
-          </List>
+          </div>
           <div
             style={{
               backgroundColor: theme.palette.background.paper,

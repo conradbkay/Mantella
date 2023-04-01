@@ -97,7 +97,7 @@ app.enable('trust proxy') // heroku
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',
-    resave: true,
+    resave: false,
     proxy: true, // required for heroku
     saveUninitialized: false,
     cookie: {
