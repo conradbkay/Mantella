@@ -39,21 +39,15 @@ const getCellStyles = ({
 }): CSSProperties => {
   const isLastColumn = progress === 2
   const isFirstColumn = progress === 0
-  const isFinalRow =
-    project.lists.findIndex((projList) => projList.id === list.id) ===
-    project.lists.length - 1
   return {
     borderTop: PROJECT_BORDER,
     borderRight: `1px ${
       isLastColumn ? 'solid' : 'dashed'
     } ${PROJECT_BORDER_COLOR}`,
-    borderBottom: isFinalRow ? PROJECT_BORDER : undefined,
-    borderBottomLeftRadius: isFinalRow && isFirstColumn ? 4 : undefined,
-    borderBottomRightRadius: isFinalRow && isLastColumn ? 4 : undefined,
     borderLeft: isFirstColumn ? PROJECT_BORDER : undefined,
     width: '100%',
     padding: collapsed ? '0px 8px' : 8,
-    maxHeight: collapsed ? 100 : undefined, //'60vh',
+    maxHeight: collapsed ? 100 : undefined, // we could set a maxHeight of some percent of vh, but we'd have to change overflow and it could cause problems for D&D
     overflowY: 'hidden',
     maxWidth: '100%',
     overflowX: 'hidden',

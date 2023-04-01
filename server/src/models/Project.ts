@@ -29,7 +29,7 @@ export class Project {
       lastEdited?: string
       id: string
     }>
-    assignedTo: string[] // ids
+    assignedTo: string[]
     subTasks: Array<{ name: string; completed: boolean; id: string }>
     recurrance?: { interval?: number; nextDue?: string }
     description?: string

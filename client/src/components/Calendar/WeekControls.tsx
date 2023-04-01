@@ -52,7 +52,7 @@ export const WeekControls = (props: Props) => {
             (num: string) => num !== '-1'
           )
           toggleProject(
-            // we dont want the array to even be empty, and we dont want both the All projects and anything else to show at the same time.
+            // we dont want the array to ever be empty, and we dont want both the All projects and anything else to show at the same time.
             ((e as any).target.value.includes('-1') &&
               !currIds.includes('-1')) ||
               withoutAllProjects.length === 0

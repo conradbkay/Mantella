@@ -57,7 +57,6 @@ export const ProjectChat = ({
     func()
   }, [chatId])
 
-  // Runs whenever a socket event is recieved from the server
   useEffect(() => {
     socket.on('message', (data) => {
       setMessagesReceived((state) => [

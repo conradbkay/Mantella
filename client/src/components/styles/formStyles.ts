@@ -13,7 +13,7 @@ export const useFormStyles = makeStyles((theme: Theme) => ({
   paper: {
     marginTop: 8,
     display: 'flex',
-    flexDirection: 'column', // prevent all from being on one line
+    flexDirection: 'column',
     alignItems: 'center',
     padding: `${theme.spacing(2, 3, 3)}`
   },

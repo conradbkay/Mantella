@@ -1,12 +1,8 @@
 import { Button, Paper } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { getAllTasks, id } from '../../utils/utilities'
+import { getAllTasks, id, toDaysHHMMSS } from '../../utils/utilities'
 import { useMemo } from 'react'
-import {
-  RESET_POMODORO,
-  TOGGLE_SELECTING_TASK,
-  TOGGLE_STOPWATCH
-} from '../../store/pomodoro'
+import { TOGGLE_SELECTING_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
 
 type Props = {
   toggleWorking: () => void
@@ -64,28 +60,22 @@ export const Display = ({ timeLeft }: Props) => {
             ? 'Cancel'
             : 'Select ' + (pomodoro.selectedTaskId ? 'New' : '')}
         </Button>
-        <p>
+        <p style={{ fontWeight: 500, marginTop: 4 }}>
           {pomodoro.selectedTaskId && !pomodoro.selectingTask
-            ? '' // toDaysHHMMSS(tasks[pomodoro.selectedTaskId].timeWorkedOn)
+            ? toDaysHHMMSS(
+                tasks[id(tasks, pomodoro.selectedTaskId)].timeWorkedOn
+              )
             : ''}
         </p>
       </Paper>
       <div style={{ display: 'flex' }}>
         <Button
-          onClick={() => dispatch(TOGGLE_STOPWATCH())}
+          onClick={() => dispatch(TOGGLE_TIMER())}
           color="primary"
           fullWidth
           variant="outlined"
         >
           {buttonText}
-        </Button>
-        <div style={{ width: 8 }} />
-        <Button
-          onClick={() => dispatch(RESET_POMODORO())}
-          color="secondary"
-          fullWidth
-        >
-          Reset
         </Button>
       </div>
     </div>

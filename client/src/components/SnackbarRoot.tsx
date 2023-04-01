@@ -53,7 +53,6 @@ const useStyles = makeStyles((theme: Theme) => ({
 }))
 
 export const SnackbarRoot = () => {
-  // Find what Icon to use for snackbar by variant
   const variantIcon = {
     success: CheckCircleIcon,
     warning: WarningIcon,

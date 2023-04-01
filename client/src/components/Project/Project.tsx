@@ -9,7 +9,8 @@ import {
   FormControl,
   Select,
   InputLabel,
-  MenuItem
+  MenuItem,
+  ButtonBase
 } from '@mui/material'
 import { TState } from '../../types/state'
 import { CreateList } from './CreateList'
@@ -99,7 +100,6 @@ export const PROJECT_BORDER = '1px solid ' + PROJECT_BORDER_COLOR
 
 const PROGRESS_DISPLAYS = ['No Progress', 'In Progress', 'Complete']
 
-// when dragging to an empty list droppable.sortable will be empty
 const getDragEventData = ({ active, over }: DragOverEvent | DragEndEvent) => {
   if (over && active.data.current) {
     const taskId = active.id as string
@@ -254,20 +254,20 @@ export const Project = (props: Props) => {
     }
   }
 
-  const onDragEnd = (event: DragEndEvent) => {
+  const onDragEnd = async (event: DragEndEvent) => {
     if (event.over && event.over.id === 'trash') {
       dispatch(OPEN_SNACKBAR({ message: 'Task deleted', variant: 'undo' }))
       dispatch(
         SET_TASK({ id: draggingId!, projectId: project.id, newTask: undefined })
       )
-      // they will have 5 seconds to undo with the snackbar by reloading the page
+      // they will have 5 seconds to undo with the snackbar by reloading the page so that the request does not get sent
       setTimeout(() => {
         APIDeleteTask(draggingId!, project.id)
       }, 5500)
     } else if ((event.active.id as string).split('|').length === 3) {
       const [, taskId, userId] = (event.active.id as string).split('|')
 
-      const remove = () => {
+      const remove = async () => {
         dispatch(
           SET_TASK({
             id: taskId,
@@ -293,9 +293,8 @@ export const Project = (props: Props) => {
       } else if (taskId !== event.over.id) {
         // to another task, or to a list
         const task = project.tasks.find((task) => task.id === event.over!.id)
-        remove()
 
-        if (task && (!task.assignedTo || !task.assignedTo.includes(userId))) {
+        if (task && !task.assignedTo.includes(userId)) {
           dispatch(
             SET_TASK({
               id: event.over.id as string,
@@ -305,12 +304,16 @@ export const Project = (props: Props) => {
               }
             })
           )
+          // since both of the following functions modify the same data, we need to avoid race conditions by doing one first on the server
+          await remove()
 
           APIAssignUserToTask({
             userId,
             taskId: event.over.id as string,
             projId: project.id
           })
+        } else {
+          remove()
         }
       }
     } else if (event.over && (event.active.id as any).slice(0, 4) === 'user') {
@@ -369,6 +372,7 @@ export const Project = (props: Props) => {
         distance: 8
       }
     }),
+    // TODO: isn't working
     useSensor(KeyboardSensor)
   )
 
@@ -479,6 +483,25 @@ export const Project = (props: Props) => {
                         ))}
                       </tr>
                     ))}
+                    <tr>
+                      <td>
+                        <ButtonBase
+                          onClick={() => setDialogOpen(true)}
+                          style={{
+                            width: '100%',
+                            color: theme.palette.primary.main,
+                            fontSize: 18,
+                            height: 64,
+                            // for some reason putting border in parent makes it jut out by 1px on each side
+                            border: PROJECT_BORDER,
+                            borderBottomLeftRadius: 4,
+                            borderBottomRightRadius: 4
+                          }}
+                        >
+                          CREATE LIST
+                        </ButtonBase>
+                      </td>
+                    </tr>
                   </TableBody>
                 </table>
               ) : viewType === 'list' ? (

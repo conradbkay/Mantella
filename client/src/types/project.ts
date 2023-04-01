@@ -36,7 +36,7 @@ export interface TTask {
   color: string
   createdAt: string // date
   dueDate?: string | null // date
-  assignedTo?: string[] | null
+  assignedTo: string[]
   comments: Array<{
     id: string
     comment: string

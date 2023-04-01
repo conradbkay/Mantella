@@ -10,7 +10,7 @@ export type TStopWatch = {
 
 export type TPomodoro = {
   paused: boolean
-  working: boolean // if false we are in break
+  working: boolean
   currSeconds: number
   breakSeconds: number
   workSeconds: number

@@ -70,7 +70,6 @@ io.on('connection', (socket: any) => {
     }
 
     io.in(chatId).emit('message', messageObj)
-    // save to project
 
     const chat = await ChatModel.findOne({ id: chatId })
 

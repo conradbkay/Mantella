@@ -75,7 +75,6 @@ const useStyles = makeStyles(() => ({
   badge: {
     marginTop: 15,
     marginRight: 15
-    // position: 'relative'
   },
   input: {
     cursor: 'inherit',
@@ -148,6 +147,7 @@ export const BaseTask = memo(
     return task ? (
       <div style={{ width: '100%' }}>
         <div
+          className="task"
           ref={setNodeRef}
           id={task.id.toString()}
           style={{

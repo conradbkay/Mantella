@@ -10,7 +10,6 @@ export const router = Router()
  MUST GO AFTER router declaration because otherwise those modules won't have anything to import */
 
 router.post('/logout', logout)
-// todo: make session persist
 router.post('/register', register)
 // doesn't work without {session: true}
 router.post('/login', passport.authenticate('local', { session: true }), login)

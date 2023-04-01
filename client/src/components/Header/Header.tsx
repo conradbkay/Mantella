@@ -236,7 +236,7 @@ export const Header = withRouter((props: Props) => {
                     <MenuIcon />
                   </IconButton>
                 </div>
-                <HeaderSearchBar />
+                {authenticated !== null && <HeaderSearchBar />}
                 <div className={classes.tabContainer}>
                   <Tabs
                     value={value === -1 ? false : value}

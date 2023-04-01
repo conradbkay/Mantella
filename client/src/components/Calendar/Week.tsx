@@ -13,7 +13,7 @@ import { id } from '../../utils/utilities'
 const getDays = (start: Date): Date[] => {
   const result: Date[] = [subDays(start, 1), start]
   for (let i = 0; i < 5; i++) {
-    result.push(addDays(start, i + 1)) // start at adding 1 day
+    result.push(addDays(start, i + 1))
   }
 
   return result
@@ -54,7 +54,7 @@ export const CalendarWeek = ({ projectId }: { projectId?: string }) => {
 
   const days = getDays(baseDay)
 
-  // using new Array(7).fill([]) causes all pointers to be equal
+  // using new Array(7).fill([]) causes all references to be to the same array
   const weekTasks: TTask[][] = [[], [], [], [], [], [], []]
 
   for (let task of allTasks) {

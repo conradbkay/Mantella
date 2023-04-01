@@ -5,7 +5,7 @@ type OwnProps = {
   project: TProject
 }
 
-// make it real pretty, lotta colors
+// make it stylistic with good colors
 export const ProjStats = ({ project }: OwnProps) => {
   const theme = useTheme()
 

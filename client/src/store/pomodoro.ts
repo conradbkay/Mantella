@@ -8,7 +8,6 @@ const pomodoroSlice = createSlice({
   reducers: {
     TICK: (pom) => {
       if (pom.currSeconds > 0 && !pom.paused) {
-        // just a double check
         pom.currSeconds -= 1
       } else {
         pom.paused = true

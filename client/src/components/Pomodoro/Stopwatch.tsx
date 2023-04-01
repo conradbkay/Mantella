@@ -48,7 +48,7 @@ export const Stopwatch = () => {
         >
           Reset
         </Button>
-        <Button onClick={() => dispatch(TOGGLE_STOPWATCH)} color="secondary">
+        <Button onClick={() => dispatch(TOGGLE_STOPWATCH())} color="secondary">
           {stopWatch.paused ? (
             <PlayArrow style={{ marginRight: 4 }} />
           ) : (

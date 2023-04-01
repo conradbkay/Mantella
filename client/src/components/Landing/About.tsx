@@ -109,33 +109,6 @@ export const About = ({ showLinkedin }: Props) => {
         </Grid>
       </Grid>
       <div style={{ margin: '20px 0' }}>
-        {showLinkedin && (
-          <>
-            <Typography variant="h4" align="center" gutterBottom>
-              The Team
-            </Typography>
-            <div className={classes.kayLink}>
-              <div
-                className="LI-profile-badge"
-                data-version="v1"
-                data-size="large"
-                data-locale="en_US"
-                data-type="vertical"
-                data-theme="dark"
-                data-vanity="austin-kay-4a823b139"
-              >
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="LI-simple-link"
-                  href="https://www.linkedin.com/in/austin-kay-4a823b139?trk=profile-badge"
-                >
-                  Austin Kay - Builder
-                </a>
-              </div>
-            </div>{' '}
-          </>
-        )}
         <Typography style={{ marginTop: 20 }} variant="h4" align="center">
           Features
         </Typography>

@@ -4,18 +4,11 @@ html * {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
-.fullwidth {
-  width: 100%;
-}
-
-.gap {
-  margin: 8px 0px !important;
-}
-
-.rw-datetime-picker {
-  width: 100%;
+.task:focus {
+  filter: brightness(130%);
 }
 
 .RichEditor-root {

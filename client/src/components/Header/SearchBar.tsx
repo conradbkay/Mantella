@@ -59,6 +59,11 @@ export const HeaderSearchBar = () => {
     setResults(newResults)
   }
 
+  const reset = () => {
+    setResults([])
+    setValue('')
+  }
+
   return (
     <Paper
       style={{
@@ -81,10 +86,10 @@ export const HeaderSearchBar = () => {
         sx={{ ml: 1, flex: 1 }}
         placeholder={'Search Projects'}
       />
-      {results.length !== 0 && (
+      {value && (
         <>
-          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-            <Close onClick={() => setResults([])} />
+          <IconButton onClick={reset} type="submit" aria-label="search">
+            <Close />
           </IconButton>
 
           <Paper
@@ -105,9 +110,35 @@ export const HeaderSearchBar = () => {
                   key={result.title + i + result.toId}
                   component={Link}
                   onClick={() => {
-                    setResults([])
+                    const focus = () => {
+                      const elem = document.getElementById(result.toId!)
+
+                      if (elem) {
+                        elem.setAttribute('tabindex', '0')
+                        elem.focus()
+                        // move task to center of screen
+                        elem.scrollIntoView({
+                          block: 'center',
+                          inline: 'center',
+                          behavior: 'auto'
+                        })
+                        return true
+                      }
+
+                      return false
+                    }
+                    reset()
+                    // incredibly hacky
+                    if (result.toId) {
+                      if (!focus()) {
+                        setTimeout(() => {
+                          console.log('not')
+                          focus()
+                        }, 100)
+                      }
+                    }
                   }}
-                  to={`/project/${result.projectId}#${result.toId || ''}`}
+                  to={`/project/${result.projectId}`}
                 >
                   {result.title}
                 </ListItem>

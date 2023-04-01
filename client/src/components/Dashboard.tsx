@@ -31,7 +31,6 @@ export const Dashboard = () => {
   const [editingTaskId, setEditingTaskId] = useState('')
   const projects = useAppSelector(selectProjects)
   const user = useAppSelector((state) => state.user)
-  //const [tasks, setTasks] = useState(getAllTasks(props.projects))
   const tasks = getAllTasks(projects)
   let betterColors = genColors()
 

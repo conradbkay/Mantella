@@ -19,12 +19,12 @@ const footers = [
 const useStyles = makeStyles((theme: Theme) => ({
   footer: {
     marginTop: 64,
-    borderTop: `1px solid ${theme.palette.divider}`, // nice little division
+    borderTop: `1px solid ${theme.palette.divider}`,
     padding: `${theme.spacing(6)}px 0`,
     marginLeft: 'auto',
     marginRight: 'auto',
     [theme.breakpoints.up(1200)]: {
-      width: 1000 // dont make it always fullWidth(eez to big)
+      width: 1000
     }
   }
 }))

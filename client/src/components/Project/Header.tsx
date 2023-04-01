@@ -26,21 +26,9 @@ type Props = {
 
 const ProjectHeader = memo(
   ({ project, deleteMode, viewType, setViewType, setCreating }: Props) => {
-    //const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const [name, setName] = useState(project ? project.name : undefined)
 
     const dispatch = useDispatch()
-
-    /*useEffect(() => {
-      window.addEventListener('resize', () => {
-        setWindowWidth(window.innerWidth)
-      })
-
-      return () =>
-        window.removeEventListener('resize', () => {
-          setWindowWidth(window.innerWidth)
-        })
-    }, [])*/
 
     const { setNodeRef } = useDroppable({ id: 'users' })
 

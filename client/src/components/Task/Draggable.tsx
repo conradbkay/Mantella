@@ -14,7 +14,7 @@ const DraggableTask = ({ task, children }: Props) => {
     })
 
   const style = {
-    // using .Transform causes short elements to get stretched
+    // using CSS.Transform causes short elements to get stretched
     transform: CSS.Translate.toString(transform),
     transition
   }

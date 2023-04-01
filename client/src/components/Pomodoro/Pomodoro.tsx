@@ -41,7 +41,6 @@ export const Pomodoro = ({ onClose }: Props) => {
         }
         dispatch(POM_TICK())
       }
-      // set tab title
       document.title = pomodoro.paused
         ? 'Mantella'
         : `${pomodoro.working ? 'Work ' : 'Break '} ${toDaysHHMMSS(
