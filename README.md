@@ -57,6 +57,8 @@ Message with specific user, even groups
 
 Settings:
 Persistent default theme
+change name
+migrate to email/password if guest, could be in header as a "migrate" basically register page
 
 Project members:
 privileges for certain members, transfer to owner

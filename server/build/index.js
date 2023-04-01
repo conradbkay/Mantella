@@ -77,6 +77,11 @@ app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
     resave: true,
     saveUninitialized: false,
+    cookie: {
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none'
+    },
     genid: () => {
         return (0, uuid_1.v4)();
     },

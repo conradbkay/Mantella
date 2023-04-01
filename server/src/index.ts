@@ -98,6 +98,11 @@ app.use(
     secret: process.env.PRIVATE || 'test',
     resave: true,
     saveUninitialized: false,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'none'
+    },
     genid: () => {
       return uuid()
     },
