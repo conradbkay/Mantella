@@ -41,8 +41,6 @@ Websocket for every update
 Look into operational transformation
 Edit history from diffs
 
-Search bar smooth scroll to task
-
 Notetaker
 
 Wire components together
@@ -50,8 +48,7 @@ Wire components together
 Animations with react-spring, dark to light mode is jarring for example
 
 "List view" that actually shows lists, separate from "tasks"
-
-dragging user doesn't show, as if z-index is too low
+Could have drag and drop that actually commits to project?
 
 See how feasable mobile (probably sideways orientation) would be
 

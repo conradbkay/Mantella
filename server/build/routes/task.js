@@ -209,10 +209,6 @@ const assignUserToTask = async (req, res) => {
     if (!task) {
         throw new Error('task not in project');
     }
-    if (!task.assignedTo) {
-        // legacy tasks
-        task.assignedTo = [];
-    }
     if (task.assignedTo.includes(req.body.userId)) {
         task.assignedTo.splice(task.assignedTo.indexOf(req.body.userId), 1);
     }

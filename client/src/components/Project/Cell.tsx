@@ -48,9 +48,7 @@ const getCellStyles = ({
     width: '100%',
     padding: collapsed ? '0px 8px' : 8,
     maxHeight: collapsed ? 100 : undefined, // we could set a maxHeight of some percent of vh, but we'd have to change overflow and it could cause problems for D&D
-    overflowY: 'hidden',
     maxWidth: '100%',
-    overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column'
   }
@@ -113,10 +111,7 @@ export const ProjectCell = memo(
 
     // TODO: make background color change when dragging task, same for task changing when dragging user on
     return (
-      <td
-        className="anim-height"
-        style={getCellStyles({ project, collapsed, list, progress })}
-      >
+      <td style={getCellStyles({ project, collapsed, list, progress })}>
         {progress === 0 && (
           <div style={{ display: 'flex', margin: 4 }}>
             {collapsed && (

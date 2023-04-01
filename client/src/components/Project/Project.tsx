@@ -149,6 +149,7 @@ const customCollisionDetection = ({
   const rectIntersectionCollisions = rectIntersection({
     ...args,
     droppableContainers: droppableContainers.filter(
+      // draggable avatar or trash
       ({ id }: any) => id === 'trash' || id.split('|').length > 2
     )
   })

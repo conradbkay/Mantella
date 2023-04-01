@@ -11,7 +11,6 @@ exports.router = (0, express_1.Router)();
 /* make sure these modules run as they contain router.* methods
  MUST GO AFTER router declaration because otherwise those modules won't have anything to import */
 exports.router.post('/logout', auth_1.logout);
-// todo: make session persist
 exports.router.post('/register', auth_1.register);
 // doesn't work without {session: true}
 exports.router.post('/login', passport_2.default.authenticate('local', { session: true }), auth_1.login);

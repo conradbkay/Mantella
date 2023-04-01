@@ -55,7 +55,6 @@ io.on('connection', (socket) => {
             id: (0, uuid_1.v4)()
         };
         io.in(chatId).emit('message', messageObj);
-        // save to project
         const chat = await Chat_1.ChatModel.findOne({ id: chatId });
         if (chat) {
             chat.messages.push(messageObj);
