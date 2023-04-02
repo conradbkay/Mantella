@@ -54,7 +54,9 @@ export const SubtaskMap = ({
                 />
               )}
             </div>
-            <span style={{ marginLeft: 8 }}>{subTask.name}</span>
+            <span style={{ marginLeft: 8, userSelect: 'none' }}>
+              {subTask.name}
+            </span>
           </animated.div>
         )}
     </Transition>

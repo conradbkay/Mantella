@@ -83,7 +83,8 @@ const projectSlice = createSlice({
     ) => {
       const project = projects[id(projects, payload.projectId)]
       const tasks = project.tasks
-      if (payload.newTask === null) {
+
+      if (!payload.newTask) {
         // REFERENCE CLEANUP
 
         project.lists.forEach((list) => {

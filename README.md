@@ -39,42 +39,52 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 Allow link as [http://mantella.herokuapp.com?action=autoTrial] which would automatically create a guest account which has all premium features for 7 days. Migration of guest accounts to proper account should be added after this is added (settings -> set email/password)
 
+### Edit History
+
 Websocket for every update
 Look into operational transformation
 Edit history from diffs
 
+### Mobile Styling
+
+Sideways and normal orientation
+
+### Additional Features
+
 Notetaker
 
-Wire components together
+Wiring components together
 
 Animations with react-spring, dark to light mode is jarring for example
 
 "List view" that actually shows lists, separate from "tasks"
 Could have drag and drop that actually commits to project?
 
-See how feasable mobile (probably sideways orientation) would be
+### Chat
 
-Chat:
 Message with specific user, even groups
+Track seen and unseen messages, show unread count on sidebar and perhaps tab name
 
-Settings:
-Persistent default theme
+### User
+
+Persistent default theme, or just make header theme changer persistent in localstorage and user
 change name
 migrate to email/password if guest, could be in header as a "migrate" basically register page
-
-Project members:
 privileges for certain members, transfer to owner
 
-Statistics:
+### Statistics
+
 Track who completes task and when
 
-Custom right click
+### Bugs
 
-dragging from task user to task with same user assigned is bugged
-
-Recurring tasks:
-when they drag to completed, it should go back to no progress when the due date passes, so do a check for that on login perhaps
+chat websocket doesn't work on heroku
 
 deleting project causes error
 
-chat websocket doesn't work on heroku
+dragging from task user to task with same user assigned is bugged
+
+### Recurring Tasks
+
+when they drag to completed, it should go back to no progress when the due date passes, so do a check for that on login perhaps
+

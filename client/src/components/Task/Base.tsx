@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef, memo } from 'react'
 import { TTask, TSubtask } from '../../types/project'
-import { LinearProgress, Badge, IconButton, useTheme } from '@mui/material'
+import {
+  LinearProgress,
+  Badge,
+  IconButton,
+  useTheme,
+  MenuItem,
+  Popover,
+  ListItemIcon,
+  ListItemText
+} from '@mui/material'
 import { formatDueDate } from '../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../utils/utilities'
 import PlayArrow from '@mui/icons-material/PlayArrow'
@@ -21,8 +30,11 @@ import DraggableAvatar from './DraggableAvatar'
 import { taskDummyOpacity } from '../Project/Project'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { SELECT_POMODORO_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
-import { SET_SUBTASK } from '../../store/projects'
+import { SET_SUBTASK, SET_TASK } from '../../store/projects'
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
+import { APIDeleteTask } from '../../API/task'
+import Edit from '@mui/icons-material/Edit'
+import Delete from '@mui/icons-material/Delete'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -105,6 +117,9 @@ export const BaseTask = memo(
     showProgress,
     isDraggingUser
   }: OwnProps) => {
+    const [rightClickAnchorEl, setRightClickAnchorEl] =
+      useState<null | EventTarget>(null)
+
     const dispatch = useAppDispatch()
     const { pomodoro } = useAppSelector((state) => ({
       pomodoro: state.pomodoro
@@ -144,274 +159,344 @@ export const BaseTask = memo(
 
     const TimeIcon = isCurrentTask ? Pause : PlayArrow
 
-    return task ? (
-      <div style={{ width: '100%' }}>
-        <div
-          className="task"
-          ref={setNodeRef}
-          id={task.id.toString()}
-          style={{
-            display: hidden ? 'none' : undefined,
-            minHeight: MIN_HEIGHT,
-            backgroundColor:
-              task.color && task.color !== '#FFFFFF'
-                ? task.color
-                : theme.palette.background.paper,
-            backgroundImage:
-              theme.palette.mode === 'dark'
-                ? 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))'
-                : undefined,
-            border,
-            cursor: 'pointer',
-            color: isDragging
-              ? theme.palette.text.disabled
-              : theme.palette.text.secondary,
-            opacity: isDragging ? taskDummyOpacity : undefined,
-            outline: 'none',
-            ...(style || {})
+    if (!task) {
+      return null
+    }
+
+    return (
+      <>
+        <Popover
+          anchorEl={rightClickAnchorEl ? (rightClickAnchorEl as any).el : null}
+          open={Boolean(rightClickAnchorEl)}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            rightClickAnchorEl
+              ? {
+                  top: (rightClickAnchorEl as any).top,
+                  left: (rightClickAnchorEl as any).left
+                }
+              : undefined
+          }
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right'
           }}
-          onClick={() => {
-            if (pomodoro.selectingTask) {
-              dispatch(SELECT_POMODORO_TASK(task.id.toString()))
-            } else {
-              openFunc()
-            }
-          }}
+          onClose={() => setRightClickAnchorEl(null)}
         >
-          <Badge
-            classes={{
-              colorSecondary: classes.badgeColor,
-              badge: classes.badge
-            }}
-            color={'primary'}
-            badgeContent={task.points}
-            style={{
-              width: '100%',
-              display: 'flex',
-              minHeight: MIN_HEIGHT,
-              outline: 'none'
+          <MenuItem
+            onClick={() => {
+              setRightClickAnchorEl(null)
+              openFunc()
             }}
           >
-            <div style={{ margin: 4, width: '100%', display: 'block' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                {showProgress && (
-                  <CheckCircleOutline
+            <ListItemIcon>
+              <Edit fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Edit Task</ListItemText>
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setRightClickAnchorEl(null)
+              dispatch(
+                SET_TASK({
+                  id: task.id,
+                  projectId: project.id,
+                  newTask: undefined
+                })
+              )
+              APIDeleteTask(task.id, project.id)
+            }}
+          >
+            <ListItemIcon>
+              <Delete fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Delete Task</ListItemText>
+          </MenuItem>
+        </Popover>
+        <div style={{ width: '100%' }}>
+          <div
+            onContextMenu={(e) => {
+              e.preventDefault()
+
+              e.stopPropagation() // parents (Cell) have contextMenu watchers too, don't call both
+              setRightClickAnchorEl({
+                el: e.currentTarget,
+                top: e.clientY,
+                left: e.clientX
+              } as any)
+            }}
+            className="task"
+            ref={setNodeRef}
+            id={task.id.toString()}
+            style={{
+              display: hidden ? 'none' : undefined,
+              minHeight: MIN_HEIGHT,
+              backgroundColor:
+                task.color && task.color !== '#FFFFFF'
+                  ? task.color
+                  : theme.palette.background.paper,
+              backgroundImage:
+                theme.palette.mode === 'dark'
+                  ? 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))'
+                  : undefined,
+              border,
+              cursor: 'pointer',
+              color: isDragging
+                ? theme.palette.text.disabled
+                : theme.palette.text.secondary,
+              opacity: isDragging ? taskDummyOpacity : undefined,
+              outline: 'none',
+              ...(style || {})
+            }}
+            onClick={() => {
+              if (pomodoro.selectingTask) {
+                dispatch(SELECT_POMODORO_TASK(task.id.toString()))
+              } else {
+                openFunc()
+              }
+            }}
+          >
+            <Badge
+              classes={{
+                colorSecondary: classes.badgeColor,
+                badge: classes.badge
+              }}
+              color={'primary'}
+              badgeContent={task.points}
+              style={{
+                width: '100%',
+                display: 'flex',
+                minHeight: MIN_HEIGHT,
+                outline: 'none'
+              }}
+            >
+              <div style={{ margin: 4, width: '100%', display: 'block' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {showProgress && (
+                    <CheckCircleOutline
+                      style={{
+                        marginLeft: 4,
+                        color: [
+                          undefined,
+                          theme.palette.warning.main,
+                          theme.palette.success.main
+                        ][getProgress(task.id, project)]
+                      }}
+                    />
+                  )}
+                  <div
                     style={{
-                      marginLeft: 4,
-                      color: [
-                        undefined,
-                        theme.palette.warning.main,
-                        theme.palette.success.main
-                      ][getProgress(task.id, project)]
+                      display: 'flex'
                     }}
-                  />
+                  >
+                    {task.assignedTo &&
+                      task.assignedTo.map((userId, i) => (
+                        <DraggableAvatar
+                          noMargin
+                          key={userId}
+                          task={task}
+                          user={project.users[id(project.users, userId)]}
+                        />
+                      ))}
+                  </div>
+                  <span
+                    id={task.id}
+                    style={{
+                      fontSize: 18,
+                      maxWidth: '94%',
+                      color: isDragging
+                        ? theme.palette.text.disabled
+                        : theme.palette.text.secondary,
+                      marginLeft: 4,
+                      marginTop: 4
+                    }}
+                  >
+                    <div style={{ display: 'flex', userSelect: 'none' }}>
+                      {task.name ? task.name : 'Unnamed Task'}
+                    </div>
+                  </span>
+                </div>
+                {task.description && (
+                  <div style={{ marginTop: 4, marginLeft: 4 }}>
+                    <Editor
+                      editorState={getEditorStateFromTaskDescription(
+                        task.description
+                      )}
+                      readOnly
+                      onChange={() => null}
+                    />
+                  </div>
+                )}
+                <SubtaskMap
+                  show={showSubTasks}
+                  subTasks={task.subTasks}
+                  taskId={task.id}
+                  onCheckbox={(newSub: TSubtask) => {
+                    dispatch(
+                      SET_SUBTASK({
+                        taskId: task.id,
+                        projectId: project.id,
+                        id: newSub.id,
+                        newSubtask: newSub
+                      })
+                    )
+                    APISetSubtask({
+                      projId: project.id,
+                      taskId: task.id,
+                      subtaskId: newSub.id,
+                      info: { name: newSub.name, completed: newSub.completed }
+                    })
+                  }}
+                />
+
+                {task.comments.length !== 0 && (
+                  <Transition
+                    initial={null}
+                    items={showComments}
+                    from={{ height: 0, overflow: 'hidden' }}
+                    enter={{ height: 'auto' }}
+                    leave={{ height: 0, overflow: 'hidden' }}
+                  >
+                    {(show) =>
+                      show &&
+                      ((style) => (
+                        <animated.div style={{ marginLeft: 6, ...style }}>
+                          <div
+                            style={{
+                              paddingTop: 10,
+                              paddingBottom: 10,
+                              borderRadius: '.8rem'
+                            }}
+                          >
+                            {task.comments.map((comment) => (
+                              <div
+                                key={comment.id}
+                                style={{ color: theme.palette.text.primary }}
+                              >
+                                <span
+                                  style={{
+                                    color: theme.palette.text.secondary
+                                  }}
+                                >
+                                  {
+                                    formatDueDate(
+                                      {
+                                        ...task,
+                                        dueDate: comment.dateAdded,
+                                        recurrance: undefined
+                                      },
+                                      false
+                                    ).split('Due')[1]
+                                  }
+                                </span>
+                                {'  -  '}
+                                {comment.comment}
+                              </div>
+                            ))}
+                          </div>
+                        </animated.div>
+                      ))
+                    }
+                  </Transition>
+                )}
+                {task.dueDate && getProgress(task.id, project) !== 2 && (
+                  <>
+                    <div
+                      style={{
+                        marginLeft: 6,
+                        color: isBefore(new Date(task.dueDate), new Date())
+                          ? '#d32f24'
+                          : theme.palette.text.primary
+                      }}
+                    >
+                      {formatDate}
+                    </div>
+                  </>
                 )}
                 <div
                   style={{
-                    display: 'flex'
+                    display: 'flex',
+                    cursor: 'pointer'
                   }}
                 >
-                  {task.assignedTo &&
-                    task.assignedTo.map((userId, i) => (
-                      <DraggableAvatar
-                        noMargin
-                        key={userId}
-                        task={task}
-                        user={project.users[id(project.users, userId)]}
-                      />
-                    ))}
-                </div>
-                <span
-                  id={task.id}
-                  style={{
-                    fontSize: 18,
-                    maxWidth: '94%',
-                    color: isDragging
-                      ? theme.palette.text.disabled
-                      : theme.palette.text.secondary,
-                    marginLeft: 4,
-                    marginTop: 4
-                  }}
-                >
-                  <div style={{ display: 'flex', userSelect: 'none' }}>
-                    {task.name ? task.name : 'Unnamed Task'}
-                  </div>
-                </span>
-              </div>
-              {task.description && (
-                <div style={{ marginTop: 4, marginLeft: 4 }}>
-                  <Editor
-                    editorState={getEditorStateFromTaskDescription(
-                      task.description
-                    )}
-                    readOnly
-                    onChange={() => null}
+                  {Object.values(task.comments).length !== 0 && (
+                    <IconButton
+                      aria-label="show comments"
+                      className={classes.play}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setShowComments(!showComments)
+                      }}
+                    >
+                      <Comment />
+                    </IconButton>
+                  )}
+                  {Object.values(task.subTasks).length !== 0 && (
+                    <IconButton
+                      aria-label="show subtasks"
+                      style={{ marginRight: 8 }}
+                      className={classes.play}
+                      onClick={(e) => {
+                        // eventually have it toggle icon based on current showSubtasks(same with comments)
+                        e.stopPropagation()
+                        setShowSubTasks(!showSubTasks)
+                      }}
+                    >
+                      <List />
+                    </IconButton>
+                  )}
+                  {task.timeWorkedOn !== 0 && (
+                    <span
+                      style={{
+                        alignSelf: 'center',
+                        fontSize: 13,
+                        marginLeft: 6
+                      }}
+                    >
+                      Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}
+                    </span>
+                  )}
+                  <TimeIcon
+                    style={{
+                      marginLeft: 'auto',
+                      color: theme.palette.text.secondary
+                    }}
+                    className={classes.play}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      dispatch(SELECT_POMODORO_TASK(task.id))
+                      dispatch(TOGGLE_TIMER())
+                    }}
                   />
                 </div>
-              )}
-              <SubtaskMap
-                show={showSubTasks}
-                subTasks={task.subTasks}
-                taskId={task.id}
-                onCheckbox={(newSub: TSubtask) => {
-                  dispatch(
-                    SET_SUBTASK({
-                      taskId: task.id,
-                      projectId: project.id,
-                      id: newSub.id,
-                      newSubtask: newSub
-                    })
-                  )
-                  APISetSubtask({
-                    projId: project.id,
-                    taskId: task.id,
-                    subtaskId: newSub.id,
-                    info: { name: newSub.name, completed: newSub.completed }
-                  })
-                }}
-              />
-
-              {task.comments.length !== 0 && (
-                <Transition
-                  initial={null}
-                  items={showComments}
-                  from={{ height: 0, overflow: 'hidden' }}
-                  enter={{ height: 'auto' }}
-                  leave={{ height: 0, overflow: 'hidden' }}
-                >
-                  {(show) =>
-                    show &&
-                    ((style) => (
-                      <animated.div style={{ marginLeft: 6, ...style }}>
-                        <div
-                          style={{
-                            paddingTop: 10,
-                            paddingBottom: 10,
-                            borderRadius: '.8rem'
-                          }}
-                        >
-                          {task.comments.map((comment) => (
-                            <div
-                              key={comment.id}
-                              style={{ color: theme.palette.text.primary }}
-                            >
-                              <span
-                                style={{ color: theme.palette.text.secondary }}
-                              >
-                                {
-                                  formatDueDate(
-                                    {
-                                      ...task,
-                                      dueDate: comment.dateAdded,
-                                      recurrance: undefined
-                                    },
-                                    false
-                                  ).split('Due')[1]
-                                }
-                              </span>
-                              {'  -  '}
-                              {comment.comment}
-                            </div>
-                          ))}
-                        </div>
-                      </animated.div>
-                    ))
-                  }
-                </Transition>
-              )}
-              {task.dueDate && getProgress(task.id, project) !== 2 && (
-                <>
-                  <div
-                    style={{
-                      marginLeft: 6,
-                      color: isBefore(new Date(task.dueDate), new Date())
-                        ? '#d32f24'
-                        : theme.palette.text.primary
-                    }}
-                  >
-                    {formatDate}
-                  </div>
-                </>
-              )}
-              <div
-                style={{
-                  display: 'flex',
-                  cursor: 'pointer'
-                }}
-              >
-                {Object.values(task.comments).length !== 0 && (
-                  <IconButton
-                    aria-label="show comments"
-                    className={classes.play}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      setShowComments(!showComments)
-                    }}
-                  >
-                    <Comment />
-                  </IconButton>
-                )}
-                {Object.values(task.subTasks).length !== 0 && (
-                  <IconButton
-                    aria-label="show subtasks"
-                    style={{ marginRight: 8 }}
-                    className={classes.play}
-                    onClick={(e) => {
-                      // eventually have it toggle icon based on current showSubtasks(same with comments)
-                      e.stopPropagation()
-                      setShowSubTasks(!showSubTasks)
-                    }}
-                  >
-                    <List />
-                  </IconButton>
-                )}
-                {task.timeWorkedOn !== 0 && (
-                  <span
-                    style={{ alignSelf: 'center', fontSize: 13, marginLeft: 6 }}
-                  >
-                    Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}
-                  </span>
-                )}
-                <TimeIcon
-                  style={{
-                    marginLeft: 'auto',
-                    color: theme.palette.text.secondary
-                  }}
-                  className={classes.play}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    dispatch(SELECT_POMODORO_TASK(task.id))
-                    dispatch(TOGGLE_TIMER())
-                  }}
-                />
               </div>
-            </div>
-          </Badge>
-          {task.subTasks.length !== 0 && (
-            <LinearProgress
-              aria-label="subtasks"
-              style={{
-                borderRadius: 0
-              }}
-              variant="determinate"
-              color="secondary"
-              value={
-                task.progress === 2
-                  ? 100
-                  : (task.subTasks.filter((subTask) => subTask.completed)
-                      .length /
-                      task.subTasks.length) *
-                    100
-              }
-            />
-          )}
+            </Badge>
+            {task.subTasks.length !== 0 && (
+              <LinearProgress
+                aria-label="subtasks"
+                style={{
+                  borderRadius: 0
+                }}
+                variant="determinate"
+                color="secondary"
+                value={
+                  task.progress === 2
+                    ? 100
+                    : (task.subTasks.filter((subTask) => subTask.completed)
+                        .length /
+                        task.subTasks.length) *
+                      100
+                }
+              />
+            )}
+          </div>
         </div>
-      </div>
-    ) : null
+      </>
+    )
   }
 )

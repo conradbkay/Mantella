@@ -81,11 +81,13 @@ app.use((0, express_session_1.default)({
     resave: false,
     proxy: process.env.NODE_ENV == 'production' ? true : false,
     saveUninitialized: false,
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'none'
-    },
+    cookie: process.env.NODE_ENV == 'production'
+        ? {
+            secure: true,
+            httpOnly: true,
+            sameSite: 'none'
+        }
+        : undefined,
     genid: () => {
         return (0, uuid_1.v4)();
     },

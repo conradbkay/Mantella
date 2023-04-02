@@ -102,11 +102,14 @@ app.use(
     resave: false,
     proxy: process.env.NODE_ENV == 'production' ? true : false, // required for heroku
     saveUninitialized: false,
-    cookie: {
-      secure: true,
-      httpOnly: true,
-      sameSite: 'none'
-    },
+    cookie:
+      process.env.NODE_ENV == 'production'
+        ? {
+            secure: true,
+            httpOnly: true,
+            sameSite: 'none'
+          }
+        : undefined,
     genid: () => {
       return uuid()
     },

@@ -442,6 +442,7 @@ export const Project = (props: Props) => {
                             color: theme.palette.text.secondary,
                             padding: 8,
                             display: 'flex',
+                            userSelect: 'none',
                             justifyContent: 'center',
                             alignItems: 'center',
                             fontSize: 20
