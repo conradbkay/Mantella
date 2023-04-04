@@ -20,4 +20,5 @@ require("./list");
 require("./project");
 require("./chat");
 require("./task");
+require("./user");
 //# sourceMappingURL=router.js.map

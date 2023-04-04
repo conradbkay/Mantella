@@ -174,9 +174,9 @@ export const Project = (props: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [draggingId, setDraggingId] = useState(null as string | null)
   const [overTrash, setOverTrash] = useState(false)
-  const [viewType, setViewType] = useState<'kanban' | 'list' | 'calendar'>(
-    'kanban'
-  )
+  const [viewType, setViewType] = useState<
+    'kanban' | 'lists' | 'calendar' | 'tasks'
+  >('kanban')
   const [listSort, setListSort] = useState<
     'default' | 'points' | 'due date' | 'newest'
   >('default')
@@ -413,7 +413,7 @@ export const Project = (props: Props) => {
                 minHeight: 'calc(100vh - 328px)'
               }}
             >
-              {viewType === 'kanban' ? (
+              {viewType === 'kanban' || viewType === 'lists' ? (
                 <table
                   style={{
                     width: '100%',
@@ -422,67 +422,73 @@ export const Project = (props: Props) => {
                   }}
                 >
                   <TableBody>
-                    <tr style={{ display: 'flex' }}>
-                      {[0, 1, 2].map((col) => (
-                        <td
-                          key={col}
-                          style={{
-                            width: '100%',
-                            backgroundColor: new Color(
-                              theme.palette.background.paper
-                            )
-                              .lighten(0.7)
-                              .hex()
-                              .toString(),
-                            borderLeft: col ? 'none' : PROJECT_BORDER,
-                            borderRight: PROJECT_BORDER,
-                            borderTop: PROJECT_BORDER,
-                            borderTopLeftRadius: col ? 0 : 4,
-                            borderTopRightRadius: col === 2 ? 4 : 0,
-                            color: theme.palette.text.secondary,
-                            padding: 8,
-                            display: 'flex',
-                            userSelect: 'none',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 20
-                          }}
-                        >
-                          <CheckCircleOutline
+                    {viewType === 'kanban' && (
+                      <tr style={{ display: 'flex' }}>
+                        {[0, 1, 2].map((col) => (
+                          <td
+                            key={col}
                             style={{
-                              paddingRight: 8,
-                              color:
-                                col === 2
-                                  ? theme.palette.success.main
-                                  : col
-                                  ? theme.palette.warning.main
-                                  : undefined
+                              width: '100%',
+                              backgroundColor: new Color(
+                                theme.palette.background.paper
+                              )
+                                .lighten(0.7)
+                                .hex()
+                                .toString(),
+                              borderLeft: col ? 'none' : PROJECT_BORDER,
+                              borderRight: PROJECT_BORDER,
+                              borderTop: PROJECT_BORDER,
+                              borderTopLeftRadius: col ? 0 : 4,
+                              borderTopRightRadius: col === 2 ? 4 : 0,
+                              color: theme.palette.text.secondary,
+                              padding: 8,
+                              display: 'flex',
+                              userSelect: 'none',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              fontSize: 20
                             }}
-                          />
-                          {PROGRESS_DISPLAYS[col]}
-                        </td>
-                      ))}
-                    </tr>
+                          >
+                            <CheckCircleOutline
+                              style={{
+                                paddingRight: 8,
+                                color:
+                                  col === 2
+                                    ? theme.palette.success.main
+                                    : col
+                                    ? theme.palette.warning.main
+                                    : undefined
+                              }}
+                            />
+                            {PROGRESS_DISPLAYS[col]}
+                          </td>
+                        ))}
+                      </tr>
+                    )}
                     {project.lists.map((list) => (
                       <tr
                         style={{
-                          display: 'flex'
+                          display: 'flex',
+                          flexDirection: viewType === 'lists' ? 'column' : 'row'
                         }}
                         key={list.id}
                       >
-                        {[0, 1, 2].map((progress) => (
-                          <ProjectCell
-                            draggingId={draggingId}
-                            setCreating={(id) => setCreating(id)}
-                            openFunc={(tId: string) => {
-                              setEditingTaskId(tId)
-                            }}
-                            key={list.id + progress}
-                            progress={progress as 0 | 1 | 2}
-                            list={list}
-                            project={project}
-                          />
-                        ))}
+                        {[0, 1, 2].map((progress) =>
+                          progress === 0 || viewType === 'kanban' ? (
+                            <ProjectCell
+                              viewType={viewType}
+                              draggingId={draggingId}
+                              setCreating={(id) => setCreating(id)}
+                              openFunc={(tId: string) => {
+                                setEditingTaskId(tId)
+                              }}
+                              key={list.id + progress}
+                              progress={progress as 0 | 1 | 2}
+                              list={list}
+                              project={project}
+                            />
+                          ) : null
+                        )}
                       </tr>
                     ))}
                     <tr>
@@ -506,7 +512,7 @@ export const Project = (props: Props) => {
                     </tr>
                   </TableBody>
                 </table>
-              ) : viewType === 'list' ? (
+              ) : viewType === 'tasks' ? (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <FormControl
                     style={{

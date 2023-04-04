@@ -75,9 +75,6 @@ const deleteProject = async (req, res) => {
     if (users) {
         for (const user of users) {
             user.projects = user.projects.filter((proj) => proj !== req.body.id);
-            if (!user.projects.length) {
-                throw new Error('cannot delete only project');
-            }
             await user.save();
         }
     }

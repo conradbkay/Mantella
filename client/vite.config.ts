@@ -8,13 +8,10 @@ import svgrPlugin from 'vite-plugin-svgr'
 import eslint from 'vite-plugin-eslint'
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [react(), viteTsconfigPaths(), svgrPlugin(), eslint() /*ssr()*/],
   build: {
     outDir: 'build'
-  },
-  define: {
-    global: process.env.NODE_ENV === 'production' ? undefined : {}
   },
   server: {
     open: true,
@@ -34,4 +31,4 @@ export default defineConfig({
       exclude: ['node_modules/', 'src/setupTests.ts']
     }
   }
-})
+}))

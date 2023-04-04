@@ -97,7 +97,14 @@ const ProjectHeader = memo(
                   }}
                 >
                   <ToggleButton value="kanban">Kanban</ToggleButton>
-                  <ToggleButton value="list">List</ToggleButton>
+                  <ToggleButton value="lists">lists</ToggleButton>
+
+                  <ToggleButton
+                    value="tasks"
+                    disabled={project.tasks.length === 0}
+                  >
+                    Tasks
+                  </ToggleButton>
                   <ToggleButton value="calendar">Calendar</ToggleButton>
                 </ToggleButtonGroup>
 

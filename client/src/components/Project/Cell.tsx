@@ -1,5 +1,5 @@
 import { ChangeEvent, CSSProperties, memo, useState } from 'react'
-import { TList, TProject } from '../../types/project'
+import { TList, TProject, TTask } from '../../types/project'
 import { BaseTask } from '../Task/Base'
 import {
   IconButton,
@@ -33,29 +33,32 @@ interface Props {
   progress: 0 | 1 | 2
   draggingId?: string | null
   openFunc: (id: string) => void
+  viewType: 'lists' | 'kanban'
   setCreating: (id: string) => void
 }
 
 const getCellStyles = ({
-  project,
-  list,
   progress,
+  idx,
+  viewType,
   collapsed
 }: {
-  project: TProject
-  list: TList
+  viewType: 'lists' | 'kanban'
   progress: number
   collapsed: boolean
+  idx: number
 }): CSSProperties => {
-  const isLastColumn = progress === 2
-  const isFirstColumn = progress === 0
+  const isLastColumn = viewType === 'lists' || progress === 2
+  const isFirstColumn = viewType === 'lists' || progress === 0
   return {
     borderTop: PROJECT_BORDER,
+    borderTopLeftRadius: idx > 0 || viewType === 'kanban' ? 0 : 4,
+    borderTopRightRadius: idx > 0 || viewType === 'kanban' ? 0 : 4,
     borderRight: `1px ${
       isLastColumn ? 'solid' : 'dashed'
     } ${PROJECT_BORDER_COLOR}`,
     borderLeft: isFirstColumn ? PROJECT_BORDER : undefined,
-    width: '100%',
+    width: viewType === 'kanban' ? '100%' : undefined,
     padding: collapsed ? '0px 8px' : '8px 8px 32px 8px',
     maxWidth: '100%',
     display: 'flex',
@@ -64,7 +67,15 @@ const getCellStyles = ({
 }
 
 export const ProjectCell = memo(
-  ({ project, list, progress, openFunc, draggingId, setCreating }: Props) => {
+  ({
+    project,
+    list,
+    progress,
+    openFunc,
+    draggingId,
+    setCreating,
+    viewType
+  }: Props) => {
     const [anchorEl, setAnchorEl] = useState(null as HTMLElement | null)
     const [rightClickAnchorEl, setRightClickAnchorEl] = useState<null | {
       el: EventTarget
@@ -93,9 +104,18 @@ export const ProjectCell = memo(
       setEditingList(['', ''])
     }
 
-    let tasks = list.taskIds[progress].map(
-      (taskId) => project.tasks[id(project.tasks, taskId)]
-    )
+    let tasks =
+      viewType === 'lists'
+        ? list.taskIds.reduce((accum, cur) => {
+            return [
+              ...accum,
+              ...cur.map((taskId) => project.tasks[id(project.tasks, taskId)])
+            ]
+          }, [] as TTask[])
+        : list.taskIds[progress].map(
+            (taskId) => project.tasks[id(project.tasks, taskId)]
+          )
+
     // TODO: For now tasks cannot be dragged if tasks are filtered out
     //const isDragDisabled = tasks.length !== filterTasks(tasks, filter).length
 
@@ -249,7 +269,12 @@ export const ProjectCell = memo(
               left: e.clientX
             } as any)
           }}
-          style={getCellStyles({ project, collapsed, list, progress })}
+          style={getCellStyles({
+            collapsed,
+            progress,
+            viewType,
+            idx: id(project.lists, list.id)
+          })}
         >
           {progress === 0 && (
             <div style={{ display: 'flex', margin: 4 }}>

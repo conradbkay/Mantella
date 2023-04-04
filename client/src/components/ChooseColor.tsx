@@ -2,6 +2,7 @@ import { TwitterPicker } from 'react-color'
 import { colors } from '../colors'
 type OwnProps = {
   color: string
+  default?: string
   onChange(color: string | string[]): void
 }
 
@@ -10,7 +11,11 @@ export const ChooseColor = (props: OwnProps) => {
     <TwitterPicker
       triangle="hide"
       width={'208px'}
-      colors={Object.values(colors)}
+      colors={
+        props.default
+          ? [props.default, ...Object.values(colors)]
+          : Object.values(colors)
+      }
       color={props.color}
       onChangeComplete={(color) => props.onChange(color.hex)}
     />

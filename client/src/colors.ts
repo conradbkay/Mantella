@@ -1,13 +1,23 @@
+import Color from 'color'
+
 export const colors = {
-  Default: '#121212',
   Red: '#C20026',
-  Blue: '#005BD2',
   Orange: '#C38300',
-  Purple: '#7B39BC',
-  cyan: '#00A86C',
+  Yellow: '#ffe100',
   Green: '#3D8F00',
+  Blue: '#005BD2',
+  Purple: '#7B39BC',
   Magenta: '#B52DB5',
-  Black: '#000000'
+  cyan: '#00A86C'
 }
+
+// colors are dark-mode designed by default
+export const colorForLightMode = (color: string) => {
+  return new Color(color).lightness(85).hex().toString()
+}
+
+/*for (const color in colors) {
+  colors[color] = new Color(colors[color]).lightness(40).hex().toString()
+}*/
 
 export type TColor = typeof colors

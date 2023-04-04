@@ -12,11 +12,17 @@ const userSlice = createSlice({
     },
     REGISTER: (state, action: PayloadAction<{ user: TAuthUser }>) => {
       return action.payload.user
+    },
+    SET_NAME: (state, action: PayloadAction<{ name: string }>) => {
+      state!.username = action.payload.name
+    },
+    SET_EMAIL: (state, action: PayloadAction<{ email: string }>) => {
+      state!.email = action.payload.email
     }
   }
 })
 
-export const { LOGIN, REGISTER } = userSlice.actions
+export const { LOGIN, REGISTER, SET_NAME, SET_EMAIL } = userSlice.actions
 
 export const selectUser = (state: RootState) => state.user
 

@@ -23,7 +23,7 @@ const projectSlice = createSlice({
           projects[id(projects, payload.id)] = payload.project
         }
       } else {
-        delete projects[id(projects, payload.id)]
+        projects.splice(id(projects, payload.id), 1)
       }
     },
 

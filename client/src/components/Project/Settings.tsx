@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { useHistory } from 'react-router'
 import { useAppDispatch } from '../../store/hooks'
 import { SET_PROJECT } from '../../store/projects'
+import { APIDeleteProject } from '../../API/project'
 
 type Props = {
   projectId: string
@@ -23,6 +24,7 @@ export const ProjectSettings = ({ projectId }: Props) => {
 
   const deleteProject = () => {
     dispatch(SET_PROJECT({ id: projectId, project: undefined }))
+    APIDeleteProject(projectId)
     navigate.push('/dashboard')
   }
 

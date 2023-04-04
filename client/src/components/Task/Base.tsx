@@ -35,6 +35,7 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 import { APIDeleteTask } from '../../API/task'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
+import { colorForLightMode } from '../../colors'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -232,8 +233,12 @@ export const BaseTask = memo(
               display: hidden ? 'none' : undefined,
               minHeight: MIN_HEIGHT,
               backgroundColor:
-                task.color && task.color !== '#FFFFFF'
-                  ? task.color
+                task.color &&
+                task.color.toUpperCase() !== '#FFFFFF' &&
+                task.color !== '#121212'
+                  ? theme.palette.mode === 'dark'
+                    ? task.color
+                    : colorForLightMode(task.color)
                   : theme.palette.background.paper,
               backgroundImage:
                 theme.palette.mode === 'dark'
