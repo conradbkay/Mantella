@@ -17,7 +17,8 @@ import {
   Grid,
   AppBar,
   Tabs,
-  useTheme
+  useTheme,
+  useMediaQuery
 } from '@mui/material'
 import { Slide, useScrollTrigger } from '@mui/material'
 import { ReactElement } from 'react'
@@ -36,6 +37,7 @@ import { makeStyles } from '@mui/styles'
 import { useAppSelector } from '../../store/hooks'
 import { selectUser } from '../../store/user'
 import { HeaderSearchBar } from './SearchBar'
+import PageView from '@mui/icons-material/PageView'
 
 const noAuthItems = [
   {
@@ -151,6 +153,8 @@ export const Header = withRouter((props: Props) => {
 
   const theme = useTheme()
 
+  const isMobile = useMediaQuery('(max-width: 500px)')
+
   return (
     <>
       <HideOnScroll>
@@ -174,11 +178,19 @@ export const Header = withRouter((props: Props) => {
               style={{ alignItems: 'center', height: '100%' }}
               className={classes.flex}
             >
+              <div className={classes.iconContainer}>
+                <IconButton
+                  onClick={() => setDrawer(true)}
+                  className={classes.iconButton}
+                >
+                  <MenuIcon />
+                </IconButton>
+              </div>
               {authenticated !== null && (
                 <>
                   <Button
                     style={{
-                      margin: 'auto 25px auto 0px',
+                      margin: isMobile ? 'auto 8px' : 'auto 25px auto 0px',
                       paddingTop: 8,
                       paddingBottom: 8
                     }}
@@ -186,8 +198,14 @@ export const Header = withRouter((props: Props) => {
                     variant="outlined"
                     onClick={(e) => setAnchorEl(e.currentTarget)}
                   >
-                    <MenuIcon />
-                    <span style={{ marginLeft: 5 }}>Projects</span>
+                    {isMobile ? (
+                      <PageView />
+                    ) : (
+                      <>
+                        <MenuIcon />
+                        <span style={{ marginLeft: 5 }}>Projects</span>
+                      </>
+                    )}
                   </Button>
                   <Menu
                     anchorEl={anchorEl}
@@ -200,42 +218,36 @@ export const Header = withRouter((props: Props) => {
                   </Menu>
                 </>
               )}
-              <div className={classes.inline}>
-                <Typography variant="h6" color="inherit" noWrap>
-                  <Trail
-                    items={'Mantella'}
-                    from={{ transform: 'translate3d(0,-40px,0)' }}
-                    to={{ transform: 'translate3d(0,0px,0)' }}
-                  >
-                    {(item) => (trailProps) =>
-                      (
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href="https://github.com/USA-Kay/Mantella"
-                          style={{
-                            ...trailProps,
-                            color: theme.palette.text.secondary,
-                            textDecoration: 'none',
-                            paddingRight: 5
-                          }}
-                          className={classes.tagline}
-                        >
-                          Mantella
-                        </a>
-                      )}
-                  </Trail>
-                </Typography>
-              </div>
-              <Fragment>
-                <div className={classes.iconContainer}>
-                  <IconButton
-                    onClick={() => setDrawer(true)}
-                    className={classes.iconButton}
-                  >
-                    <MenuIcon />
-                  </IconButton>
+              {!isMobile && (
+                <div className={classes.inline}>
+                  <Typography variant="h6" color="inherit" noWrap>
+                    <Trail
+                      items={'Mantella'}
+                      from={{ transform: 'translate3d(0,-40px,0)' }}
+                      to={{ transform: 'translate3d(0,0px,0)' }}
+                    >
+                      {(item) => (trailProps) =>
+                        (
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            href="https://github.com/USA-Kay/Mantella"
+                            style={{
+                              ...trailProps,
+                              color: theme.palette.text.secondary,
+                              textDecoration: 'none',
+                              paddingRight: 5
+                            }}
+                            className={classes.tagline}
+                          >
+                            Mantella
+                          </a>
+                        )}
+                    </Trail>
+                  </Typography>
                 </div>
+              )}
+              <Fragment>
                 {authenticated !== null && <HeaderSearchBar />}
                 <div
                   className={classes.tabContainer}
@@ -283,7 +295,7 @@ export const Header = withRouter((props: Props) => {
           </Grid>
         </AppBar>
       </HideOnScroll>
-      <Drawer anchor="right" open={drawer} onClose={() => setDrawer(false)}>
+      <Drawer anchor="left" open={drawer} onClose={() => setDrawer(false)}>
         <div style={{ width: 'auto' }}>
           <List>
             {MenuItems.map((menuItem, index) => (

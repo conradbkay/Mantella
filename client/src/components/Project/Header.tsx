@@ -15,17 +15,29 @@ import { useDispatch } from 'react-redux'
 import { APIEditProject } from '../../API/project'
 import Delete from '@mui/icons-material/Delete'
 import { SET_PROJECT } from '../../store/projects'
+import Calendar from '@mui/icons-material/CalendarToday'
+import ViewList from '@mui/icons-material/ViewList'
+import ViewDay from '@mui/icons-material/ViewDay'
+import Add from '@mui/icons-material/Add'
 
 type Props = {
   project: TProject
   viewType: string
   setViewType: (newType: string) => void
   setCreating: () => void
+  isMobile: boolean
   deleteMode: boolean // when dragging a task, whole header becomes a trash can
 }
 
 const ProjectHeader = memo(
-  ({ project, deleteMode, viewType, setViewType, setCreating }: Props) => {
+  ({
+    project,
+    deleteMode,
+    viewType,
+    setViewType,
+    setCreating,
+    isMobile
+  }: Props) => {
     const [name, setName] = useState(project ? project.name : undefined)
 
     const dispatch = useDispatch()
@@ -69,7 +81,7 @@ const ProjectHeader = memo(
                   aria-label="project name"
                   style={{
                     ...input(theme),
-                    width: /*`${windowWidth - 300}px`*/ 200
+                    width: /*`${windowWidth - 300}px`*/ isMobile ? 120 : 200
                   }}
                   value={name}
                   onBlur={() => {
@@ -96,25 +108,32 @@ const ProjectHeader = memo(
                     }
                   }}
                 >
-                  <ToggleButton value="kanban">Kanban</ToggleButton>
-                  <ToggleButton value="lists">lists</ToggleButton>
+                  {!isMobile && (
+                    <ToggleButton value="kanban">Kanban</ToggleButton>
+                  )}
+                  <ToggleButton value="lists">
+                    {isMobile ? <ViewDay /> : 'lists'}
+                  </ToggleButton>
 
                   <ToggleButton
                     value="tasks"
                     disabled={project.tasks.length === 0}
                   >
-                    Tasks
+                    {isMobile ? <ViewList /> : 'Tasks'}
                   </ToggleButton>
-                  <ToggleButton value="calendar">Calendar</ToggleButton>
+                  <ToggleButton value="calendar">
+                    {isMobile ? <Calendar /> : 'Calendar'}
+                  </ToggleButton>
                 </ToggleButtonGroup>
 
                 <div style={{ marginLeft: 'auto', display: 'flex' }}>
+                  {/* todo: hide button when enoguh users exist that header is too wide */}
                   <Button
                     variant="outlined"
                     onClick={() => setCreating()}
-                    style={{ marginRight: 8 }}
+                    style={{ marginRight: 8, marginLeft: 8 }}
                   >
-                    Create Task
+                    {isMobile ? <Add /> : 'Create Task'}
                   </Button>
                   <div ref={setNodeRef} style={{ display: 'flex' }}>
                     {project.users.map((user, i) => (
@@ -134,7 +153,8 @@ const ProjectHeader = memo(
       oldProps.project.users === newProps.project.users &&
       oldProps.project.name === newProps.project.name &&
       oldProps.deleteMode === newProps.deleteMode &&
-      oldProps.viewType === newProps.viewType
+      oldProps.viewType === newProps.viewType &&
+      oldProps.isMobile === newProps.isMobile
 
     return same
   }

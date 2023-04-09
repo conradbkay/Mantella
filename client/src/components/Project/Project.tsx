@@ -10,13 +10,14 @@ import {
   Select,
   InputLabel,
   MenuItem,
-  ButtonBase
+  ButtonBase,
+  useMediaQuery
 } from '@mui/material'
 import { TState } from '../../types/state'
 import { CreateList } from './CreateList'
 import Add from '@mui/icons-material/Add'
 import Create from '@mui/icons-material/Create'
-import { NoMatch } from '../NoMatch/NoMatch'
+import { NoMatch } from '../404/NoMatch'
 import Helmet from 'react-helmet'
 import { id } from '../../utils/utilities'
 import { ProjectCell } from './Cell'
@@ -174,9 +175,12 @@ export const Project = (props: Props) => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [draggingId, setDraggingId] = useState(null as string | null)
   const [overTrash, setOverTrash] = useState(false)
+
+  const isMobile = useMediaQuery('(max-width: 500px)')
+
   const [viewType, setViewType] = useState<
     'kanban' | 'lists' | 'calendar' | 'tasks'
-  >('kanban')
+  >(isMobile ? 'lists' : 'kanban')
   const [listSort, setListSort] = useState<
     'default' | 'points' | 'due date' | 'newest'
   >('default')
@@ -395,6 +399,7 @@ export const Project = (props: Props) => {
           onDragCancel={onDragCancel}
         >
           <ProjectHeader
+            isMobile={isMobile}
             setCreating={() => setCreating(project.lists[0].id)}
             setViewType={(newType: string) => {
               setViewType(newType as any)
@@ -407,7 +412,7 @@ export const Project = (props: Props) => {
             <Sidebar project={project} socket={props.socket} />
             <Paper
               style={{
-                margin: 20,
+                margin: isMobile ? 0 : 20,
                 width: '100%',
                 padding: '20px 20px 40px',
                 minHeight: 'calc(100vh - 328px)'

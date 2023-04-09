@@ -34,6 +34,7 @@ import { APIDeleteTask } from '../../API/task'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
 import { colorForLightMode } from '../../colors'
+import { Description } from '../TextEditor/DescriptionEditor'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -324,17 +325,15 @@ export const BaseTask = memo(
                     </div>
                   </span>
                 </div>
-                {/*task.description && (
+                {task.description && (
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
-                    <Editor
-                      editorState={getEditorStateFromTaskDescription(
-                        task.description
-                      )}
+                    <Description
+                      initialState={task.description}
                       readOnly
                       onChange={() => null}
                     />
                   </div>
-                      )*/}
+                )}
                 <SubtaskMap
                   show={showSubTasks}
                   subTasks={task.subTasks}

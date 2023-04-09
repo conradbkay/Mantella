@@ -21,13 +21,12 @@ import { formatDueDate } from '../../utils/formatDueDate'
 import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
 import { TComment, TSubtask, TTask } from '../../types/project'
-import { Description } from './DescriptionEditor'
+import { Description } from '../TextEditor/DescriptionEditor'
 import { TState } from '../../types/state'
 import { useSelector } from 'react-redux'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import { createEditor } from 'lexical'
 
 type OwnProps = {
   onClose: () => void
@@ -46,10 +45,6 @@ type OwnProps = {
 
 export const EditTaskBase = (props: OwnProps) => {
   const [task, setTask] = useState(cloneDeep(props.task))
-
-  const editor = createEditor()
-  console.log(editor)
-  //editor.parseEditorState(task.description)
 
   const projects = useSelector((state: TState) => state.projects)
 
@@ -160,7 +155,12 @@ export const EditTaskBase = (props: OwnProps) => {
               }}
             />
           </div>
-          <Description />
+          <Description
+            initialState={props.task.description || undefined}
+            onChange={(newDescription) =>
+              setTask({ ...task, description: newDescription })
+            }
+          />
           <div style={{ display: 'flex', margin: '12px 4px 8px 6px' }}>
             <ChooseColor
               color={task.color || '#FFFFFF'}
@@ -229,7 +229,7 @@ export const EditTaskBase = (props: OwnProps) => {
             <EditSubtask setSubtask={setSubtask} subtask={subtask} />
           ))}
           <Button
-            variant="outlined"
+            color="inherit"
             style={{
               marginTop: 8,
               marginBottom: 8,
@@ -303,7 +303,7 @@ export const EditTaskBase = (props: OwnProps) => {
             </div>
           ))}
           <Button
-            variant="outlined"
+            color="inherit"
             onClick={() => {
               const newCommentId = uuid()
               setComment(newCommentId, {
