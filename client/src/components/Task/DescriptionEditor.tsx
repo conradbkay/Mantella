@@ -1,8 +1,61 @@
-import { Editor, EditorState, RichUtils, getDefaultKeyBinding } from 'draft-js'
-import { useRef, useCallback, CSSProperties } from 'react'
+import { useEffect } from 'react'
 
-import 'draft-js/dist/Draft.css'
+import { $getRoot, $getSelection, EditorState } from 'lexical'
 
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary'
+
+// When the editor changes, you can get notified via the
+// LexicalOnChangePlugin!
+function onChange(editorState: EditorState) {
+  editorState.read(() => {
+    // Read the contents of the EditorState here.
+    const root = $getRoot()
+    const selection = $getSelection()
+
+    console.log(root, selection)
+  })
+}
+
+// TODO: lazy load
+function MyCustomAutoFocusPlugin() {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    // Focus the editor when the effect fires!
+    editor.focus()
+  }, [editor])
+
+  return null
+}
+
+export const Description = () => {
+  const initialConfig = {
+    namespace: 'Description',
+    theme: {},
+    onError: (error: Error) => console.error(error)
+  }
+
+  return (
+    <LexicalComposer initialConfig={initialConfig}>
+      <PlainTextPlugin
+        contentEditable={<ContentEditable />}
+        placeholder={<div>Enter some text...</div>}
+        ErrorBoundary={LexicalErrorBoundary}
+      />
+      <OnChangePlugin onChange={onChange} />
+      <HistoryPlugin />
+      <MyCustomAutoFocusPlugin />
+    </LexicalComposer>
+  )
+}
+
+/*
 const styleMap = {
   CODE: {
     backgroundColor: 'rgba(0, 0, 0, 0.05)',
@@ -11,7 +64,6 @@ const styleMap = {
     padding: 2
   }
 }
-
 const getBlockStyle: any = (block: any) => {
   switch (block.getType()) {
     case 'blockquote':
@@ -133,7 +185,7 @@ export const Description = ({
       }
       return 'not-handled'
     },
-    [/*editorState,*/ setEditorState]
+    [setEditorState]
   )
 
   const mapKeyToEditorCommand = useCallback(
@@ -143,7 +195,7 @@ export const Description = ({
           const newEditorState = RichUtils.onTab(
             e,
             editorState,
-            4 /* maxDepth */
+            4 
           )
           if (newEditorState !== editorState) {
             setEditorState(newEditorState)
@@ -204,3 +256,4 @@ export const Description = ({
     </div>
   )
 }
+*/

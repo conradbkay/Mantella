@@ -22,13 +22,12 @@ import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
 import { TComment, TSubtask, TTask } from '../../types/project'
 import { Description } from './DescriptionEditor'
-import { EditorState } from 'draft-js'
-import { getEditorStateFromTaskDescription } from './getEditorState'
 import { TState } from '../../types/state'
 import { useSelector } from 'react-redux'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { createEditor } from 'lexical'
 
 type OwnProps = {
   onClose: () => void
@@ -42,17 +41,15 @@ type OwnProps = {
 /** todo:
  * better code support (several themes and languages)
  * better editor features (fitting headers, colors, etc)
- * make rendering in task base work for everything
+ * make rendering description in task base work for everything
  */
 
 export const EditTaskBase = (props: OwnProps) => {
   const [task, setTask] = useState(cloneDeep(props.task))
 
-  const [editorState, setEditorState] = useState(
-    task.description
-      ? getEditorStateFromTaskDescription(task.description)
-      : EditorState.createEmpty()
-  )
+  const editor = createEditor()
+  console.log(editor)
+  //editor.parseEditorState(task.description)
 
   const projects = useSelector((state: TState) => state.projects)
 
@@ -163,10 +160,7 @@ export const EditTaskBase = (props: OwnProps) => {
               }}
             />
           </div>
-          <Description
-            editorState={editorState}
-            setEditorState={setEditorState}
-          />
+          <Description />
           <div style={{ display: 'flex', margin: '12px 4px 8px 6px' }}>
             <ChooseColor
               color={task.color || '#FFFFFF'}

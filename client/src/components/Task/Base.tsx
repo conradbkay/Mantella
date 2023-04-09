@@ -20,8 +20,6 @@ import { Transition, animated } from 'react-spring/renderprops'
 import { TProject } from '../../types/project'
 import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../API/project'
-import { Editor } from 'draft-js'
-import { getEditorStateFromTaskDescription } from './getEditorState'
 import { makeStyles } from '@mui/styles'
 import { SubtaskMap } from './SubtaskMap'
 import { id } from '../../utils/utilities'
@@ -326,7 +324,7 @@ export const BaseTask = memo(
                     </div>
                   </span>
                 </div>
-                {task.description && (
+                {/*task.description && (
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
                     <Editor
                       editorState={getEditorStateFromTaskDescription(
@@ -336,7 +334,7 @@ export const BaseTask = memo(
                       onChange={() => null}
                     />
                   </div>
-                )}
+                      )*/}
                 <SubtaskMap
                   show={showSubTasks}
                   subTasks={task.subTasks}

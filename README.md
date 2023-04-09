@@ -42,6 +42,16 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 ## Todos
 
+### Documents
+
+Entirely separate tab
+
+Separate from projects but can give all project members access 
+
+Similar to docs
+
+Link document to task
+
 ### Edit History
 
 Websocket for every update
