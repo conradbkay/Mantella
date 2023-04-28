@@ -1,10 +1,15 @@
 import axios from 'axios'
 
-export const APILogin = async (email: string, password: string) => {
+export const APILogin = async (
+  email: string,
+  password: string,
+  persist: boolean
+) => {
   try {
     const res = await axios.post('/login', {
       email,
-      password
+      password,
+      persist
     })
     return res.data.user
   } catch (err) {
@@ -26,6 +31,7 @@ export const APIRegister = async (registerData: {
   email: string
   username: string
   password: string
+  persist: boolean
 }) => {
   try {
     const res = await axios.post('/register', registerData)

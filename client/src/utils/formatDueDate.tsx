@@ -1,36 +1,28 @@
-import { isPast } from 'date-fns'
+import { formatRelative } from 'date-fns'
 import { TTask } from '../types/project'
 import { toDaysHHMMSS } from './utilities'
-import { formatDistanceToNowStrict } from 'date-fns'
 
-// Jan 1st 12:02 am
-const baseFormat = (date: Date): string => formatDistanceToNowStrict(date)
-
-const overdueFormat = (date: Date): string => {
-  return 'Overdue by ' + formatDistanceToNowStrict(date)
+export const formatDate = (date: Date) => {
+  let str = formatRelative(date, new Date())
+  str = str[0].toUpperCase() + str.slice(1)
+  return str
 }
 
-const formatDueDateString = (date: Date, hasOver?: boolean): string => {
-  return isPast(date) && hasOver
-    ? overdueFormat(date)
-    : 'Due in ' + baseFormat(date)
+const formatDueDateString = (date: Date): string => {
+  return 'Due ' + formatDate(date)
 }
 
-export const formatDueDate = (task: TTask, hasOverDue?: boolean): string => {
+export const formatDueDate = (task: TTask): string => {
   if (!task.dueDate) {
     return ''
   }
 
-  if (!task.recurrance) {
-    return formatDueDateString(new Date(task.dueDate), hasOverDue)
-  }
-
-  if (task.recurrance.interval) {
+  if (task.recurrance && task.recurrance.interval) {
     return `Due every ${toDaysHHMMSS(
       task.recurrance.interval!,
       true
-    )} next: ${formatDueDateString(new Date(task.dueDate), hasOverDue)}`
+    )} next: ${formatDueDateString(new Date(task.dueDate))}`
   }
 
-  return formatDueDateString(new Date(task.dueDate), hasOverDue)
+  return formatDueDateString(new Date(task.dueDate))
 }

@@ -48,11 +48,11 @@ import { arrayMove } from '@dnd-kit/sortable'
 import { APIReplaceListIds } from '../../API/list'
 import { Sidebar } from './Sidebar'
 import { Socket } from 'socket.io-client'
-import { APIAssignUserToTask, APIDeleteTask } from '../../API/task'
 import { CalendarWeek } from '../Calendar/Week'
-import { OPEN_SNACKBAR } from '../../store/snackbar'
 import { SET_PROJECT, SET_TASK } from '../../store/projects'
 import { TTask } from '../../types/project'
+import { assignUserToTask, deleteTask } from '../../actions/task'
+import { Scrollbar } from 'react-scrollbars-custom'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -205,10 +205,6 @@ export const Project = (props: Props) => {
 
   const onDragOver = (event: DragOverEvent) => {
     if (event.over && event.over.id === 'trash') {
-      /**
-       * @todo I can't think of a good way to remove the task from redux so it doesn't show when hovering delete
-       * maybe we store a copy of the project in this component like the editTask component and save those to both redux and the server, possibly with better D&D performance. Even then,
-       */
       if (!overTrash) {
         setOverTrash(true)
       }
@@ -261,40 +257,15 @@ export const Project = (props: Props) => {
 
   const onDragEnd = async (event: DragEndEvent) => {
     if (event.over && event.over.id === 'trash') {
-      dispatch(OPEN_SNACKBAR({ message: 'Task deleted', variant: 'undo' }))
-      dispatch(
-        SET_TASK({ id: draggingId!, projectId: project.id, newTask: undefined })
-      )
-      // they will have 5 seconds to undo with the snackbar by reloading the page so that the request does not get sent
-      setTimeout(() => {
-        APIDeleteTask(draggingId!, project.id)
-      }, 5500)
+      deleteTask(dispatch, draggingId!, project.id)
     } else if ((event.active.id as string).split('|').length === 3) {
       const [, taskId, userId] = (event.active.id as string).split('|')
 
-      const remove = async () => {
-        dispatch(
-          SET_TASK({
-            id: taskId,
-            projectId: project.id,
-            newTask: {
-              assignedTo: (
-                project.tasks[id(project.tasks, taskId)].assignedTo || []
-              ).filter((id: string) => id !== userId)
-            }
-          })
-        )
-        APIAssignUserToTask({
-          userId,
-          taskId,
-          projId: project.id
-        })
-      }
       if (
         !event.over ||
         (taskId !== event.over.id && event.over.id === 'users')
       ) {
-        remove()
+        assignUserToTask(dispatch, { project, userId, taskId })
       } else if (taskId !== event.over.id) {
         // to another task, or to a list
         const task = project.tasks.find((task) => task.id === event.over!.id)
@@ -310,15 +281,15 @@ export const Project = (props: Props) => {
             })
           )
           // since both of the following functions modify the same data, we need to avoid race conditions by doing one first on the server
-          await remove()
+          await assignUserToTask(dispatch, { project, userId, taskId })
 
-          APIAssignUserToTask({
+          assignUserToTask(dispatch, {
+            project,
             userId,
-            taskId: event.over.id as string,
-            projId: project.id
+            taskId: event.over.id as string
           })
         } else {
-          remove()
+          assignUserToTask(dispatch, { project, userId, taskId })
         }
       }
     } else if (event.over && (event.active.id as any).slice(0, 4) === 'user') {
@@ -333,18 +304,10 @@ export const Project = (props: Props) => {
         newAssigned.push(userId)
       }
 
-      dispatch(
-        SET_TASK({
-          id: event.over.id as string,
-          projectId: project.id,
-          newTask: { assignedTo: newAssigned }
-        })
-      )
-
-      APIAssignUserToTask({
+      assignUserToTask(dispatch, {
+        project,
         userId,
-        taskId: event.over.id as string,
-        projId: project.id
+        taskId: event.over.id as string
       })
     } else {
       const data = getDragEventData(event)
@@ -410,153 +373,155 @@ export const Project = (props: Props) => {
           />
           <div style={{ display: 'flex', minHeight: 'calc(100vh - 124px)' }}>
             <Sidebar project={project} socket={props.socket} />
-            <Paper
-              style={{
-                margin: isMobile ? 0 : 20,
-                width: '100%',
-                padding: '20px 20px 40px',
-                minHeight: 'calc(100vh - 328px)'
-              }}
-            >
-              {viewType === 'kanban' || viewType === 'lists' ? (
-                <table
-                  style={{
-                    width: '100%',
-                    borderCollapse: 'collapse',
-                    tableLayout: 'fixed'
-                  }}
-                >
-                  <TableBody>
-                    {viewType === 'kanban' && (
-                      <tr style={{ display: 'flex' }}>
-                        {[0, 1, 2].map((col) => (
-                          <td
-                            key={col}
-                            style={{
-                              width: '100%',
-                              backgroundColor: new Color(
-                                theme.palette.background.paper
-                              )
-                                .lighten(0.7)
-                                .hex()
-                                .toString(),
-                              borderLeft: col ? 'none' : PROJECT_BORDER,
-                              borderRight: PROJECT_BORDER,
-                              borderTop: PROJECT_BORDER,
-                              borderTopLeftRadius: col ? 0 : 4,
-                              borderTopRightRadius: col === 2 ? 4 : 0,
-                              color: theme.palette.text.secondary,
-                              padding: 8,
-                              display: 'flex',
-                              userSelect: 'none',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              fontSize: 20
-                            }}
-                          >
-                            <CheckCircleOutline
-                              style={{
-                                paddingRight: 8,
-                                color:
-                                  col === 2
-                                    ? theme.palette.success.main
-                                    : col
-                                    ? theme.palette.warning.main
-                                    : undefined
-                              }}
-                            />
-                            {PROGRESS_DISPLAYS[col]}
-                          </td>
-                        ))}
-                      </tr>
-                    )}
-                    {project.lists.map((list) => (
-                      <tr
-                        style={{
-                          display: 'flex',
-                          flexDirection: viewType === 'lists' ? 'column' : 'row'
-                        }}
-                        key={list.id}
-                      >
-                        {[0, 1, 2].map((progress) =>
-                          progress === 0 || viewType === 'kanban' ? (
-                            <ProjectCell
-                              viewType={viewType}
-                              draggingId={draggingId}
-                              setCreating={(id) => setCreating(id)}
-                              openFunc={(tId: string) => {
-                                setEditingTaskId(tId)
-                              }}
-                              key={list.id + progress}
-                              progress={progress as 0 | 1 | 2}
-                              list={list}
-                              project={project}
-                            />
-                          ) : null
-                        )}
-                      </tr>
-                    ))}
-                    <tr>
-                      <td>
-                        <ButtonBase
-                          onClick={() => setDialogOpen(true)}
-                          style={{
-                            width: '100%',
-                            color: theme.palette.primary.main,
-                            fontSize: 18,
-                            height: 64,
-                            // for some reason putting border in parent makes it jut out by 1px on each side
-                            border: PROJECT_BORDER,
-                            borderBottomLeftRadius: 4,
-                            borderBottomRightRadius: 4
-                          }}
-                        >
-                          CREATE LIST
-                        </ButtonBase>
-                      </td>
-                    </tr>
-                  </TableBody>
-                </table>
-              ) : viewType === 'tasks' ? (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <FormControl
+            <Scrollbar style={{ height: 'inherit', width: '100%' }}>
+              <Paper
+                style={{
+                  margin: isMobile ? 0 : 16,
+                  padding: '16px 20px',
+                  minHeight: 'calc(100vh - 328px)'
+                }}
+              >
+                {viewType === 'kanban' || viewType === 'lists' ? (
+                  <table
                     style={{
-                      marginBottom: 16,
-                      maxWidth: 350,
-                      marginLeft: 'auto'
+                      width: '100%',
+                      borderCollapse: 'collapse',
+                      tableLayout: 'fixed'
                     }}
                   >
-                    <InputLabel variant="standard">Sort By</InputLabel>
-                    <Select
-                      variant="standard"
-                      value={listSort}
-                      label="Sort By"
-                      onChange={(e) => setListSort(e.target.value as any)}
-                    >
-                      {['Default', 'Points', 'Due Date', 'Newest'].map(
-                        (order, i) => (
-                          <MenuItem key={i} value={order.toLowerCase()}>
-                            {order}
-                          </MenuItem>
-                        )
+                    <TableBody>
+                      {viewType === 'kanban' && (
+                        <tr style={{ display: 'flex' }}>
+                          {[0, 1, 2].map((col) => (
+                            <td
+                              key={col}
+                              style={{
+                                width: '100%',
+                                backgroundColor: new Color(
+                                  theme.palette.background.paper
+                                )
+                                  .lighten(0.7)
+                                  .hex()
+                                  .toString(),
+                                borderLeft: col ? 'none' : PROJECT_BORDER,
+                                borderRight: PROJECT_BORDER,
+                                borderTop: PROJECT_BORDER,
+                                borderTopLeftRadius: col ? 0 : 4,
+                                borderTopRightRadius: col === 2 ? 4 : 0,
+                                color: theme.palette.text.secondary,
+                                padding: 8,
+                                display: 'flex',
+                                userSelect: 'none',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                fontSize: 20
+                              }}
+                            >
+                              <CheckCircleOutline
+                                style={{
+                                  paddingRight: 8,
+                                  color:
+                                    col === 2
+                                      ? theme.palette.success.main
+                                      : col
+                                      ? theme.palette.warning.main
+                                      : undefined
+                                }}
+                              />
+                              {PROGRESS_DISPLAYS[col]}
+                            </td>
+                          ))}
+                        </tr>
                       )}
-                    </Select>
-                  </FormControl>
-                  {sortTasks(listSort, project.tasks).map((task, i) => (
-                    <BaseTask
-                      showProgress
-                      key={task.id}
-                      style={{}}
-                      project={project}
-                      openFunc={() => setEditingTaskId(task.id)}
-                      task={task}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <CalendarWeek />
-              )}
-            </Paper>
+                      {project.lists.map((list) => (
+                        <tr
+                          style={{
+                            display: 'flex',
+                            flexDirection:
+                              viewType === 'lists' ? 'column' : 'row'
+                          }}
+                          key={list.id}
+                        >
+                          {[0, 1, 2].map((progress) =>
+                            progress === 0 || viewType === 'kanban' ? (
+                              <ProjectCell
+                                viewType={viewType}
+                                draggingId={draggingId}
+                                setCreating={(id) => setCreating(id)}
+                                openFunc={(tId: string) => {
+                                  setEditingTaskId(tId)
+                                }}
+                                key={list.id + progress}
+                                progress={progress as 0 | 1 | 2}
+                                list={list}
+                                project={project}
+                              />
+                            ) : null
+                          )}
+                        </tr>
+                      ))}
+                      <tr>
+                        <td>
+                          <ButtonBase
+                            onClick={() => setDialogOpen(true)}
+                            style={{
+                              width: '100%',
+                              color: theme.palette.primary.main,
+                              fontSize: 18,
+                              height: 64,
+                              // for some reason putting border in parent makes it jut out by 1px on each side
+                              border: PROJECT_BORDER,
+                              borderBottomLeftRadius: 4,
+                              borderBottomRightRadius: 4
+                            }}
+                          >
+                            CREATE LIST
+                          </ButtonBase>
+                        </td>
+                      </tr>
+                    </TableBody>
+                  </table>
+                ) : viewType === 'tasks' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <FormControl
+                      style={{
+                        marginBottom: 16,
+                        maxWidth: 350,
+                        marginLeft: 'auto'
+                      }}
+                    >
+                      <InputLabel variant="standard">Sort By</InputLabel>
+                      <Select
+                        variant="standard"
+                        value={listSort}
+                        label="Sort By"
+                        onChange={(e) => setListSort(e.target.value as any)}
+                      >
+                        {['Default', 'Points', 'Due Date', 'Newest'].map(
+                          (order, i) => (
+                            <MenuItem key={i} value={order.toLowerCase()}>
+                              {order}
+                            </MenuItem>
+                          )
+                        )}
+                      </Select>
+                    </FormControl>
+                    {sortTasks(listSort, project.tasks).map((task, i) => (
+                      <BaseTask
+                        showProgress
+                        key={task.id}
+                        style={{}}
+                        project={project}
+                        openFunc={() => setEditingTaskId(task.id)}
+                        task={task}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <CalendarWeek />
+                )}
+              </Paper>
+            </Scrollbar>
           </div>
 
           <DragOverlay dropAnimation={dropAnimationConfig}>

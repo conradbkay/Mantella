@@ -47,12 +47,12 @@ app.use((0, cors_1.default)({
 const server = http_1.default.createServer();
 const io = new Server(server);
 io.on('connection', (socket) => {
-    socket.on('send_message', async ({ chatId, message, userId }) => {
+    socket.on('send_message', async ({ chatId, message, userId, id }) => {
         const messageObj = {
             message,
             senderId: userId,
             createdAt: new Date().getTime(),
-            id: (0, uuid_1.v4)()
+            id: id || (0, uuid_1.v4)()
         };
         io.in(chatId).emit('message', messageObj);
         const chat = await Chat_1.ChatModel.findOne({ id: chatId });
@@ -61,8 +61,10 @@ io.on('connection', (socket) => {
             await chat.save();
         }
     });
-    socket.on('login', ({ chatId }) => {
-        socket.join(chatId);
+    socket.on('login', ({ chatIds }) => {
+        for (let chatId of chatIds) {
+            socket.join(chatId);
+        }
     });
 });
 server.listen(3000, () => {

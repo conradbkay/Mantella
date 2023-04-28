@@ -132,7 +132,6 @@ export const HeaderSearchBar = () => {
                     if (result.toId) {
                       if (!focus()) {
                         setTimeout(() => {
-                          console.log('not')
                           focus()
                         }, 100)
                       }

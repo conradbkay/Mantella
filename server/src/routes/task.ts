@@ -130,16 +130,14 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
 
   if (proj) {
     const oldListIdx = proj.lists.findIndex(
-      (list) => list.id === req.body.oldListId
+      (list) => list.id === req.body.from[0]
     )
     const newListIdx = proj.lists.findIndex(
-      (list) => list.id === req.body.newListId
+      (list) => list.id === req.body.to[0]
     )
 
-    proj.lists[oldListIdx].taskIds[req.body.oldProgress] =
-      req.body.oldListReplaceIds
-    proj.lists[newListIdx].taskIds[req.body.newProgress] =
-      req.body.newListReplaceIds
+    proj.lists[oldListIdx].taskIds[req.body.from[1]] = req.body.from[2]
+    proj.lists[newListIdx].taskIds[req.body.to[1]] = req.body.to[2]
 
     proj.markModified('lists') // mongoose does not watch subarrays this deep
 

@@ -35,7 +35,7 @@ const createProject = async (req, res) => {
                     }
                 ],
                 tasks: [],
-                chatId: chatId,
+                channels: [[chatId, 'General']],
                 enrolledUsers: [],
                 columnOrder: [listId],
                 isPrivate: false

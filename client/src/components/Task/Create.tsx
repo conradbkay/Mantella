@@ -1,9 +1,8 @@
 import { Button } from '@mui/material'
 import { TProject, TTask } from '../../types/project'
-import { APICreateTask } from '../../API/task'
 import { EditTaskBase } from './EditBase'
-import { SET_PROJECT } from '../../store/projects'
 import { useAppDispatch } from '../../store/hooks'
+import { createTask } from '../../actions/task'
 
 type OwnProps = {
   onClose: () => void
@@ -29,31 +28,13 @@ export const CreateTask = (props: OwnProps) => {
   const dispatch = useAppDispatch()
 
   const createTaskExec = async (task: TTask, listId: string) => {
-    try {
-      const res = await APICreateTask(props.project.id, listId, {
-        points: task.points,
-        color: task.color,
-        name: task.name,
-        description: task.description,
-        dueDate: task.dueDate ? task.dueDate.toString() : undefined
-      })
-      if (res && res.project) {
-        dispatch(
-          SET_PROJECT({
-            id: res.project.id,
-            project: res.project
-          })
-        )
-      }
-    } catch (err) {
-      console.error(err)
-    } finally {
-      props.onClose()
-    }
+    createTask(dispatch, task, listId, props.project.id)
+    props.onClose()
   }
 
   return (
     <EditTaskBase
+      title="Create Task"
       projectId={props.project.id}
       onClose={() => props.onClose()}
       task={defaultTask}

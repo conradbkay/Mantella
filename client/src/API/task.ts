@@ -4,7 +4,7 @@ import { TTask } from '../types/project'
 export const APICreateTask = async (
   projId: string,
   listId: string,
-  taskInfo: any
+  taskInfo: Partial<TTask>
 ) => {
   const res = await axios.post('/createTask', { projId, listId, taskInfo })
 
@@ -13,12 +13,8 @@ export const APICreateTask = async (
 
 type DragTaskInfo = {
   projectId: string
-  oldListId: string
-  oldProgress: number
-  oldListReplaceIds: string[]
-  newListId: string
-  newProgress: number
-  newListReplaceIds: string[]
+  from: [string, number, string[]]
+  to: [string, number, string[]]
 }
 
 export const APIDragTask = async (info: DragTaskInfo) => {

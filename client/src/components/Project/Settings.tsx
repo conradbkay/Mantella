@@ -10,8 +10,7 @@ import Delete from '@mui/icons-material/Delete'
 import { useState } from 'react'
 import { useHistory } from 'react-router'
 import { useAppDispatch } from '../../store/hooks'
-import { SET_PROJECT } from '../../store/projects'
-import { APIDeleteProject } from '../../API/project'
+import { deleteProject } from '../../actions/project'
 
 type Props = {
   projectId: string
@@ -21,12 +20,6 @@ export const ProjectSettings = ({ projectId }: Props) => {
   const [hasClicked, setClicked] = useState(false)
   const navigate = useHistory()
   const dispatch = useAppDispatch()
-
-  const deleteProject = () => {
-    dispatch(SET_PROJECT({ id: projectId, project: undefined }))
-    APIDeleteProject(projectId)
-    navigate.push('/dashboard')
-  }
 
   const theme = useTheme()
 
@@ -54,7 +47,7 @@ export const ProjectSettings = ({ projectId }: Props) => {
           size="medium"
           onClick={() => {
             if (hasClicked) {
-              deleteProject()
+              deleteProject(dispatch, navigate.push, projectId)
             } else {
               setClicked(true)
             }

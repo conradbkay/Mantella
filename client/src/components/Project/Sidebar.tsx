@@ -1,6 +1,6 @@
 import Settings from '@mui/icons-material/Settings'
 import Person from '@mui/icons-material/Person'
-import Chat from '@mui/icons-material/Chat'
+import ChatIcon from '@mui/icons-material/Chat'
 import { FilterTasks } from './FilterTasks'
 import { ProjectSettings } from './Settings'
 import { ProjStats } from './Statistics'
@@ -13,10 +13,10 @@ import { TProject } from '../../types/project'
 import { Pomodoro } from '../Pomodoro/Pomodoro'
 import Timer from '@mui/icons-material/Timer'
 import { Socket } from 'socket.io-client'
-import { ProjectChat } from './Chat'
+import { ChatMessages } from '../Chat/Messages'
 
 const listItems = [
-  { title: 'Chat', Icon: Chat },
+  { title: 'Chat', Icon: ChatIcon },
   { title: 'Settings', Icon: Settings },
   { title: 'Members', Icon: Person },
   { title: 'Filter', Icon: FilterList },
@@ -93,10 +93,10 @@ export const Sidebar = memo(
                 : undefined
             }}
           >
-            <ProjectChat
+            <ChatMessages
               users={project.users}
               socket={socket}
-              chatId={project.chatId}
+              channel={project.channels[0]}
               open={open === 'Chat'}
             />
             {open === 'Filter' ? (

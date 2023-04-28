@@ -9,7 +9,6 @@ import {
   IconButton
 } from '@mui/material'
 import Close from '@mui/icons-material/Close'
-import { Change } from '../../types/types'
 import { TProject } from '../../types/project'
 import { useState } from 'react'
 import { APICreateList } from '../../API/list'
@@ -63,7 +62,7 @@ export const CreateList = ({ project, onClose }: Props) => {
             margin="dense"
             label="List Name"
             value={name}
-            onChange={({ target }: Change) => setName(target.value)}
+            onChange={({ target }) => setName(target.value)}
             fullWidth
           />
         </DialogContent>

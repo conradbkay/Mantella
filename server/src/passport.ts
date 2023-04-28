@@ -1,4 +1,5 @@
 import { comparePassword, UserModel } from './models/User'
+import { Request } from 'express'
 
 export const isAuthenticated = (req: any, res: any, next: any) => {
   if (req.user) return next()
@@ -9,7 +10,7 @@ export const isAuthenticated = (req: any, res: any, next: any) => {
 }
 
 export const passportStrategy = async (
-  req: any,
+  req: Request,
   email: string,
   password: string,
   done: Function

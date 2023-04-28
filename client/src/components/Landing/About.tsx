@@ -53,6 +53,7 @@ export const About = ({ showLinkedin }: Props) => {
   const navigate = useHistory()
   const dispatch = useAppDispatch()
   const loginAsGuest = async () => {
+    localStorage.setItem('preserve', 'true')
     const res = await APIGuestLogin()
     if (res) {
       const authUser = transformUser(res)

@@ -8,15 +8,13 @@ import {
 } from '@mui/material'
 import { useFormStyles } from './styles/formStyles'
 import CalendarTodayRounded from '@mui/icons-material/CalendarTodayRounded'
-import { Change } from '../types/types'
 import { useState } from 'react'
 import Helmet from 'react-helmet'
-import { APICreateProject } from '../API/project'
 import { useHistory } from 'react-router'
-import { SET_PROJECT } from '../store/projects'
 import { OPEN_SNACKBAR } from '../store/snackbar'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { selectUser } from '../store/user'
+import { createProject } from '../actions/project'
 
 export const CreateProject = () => {
   const [name, setName] = useState('')
@@ -27,30 +25,7 @@ export const CreateProject = () => {
 
   const onCompleted = async () => {
     setLoading(true)
-    const res = await APICreateProject(name || 'Untitled Project')
-    if (res && res.id) {
-      dispatch(
-        SET_PROJECT({
-          id: res.id,
-          project: res
-        })
-      )
-
-      navigate.push('/project/' + res.id)
-      dispatch(
-        OPEN_SNACKBAR({
-          message: 'Project Created Successfully',
-          variant: 'success'
-        })
-      )
-    } else {
-      dispatch(
-        OPEN_SNACKBAR({
-          message: 'Project Could Not Be Created',
-          variant: 'warning'
-        })
-      )
-    }
+    await createProject(dispatch, name, navigate.push)
     setLoading(false)
   }
 
@@ -93,7 +68,7 @@ export const CreateProject = () => {
                 label="Project Name"
                 value={name}
                 fullWidth
-                onChange={(e: Change) => setName(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
               <div style={{ marginLeft: 12, marginTop: 'auto' }}>

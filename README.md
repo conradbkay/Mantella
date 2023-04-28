@@ -34,7 +34,7 @@ We are using `Node.js` to run server-side javascript with `Express` as the RESTf
 
 ### Client
 
-The client is running on `React.js` which means that our UI is divided into components, and state update is automatically reflected in the DOM. State can be local in the component, or in the `Redux` store which can be thought of as a god object. `Material-ui` is used as a UI framework and although large, is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
+The client is running on `React.js` which means that our UI is divided into components, and state update is automatically reflected in the DOM. State can be local in the component, or in the `Redux` store which is a giant immutable object. `Material-ui` is used as a UI framework and although large, is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
 
 ## Direction
 
@@ -84,8 +84,6 @@ Track seen and unseen messages, show unread count on sidebar and perhaps tab nam
 
 ### User
 
-Persistent default theme, or just make header theme changer persistent in localstorage and user
-
 choose whether session happens, also in settings
 
 privileges for certain members, transfer to owner
@@ -101,6 +99,10 @@ chat websocket doesn't work on heroku
 dragging from task user to task with same user assigned is bugged
 
 lists view drag and drop
+
+### Tasks
+
+Custom color management, add names for colors
 
 ### Recurring Tasks
 

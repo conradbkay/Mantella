@@ -1,5 +1,5 @@
 import { Tooltip, Avatar } from '@mui/material'
-import { TProjectUser } from '../../types/project'
+import { TProjectUser } from '../types/project'
 
 export const HoverableAvatar = ({
   user,
@@ -12,7 +12,7 @@ export const HoverableAvatar = ({
     <Tooltip title={`${user.username}`}>
       <Avatar
         style={{
-          margin: noMargin ? 'auto 4px auto 4px' : 'auto 10px'
+          margin: noMargin ? undefined : 'auto 10px'
         }}
       >
         <span style={{ position: 'absolute' }}>

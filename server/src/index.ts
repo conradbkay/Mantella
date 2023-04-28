@@ -61,12 +61,12 @@ const server = http.createServer()
 const io = new Server(server)
 
 io.on('connection', (socket: any) => {
-  socket.on('send_message', async ({ chatId, message, userId }: any) => {
+  socket.on('send_message', async ({ chatId, message, userId, id }: any) => {
     const messageObj = {
       message,
       senderId: userId,
       createdAt: new Date().getTime(),
-      id: uuid()
+      id: id || uuid()
     }
 
     io.in(chatId).emit('message', messageObj)
@@ -79,8 +79,10 @@ io.on('connection', (socket: any) => {
     }
   })
 
-  socket.on('login', ({ chatId }: any) => {
-    socket.join(chatId)
+  socket.on('login', ({ chatIds }: any) => {
+    for (let chatId of chatIds) {
+      socket.join(chatId)
+    }
   })
 })
 

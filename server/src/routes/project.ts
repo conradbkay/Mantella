@@ -50,7 +50,7 @@ export const createProject = async (
           }
         ],
         tasks: [],
-        chatId: chatId,
+        channels: [[chatId, 'General']],
         enrolledUsers: [],
         columnOrder: [listId],
         isPrivate: false

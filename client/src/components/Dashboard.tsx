@@ -1,7 +1,6 @@
 import {
   Button,
-  Card,
-  CardActions,
+  ButtonBase,
   Fab,
   Tooltip,
   Typography,
@@ -17,14 +16,12 @@ import Add from '@mui/icons-material/Add'
 import { useAppSelector } from '../store/hooks'
 import { selectProjects } from '../store/projects'
 import { format, getHours } from 'date-fns'
+import Color from 'color'
 
 const genColors = () => {
-  let betterColors: any = { ...colors }
-  delete betterColors.Default
-  delete betterColors.Brown
-  delete betterColors.Black
-  delete betterColors.Yellow
-  return Object.values(betterColors)
+  return Object.values({ ...colors }).map((c) =>
+    new Color(c).lightness(12).toString()
+  )
 }
 
 export const Dashboard = () => {
@@ -119,10 +116,15 @@ export const Dashboard = () => {
             </Typography>
             <div style={{ margin: '0px 40px' }}>
               {projects.map((project, i) => {
-                const cols = [0, 0, 0]
+                const cols: [number, string][] = [
+                  [project.tasks.length, 'Tasks'],
+                  [0, 'Created'],
+                  [0, 'Started'],
+                  [0, 'Completed']
+                ]
                 project.lists.forEach((list) => {
                   list.taskIds.forEach((ids, i) => {
-                    cols[i] += ids.length
+                    cols[i + 1][0] += ids.length
                   })
                 })
 
@@ -132,13 +134,17 @@ export const Dashboard = () => {
                 }
 
                 return (
-                  <Card
+                  <ButtonBase
+                    component={Link}
+                    to={`/project/${project.id}`}
                     style={{
+                      display: 'flex',
+                      flexDirection: 'column',
                       padding: 16,
-                      paddingBottom: 0,
-                      margin: '12px 0',
+                      borderRadius: 4,
+                      marginBottom: 16,
                       minWidth: 300,
-                      backgroundColor: color as any
+                      backgroundColor: color
                     }}
                     key={project.id}
                   >
@@ -146,43 +152,33 @@ export const Dashboard = () => {
                       gutterBottom
                       variant="h5"
                       component="h2"
-                      style={{ color: theme.palette.text.secondary }}
+                      style={{ color: theme.palette.text.primary }}
                     >
                       {project.name}
                     </Typography>
-                    <ul style={{ color: theme.palette.text.secondary }}>
-                      <div>
-                        <span style={{ fontWeight: 500 }}>
-                          {project.tasks.length}
-                        </span>{' '}
-                        Tasks
-                      </div>
-                      <div>
-                        <span style={{ fontWeight: 500 }}>{cols[0]}</span>{' '}
-                        Created
-                      </div>
-                      <div>
-                        <span style={{ fontWeight: 500 }}>{cols[1]}</span>{' '}
-                        Started
-                      </div>
-                      <div>
-                        <span style={{ fontWeight: 500 }}>{cols[2]}</span>{' '}
-                        Finished
-                      </div>
+                    <ul
+                      style={{
+                        color: theme.palette.text.secondary,
+                        fontSize: 15
+                      }}
+                    >
+                      {cols.map((col, i) => (
+                        <div key={i}>
+                          <span
+                            style={{
+                              fontWeight: 500,
+                              fontSize: 17,
+                              marginRight: 4,
+                              color: theme.palette.text.primary
+                            }}
+                          >
+                            {col[0]}
+                          </span>{' '}
+                          {col[1]}
+                        </div>
+                      ))}
                     </ul>
-                    <CardActions style={{ justifyContent: 'flex-end' }}>
-                      <Button
-                        component={Link}
-                        to={`/project/${project.id}`}
-                        style={{
-                          color: theme.palette.text.primary,
-                          marginRight: -12
-                        }}
-                      >
-                        View
-                      </Button>
-                    </CardActions>
-                  </Card>
+                  </ButtonBase>
                 )
               })}
             </div>

@@ -33,18 +33,21 @@ const register = async (req, res) => {
                 email: req.body.email,
                 username: req.body.username,
                 profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId, chatId)),
+            }, projectId, [chatId, 'General'])),
             await User_1.UserModel.create(Object.assign(Object.assign({}, (0, data_1.generateGuestUser)(projectId, userId)), { password, email: req.body.email, username: req.body.username })),
             await Chat_1.ChatModel.create({
                 id: chatId,
-                messages: []
+                messages: [],
+                projectId: projectId
             })
         ]);
-        req.login(newUser, (err) => {
-            if (err) {
-                console.log('could not passport login during signup', err);
-            }
-        });
+        if (req.body.persist) {
+            req.login(newUser, (err) => {
+                if (err) {
+                    console.log('could not passport login during signup', err);
+                }
+            });
+        }
         res.json({
             user: Object.assign(Object.assign({}, newUser.toObject()), { password: undefined, _id: undefined, projects: [project.toObject()] })
         });
@@ -78,7 +81,7 @@ const guestLogin = async (req, res) => {
                 username: 'Guest',
                 id: userId,
                 profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId, chatId)),
+            }, projectId, [chatId, 'General'])),
             await User_1.UserModel.create((0, data_1.generateGuestUser)(projectId, userId)),
             await Chat_1.ChatModel.create({
                 id: chatId,

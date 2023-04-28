@@ -11,6 +11,10 @@ export class Chat {
     replyToId?: string
   }>
   @prop()
+  public name!: string
+  @prop()
   public id!: string
+  @prop()
+  public projectId!: string
 }
 export const ChatModel = getModelForClass(Chat)

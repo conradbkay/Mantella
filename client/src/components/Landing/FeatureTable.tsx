@@ -13,6 +13,7 @@ import { CSSProperties } from 'react'
 
 const tableHeadData: string[] = ['Feature', 'Mantella', 'Trello', 'KanbanFlow']
 const features = [
+  ['Chat', 'CHECK', 'NO', 'NO'],
   ['Swimlanes', 'CHECK', 'NO', 'PRO'],
   ['Pomodoro Timer', 'CHECK', 'NO', 'Extensions'],
   ['Time Management Integration', 'CHECK', 'NO', 'Extensions'],
@@ -20,7 +21,7 @@ const features = [
   ['Filtering', 'CHECK', 'CHECK', 'CHECK'],
   ['Recurring Tasks', 'WIP', 'CHECK', 'CHECK'],
   ['Collapse Columns', 'CHECK', 'CHECK', 'NO'],
-  ['Mobile Friendly', 'WIP', 'CHECK', 'CHECK'],
+  ['Mobile Friendly', 'CHECK', 'CHECK', 'CHECK'],
   ['Attach Photos', 'WIP', 'PRO', 'CHECK'],
   ['Comments', 'CHECK', 'NO', 'CHECK'],
   ['Links', 'WIP', 'NO', 'CHECK']

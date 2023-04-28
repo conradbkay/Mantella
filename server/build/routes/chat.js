@@ -1,30 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMessage = exports.getChat = exports.createChat = void 0;
+exports.editChannel = exports.deleteChannel = exports.createChannel = exports.sendMessage = exports.getChat = void 0;
 const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
 const Chat_1 = require("../models/Chat");
-const createChat = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (proj) {
-        const chatId = (0, uuid_1.v4)();
-        const chat = await Chat_1.ChatModel.create({
-            id: chatId,
-            projectId: req.body.projId,
-            messages: []
-        });
-        proj.chatId = chatId;
-        await proj.save();
-        res.json({ chat: chat.toObject() });
-    }
-    else {
-        throw new Error('Project does not exist');
-    }
-};
-exports.createChat = createChat;
-router_1.router.post('/createChat', passport_1.isAuthenticated, exports.createChat);
 const getChat = async (req, res) => {
     const chat = await Chat_1.ChatModel.findOne({ id: req.body.id });
     res.json({ chat });
@@ -35,7 +16,7 @@ const sendMessage = async (req, res) => {
     const messageId = (0, uuid_1.v4)();
     const chat = await Chat_1.ChatModel.findOne({ id: req.body.chatId });
     if (chat) {
-        chat.messages.push({
+        chat.messages.unshift({
             id: messageId,
             senderId: req.user.id,
             message: req.body.message,
@@ -51,4 +32,58 @@ const sendMessage = async (req, res) => {
 };
 exports.sendMessage = sendMessage;
 router_1.router.post('/sendMessage', passport_1.isAuthenticated, exports.sendMessage);
+const createChannel = async (req, res) => {
+    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
+    if (proj) {
+        const name = req.body.name || 'New Channel';
+        const chatId = (0, uuid_1.v4)();
+        await Chat_1.ChatModel.create({
+            id: chatId,
+            projectId: req.body.projId,
+            name,
+            messages: []
+        });
+        proj.channels.push([chatId, name]);
+        await proj.save();
+        res.json({ project: proj });
+    }
+    else {
+        throw new Error('Project does not exist');
+    }
+};
+exports.createChannel = createChannel;
+router_1.router.post('/createChannel', passport_1.isAuthenticated, exports.createChannel);
+const deleteChannel = async (req, res) => {
+    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
+    if (proj) {
+        proj.channels = proj.channels.filter((channel) => channel[0] !== req.body.id);
+        await proj.save();
+        res.json({ project: proj });
+    }
+    else {
+        throw new Error('Project does not exist');
+    }
+};
+exports.deleteChannel = deleteChannel;
+router_1.router.post('/deleteChannel', passport_1.isAuthenticated, exports.deleteChannel);
+const editChannel = async (req, res) => {
+    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
+    if (proj) {
+        const channelIdx = proj.channels.findIndex((channel) => channel[0] === req.body.id);
+        if (channelIdx >= 0) {
+            proj.channels[channelIdx][1] = req.body.name;
+            proj.markModified('channels');
+            await proj.save();
+            res.json(proj);
+        }
+        else {
+            throw new Error('Channel does not exist');
+        }
+    }
+    else {
+        throw new Error('Project does not exist');
+    }
+};
+exports.editChannel = editChannel;
+router_1.router.post('/editChannel', passport_1.isAuthenticated, exports.editChannel);
 //# sourceMappingURL=chat.js.map

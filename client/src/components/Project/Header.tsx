@@ -12,13 +12,12 @@ import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'
 import { useDispatch } from 'react-redux'
-import { APIEditProject } from '../../API/project'
 import Delete from '@mui/icons-material/Delete'
-import { SET_PROJECT } from '../../store/projects'
 import Calendar from '@mui/icons-material/CalendarToday'
 import ViewList from '@mui/icons-material/ViewList'
 import ViewDay from '@mui/icons-material/ViewDay'
 import Add from '@mui/icons-material/Add'
+import { setProjectName } from '../../actions/project'
 
 type Props = {
   project: TProject
@@ -38,7 +37,7 @@ const ProjectHeader = memo(
     setCreating,
     isMobile
   }: Props) => {
-    const [name, setName] = useState(project ? project.name : undefined)
+    const [name, setName] = useState(project.name)
 
     const dispatch = useDispatch()
 
@@ -85,14 +84,7 @@ const ProjectHeader = memo(
                   }}
                   value={name}
                   onBlur={() => {
-                    dispatch(
-                      SET_PROJECT({
-                        id: project.id,
-                        project: { ...project, name: name || 'newname' }
-                      })
-                    )
-
-                    APIEditProject(project.id, { name: name || 'newname' })
+                    setProjectName(dispatch, project, name)
                   }}
                   onChange={(e: any) => setName(e.target.value)}
                 />

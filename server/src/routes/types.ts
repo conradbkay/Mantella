@@ -9,6 +9,7 @@ interface Req<body = {}> extends Request {
 export type loginReqObj = {
   email: string
   password: string
+  persist: boolean
 }
 export type loginReq = Req<loginReqObj>
 export type loginResObj = {
@@ -20,6 +21,7 @@ export type registerReqObj = {
   email: string
   username: string
   password: string
+  persist: boolean
 }
 export type registerReq = Req<registerReqObj>
 export type registerResObj = {
@@ -140,12 +142,8 @@ export type deleteTaskRes = Response<{}>
 
 export type dragTaskReq = Req<{
   projectId: string
-  oldListId: string
-  oldProgress: number
-  oldListReplaceIds: string[]
-  newListId: string
-  newProgress: number
-  newListReplaceIds: string[]
+  from: [string, number, string[]]
+  to: [string, number, string[]]
 }>
 export type dragTaskRes = Response<{}>
 

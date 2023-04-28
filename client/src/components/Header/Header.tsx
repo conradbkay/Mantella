@@ -31,6 +31,7 @@ import Home from '@mui/icons-material/Home'
 import { Link as NavLink } from 'react-router-dom'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
+import Chat from '@mui/icons-material/Chat'
 import { ProjectFinder } from '../ProjectFinder'
 import { HoverableAvatar } from '../HoverableAvatar'
 import { makeStyles } from '@mui/styles'
@@ -64,6 +65,11 @@ const authItems = [
     label: 'Calendar',
     pathname: '/calendar',
     menuIcon: CalendarToday
+  },
+  {
+    label: 'Chat',
+    pathname: '/chat',
+    menuIcon: Chat
   }
 ]
 

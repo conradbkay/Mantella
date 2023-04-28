@@ -2,7 +2,7 @@ import { Route, Redirect, RouteProps } from 'react-router'
 import { useAppSelector } from '../store/hooks'
 import { selectUser } from '../store/user'
 interface TProps extends RouteProps {
-  component: any
+  component?: any
   componentProps: any
 }
 

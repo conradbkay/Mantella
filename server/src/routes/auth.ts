@@ -59,7 +59,7 @@ export const register = async (req: registerReq, res: registerRes) => {
               'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
           },
           projectId,
-          chatId
+          [chatId, 'General']
         )
       ),
       await UserModel.create({
@@ -70,15 +70,18 @@ export const register = async (req: registerReq, res: registerRes) => {
       }),
       await ChatModel.create({
         id: chatId,
-        messages: []
+        messages: [],
+        projectId: projectId
       })
     ])
 
-    req.login(newUser, (err: any) => {
-      if (err) {
-        console.log('could not passport login during signup', err)
-      }
-    })
+    if (req.body.persist) {
+      req.login(newUser, (err: any) => {
+        if (err) {
+          console.log('could not passport login during signup', err)
+        }
+      })
+    }
 
     res.json({
       user: {
@@ -122,7 +125,7 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
               'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
           },
           projectId,
-          chatId
+          [chatId, 'General']
         )
       ),
       await UserModel.create(generateGuestUser(projectId, userId)),

@@ -14,12 +14,11 @@ import {
 } from '@mui/material'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { APIKickUser, APIShareProject } from '../../API/project'
 import { TState } from '../../types/state'
 import Delete from '@mui/icons-material/Delete'
 import { TProject } from '../../types/project'
-import { OPEN_SNACKBAR } from '../../store/snackbar'
-import { SET_PROJECT } from '../../store/projects'
+import { kickUser, shareProject } from '../../actions/project'
+
 type Props = {
   project: TProject
 }
@@ -30,41 +29,6 @@ export const ShareProject = ({ project }: Props) => {
 
   const user = useSelector((state: TState) => state.user)
   const theme = useTheme()
-
-  const submit = async () => {
-    try {
-      const res = await APIShareProject({
-        email: senderEmail,
-        projectId: project.id
-      })
-
-      const newProj = res[1]
-
-      dispatch(SET_PROJECT({ id: newProj.id, project: newProj }))
-
-      dispatch(OPEN_SNACKBAR({ message: 'User invited', variant: 'success' }))
-    } catch (err) {
-      dispatch(
-        OPEN_SNACKBAR({
-          message:
-            'User could not be invited, did you enter the correct email?',
-          variant: 'error'
-        })
-      )
-    }
-  }
-
-  const kickUser = async (kickingId: string) => {
-    try {
-      const res = await APIKickUser(project.id, kickingId)
-
-      dispatch(SET_PROJECT({ id: res.project.id, project: res.project }))
-    } catch (err) {
-      dispatch(
-        OPEN_SNACKBAR({ message: 'User could not be kicked', variant: 'error' })
-      )
-    }
-  }
 
   return (
     <DialogContent
@@ -98,7 +62,7 @@ export const ShareProject = ({ project }: Props) => {
             />
             <ListItemSecondaryAction>
               <IconButton
-                onClick={() => kickUser(member.id)}
+                onClick={() => kickUser(dispatch, project.id, member.id)}
                 disabled={
                   project.ownerId !== user!.id || member.id === user!.id
                 }
@@ -126,7 +90,7 @@ export const ShareProject = ({ project }: Props) => {
           onChange={(e) => setSenderEmail(e.target.value)}
         />
         <Button
-          onClick={() => submit()}
+          onClick={() => shareProject(dispatch, project.id, senderEmail)}
           style={{ height: '100%', margin: 'auto 0 auto 8px' }}
           variant="contained"
           color="primary"

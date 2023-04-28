@@ -7,7 +7,9 @@ import {
   Typography,
   IconButton,
   TextField,
-  InputAdornment
+  InputAdornment,
+  Checkbox,
+  FormControlLabel
 } from '@mui/material'
 import LockOpen from '@mui/icons-material/LockOpen'
 import { useFormStyles } from './styles/formStyles'
@@ -53,6 +55,7 @@ export const AuthRender = ({ authType }: Props) => {
   const [confirmText, setConfirmText] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState('')
+  const [persist, setPersist] = useState(true)
 
   const navigate = useHistory()
   const classes = useFormStyles()
@@ -68,11 +71,15 @@ export const AuthRender = ({ authType }: Props) => {
           autoComplete="on"
           onSubmit={async (e) => {
             e.preventDefault()
+
+            localStorage.setItem('persist', persist.toString())
+
             if (authType === 'Register') {
               const user = await APIRegister({
                 email,
                 password,
-                username
+                username,
+                persist
               })
               if (user) {
                 const authUser = transformUser(user)
@@ -90,7 +97,7 @@ export const AuthRender = ({ authType }: Props) => {
                 )
               }
             } else {
-              const user = await APILogin(email, password)
+              const user = await APILogin(email, password, persist)
               if (user) {
                 const authUser = transformUser(user)
 
@@ -173,6 +180,22 @@ export const AuthRender = ({ authType }: Props) => {
                 onChange={(e: any) => setConfirmText(e.target.value)}
               />
             )}
+            <div style={{ width: '100%', marginTop: 4 }}>
+              {/* show a "stay logged in" toggle checkbox with MUI */}
+              <FormControlLabel
+                style={{ marginLeft: 0 }}
+                control={
+                  <Checkbox
+                    checked={persist}
+                    onChange={(e) => setPersist(e.target.checked)}
+                    defaultChecked
+                    style={{ marginRight: 4 }}
+                  />
+                }
+                label="Stay Logged In"
+              />
+            </div>
+
             <Grid
               container
               justifyContent="center"

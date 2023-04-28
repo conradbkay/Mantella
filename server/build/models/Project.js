@@ -39,8 +39,8 @@ tslib_1.__decorate([
 ], Project.prototype, "security", void 0);
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),
-    tslib_1.__metadata("design:type", String)
-], Project.prototype, "chatId", void 0);
+    tslib_1.__metadata("design:type", Array)
+], Project.prototype, "channels", void 0);
 Project = tslib_1.__decorate([
     (0, typegoose_1.modelOptions)({ options: { allowMixed: 0 } })
 ], Project);

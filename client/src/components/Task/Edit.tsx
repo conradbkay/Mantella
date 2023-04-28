@@ -3,11 +3,12 @@ import { id } from '../../utils/utilities'
 import { useDispatch, useSelector } from 'react-redux'
 import Delete from '@mui/icons-material/Delete'
 import { TTask } from '../../types/project'
-import { APIDeleteTask, APIDragTask, APIEditTask } from '../../API/task'
+import { APIEditTask } from '../../API/task'
 //import { convertToRaw } from 'draft-js'
 import { EditTaskBase } from './EditBase'
 import { TState } from '../../types/state'
-import { SET_PROJECT, SET_TASK } from '../../store/projects'
+import { SET_TASK } from '../../store/projects'
+import { deleteTask, dragTask } from '../../actions/task'
 
 type OwnProps = {
   onClose: () => void
@@ -15,7 +16,7 @@ type OwnProps = {
   projectId: string
 }
 
-/** todo:
+/** TODO:
  * better code support (several themes and languages)
  * better editor features (fitting headers, colors, etc)
  * make rendering in task base work for everything
@@ -38,18 +39,7 @@ export const EditTaskModal = (props: OwnProps) => {
     return null
   }
 
-  const deleteTask = () => {
-    dispatch(
-      SET_TASK({
-        id: props.taskId,
-        projectId: props.projectId,
-        newTask: undefined
-      })
-    )
-    APIDeleteTask(props.taskId, props.projectId)
-  }
-
-  const drag = async (newId: string) => {
+  const drag = (newId: string) => {
     let progress = 0
 
     project.lists.forEach((list) => {
@@ -60,22 +50,7 @@ export const EditTaskModal = (props: OwnProps) => {
       })
     })
 
-    const data = await APIDragTask({
-      projectId: project.id,
-      oldListId: ownerList.id,
-      newListId: newId,
-      oldProgress: progress,
-      newProgress: progress,
-      oldListReplaceIds: project.lists[id(project.lists, ownerList.id)].taskIds[
-        progress
-      ].filter((id) => id !== props.taskId),
-      newListReplaceIds: [
-        props.taskId,
-        ...project.lists[id(project.lists, newId)].taskIds[progress]
-      ]
-    })
-
-    dispatch(SET_PROJECT({ id: project.id, project: data.project }))
+    dragTask(dispatch, project, progress, ownerList, newId, props.taskId)
   }
 
   const confirmChanges = (task: TTask, listId: string) => {
@@ -110,7 +85,7 @@ export const EditTaskModal = (props: OwnProps) => {
         <Button
           onClick={() => {
             props.onClose()
-            deleteTask()
+            deleteTask(dispatch, props.taskId, project.id)
           }}
           style={{ backgroundColor: 'red', color: 'white', marginRight: 8 }}
         >

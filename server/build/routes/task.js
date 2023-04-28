@@ -102,12 +102,10 @@ router_1.router.post('/deleteTask', passport_1.isAuthenticated, exports.deleteTa
 const dragTask = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
     if (proj) {
-        const oldListIdx = proj.lists.findIndex((list) => list.id === req.body.oldListId);
-        const newListIdx = proj.lists.findIndex((list) => list.id === req.body.newListId);
-        proj.lists[oldListIdx].taskIds[req.body.oldProgress] =
-            req.body.oldListReplaceIds;
-        proj.lists[newListIdx].taskIds[req.body.newProgress] =
-            req.body.newListReplaceIds;
+        const oldListIdx = proj.lists.findIndex((list) => list.id === req.body.from[0]);
+        const newListIdx = proj.lists.findIndex((list) => list.id === req.body.to[0]);
+        proj.lists[oldListIdx].taskIds[req.body.from[1]] = req.body.from[2];
+        proj.lists[newListIdx].taskIds[req.body.to[1]] = req.body.to[2];
         proj.markModified('lists'); // mongoose does not watch subarrays this deep
         const newProj = await proj.save();
         res.json({ project: newProj.toObject() });

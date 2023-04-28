@@ -7,7 +7,7 @@ export type TProjectUser = {
 
 export interface TProject {
   id: string
-  chatId: string
+  channels: [string, string][] // id, name
   name: string
   ownerId: string
   lists: Array<{

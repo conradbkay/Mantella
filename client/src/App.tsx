@@ -1,5 +1,5 @@
-import { useMemo, useState, createContext } from 'react'
-import { Provider } from 'react-redux'
+import { useMemo, useState, createContext, useEffect } from 'react'
+import { Provider, useSelector } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
 
@@ -22,8 +22,9 @@ import { useTheme } from '@mui/material'
 import io from 'socket.io-client'
 import { useAppDispatch } from './store/hooks'
 import { transformUser } from './store/auth'
-import { SET_PROJECTS } from './store/projects'
+import { SET_PROJECTS, selectProjects } from './store/projects'
 import { LOGIN } from './store/user'
+import { Chat } from './components/Chat/Chat'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
@@ -51,30 +52,44 @@ const socket = io('http://localhost:3000', {
 })
 
 const secondary = '#cc1100'
-const primary = '#00838f'
+const primary = '#7289da'
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
 const Router = () => {
   const [loaded, setLoaded] = useState(false)
   const dispatch = useAppDispatch()
-
   window.onload = async () => {
     try {
-      const loginRes = await APICookieLogin()
+      const preserve = localStorage.getItem('preserve') === 'true'
+      if (preserve) {
+        const loginRes = await APICookieLogin()
 
-      if (loginRes) {
-        const authUser = transformUser(loginRes)
+        if (loginRes) {
+          const authUser = transformUser(loginRes)
 
-        dispatch(LOGIN({ user: authUser }))
-        dispatch(SET_PROJECTS(loginRes.projects))
+          dispatch(LOGIN({ user: authUser }))
+          dispatch(SET_PROJECTS(loginRes.projects))
+        }
       }
-
       setLoaded(true)
     } catch (err) {
       setLoaded(true)
     }
   }
+
+  const projects = useSelector(selectProjects)
+
+  const [connected, setConnected] = useState(false)
+
+  useEffect(() => {
+    if (!connected && projects.length > 0) {
+      socket.emit('login', {
+        chatIds: projects.map((proj) => proj.channels.map((c) => c[0])).flat()
+      })
+      setConnected(true)
+    }
+  }, [connected, projects])
 
   return (
     <BrowserRouter>
@@ -121,6 +136,12 @@ const Router = () => {
           />
           <PrivateRoute
             exact
+            component={Chat}
+            componentProps={{ socket }}
+            path="/chat"
+          />
+          <PrivateRoute
+            exact
             path="/dashboard"
             component={Dashboard}
             componentProps={{}}
@@ -160,21 +181,23 @@ const Router = () => {
 }
 
 export const Wrapper = () => {
-  const [mode, setMode] = useState<'light' | 'dark'>('dark')
+  const [mode, setMode] = useState(localStorage.getItem('theme') || 'dark')
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'))
+        const newMode = mode === 'light' ? 'dark' : 'light'
+        localStorage.setItem('theme', newMode)
+        setMode(newMode)
       }
     }),
-    []
+    [mode]
   )
 
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode,
+          mode: mode as any,
           primary: {
             main: primary
           },

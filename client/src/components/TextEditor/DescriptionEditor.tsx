@@ -50,18 +50,6 @@ function CodeHighlightPlugin() {
   return null
 }
 
-// TODO: lazy load
-function MyCustomAutoFocusPlugin() {
-  const [editor] = useLexicalComposerContext()
-
-  useEffect(() => {
-    // Focus the editor when the effect fires!
-    editor.focus()
-  }, [editor])
-
-  return null
-}
-
 export const Description = ({
   onChange,
   initialState,
@@ -128,7 +116,6 @@ export const Description = ({
           <CodeHighlightPlugin />
           <ListPlugin />
           <AutoLinkPlugin matchers={MATCHERS} />
-          <MyCustomAutoFocusPlugin />
         </div>
       </div>
     </LexicalComposer>

@@ -28,13 +28,13 @@ import DraggableAvatar from './DraggableAvatar'
 import { taskDummyOpacity } from '../Project/Project'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { SELECT_POMODORO_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
-import { SET_SUBTASK, SET_TASK } from '../../store/projects'
+import { SET_SUBTASK } from '../../store/projects'
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
-import { APIDeleteTask } from '../../API/task'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
 import { colorForLightMode } from '../../colors'
 import { Description } from '../TextEditor/DescriptionEditor'
+import { deleteTask } from '../../actions/task'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -130,14 +130,14 @@ export const BaseTask = memo(
     const [showComments, setShowComments] = useState(false)
     const [showSubTasks, setShowSubTasks] = useState(true)
 
-    const [formatDate, setFormatDate] = useState(formatDueDate(task, true))
+    const [formatDate, setFormatDate] = useState(formatDueDate(task))
 
-    if (formatDueDate(task, true) !== formatDate) {
-      setFormatDate(formatDueDate(task, true))
+    if (formatDueDate(task) !== formatDate) {
+      setFormatDate(formatDueDate(task))
     }
     useInterval(() => {
       if (task.dueDate) {
-        setFormatDate(formatDueDate(task, true))
+        setFormatDate(formatDueDate(task))
       }
     }, 1000)
 
@@ -197,14 +197,7 @@ export const BaseTask = memo(
           <MenuItem
             onClick={() => {
               setRightClickAnchorEl(null)
-              dispatch(
-                SET_TASK({
-                  id: task.id,
-                  projectId: project.id,
-                  newTask: undefined
-                })
-              )
-              APIDeleteTask(task.id, project.id)
+              deleteTask(dispatch, task.id, project.id)
             }}
           >
             <ListItemIcon>
@@ -386,14 +379,11 @@ export const BaseTask = memo(
                                   }}
                                 >
                                   {
-                                    formatDueDate(
-                                      {
-                                        ...task,
-                                        dueDate: comment.dateAdded,
-                                        recurrance: undefined
-                                      },
-                                      false
-                                    ).split('Due')[1]
+                                    formatDueDate({
+                                      ...task,
+                                      dueDate: comment.dateAdded,
+                                      recurrance: undefined
+                                    }).split('Due')[1]
                                   }
                                 </span>
                                 {'  -  '}

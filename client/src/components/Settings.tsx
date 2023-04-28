@@ -5,7 +5,9 @@ import {
   ListItemText,
   Button,
   useTheme,
-  TextField
+  TextField,
+  Checkbox,
+  FormControlLabel
 } from '@mui/material'
 import { List } from '@mui/material'
 import { makeStyles } from '@mui/styles'
@@ -42,6 +44,9 @@ export const Settings = () => {
 
   const [name, setName] = useState(user!.username)
   const [email, setEmail] = useState(user!.email)
+  const [persist, setPersist] = useState(
+    localStorage.getItem('persist') === 'true'
+  )
 
   return (
     <>
@@ -157,13 +162,33 @@ export const Settings = () => {
               </Button>
             </div>
           </ListItem>
-          <ListItem>
+          <ListItem
+            style={{ flexDirection: 'column', alignItems: 'flex-start' }}
+          >
             <ListItemText
               primary="Preferences"
               style={{ color: theme.palette.text.primary }}
             />
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              Stay logged in?
+            <div style={{ width: '100%', marginTop: 4 }}>
+              {/* show a "stay logged in" toggle checkbox with MUI */}
+              <FormControlLabel
+                style={{ marginLeft: 0, color: 'white' }}
+                control={
+                  <Checkbox
+                    checked={persist}
+                    onChange={(e) => {
+                      setPersist(e.target.checked)
+                      localStorage.setItem(
+                        'persist',
+                        e.target.checked.toString()
+                      )
+                    }}
+                    defaultChecked
+                    style={{ marginRight: 4 }}
+                  />
+                }
+                label="Stay Logged In"
+              />
             </div>
           </ListItem>
         </List>

@@ -50,12 +50,12 @@ const generateIds = (length) => {
     return ids;
 };
 exports.generateIds = generateIds;
-const generateDefaultProject = (newUser, projectId, chatId) => {
+const generateDefaultProject = (newUser, projectId, chat) => {
     const listIds = [(0, uuid_1.v4)(), (0, uuid_1.v4)(), (0, uuid_1.v4)()];
     const ids = (0, exports.generateIds)(16);
     const tasks = (0, exports.taskObjects)(ids);
     return {
-        chatId,
+        channels: [chat],
         history: [],
         name: 'Tutorial Project',
         lists: [

@@ -34,6 +34,7 @@ type OwnProps = {
   projectId: string
   task: TTask
   ownerListId: string
+  title?: string
   SecondaryAction: any
 }
 
@@ -117,7 +118,9 @@ export const EditTaskBase = (props: OwnProps) => {
             paddingBottom: 12
           }}
         >
-          <DialogTitle style={{ paddingLeft: '0px' }}>Edit Task</DialogTitle>
+          <DialogTitle style={{ paddingLeft: '0px' }}>
+            {props.title || 'Edit Task'}
+          </DialogTitle>
           <div
             style={{
               display: 'flex',

@@ -46,7 +46,7 @@ export class Project {
   @prop()
   public security?: { public: boolean; assignedUsers: Array<string> }
   @prop()
-  public chatId!: string
+  public channels!: [string, string][] // id, name
 }
 
 export type Task = Project['tasks'][0]
