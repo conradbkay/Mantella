@@ -58,7 +58,9 @@ const filterByColor = (
   filterData: TFilterData['color']
 ): boolean => {
   return (
-    !filterData || filterData.includes('all') || filterData.includes(task.color)
+    !filterData ||
+    filterData.includes('all') ||
+    filterData.map((c) => c.toLowerCase()).includes(task.color.toLowerCase())
   )
 }
 

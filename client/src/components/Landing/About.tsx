@@ -17,21 +17,14 @@ const useStyles = makeStyles((theme: Theme) => ({
     padding: '80px 40px',
     display: 'flex',
     alignItems: 'center',
+    backgroundColor: theme.palette.background.paper,
+    color: theme.palette.primary.main,
     justifyContent: 'space-between',
-    backgroundImage: 'url(herringbone.webp)',
     position: 'relative'
   },
   heroTitle: {
     fontSize: 64,
     textAlign: 'center'
-  },
-  kayLink: {
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 16,
-    marginBottom: 16,
-    textAlign: 'center',
-    minHeight: 368
   },
   title: {
     fontWeight: 700,
@@ -42,6 +35,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     fontWeight: 400,
     fontSize: '1.25rem',
     zIndex: 2
+  },
+  guestButton: {
+    backgroundColor: theme.palette.primary.main
   }
 }))
 
@@ -82,9 +78,6 @@ export const About = ({ showLinkedin }: Props) => {
         />
       </Helmet>
       <Grid container className={classes.heroContent}>
-        <Grid item md={6} sm={12}>
-          <FeatureGallery />
-        </Grid>
         <Grid
           item
           md={6}
@@ -102,11 +95,15 @@ export const About = ({ showLinkedin }: Props) => {
           <Button
             variant="contained"
             size="large"
+            className={classes.guestButton}
             onClick={() => loginAsGuest()}
-            style={{ marginTop: 8, color: 'white', backgroundColor: 'black' }}
+            style={{ marginTop: 16, padding: '11px 26px', fontSize: 16 }}
           >
             Continue as Guest
           </Button>
+        </Grid>
+        <Grid item md={6} sm={12}>
+          <FeatureGallery />
         </Grid>
       </Grid>
       <div style={{ margin: '20px 0' }}>

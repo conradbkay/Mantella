@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { TProject, TRole } from '../types/project'
 
 export const APICreateProject = async (name: string) => {
   try {
@@ -54,4 +55,33 @@ export const APIKickUser = async (projectId: string, kickingId: string) => {
   const res = await axios.post('/kickUser', { projectId, userId: kickingId })
 
   return res.data
+}
+
+export const APISetRole = async (
+  projectId: string,
+  role: TRole | string
+): Promise<TProject> => {
+  const res = await axios.post('/setRole', { projectId, role })
+
+  return res.data.project as TProject
+}
+
+export const APISetUserRoles = async (
+  projectId: string,
+  userId: string,
+  roles: string[]
+): Promise<TProject> => {
+  const res = await axios.post('/setUserRoles', { projectId, userId, roles })
+
+  return res.data.project as TProject
+}
+
+export const APIMoveRole = async (
+  projectId: string,
+  from: number,
+  to: number
+) => {
+  const res = await axios.post('/moveRole', { projectId, from, to })
+
+  return res
 }

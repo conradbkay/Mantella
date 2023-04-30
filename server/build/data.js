@@ -52,6 +52,7 @@ const generateIds = (length) => {
 exports.generateIds = generateIds;
 const generateDefaultProject = (newUser, projectId, chat) => {
     const listIds = [(0, uuid_1.v4)(), (0, uuid_1.v4)(), (0, uuid_1.v4)()];
+    const roleId = (0, uuid_1.v4)();
     const ids = (0, exports.generateIds)(16);
     const tasks = (0, exports.taskObjects)(ids);
     return {
@@ -72,13 +73,24 @@ const generateDefaultProject = (newUser, projectId, chat) => {
             {
                 id: listIds[2],
                 name: 'Other Features',
-                taskIds: [[ids[10], ids[11], ids[12], ids[13], ids[14]], [], []]
+                taskIds: [
+                    [ids[10], ids[11], ids[12], ids[13], ids[14], ids[15]],
+                    [],
+                    []
+                ]
             }
         ],
         ownerId: newUser.id,
         id: projectId,
         tasks: tasks,
-        users: [newUser]
+        users: [Object.assign(Object.assign({}, newUser), { roles: [roleId] })],
+        roles: [
+            {
+                id: roleId,
+                name: 'Admin',
+                color: '#FF0000'
+            }
+        ]
     };
 };
 exports.generateDefaultProject = generateDefaultProject;

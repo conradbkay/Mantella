@@ -5,6 +5,12 @@ export type TProjectUser = {
   profileImg: string
 }
 
+export type TRole = {
+  name: string
+  color: string
+  id: string
+}
+
 export interface TProject {
   id: string
   channels: [string, string][] // id, name
@@ -17,6 +23,8 @@ export interface TProject {
   }>
 
   tasks: TTask[]
+
+  roles: TRole[]
 
   users: TProjectUser[]
 

@@ -42,6 +42,14 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 ## Todos
 
+Store filters for later use
+
+change progress in task edit modal
+
+graph in project statistics
+
+Drag area over several tasks and have right click context apply to all of them, even have drag and drop of that task mass
+
 ### Documents
 
 Entirely separate tab
@@ -64,8 +72,6 @@ Edit history from diffs
 
 Sideways and normal orientation
 
-Likely remove kanban view in place of the new lists view
-
 Sidebar items full width on open
 
 ### Additional Features
@@ -83,8 +89,6 @@ Message with specific user, even groups
 Track seen and unseen messages, show unread count on sidebar and perhaps tab name
 
 ### User
-
-choose whether session happens, also in settings
 
 privileges for certain members, transfer to owner
 

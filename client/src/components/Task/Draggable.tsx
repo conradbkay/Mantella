@@ -1,16 +1,15 @@
 import { useSortable } from '@dnd-kit/sortable'
-import { TTask } from '../../types/project'
 import { CSS } from '@dnd-kit/utilities'
 
 type Props = {
-  task: TTask
+  id: string
   children: React.ReactNode
 }
 
-const DraggableTask = ({ task, children }: Props) => {
+const DraggableTask = ({ id, children }: Props) => {
   const { setNodeRef, listeners, attributes, transform, transition } =
     useSortable({
-      id: task.id
+      id
     })
 
   const style = {

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProjectMembers = exports.shareProject = exports.getProjectById = exports.kickUserFromProject = exports.leaveProject = exports.deleteProject = exports.editProject = exports.createProject = void 0;
+exports.moveRole = exports.setUserRoles = exports.setRole = exports.getProjectMembers = exports.shareProject = exports.getProjectById = exports.kickUserFromProject = exports.leaveProject = exports.deleteProject = exports.editProject = exports.createProject = void 0;
 const User_1 = require("../models/User");
 const Project_1 = require("../models/Project");
 const uuid_1 = require("uuid");
@@ -11,11 +11,19 @@ const createProject = async (req, res) => {
     const creatingId = (0, uuid_1.v4)();
     const listId = (0, uuid_1.v4)();
     const chatId = (0, uuid_1.v4)();
+    const adminRoleId = (0, uuid_1.v4)();
     if (req.user) {
         ;
         req.user.projects.push(creatingId);
         const [created] = await Promise.all([
             Project_1.ProjectModel.create({
+                roles: [
+                    {
+                        name: 'Admin',
+                        color: '#FF0000',
+                        id: adminRoleId
+                    }
+                ],
                 id: creatingId,
                 name: req.body.name,
                 ownerId: req.user.id,
@@ -24,7 +32,8 @@ const createProject = async (req, res) => {
                         id: req.user.id,
                         username: req.user.username,
                         email: req.user.email,
-                        profileImg: req.user.profileImg
+                        profileImg: req.user.profileImg,
+                        roles: [adminRoleId]
                     }
                 ],
                 lists: [
@@ -182,7 +191,8 @@ const shareProject = async (req, res) => {
         email: user.email,
         username: user.username,
         profileImg: user.profileImg || '',
-        id: user.id
+        id: user.id,
+        roles: []
     });
     project.markModified('users');
     project = await project.save();
@@ -198,4 +208,57 @@ const getProjectMembers = async (req, res) => {
 };
 exports.getProjectMembers = getProjectMembers;
 router_1.router.post('/getProjectMembers', passport_1.isAuthenticated, exports.getProjectMembers);
+const setRole = async (req, res) => {
+    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
+    if (!project) {
+        throw new Error('project does not exist');
+    }
+    const role = req.body.role;
+    const roleIdx = project.roles.findIndex((compare) => {
+        return typeof role === 'string'
+            ? compare.id === role
+            : compare.id === role.id;
+    });
+    if (roleIdx === -1) {
+        project.roles.push(role);
+    }
+    else if (typeof role === 'string') {
+        project.roles.splice(roleIdx, 1);
+    }
+    else {
+        project.roles[roleIdx] = role;
+    }
+    project.markModified('roles');
+    await project.save();
+    res.json({ project });
+};
+exports.setRole = setRole;
+router_1.router.post('/setRole', passport_1.isAuthenticated, exports.setRole);
+const setUserRoles = async (req, res) => {
+    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
+    if (!project) {
+        throw new Error('project does not exist');
+    }
+    const userIdx = project.users.findIndex((compare) => {
+        return compare.id === req.body.userId;
+    });
+    project.users[userIdx].roles = req.body.roles;
+    project.markModified('users');
+    await project.save();
+    res.json({ project });
+};
+exports.setUserRoles = setUserRoles;
+router_1.router.post('/setUserRoles', passport_1.isAuthenticated, exports.setUserRoles);
+const moveRole = async (req, res) => {
+    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
+    if (!project) {
+        throw new Error('project does not exist');
+    }
+    project.roles.splice(req.body.to, 0, project.roles.splice(req.body.from, 1)[0]);
+    project.markModified('roles');
+    await project.save();
+    res.json({ message: 'done' });
+};
+exports.moveRole = moveRole;
+router_1.router.post('/moveRole', passport_1.isAuthenticated, exports.moveRole);
 //# sourceMappingURL=project.js.map

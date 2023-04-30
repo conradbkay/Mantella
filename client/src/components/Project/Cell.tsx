@@ -356,8 +356,9 @@ export const ProjectCell = memo(
               >
                 {!collapsed
                   ? tasks.map((task, i) => (
-                      <DraggableTask task={task} key={task.id}>
+                      <DraggableTask id={task.id} key={task.id}>
                         <BaseTask
+                          showProgress={viewType === 'lists'}
                           isDragging={draggingId === task.id}
                           hidden={!filterTask(task, filter)}
                           openFunc={() => openFunc(task.id)}

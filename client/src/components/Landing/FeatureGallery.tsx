@@ -1,11 +1,11 @@
-import { Icon, Paper } from '@mui/material'
+import { Icon, Paper, useTheme } from '@mui/material'
 
 const galleryOptions = [
   {
-    name: 'Dividers',
+    name: 'Chat',
     description:
-      'divide tasks in different task lists or swimlanes for maximum efficiency',
-    icon: 'view_quilt'
+      'Chat with your team members, create channels and send messages',
+    icon: 'chat'
   },
   {
     name: 'Private tasks',
@@ -19,8 +19,8 @@ const galleryOptions = [
     icon: 'timer'
   },
   {
-    name: 'Board settings',
-    description: 'Manage members and admins, customize the app',
+    name: 'Member roles',
+    description: 'Assign roles to users to manage permissions',
     icon: 'settings'
   },
   {
@@ -37,7 +37,7 @@ const galleryOptions = [
   },
   {
     name: 'Task Board',
-    description: 'Get an overview of what has to be done',
+    description: 'Use different views and filter or sort tasks',
     icon: 'view_list'
   },
   {
@@ -53,6 +53,8 @@ const galleryOptions = [
 ]
 
 export const FeatureGallery = () => {
+  const theme = useTheme()
+
   return (
     <Paper style={{ padding: 16, maxWidth: 1000, margin: '12px auto' }}>
       <div
@@ -81,19 +83,22 @@ export const FeatureGallery = () => {
                   flexDirection: 'row',
                   display: 'flex',
                   alignItems: 'center',
-                  fontFamily: 'nunito'
+                  fontFamily: 'nunito',
+                  color: theme.palette.primary.main
                 }}
               >
-                <Icon
-                  style={{ fontSize: 36, marginRight: 4, color: '#224885' }}
-                >
+                <Icon style={{ fontSize: 36, marginRight: 4 }}>
                   {galleryOption.icon}
                 </Icon>
-                <p style={{ fontWeight: 700, fontSize: 22, color: '#224885' }}>
+                <p style={{ fontWeight: 700, fontSize: 22 }}>
                   {galleryOption.name}
                 </p>
               </div>
-              <div style={{ marginTop: 8 }}>{galleryOption.description}</div>
+              <div
+                style={{ marginTop: 8, color: theme.palette.text.secondary }}
+              >
+                {galleryOption.description}
+              </div>
             </div>
           </div>
         ))}

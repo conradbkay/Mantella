@@ -53,6 +53,7 @@ import { SET_PROJECT, SET_TASK } from '../../store/projects'
 import { TTask } from '../../types/project'
 import { assignUserToTask, deleteTask } from '../../actions/task'
 import { Scrollbar } from 'react-scrollbars-custom'
+import { filterTask } from '../../utils/filterTasks'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -127,7 +128,7 @@ const getDragEventData = ({ active, over }: DragOverEvent | DragEndEvent) => {
 }
 
 // necessary to allow clicking AND dragging tasks
-class MyPointerSensor extends PointerSensor {
+export class MyPointerSensor extends PointerSensor {
   static activators = [
     {
       eventName: 'onPointerDown' as any,
@@ -188,9 +189,10 @@ export const Project = (props: Props) => {
   const [creating, setCreating] = useState('')
   const [fab, setFab] = useState(false)
 
-  const { project } = useSelector((state: TState) => {
+  const { project, filter } = useSelector((state: TState) => {
     return {
-      project: state.projects[id(state.projects, props.params.id)]
+      project: state.projects[id(state.projects, props.params.id)],
+      filter: state.filter
     }
   })
 
@@ -510,6 +512,7 @@ export const Project = (props: Props) => {
                       <BaseTask
                         showProgress
                         key={task.id}
+                        hidden={!filterTask(task, filter)}
                         style={{}}
                         project={project}
                         openFunc={() => setEditingTaskId(task.id)}

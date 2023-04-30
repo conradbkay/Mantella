@@ -104,7 +104,7 @@ export const Sidebar = memo(
             ) : open === 'Members' ? (
               <ShareProject project={project} />
             ) : open === 'Settings' ? (
-              <ProjectSettings projectId={project.id} />
+              <ProjectSettings project={project} />
             ) : open === 'Statistics' ? (
               <ProjStats project={project} />
             ) : open === 'Pomodoro' ? (

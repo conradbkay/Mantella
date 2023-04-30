@@ -115,11 +115,17 @@ export const generateIds = (length: number): string[] => {
 }
 
 export const generateDefaultProject = (
-  newUser: { email: string; id: string; profileImg: string; username: string },
+  newUser: {
+    email: string
+    id: string
+    profileImg: string
+    username: string
+  },
   projectId: string,
   chat: [string, string]
 ): Project => {
   const listIds = [uuid(), uuid(), uuid()]
+  const roleId = uuid()
   const ids = generateIds(16)
   const tasks = taskObjects(ids)
   return {
@@ -140,13 +146,24 @@ export const generateDefaultProject = (
       {
         id: listIds[2],
         name: 'Other Features',
-        taskIds: [[ids[10], ids[11], ids[12], ids[13], ids[14]], [], []]
+        taskIds: [
+          [ids[10], ids[11], ids[12], ids[13], ids[14], ids[15]],
+          [],
+          []
+        ]
       }
     ],
     ownerId: newUser.id,
     id: projectId,
     tasks: tasks,
-    users: [newUser]
+    users: [{ ...newUser, roles: [roleId] }],
+    roles: [
+      {
+        id: roleId,
+        name: 'Admin',
+        color: '#FF0000'
+      }
+    ]
   }
 }
 

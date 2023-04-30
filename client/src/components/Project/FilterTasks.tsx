@@ -33,13 +33,12 @@ const FilterTasksComponent = () => {
       <List style={{ minWidth: 400, marginTop: 8 }}>
         <ListItem>
           <ListItemText
+            primary="Filter Tasks"
+            secondary="Sorted or Filtered Tasks cannot be dragged"
             style={{
-              color: theme.palette.text.secondary
+              color: theme.palette.text.primary
             }}
-          >
-            {/* todo: fix drag and drop for this */}
-            Sorted or Filtered Tasks cannot be dragged
-          </ListItemText>
+          />
         </ListItem>
         <ListItem
           style={{
@@ -79,11 +78,7 @@ const FilterTasksComponent = () => {
               dispatch(
                 SET_FILTER({
                   ...filterData,
-                  color: color.length
-                    ? color.includes('all') && color.length > 1
-                      ? color.filter((c: any) => c !== 'all')
-                      : color
-                    : ['all']
+                  color: [color]
                 })
               )
             }}

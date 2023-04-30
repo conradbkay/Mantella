@@ -42,11 +42,20 @@ export class Project {
     profileImg: string
     username: string
     email: string
+    roles: string[]
   }>
   @prop()
   public security?: { public: boolean; assignedUsers: Array<string> }
   @prop()
   public channels!: [string, string][] // id, name
+  @prop()
+  public roles!: [
+    {
+      id: string
+      color: string
+      name: string
+    }
+  ]
 }
 
 export type Task = Project['tasks'][0]

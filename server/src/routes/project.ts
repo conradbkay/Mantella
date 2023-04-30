@@ -25,12 +25,20 @@ export const createProject = async (
   const creatingId = uuid()
   const listId = uuid()
   const chatId = uuid()
+  const adminRoleId = uuid()
 
   if (req.user) {
     ;(req.user as any).projects.push(creatingId)
 
     const [created] = await Promise.all([
       ProjectModel.create({
+        roles: [
+          {
+            name: 'Admin',
+            color: '#FF0000',
+            id: adminRoleId
+          }
+        ],
         id: creatingId,
         name: req.body.name,
         ownerId: (req.user as any).id,
@@ -39,7 +47,8 @@ export const createProject = async (
             id: (req.user as any).id,
             username: (req.user as any).username,
             email: (req.user as any).email,
-            profileImg: (req.user as any).profileImg
+            profileImg: (req.user as any).profileImg,
+            roles: [adminRoleId]
           }
         ],
         lists: [
@@ -236,7 +245,8 @@ export const shareProject = async (req: Request, res: Response) => {
     email: user.email,
     username: user.username,
     profileImg: user.profileImg || '',
-    id: user.id
+    id: user.id,
+    roles: []
   })
   project.markModified('users')
 
@@ -258,3 +268,76 @@ export const getProjectMembers = async (req: Request, res: Response) => {
 }
 
 router.post('/getProjectMembers', isAuthenticated, getProjectMembers)
+
+export const setRole = async (req: Request, res: Response) => {
+  const project = await ProjectModel.findOne({ id: req.body.projectId })
+
+  if (!project) {
+    throw new Error('project does not exist')
+  }
+
+  const role = req.body.role as any
+
+  const roleIdx = project.roles.findIndex((compare) => {
+    return typeof role === 'string'
+      ? compare.id === role
+      : compare.id === role.id
+  })
+
+  if (roleIdx === -1) {
+    project.roles.push(role)
+  } else if (typeof role === 'string') {
+    project.roles.splice(roleIdx, 1)
+  } else {
+    project.roles[roleIdx] = role
+  }
+
+  project.markModified('roles')
+  await project.save()
+
+  res.json({ project })
+}
+
+router.post('/setRole', isAuthenticated, setRole)
+
+export const setUserRoles = async (req: Request, res: Response) => {
+  const project = await ProjectModel.findOne({ id: req.body.projectId })
+
+  if (!project) {
+    throw new Error('project does not exist')
+  }
+
+  const userIdx = project.users.findIndex((compare) => {
+    return compare.id === req.body.userId
+  })
+
+  project.users[userIdx].roles = req.body.roles
+
+  project.markModified('users')
+  await project.save()
+
+  res.json({ project })
+}
+
+router.post('/setUserRoles', isAuthenticated, setUserRoles)
+
+export const moveRole = async (req: Request, res: Response) => {
+  const project = await ProjectModel.findOne({ id: req.body.projectId })
+
+  if (!project) {
+    throw new Error('project does not exist')
+  }
+
+  project.roles.splice(
+    req.body.to,
+    0,
+    project.roles.splice(req.body.from, 1)[0]
+  )
+
+  project.markModified('roles')
+  await project.save()
+
+  res.json({ message: 'done' })
+}
+
+router.post('/moveRole', isAuthenticated, moveRole)
