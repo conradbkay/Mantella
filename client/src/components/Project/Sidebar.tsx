@@ -94,6 +94,7 @@ export const Sidebar = memo(
             }}
           >
             <ChatMessages
+              topMargin={64}
               users={project.users}
               socket={socket}
               channel={project.channels[0]}

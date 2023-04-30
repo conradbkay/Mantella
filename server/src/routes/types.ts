@@ -83,6 +83,7 @@ export type createListRes = Response<{}>
 export type createProjectReq = Req<{
   userId: string
   name: string
+  public: boolean
 }>
 export type createProjectRes = Response<{}>
 

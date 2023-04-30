@@ -40,13 +40,15 @@ export const ChatMessages = ({
   channel,
   open,
   users,
-  complex
+  complex,
+  topMargin
 }: {
   socket: Socket
   channel: [string, string]
   open: boolean
   users: TProject['users']
   complex?: boolean
+  topMargin?: number
 }) => {
   const [messagesReceived, setMessagesReceived] = useState([] as Message[])
   const [loading, setLoading] = useState(true)
@@ -130,7 +132,7 @@ export const ChatMessages = ({
         width,
         display: 'flex',
         flexDirection: 'column',
-        maxHeight: `calc(100vh - ${headerHeight}px)`
+        maxHeight: `calc(100vh - ${headerHeight + (topMargin || 0)}px)`
       }}
     >
       <Paper

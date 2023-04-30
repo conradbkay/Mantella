@@ -45,7 +45,7 @@ export class Project {
     roles: string[]
   }>
   @prop()
-  public security?: { public: boolean; assignedUsers: Array<string> }
+  public security?: { public: boolean }
   @prop()
   public channels!: [string, string][] // id, name
   @prop()
@@ -56,6 +56,8 @@ export class Project {
       name: string
     }
   ]
+  @prop()
+  public data!: {}
 }
 
 export type Task = Project['tasks'][0]

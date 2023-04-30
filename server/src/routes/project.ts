@@ -32,6 +32,9 @@ export const createProject = async (
 
     const [created] = await Promise.all([
       ProjectModel.create({
+        privacy: {
+          public: req.body.public || false
+        },
         roles: [
           {
             name: 'Admin',

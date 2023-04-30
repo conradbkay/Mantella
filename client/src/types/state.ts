@@ -21,6 +21,7 @@ export type TPomodoro = {
 
 export type TProfile = {
   id: string
+  guest?: boolean
   profileImg: string
   username: string
   joinedIds: string[]

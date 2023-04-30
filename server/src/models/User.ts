@@ -12,6 +12,8 @@ export class User {
   @prop()
   public projects!: string[]
   @prop()
+  public guest?: boolean
+  @prop()
   public id!: string
   @prop({ unique: true })
   public email!: string

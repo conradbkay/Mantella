@@ -15,9 +15,10 @@ import { Helmet } from 'react-helmet'
 import { APILogout } from '../API/auth'
 import Color from 'color'
 import { useState } from 'react'
-import { SET_EMAIL, SET_NAME, selectUser } from '../store/user'
+import { LOGIN, SET_EMAIL, SET_NAME, selectUser } from '../store/user'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import axios from 'axios'
+import { transformUser } from '../store/auth'
 
 // https://stackoverflow.com/questions/20771794/mailrfc822address-regex
 const emailRegex =
@@ -43,10 +44,13 @@ export const Settings = () => {
   const dispatch = useAppDispatch()
 
   const [name, setName] = useState(user!.username)
-  const [email, setEmail] = useState(user!.email)
+  const [email, setEmail] = useState(user!.guest ? '' : user!.email)
+  const [password, setPassword] = useState('')
   const [persist, setPersist] = useState(
     localStorage.getItem('persist') === 'true'
   )
+
+  const [migrating, setMigrating] = useState(false)
 
   return (
     <>
@@ -145,7 +149,9 @@ export const Settings = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
               <Button
-                disabled={user?.email === email || !emailRegex.test(email)}
+                disabled={
+                  !email || user?.email === email || !emailRegex.test(email)
+                }
                 style={{ marginLeft: 12, height: 40 }}
                 variant="contained"
                 onClick={async () => {
@@ -153,6 +159,9 @@ export const Settings = () => {
 
                   if (res.status === 200) {
                     dispatch(SET_EMAIL({ email }))
+                    if (user?.guest) {
+                      setMigrating(true)
+                    }
                   } else {
                     setEmail(user!.email)
                   }
@@ -161,6 +170,31 @@ export const Settings = () => {
                 Confirm
               </Button>
             </div>
+            {user?.guest && (
+              <div style={{ marginTop: 12 }}>
+                <TextField
+                  label="Password"
+                  type="password"
+                  placeholder="Password"
+                  size="small"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  disabled={!migrating || password.length < 1}
+                  style={{ marginLeft: 12, height: 40 }}
+                  variant="contained"
+                  onClick={async () => {
+                    const res = await axios.post('/setPassword', { password })
+                    dispatch(
+                      LOGIN({ user: transformUser(res.data.user) as any })
+                    )
+                  }}
+                >
+                  Confirm
+                </Button>
+              </div>
+            )}
           </ListItem>
           <ListItem
             style={{ flexDirection: 'column', alignItems: 'flex-start' }}

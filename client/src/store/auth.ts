@@ -7,5 +7,6 @@ export const transformUser = (user: any): TAuthUser => ({
     typeof proj === 'string' ? proj : (proj.id as string)
   ),
   id: user.id as string,
-  email: user.email
+  email: user.email,
+  guest: user.guest
 })

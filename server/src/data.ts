@@ -153,6 +153,9 @@ export const generateDefaultProject = (
         ]
       }
     ],
+    security: {
+      public: true
+    },
     ownerId: newUser.id,
     id: projectId,
     tasks: tasks,
@@ -163,7 +166,8 @@ export const generateDefaultProject = (
         name: 'Admin',
         color: '#FF0000'
       }
-    ]
+    ],
+    data: {}
   }
 }
 
@@ -173,6 +177,7 @@ export const generateGuestUser = (projectId: string, userId: string) => {
     email: uuid() + '.gmail.com',
     username: 'Guest',
     projects: [projectId],
+    guest: true,
     profileImg:
       'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
   }

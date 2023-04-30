@@ -30,7 +30,6 @@ export interface TProject {
 
   security?: {
     public: boolean
-    assignedUsers: string[] // teams or users
   } | null
 }
 

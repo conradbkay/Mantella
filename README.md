@@ -42,6 +42,8 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 
 ## Todos
 
+More integration with roles
+
 Store filters for later use
 
 change progress in task edit modal
