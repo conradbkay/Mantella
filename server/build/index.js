@@ -88,7 +88,8 @@ app.use((0, express_session_1.default)({
         ? {
             secure: true,
             httpOnly: true,
-            sameSite: 'none'
+            sameSite: 'none',
+            maxAge: 5184000000 // 2 months
         }
         : undefined,
     genid: () => {

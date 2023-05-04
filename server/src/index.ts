@@ -110,7 +110,8 @@ app.use(
         ? {
             secure: true,
             httpOnly: true,
-            sameSite: 'none'
+            sameSite: 'none',
+            maxAge: 5184000000 // 2 months
           }
         : undefined,
     genid: () => {
