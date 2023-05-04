@@ -98,6 +98,26 @@ const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1) // heroku
 }
+
+app.use(
+  session({
+    secret: process.env.PRIVATE || 'test',
+    resave: true,
+    saveUninitialized: true,
+    genid: () => {
+      return uuid()
+    },
+    name: 'connect',
+    cookie: {
+      domain: 'conradkay.com',
+      sameSite: 'none',
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production' ? true : false
+    },
+    store: new FileStore({ ttl: WEEK_IN_SECONDS })
+  })
+)
+
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',

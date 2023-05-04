@@ -80,6 +80,22 @@ if (process.env.NODE_ENV === 'production') {
 }
 app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
+    resave: true,
+    saveUninitialized: true,
+    genid: () => {
+        return (0, uuid_1.v4)();
+    },
+    name: 'connect',
+    cookie: {
+        domain: 'conradkay.com',
+        sameSite: 'none',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production' ? true : false
+    },
+    store: new FileStore({ ttl: WEEK_IN_SECONDS })
+}));
+app.use((0, express_session_1.default)({
+    secret: process.env.PRIVATE || 'test',
     resave: false,
     proxy: process.env.NODE_ENV == 'production' ? true : false,
     saveUninitialized: false,
