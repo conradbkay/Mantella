@@ -17,6 +17,7 @@ import { Request, Response } from 'express'
 import { router } from './router'
 import { isAuthenticated } from '../passport'
 import { ChatModel } from '../models/Chat'
+import { defaultColors } from '../data'
 
 export const createProject = async (
   req: createProjectReq,
@@ -32,6 +33,7 @@ export const createProject = async (
 
     const [created] = await Promise.all([
       ProjectModel.create({
+        colors: defaultColors,
         privacy: {
           public: req.body.public || false
         },

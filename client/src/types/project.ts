@@ -12,6 +12,7 @@ export type TRole = {
 }
 
 export interface TProject {
+  colors: string[]
   id: string
   channels: [string, string][] // id, name
   name: string

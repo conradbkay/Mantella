@@ -96,7 +96,7 @@ app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
 const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
 if (process.env.NODE_ENV === 'production') {
-  app.enable('trust proxy') // heroku
+  app.set('trust proxy', 1) // heroku
 }
 app.use(
   session({
@@ -104,6 +104,7 @@ app.use(
     resave: false,
     proxy: process.env.NODE_ENV == 'production' ? true : false, // required for heroku
     saveUninitialized: false,
+    name: 'mantella',
     cookie:
       process.env.NODE_ENV == 'production'
         ? {

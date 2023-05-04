@@ -25,9 +25,11 @@ import { transformUser } from './store/auth'
 import { SET_PROJECTS, selectProjects } from './store/projects'
 import { LOGIN } from './store/user'
 import { Chat } from './components/Chat/Chat'
+import useTitle from './components/useTitle'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
+  useTitle('Calendar')
   return (
     <div
       style={{

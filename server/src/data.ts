@@ -114,6 +114,17 @@ export const generateIds = (length: number): string[] => {
   return ids
 }
 
+export const defaultColors = [
+  '#C20026',
+  '#C38300',
+  '#3D8F00',
+  '#005BD2',
+  '#7B39BC',
+  '#B52DB5',
+  '#00A86C',
+  '#D0CD00'
+]
+
 export const generateDefaultProject = (
   newUser: {
     email: string
@@ -129,6 +140,7 @@ export const generateDefaultProject = (
   const ids = generateIds(16)
   const tasks = taskObjects(ids)
   return {
+    colors: defaultColors,
     channels: [chat],
     history: [],
     name: 'Tutorial Project',

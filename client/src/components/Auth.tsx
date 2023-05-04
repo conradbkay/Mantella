@@ -24,6 +24,7 @@ import { transformUser } from '../store/auth'
 import { OPEN_SNACKBAR } from '../store/snackbar'
 import { SET_PROJECTS } from '../store/projects'
 import { LOGIN, REGISTER } from '../store/user'
+import useTitle from './useTitle'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
   return <TextField margin="dense" fullWidth required {...inputProps} />
@@ -60,6 +61,8 @@ export const AuthRender = ({ authType }: Props) => {
   const navigate = useHistory()
   const classes = useFormStyles()
   const dispatch = useAppDispatch()
+
+  useTitle(authType)
 
   return (
     <div style={{ padding: 20 }}>

@@ -58,6 +58,8 @@ export class Project {
   ]
   @prop()
   public data!: {}
+  @prop()
+  public colors!: string[]
 }
 
 export type Task = Project['tasks'][0]

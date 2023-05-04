@@ -16,8 +16,4 @@ export const colorForLightMode = (color: string) => {
   return new Color(color).lightness(85).hex().toString()
 }
 
-/*for (const color in colors) {
-  colors[color] = new Color(colors[color]).lightness(40).hex().toString()
-}*/
-
 export type TColor = typeof colors

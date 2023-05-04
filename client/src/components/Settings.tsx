@@ -19,6 +19,7 @@ import { LOGIN, SET_EMAIL, SET_NAME, selectUser } from '../store/user'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import axios from 'axios'
 import { transformUser } from '../store/auth'
+import useTitle from './useTitle'
 
 // https://stackoverflow.com/questions/20771794/mailrfc822address-regex
 const emailRegex =
@@ -51,6 +52,8 @@ export const Settings = () => {
   )
 
   const [migrating, setMigrating] = useState(false)
+
+  useTitle('Settings')
 
   return (
     <>

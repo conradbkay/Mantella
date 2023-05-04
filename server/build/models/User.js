@@ -24,6 +24,10 @@ tslib_1.__decorate([
 ], User.prototype, "projects", void 0);
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),
+    tslib_1.__metadata("design:type", Boolean)
+], User.prototype, "guest", void 0);
+tslib_1.__decorate([
+    (0, typegoose_1.prop)(),
     tslib_1.__metadata("design:type", String)
 ], User.prototype, "id", void 0);
 tslib_1.__decorate([

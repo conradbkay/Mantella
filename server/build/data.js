@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateGuestUser = exports.generateDefaultProject = exports.generateIds = exports.taskObjects = exports.tags = exports.defaultTask = void 0;
+exports.generateGuestUser = exports.generateDefaultProject = exports.defaultColors = exports.generateIds = exports.taskObjects = exports.tags = exports.defaultTask = void 0;
 const uuid_1 = require("uuid");
 exports.defaultTask = {
     name: 'Task',
@@ -50,12 +50,23 @@ const generateIds = (length) => {
     return ids;
 };
 exports.generateIds = generateIds;
+exports.defaultColors = [
+    '#C20026',
+    '#C38300',
+    '#3D8F00',
+    '#005BD2',
+    '#7B39BC',
+    '#B52DB5',
+    '#00A86C',
+    '#D0CD00'
+];
 const generateDefaultProject = (newUser, projectId, chat) => {
     const listIds = [(0, uuid_1.v4)(), (0, uuid_1.v4)(), (0, uuid_1.v4)()];
     const roleId = (0, uuid_1.v4)();
     const ids = (0, exports.generateIds)(16);
     const tasks = (0, exports.taskObjects)(ids);
     return {
+        colors: exports.defaultColors,
         channels: [chat],
         history: [],
         name: 'Tutorial Project',
@@ -80,6 +91,9 @@ const generateDefaultProject = (newUser, projectId, chat) => {
                 ]
             }
         ],
+        security: {
+            public: true
+        },
         ownerId: newUser.id,
         id: projectId,
         tasks: tasks,
@@ -90,7 +104,8 @@ const generateDefaultProject = (newUser, projectId, chat) => {
                 name: 'Admin',
                 color: '#FF0000'
             }
-        ]
+        ],
+        data: {}
     };
 };
 exports.generateDefaultProject = generateDefaultProject;
@@ -100,6 +115,7 @@ const generateGuestUser = (projectId, userId) => {
         email: (0, uuid_1.v4)() + '.gmail.com',
         username: 'Guest',
         projects: [projectId],
+        guest: true,
         profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
     };
 };

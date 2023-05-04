@@ -27,6 +27,7 @@ import Close from '@mui/icons-material/Close'
 import { createChannel, deleteChannel, editChannel } from '../../actions/chat'
 import Settings from '@mui/icons-material/SettingsOutlined'
 import { id } from '../../utils/utilities'
+import useTitle from '../useTitle'
 export const inverse = (color: string, by: number) => {
   const manip = new Color(color)
 
@@ -70,6 +71,8 @@ export const Chat = ({ socket }: { socket: Socket }) => {
     setCreating(null)
     setName('')
   }
+
+  useTitle('Mantella - Chat') // TODO: unread messages in parenthesis
 
   return (
     <div

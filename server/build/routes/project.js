@@ -7,6 +7,7 @@ const uuid_1 = require("uuid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
 const Chat_1 = require("../models/Chat");
+const data_1 = require("../data");
 const createProject = async (req, res) => {
     const creatingId = (0, uuid_1.v4)();
     const listId = (0, uuid_1.v4)();
@@ -17,6 +18,10 @@ const createProject = async (req, res) => {
         req.user.projects.push(creatingId);
         const [created] = await Promise.all([
             Project_1.ProjectModel.create({
+                colors: data_1.defaultColors,
+                privacy: {
+                    public: req.body.public || false
+                },
                 roles: [
                     {
                         name: 'Admin',

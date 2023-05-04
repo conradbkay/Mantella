@@ -76,13 +76,14 @@ app.use((0, cookie_parser_1.default)(process.env.PRIVATE));
 app.use(express_1.default.urlencoded({ extended: true }));
 const WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 if (process.env.NODE_ENV === 'production') {
-    app.enable('trust proxy'); // heroku
+    app.set('trust proxy', 1); // heroku
 }
 app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
     resave: false,
     proxy: process.env.NODE_ENV == 'production' ? true : false,
     saveUninitialized: false,
+    name: 'mantella',
     cookie: process.env.NODE_ENV == 'production'
         ? {
             secure: true,

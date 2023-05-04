@@ -46,13 +46,15 @@ const RoleBase = ({
   actionText,
   setRole,
   deleteFunc,
-  save
+  save,
+  colors
 }: {
   role: TRole
   setRole: React.Dispatch<React.SetStateAction<null | TRole>>
   actionText: string
   deleteFunc?: () => void
   save: () => void
+  colors: string[]
 }) => {
   return (
     <Dialog open onClose={() => setRole(null)}>
@@ -75,7 +77,8 @@ const RoleBase = ({
             fullWidth
           />
           <ChooseColor
-            color={role.color}
+            selected={role.color}
+            colors={colors}
             onChange={(color: string) => {
               setRole((prev) => ({ ...prev!, color }))
             }}
@@ -251,6 +254,7 @@ export const ProjectSettings = ({ project }: Props) => {
       </ListItem>
       {editingRole && (
         <RoleBase
+          colors={project.colors}
           role={editingRole!}
           actionText="Edit Role"
           setRole={setEditingRole}
@@ -266,6 +270,7 @@ export const ProjectSettings = ({ project }: Props) => {
       )}
       {creatingRole && (
         <RoleBase
+          colors={project.colors}
           role={creatingRole}
           actionText="Create Role"
           setRole={setCreatingRole}

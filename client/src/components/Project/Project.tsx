@@ -54,6 +54,7 @@ import { TTask } from '../../types/project'
 import { assignUserToTask, deleteTask } from '../../actions/task'
 import { Scrollbar } from 'react-scrollbars-custom'
 import { filterTask } from '../../utils/filterTasks'
+import useTitle from '../useTitle'
 
 /**
  * @todo add a filter menu with color, column, due date, label
@@ -195,6 +196,8 @@ export const Project = (props: Props) => {
       filter: state.filter
     }
   })
+
+  useTitle(project ? project.name : 'Project')
 
   const dispatch = useDispatch()
 

@@ -17,6 +17,7 @@ import { useAppSelector } from '../store/hooks'
 import { selectProjects } from '../store/projects'
 import { format, getHours } from 'date-fns'
 import Color from 'color'
+import useTitle from './useTitle'
 
 const genColors = () => {
   return Object.values({ ...colors }).map((c) =>
@@ -34,6 +35,8 @@ export const Dashboard = () => {
   const theme = useTheme()
 
   const hours = getHours(new Date())
+
+  useTitle('Dashboard')
 
   const dateDisplay =
     hours < 5 || hours >= 17 ? 'Evening' : hours >= 12 ? 'Afternoon' : 'Morning'
