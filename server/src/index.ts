@@ -108,10 +108,10 @@ app.use(
     cookie:
       process.env.NODE_ENV == 'production'
         ? {
-            secure: true,
-            httpOnly: true,
             sameSite: 'none',
-            maxAge: 5184000000 // 2 months
+            secure: true,
+            domain: 'conradkay.com',
+            httpOnly: true
           }
         : undefined,
     genid: () => {
