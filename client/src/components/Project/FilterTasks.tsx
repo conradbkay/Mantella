@@ -23,7 +23,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
 
-const FilterTasksComponent = () => {
+const FilterTasksComponent = ({ colors }: { colors: string[] }) => {
   const [custom, setCustom] = useState(false)
   const theme = useTheme()
   const dispatch = useDispatch()
@@ -73,7 +73,8 @@ const FilterTasksComponent = () => {
         </ListItem>
         <ListItem>
           <ChooseColor
-            color={filterData.color[0] || '#FFFFFF' /* TODO: me */}
+            colors={colors}
+            selected={filterData.color[0] || '#FFFFFF' /* TODO: me */}
             onChange={(color: any) => {
               dispatch(
                 SET_FILTER({

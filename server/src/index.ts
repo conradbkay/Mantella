@@ -108,12 +108,15 @@ app.use(
       return uuid()
     },
     name: 'connect',
-    cookie: {
-      domain: 'conradkay.com',
-      sameSite: 'none',
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' ? true : false
-    },
+    cookie:
+      process.env.NODE_ENV == 'production'
+        ? {
+            domain: 'conradkay.com',
+            sameSite: 'none',
+            httpOnly: true,
+            secure: true
+          }
+        : undefined,
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
   })
 )

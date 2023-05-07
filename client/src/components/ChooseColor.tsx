@@ -7,16 +7,12 @@ type OwnProps = {
   selected?: string
   colors: string[]
   onChange(color: string): void
-  create(color: string): void
 }
 
-export const ChooseColor = ({
-  selected,
-  colors,
-  onChange,
-  create
-}: OwnProps) => {
+export const ChooseColor = ({ selected, colors, onChange }: OwnProps) => {
   const [adding, setAdding] = useState(false)
+
+  console.log(colors, Array.isArray(colors))
 
   return (
     <div>
@@ -33,7 +29,7 @@ export const ChooseColor = ({
             if (!adding) {
               setAdding(true)
             } else {
-              create(selected || '#00f')
+              //create(selected || '#00f')
             }
           }}
         >

@@ -166,6 +166,7 @@ export const EditTaskBase = (props: OwnProps) => {
           />
           <div style={{ display: 'flex', margin: '12px 4px 8px 6px' }}>
             <ChooseColor
+              colors={project.colors}
               color={task.color || '#FFFFFF'}
               default={theme.palette.mode === 'dark' ? '#121212' : '#FFFFFF'}
               onChange={(color: string) => {

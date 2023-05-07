@@ -101,7 +101,7 @@ export const Sidebar = memo(
               open={open === 'Chat'}
             />
             {open === 'Filter' ? (
-              <FilterTasks />
+              <FilterTasks colors={project.colors} />
             ) : open === 'Members' ? (
               <ShareProject project={project} />
             ) : open === 'Settings' ? (
