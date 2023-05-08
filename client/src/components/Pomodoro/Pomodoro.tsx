@@ -58,7 +58,7 @@ export const Pomodoro = ({ onClose }: Props) => {
   Swal(pomodoro, onClose, () => toggleWorking())
 
   return (
-    <div style={{ minWidth: 400 }}>
+    <div>
       <Display toggleWorking={() => toggleWorking()} timeLeft={time} />
       <Controls />
       <Stopwatch />

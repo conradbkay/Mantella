@@ -50,7 +50,8 @@ const AllCalendarWeek = () => {
 }
 
 const socket = io('http://localhost:3000', {
-  transports: ['websocket', 'polling']
+  transports: ['websocket', 'polling'],
+  reconnectionDelayMax: 10000
 })
 
 const secondary = '#cc1100'

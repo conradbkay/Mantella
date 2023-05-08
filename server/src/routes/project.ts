@@ -88,6 +88,10 @@ export const editProject = async (req: editProjectReq, res: editProjectRes) => {
         ? req.body.newProj.name
         : project.name
 
+      project.colors = req.body.newProj.colors
+        ? req.body.newProj.colors
+        : project.colors
+
       const newProj = await project.save()
 
       if (newProj) {

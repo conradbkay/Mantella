@@ -14,6 +14,7 @@ import { Pomodoro } from '../Pomodoro/Pomodoro'
 import Timer from '@mui/icons-material/Timer'
 import { Socket } from 'socket.io-client'
 import { ChatMessages } from '../Chat/Messages'
+import { Resizable } from 're-resizable'
 
 const listItems = [
   { title: 'Chat', Icon: ChatIcon },
@@ -83,14 +84,26 @@ export const Sidebar = memo(
               </Tooltip>
             ))}
           </div>
-          <div
+          <Resizable
+            defaultSize={{ width: 400, height: 'auto' }}
+            minWidth={280}
+            maxWidth={1000}
+            enable={{
+              top: false,
+              right: true,
+              bottom: false,
+              left: false,
+              topRight: false,
+              bottomRight: false,
+              bottomLeft: false,
+              topLeft: false
+            }}
             style={{
               backgroundColor: theme.palette.background.paper,
-              height: '100%',
-              maxWidth: 400,
               borderLeft: open
                 ? '1px solid ' + theme.palette.divider
-                : undefined
+                : undefined,
+              display: !open ? 'none' : undefined
             }}
           >
             <ChatMessages
@@ -101,7 +114,7 @@ export const Sidebar = memo(
               open={open === 'Chat'}
             />
             {open === 'Filter' ? (
-              <FilterTasks colors={project.colors} />
+              <FilterTasks project={project} />
             ) : open === 'Members' ? (
               <ShareProject project={project} />
             ) : open === 'Settings' ? (
@@ -111,7 +124,7 @@ export const Sidebar = memo(
             ) : open === 'Pomodoro' ? (
               <Pomodoro onClose={() => setOpen(null)} />
             ) : null}
-          </div>
+          </Resizable>
         </div>
       </div>
     )

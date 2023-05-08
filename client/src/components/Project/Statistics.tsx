@@ -26,7 +26,6 @@ export const ProjStats = ({ project }: OwnProps) => {
   return (
     <div
       style={{
-        minWidth: 400,
         color: theme.palette.text.secondary,
         paddingTop: 16
       }}

@@ -90,7 +90,8 @@ export type createProjectRes = Response<{}>
 export type editProjectReqObj = {
   id: string
   newProj: {
-    name: string
+    name?: string
+    colors?: string[]
   }
 }
 export type editProjectReq = Req<editProjectReqObj>

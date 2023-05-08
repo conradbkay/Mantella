@@ -45,6 +45,21 @@ export const createProject = async (
   }
 }
 
+export const setProjectColors = (
+  dispatch: AppDispatch,
+  project: TProject,
+  colors: string[]
+) => {
+  dispatch(
+    SET_PROJECT({
+      id: project.id,
+      project: { ...project, colors }
+    })
+  )
+
+  APIEditProject(project.id, { colors })
+}
+
 export const setProjectName = (
   dispatch: AppDispatch,
   project: TProject,

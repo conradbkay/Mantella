@@ -40,14 +40,12 @@ export const ChatMessages = ({
   channel,
   open,
   users,
-  complex,
   topMargin
 }: {
   socket: Socket
   channel: [string, string]
   open: boolean
   users: TProject['users']
-  complex?: boolean
   topMargin?: number
 }) => {
   const [messagesReceived, setMessagesReceived] = useState([] as Message[])
@@ -108,7 +106,7 @@ export const ChatMessages = ({
     }
   }, [open, messagesReceived.length])
 
-  const width = open ? (complex ? '100%' : 400) : 0
+  const width = open ? '100%' : 0
 
   const checkKeyPress = (e: any) => {
     const { key, shiftKey } = e

@@ -12,7 +12,7 @@ export const APICreateProject = async (name: string) => {
 
 export const APIEditProject = async (
   projectId: string,
-  newProj: { name: string }
+  newProj: { name?: string; colors?: string[] }
 ) => {
   try {
     const res = await axios.post('/editProject', { id: projectId, newProj })

@@ -179,7 +179,6 @@ export const Chat = ({ socket }: { socket: Socket }) => {
       <ChatMessages
         users={openProject!.users}
         channel={open}
-        complex
         open
         socket={socket}
       />

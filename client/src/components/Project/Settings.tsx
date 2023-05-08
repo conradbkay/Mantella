@@ -47,14 +47,14 @@ const RoleBase = ({
   setRole,
   deleteFunc,
   save,
-  colors
+  project
 }: {
   role: TRole
   setRole: React.Dispatch<React.SetStateAction<null | TRole>>
   actionText: string
   deleteFunc?: () => void
   save: () => void
-  colors: string[]
+  project: TProject
 }) => {
   return (
     <Dialog open onClose={() => setRole(null)}>
@@ -78,7 +78,7 @@ const RoleBase = ({
           />
           <ChooseColor
             selected={role.color}
-            colors={colors}
+            project={project}
             onChange={(color: string) => {
               setRole((prev) => ({ ...prev!, color }))
             }}
@@ -157,7 +157,6 @@ export const ProjectSettings = ({ project }: Props) => {
   return (
     <div
       style={{
-        width: 400,
         display: 'flex',
         flexDirection: 'column',
         paddingTop: 16
@@ -165,7 +164,7 @@ export const ProjectSettings = ({ project }: Props) => {
     >
       <div style={{ marginLeft: 'auto' }}>
         <IconButton
-          style={{ position: 'absolute', left: 416 }}
+          style={{ position: 'absolute', left: 20 }}
           onClick={() => setCreatingRole({ ...defaultRole, id: uuid() })}
         >
           <Add />
@@ -175,7 +174,7 @@ export const ProjectSettings = ({ project }: Props) => {
         style={{
           fontSize: 24,
           color: theme.palette.text.primary,
-          textAlign: 'center'
+          paddingLeft: 80
         }}
       >
         Roles
@@ -254,7 +253,7 @@ export const ProjectSettings = ({ project }: Props) => {
       </ListItem>
       {editingRole && (
         <RoleBase
-          colors={project.colors}
+          project={project}
           role={editingRole!}
           actionText="Edit Role"
           setRole={setEditingRole}
@@ -270,7 +269,7 @@ export const ProjectSettings = ({ project }: Props) => {
       )}
       {creatingRole && (
         <RoleBase
-          colors={project.colors}
+          project={project}
           role={creatingRole}
           actionText="Create Role"
           setRole={setCreatingRole}

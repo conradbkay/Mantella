@@ -151,3 +151,9 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
     throw new Error('Could not create guest, sorry!')
   }
 }
+
+export const deleteAccount = async (req: Request, res: Response) => {
+  await UserModel.deleteOne({ id: (req.user as any).id })
+
+  res.status(200)
+}

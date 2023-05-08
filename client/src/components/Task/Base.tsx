@@ -106,6 +106,8 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
+// TODO: make every color correct for background color
+
 export const BaseTask = memo(
   ({
     task,

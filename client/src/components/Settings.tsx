@@ -99,7 +99,6 @@ export const Settings = () => {
                     setDeleting(false)
                   }, 3000)
                 } else {
-                  // TODO
                   await axios.post('/deleteAccount', {})
                   window.location.reload()
                 }
@@ -135,7 +134,6 @@ export const Settings = () => {
                 variant="contained"
                 onClick={async () => {
                   await axios.post('/setName', { username: name })
-                  // TODO
                   dispatch(SET_NAME({ name: name }))
                 }}
               >

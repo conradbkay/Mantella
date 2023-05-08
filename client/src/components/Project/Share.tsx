@@ -34,8 +34,7 @@ export const ShareProject = ({ project }: Props) => {
     <DialogContent
       style={{
         display: 'flex',
-        flexDirection: 'column',
-        width: 352 /* 24px padding twice */
+        flexDirection: 'column'
       }}
     >
       <DialogContentText

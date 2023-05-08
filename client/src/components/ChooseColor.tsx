@@ -1,18 +1,23 @@
-import { ButtonBase, IconButton } from '@mui/material'
+import { Button, ButtonBase, IconButton } from '@mui/material'
 import { useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import Add from '@mui/icons-material/Add'
+import { setProjectColors } from '../actions/project'
+import { useDispatch } from 'react-redux'
+import { TProject } from '../types/project'
 
 type OwnProps = {
   selected?: string
-  colors: string[]
+  project: TProject
   onChange(color: string): void
 }
 
-export const ChooseColor = ({ selected, colors, onChange }: OwnProps) => {
-  const [adding, setAdding] = useState(false)
+export const ChooseColor = ({ selected, project, onChange }: OwnProps) => {
+  const [adding, setAdding] = useState('')
 
-  console.log(colors, Array.isArray(colors))
+  const dispatch = useDispatch()
+
+  const { colors } = project
 
   return (
     <div>
@@ -21,22 +26,49 @@ export const ChooseColor = ({ selected, colors, onChange }: OwnProps) => {
           <ButtonBase
             onClick={() => onChange(color)}
             key={i}
-            style={{ backgroundColor: color, borderRadius: 4, margin: 8 }}
+            style={{
+              backgroundColor: color,
+              borderRadius: 4,
+              margin: 4,
+              outline: color === selected ? '2px solid #FFF' : undefined,
+              width: 32,
+              height: 32
+            }}
           />
         ))}
-        <IconButton
-          onClick={() => {
-            if (!adding) {
-              setAdding(true)
-            } else {
-              //create(selected || '#00f')
-            }
-          }}
-        >
-          <Add />
-        </IconButton>
+        {adding ? (
+          <Button
+            onClick={async () => {
+              setAdding('')
+              onChange(adding)
+              await setProjectColors(dispatch, project, [
+                ...colors,
+                adding as string
+              ])
+            }}
+          >
+            Confirm
+          </Button>
+        ) : (
+          <IconButton
+            onClick={() => {
+              if (!adding) {
+                setAdding('#FFF')
+              }
+            }}
+          >
+            <Add />
+          </IconButton>
+        )}
       </div>
-      {adding && <HexColorPicker color={selected} onChange={onChange} />}
+      {adding && (
+        <div style={{ position: 'absolute', zIndex: 2 }}>
+          <HexColorPicker
+            color={adding}
+            onChange={(color) => setAdding(color)}
+          />
+        </div>
+      )}
     </div>
   )
 }

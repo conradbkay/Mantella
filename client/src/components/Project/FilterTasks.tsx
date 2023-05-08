@@ -22,15 +22,16 @@ import { SET_FILTER } from '../../store/filter'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import { TProject } from '../../types/project'
 
-const FilterTasksComponent = ({ colors }: { colors: string[] }) => {
+export const FilterTasks = ({ project }: { project: TProject }) => {
   const [custom, setCustom] = useState(false)
   const theme = useTheme()
   const dispatch = useDispatch()
   const filterData = useSelector((state: TState) => state.filter)
   return (
     <div>
-      <List style={{ minWidth: 400, marginTop: 8 }}>
+      <List style={{ marginTop: 8 }}>
         <ListItem>
           <ListItemText
             primary="Filter Tasks"
@@ -73,7 +74,7 @@ const FilterTasksComponent = ({ colors }: { colors: string[] }) => {
         </ListItem>
         <ListItem>
           <ChooseColor
-            colors={colors}
+            project={project}
             selected={filterData.color[0] || '#FFFFFF' /* TODO: me */}
             onChange={(color: any) => {
               dispatch(
@@ -223,5 +224,3 @@ const FilterTasksComponent = ({ colors }: { colors: string[] }) => {
     </div>
   )
 }
-
-export const FilterTasks = FilterTasksComponent
