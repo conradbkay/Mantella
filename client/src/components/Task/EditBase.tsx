@@ -9,7 +9,8 @@ import {
   MenuItem,
   FormHelperText,
   Typography,
-  IconButton
+  IconButton,
+  useTheme
 } from '@mui/material'
 import uuid from 'uuid'
 import { id } from '../../utils/utilities'
@@ -99,6 +100,8 @@ export const EditTaskBase = (props: OwnProps) => {
     setTask(newTask)
   }
 
+  const theme = useTheme()
+
   return (
     <div>
       <Dialog open onClose={() => props.onClose()}>
@@ -156,6 +159,7 @@ export const EditTaskBase = (props: OwnProps) => {
             />
           </div>
           <Description
+            color={theme.palette.text.primary}
             initialState={props.task.description || undefined}
             onChange={(newDescription) =>
               setTask({ ...task, description: newDescription })

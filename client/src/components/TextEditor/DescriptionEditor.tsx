@@ -53,13 +53,17 @@ function CodeHighlightPlugin() {
 export const Description = ({
   onChange,
   initialState,
-  readOnly
+  readOnly,
+  color
 }: {
   onChange: (newStr: string) => void
   initialState?: string
   readOnly?: boolean
+  color: string
 }) => {
   const theme = useTheme()
+
+  // make it actually change when text changes
 
   const initialConfig: InitialConfigType = {
     namespace: 'Description',
@@ -80,12 +84,13 @@ export const Description = ({
                 readOnly={readOnly}
                 style={
                   readOnly
-                    ? { outline: 'none' }
+                    ? { outline: 'none', color }
                     : {
                         outline: 'none',
                         padding: '16px 12px',
                         border: '1px solid ' + theme.palette.divider,
-                        borderRadius: 8
+                        borderRadius: 8,
+                        color
                       }
                 }
               />
@@ -101,7 +106,8 @@ export const Description = ({
                   fontSize: '15px',
                   userSelect: 'none',
                   display: 'inline-block',
-                  pointerEvents: 'none'
+                  pointerEvents: 'none',
+                  color
                 }}
               >
                 Enter some text...

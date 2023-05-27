@@ -72,6 +72,9 @@ const editProject = async (req, res) => {
             project.name = req.body.newProj.name
                 ? req.body.newProj.name
                 : project.name;
+            project.colors = req.body.newProj.colors
+                ? req.body.newProj.colors
+                : project.colors;
             const newProj = await project.save();
             if (newProj) {
                 res.json({ project: newProj.toObject() });

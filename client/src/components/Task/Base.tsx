@@ -35,6 +35,27 @@ import Delete from '@mui/icons-material/Delete'
 import { colorForLightMode } from '../../colors'
 import { Description } from '../TextEditor/DescriptionEditor'
 import { deleteTask } from '../../actions/task'
+import { inverse } from '../Chat/Chat'
+
+const invertColor = (hex: string) => {
+  if (hex.indexOf('#') === 0) {
+    hex = hex.slice(1)
+  }
+  // convert 3-digit hex to 6-digits.
+  if (hex.length === 3) {
+    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
+  }
+
+  var r = parseInt(hex.slice(0, 2), 16),
+    g = parseInt(hex.slice(2, 4), 16),
+    b = parseInt(hex.slice(4, 6), 16)
+
+  return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? '#000000' : '#FFFFFF'
+}
+
+const transformDefault = (color: string, mode: 'dark' | 'light') => {
+  return color === '#FFFFFF' ? (mode === 'dark' ? '#121212' : '#FFFFFF') : color
+}
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -165,6 +186,23 @@ export const BaseTask = memo(
       return null
     }
 
+    const backgroundColor =
+      task.color &&
+      task.color.toUpperCase() !== '#FFFFFF' &&
+      task.color !== '#121212'
+        ? theme.palette.mode === 'dark'
+          ? task.color
+          : colorForLightMode(task.color)
+        : theme.palette.background.paper
+
+    const taskColor = transformDefault(backgroundColor, theme.palette.mode)
+
+    const textColor = isDragging
+      ? inverse(invertColor(taskColor), 0.2)
+      : invertColor(taskColor) // make a bit darker on dark mode?
+
+    const secondary = inverse(textColor, 0.2)
+
     return (
       <>
         <Popover
@@ -226,23 +264,14 @@ export const BaseTask = memo(
             style={{
               display: hidden ? 'none' : undefined,
               minHeight: MIN_HEIGHT,
-              backgroundColor:
-                task.color &&
-                task.color.toUpperCase() !== '#FFFFFF' &&
-                task.color !== '#121212'
-                  ? theme.palette.mode === 'dark'
-                    ? task.color
-                    : colorForLightMode(task.color)
-                  : theme.palette.background.paper,
+              backgroundColor,
               backgroundImage:
                 theme.palette.mode === 'dark'
                   ? 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))'
                   : undefined,
               border,
               cursor: 'pointer',
-              color: isDragging
-                ? theme.palette.text.disabled
-                : theme.palette.text.secondary,
+              color: secondary,
               opacity: isDragging ? taskDummyOpacity : undefined,
               outline: 'none',
               ...(style || {})
@@ -308,9 +337,7 @@ export const BaseTask = memo(
                     style={{
                       fontSize: 18,
                       maxWidth: '94%',
-                      color: isDragging
-                        ? theme.palette.text.disabled
-                        : theme.palette.text.secondary,
+                      color: textColor,
                       marginLeft: 4,
                       marginTop: 4
                     }}
@@ -323,6 +350,7 @@ export const BaseTask = memo(
                 {task.description && (
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
                     <Description
+                      color={secondary}
                       initialState={task.description}
                       readOnly
                       onChange={() => null}

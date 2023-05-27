@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.guestLogin = exports.logout = exports.register = exports.login = void 0;
+exports.deleteAccount = exports.guestLogin = exports.logout = exports.register = exports.login = void 0;
 const tslib_1 = require("tslib");
 const bcryptjs_1 = tslib_1.__importDefault(require("bcryptjs"));
 const User_1 = require("../models/User");
@@ -102,4 +102,9 @@ const guestLogin = async (req, res) => {
     }
 };
 exports.guestLogin = guestLogin;
+const deleteAccount = async (req, res) => {
+    await User_1.UserModel.deleteOne({ id: req.user.id });
+    res.status(200);
+};
+exports.deleteAccount = deleteAccount;
 //# sourceMappingURL=auth.js.map

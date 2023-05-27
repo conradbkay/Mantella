@@ -86,12 +86,14 @@ app.use((0, express_session_1.default)({
         return (0, uuid_1.v4)();
     },
     name: 'connect',
-    cookie: {
-        domain: 'conradkay.com',
-        sameSite: 'none',
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production' ? true : false
-    },
+    cookie: process.env.NODE_ENV == 'production'
+        ? {
+            domain: 'conradkay.com',
+            sameSite: 'none',
+            httpOnly: true,
+            secure: true
+        }
+        : undefined,
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
 }));
 app.use((0, express_session_1.default)({
