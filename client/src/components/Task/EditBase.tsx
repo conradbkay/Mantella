@@ -55,7 +55,7 @@ export const EditTaskBase = (props: OwnProps) => {
 
   const setSubtask = (
     id: string,
-    toMergeSubtask?: Partial<Exclude<TSubtask, 'id'>>
+    toMergeSubtask: Partial<Exclude<TSubtask, 'id'>> | null
   ) => {
     const newTask = cloneDeep(task)
     let subtaskIndex = newTask.subTasks.findIndex((sub) => {
@@ -63,10 +63,8 @@ export const EditTaskBase = (props: OwnProps) => {
     })
 
     if (subtaskIndex < 0) {
-      subtaskIndex = 0
-    }
-
-    if (toMergeSubtask) {
+      newTask.subTasks.push(toMergeSubtask as TSubtask)
+    } else if (toMergeSubtask) {
       newTask.subTasks[subtaskIndex] = {
         ...newTask.subTasks[subtaskIndex],
         ...toMergeSubtask
@@ -75,8 +73,6 @@ export const EditTaskBase = (props: OwnProps) => {
       newTask.subTasks = newTask.subTasks.filter((sub) => sub.id !== id)
     }
     setTask(newTask)
-
-    return newTask
   }
 
   const setComment = (id: string, newComment: Partial<TComment> | null) => {
@@ -85,10 +81,8 @@ export const EditTaskBase = (props: OwnProps) => {
     let commentIndex = newTask.comments.findIndex((com) => com.id === id)
 
     if (commentIndex < 0) {
-      commentIndex = 0
-    }
-
-    if (!newComment) {
+      newTask.comments.push(newComment as TComment)
+    } else if (!newComment) {
       newTask.comments = newTask.comments.filter((com) => com.id !== id)
     } else {
       newTask.comments[commentIndex] = {

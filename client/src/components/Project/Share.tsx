@@ -1,5 +1,6 @@
 import {
   Button,
+  Dialog,
   DialogContent,
   DialogContentText,
   List,
@@ -23,7 +24,10 @@ type Props = {
   project: TProject
 }
 
-export const ShareProject = ({ project }: Props) => {
+export const ShareProject = ({
+  project,
+  onClose
+}: Props & { onClose?: () => void }) => {
   const [senderEmail, setSenderEmail] = useState('')
   const dispatch = useDispatch()
 
@@ -89,7 +93,12 @@ export const ShareProject = ({ project }: Props) => {
           onChange={(e) => setSenderEmail(e.target.value)}
         />
         <Button
-          onClick={() => shareProject(dispatch, project.id, senderEmail)}
+          onClick={() => {
+            shareProject(dispatch, project.id, senderEmail)
+            if (onClose) {
+              onClose()
+            }
+          }}
           style={{ height: '100%', margin: 'auto 0 auto 8px' }}
           variant="contained"
           color="primary"
@@ -98,5 +107,17 @@ export const ShareProject = ({ project }: Props) => {
         </Button>
       </div>
     </DialogContent>
+  )
+}
+
+export const ShareProjectDialog = ({
+  project,
+  open,
+  onClose
+}: Props & { open: boolean; onClose: () => void }) => {
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth={'xs'}>
+      <ShareProject project={project} />
+    </Dialog>
   )
 }

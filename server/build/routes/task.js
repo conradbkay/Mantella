@@ -49,13 +49,9 @@ router_1.router.post('/createTask', passport_1.isAuthenticated, exports.createTa
 const editTask = async (req, res) => {
     const project = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (project) {
-        const task = project.tasks.find((tsk) => tsk.id === req.body.taskId);
-        task.name = req.body.task.name || task.name;
-        task.points = req.body.task.points || task.points;
-        task.dueDate = req.body.task.dueDate || task.dueDate;
-        // task.recurrance = req.body.task.recurrance || task.recurrance
-        task.color = req.body.task.color || task.color;
-        task.description = req.body.task.description;
+        const idx = project.tasks.findIndex((tsk) => tsk.id === req.body.taskId);
+        const task = project.tasks[idx];
+        project.tasks[idx] = Object.assign(Object.assign({}, task), req.body.task);
         project.markModified('tasks'); // mongo won't notice that tasks were modified without this since it's so nested
         const newProj = await project.save();
         const pure = await newProj.toObject();

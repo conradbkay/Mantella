@@ -54,11 +54,7 @@ export const EditTaskModal = (props: OwnProps) => {
   }
 
   const confirmChanges = (task: TTask, listId: string) => {
-    //const taskWithDescription: TTask = {
-    //...task,
-    //description: JSON.stringify(convertToRaw(editorState.getCurrentContent()))
-    // }
-
+    console.log(task.description)
     dispatch(
       SET_TASK({
         id: props.taskId,

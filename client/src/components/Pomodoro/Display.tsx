@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { getAllTasks, id, toDaysHHMMSS } from '../../utils/utilities'
 import { useMemo } from 'react'
 import { TOGGLE_SELECTING_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
+import { Circle } from '../../utils/Circle'
 
 type Props = {
   toggleWorking: () => void
@@ -22,17 +23,35 @@ export const Display = ({ timeLeft }: Props) => {
   const buttonText = `${pomodoro.paused ? 'Start' : 'Stop'} ${
     pomodoro.working ? 'Work' : 'Break'
   }`
+
+  const totalSeconds = pomodoro.working
+    ? pomodoro.workSeconds
+    : pomodoro.breakSeconds
+
+  const percentLeft = (pomodoro.currSeconds / totalSeconds) * 100
+
   return (
-    <div style={{ margin: 10 }}>
-      <div
-        style={{
-          color: pomodoro.working ? 'red' : 'green',
-          textAlign: 'center',
-          fontSize: 24
-        }}
-      >
-        {timeLeft}
-      </div>
+    <div
+      style={{
+        margin: 10,
+        display: 'flex',
+        alignItems: 'center',
+        flexDirection: 'column'
+      }}
+    >
+      <Circle
+        progress={percentLeft}
+        text={timeLeft}
+        showPercentageSymbol={false}
+        progressColor={pomodoro.working ? 'red' : 'green'}
+        textColor={pomodoro.working ? 'red' : 'green'}
+        bgColor={
+          undefined /*new Color(theme.palette.background.paper)
+                        .lighten(0.6)
+  .toString()*/
+        }
+        textStyle={{ fontSize: 80 }}
+      />
       <Paper
         style={{
           minHeight: 36,

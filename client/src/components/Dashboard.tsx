@@ -21,7 +21,7 @@ import useTitle from './useTitle'
 
 const genColors = () => {
   return Object.values({ ...colors }).map((c) =>
-    new Color(c).lightness(12).toString()
+    new Color(c).lightness(21).toString()
   )
 }
 
@@ -155,13 +155,13 @@ export const Dashboard = () => {
                       gutterBottom
                       variant="h5"
                       component="h2"
-                      style={{ color: theme.palette.text.primary }}
+                      style={{ color: '#FFFFFF' }}
                     >
                       {project.name}
                     </Typography>
                     <ul
                       style={{
-                        color: theme.palette.text.secondary,
+                        color: 'rgba(255, 255, 255, 0.7)',
                         fontSize: 15
                       }}
                     >
@@ -172,7 +172,7 @@ export const Dashboard = () => {
                               fontWeight: 500,
                               fontSize: 17,
                               marginRight: 4,
-                              color: theme.palette.text.primary
+                              color: '#FFFFFF'
                             }}
                           >
                             {col[0]}

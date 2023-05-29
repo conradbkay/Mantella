@@ -4,7 +4,7 @@ import Delete from '@mui/icons-material/Delete'
 import { TSubtask } from '../../types/project'
 
 type Props = {
-  setSubtask: (id: string, toMergeSubtask?: Partial<TSubtask>) => void
+  setSubtask: (id: string, toMergeSubtask: Partial<TSubtask> | null) => void
   subtask: TSubtask
 }
 
@@ -38,7 +38,7 @@ export const EditSubtask = ({ setSubtask, subtask }: Props) => {
           marginTop: 'auto'
         }}
         onClick={() => {
-          setSubtask(subtask.id)
+          setSubtask(subtask.id, null)
         }}
       >
         <Delete />

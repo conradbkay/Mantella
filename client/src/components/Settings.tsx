@@ -13,13 +13,13 @@ import { List } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import { Helmet } from 'react-helmet'
 import { APILogout } from '../API/auth'
-import Color from 'color'
 import { useState } from 'react'
 import { LOGIN, SET_EMAIL, SET_NAME, selectUser } from '../store/user'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import axios from 'axios'
 import { transformUser } from '../store/auth'
 import useTitle from './useTitle'
+import { inverse } from './Chat/Chat'
 
 // https://stackoverflow.com/questions/20771794/mailrfc822address-regex
 const emailRegex =
@@ -59,17 +59,17 @@ export const Settings = () => {
     <>
       <div>
         <Helmet>
-          <style>{`body { background-color: ${new Color(
-            theme.palette.background.paper
-          )
-            .lighten(0.5)
-            .hex()
-            .toString()}; }`}</style>
+          <style>{`body { background-color: ${inverse(
+            theme.palette.background.paper,
+            0.4
+          )}; }`}</style>
         </Helmet>
         <List
-          subheader={<ListSubheader>Data</ListSubheader>}
+          subheader={
+            <ListSubheader style={{ borderRadius: 4 }}>Data</ListSubheader>
+          }
           className={classes.root}
-          style={{ margin: 'auto', marginTop: 80 }}
+          style={{ margin: 'auto', marginTop: 80, borderRadius: 4 }}
         >
           <ListItem>
             <ListItemText

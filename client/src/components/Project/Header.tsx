@@ -16,8 +16,9 @@ import Delete from '@mui/icons-material/Delete'
 import Calendar from '@mui/icons-material/CalendarToday'
 import ViewList from '@mui/icons-material/ViewList'
 import ViewDay from '@mui/icons-material/ViewDay'
-import Add from '@mui/icons-material/Add'
 import { setProjectName } from '../../actions/project'
+import LockIcon from '@mui/icons-material/LockOutlined'
+import { ShareProjectDialog } from './Share'
 
 type Props = {
   project: TProject
@@ -38,6 +39,7 @@ const ProjectHeader = memo(
     isMobile
   }: Props) => {
     const [name, setName] = useState(project.name)
+    const [sharing, setSharing] = useState(false)
 
     const dispatch = useDispatch()
 
@@ -120,23 +122,37 @@ const ProjectHeader = memo(
 
                 <div style={{ marginLeft: 'auto', display: 'flex' }}>
                   {/* todo: hide button when enoguh users exist that header is too wide */}
-                  <Button
+                  {/*<Button
                     variant="outlined"
                     onClick={() => setCreating()}
-                    style={{ marginRight: 8, marginLeft: 8 }}
+                    style={{ marginRight: 16 }}
                   >
                     {isMobile ? <Add /> : 'Create Task'}
-                  </Button>
+                  </Button>*/}
                   <div ref={setNodeRef} style={{ display: 'flex' }}>
                     {project.users.map((user, i) => (
                       <DraggableAvatar user={user} key={user.id} />
                     ))}
                   </div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setSharing(true)}
+                    style={{ borderRadius: 8, marginLeft: 16 }}
+                  >
+                    <LockIcon style={{ marginRight: 8 }} />
+                    <span style={{ fontSize: '13.5px' }}>Share</span>
+                  </Button>
                 </div>
               </>
             )}
           </Toolbar>
         </AppBar>
+        <ShareProjectDialog
+          project={project}
+          open={sharing}
+          onClose={() => setSharing(false)}
+        />
       </>
     )
   },

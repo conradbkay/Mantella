@@ -20,12 +20,16 @@ import { CalendarWeek } from './components/Calendar/Week'
 import { APICookieLogin } from './API/auth'
 import { useTheme } from '@mui/material'
 import io from 'socket.io-client'
-import { useAppDispatch } from './store/hooks'
 import { transformUser } from './store/auth'
 import { SET_PROJECTS, selectProjects } from './store/projects'
 import { LOGIN } from './store/user'
 import { Chat } from './components/Chat/Chat'
 import useTitle from './components/useTitle'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import { TICK } from './store/projects'
+import { TICK as POM_TICK } from './store/pomodoro'
+import { id, toDaysHHMMSS } from './utils/utilities'
+import { APIEditTask } from './API/task'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
@@ -58,6 +62,8 @@ const secondary = '#cc1100'
 const primary = '#7289da'
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
+
+let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
 
 const Router = () => {
   const [loaded, setLoaded] = useState(false)
@@ -93,6 +99,57 @@ const Router = () => {
       setConnected(true)
     }
   }, [connected, projects])
+
+  const { pomodoro } = useAppSelector((state) => ({
+    pomodoro: state.pomodoro
+  }))
+
+  // since this component is always mounted when a project is open, for now we include this code here instead of in the Pomodoro component which can be unmounted
+  // we could put this in the base component (App) if we want it to always run
+  useEffect(() => {
+    clearInterval(interval)
+
+    interval = setInterval(() => {
+      if (!pomodoro.paused) {
+        if (pomodoro.selectedTaskId && pomodoro.working) {
+          const project = projects.find((proj) =>
+            proj.tasks.some((task) => task.id === pomodoro.selectedTaskId)
+          )!
+
+          const task =
+            project.tasks[id(project.tasks, pomodoro.selectedTaskId!)]
+
+          if ((task.timeWorkedOn + 1) % 60 === 0) {
+            APIEditTask(
+              { ...task, timeWorkedOn: task.timeWorkedOn + 1 },
+              project.id
+            )
+          }
+
+          // ends up being 1 second extra if we don't do this
+          if (pomodoro.currSeconds !== 1) {
+            dispatch(
+              TICK({
+                taskId: pomodoro.selectedTaskId!,
+                projectId: project.id
+              })
+            )
+          }
+        }
+        dispatch(POM_TICK())
+      }
+      document.title = pomodoro.paused
+        ? 'Mantella'
+        : `${pomodoro.working ? 'Work ' : 'Break '} ${toDaysHHMMSS(
+            pomodoro.currSeconds - 1
+          )}`
+
+      return () => {
+        document.title = 'Mantella'
+        clearInterval(interval)
+      }
+    }, 1000)
+  })
 
   return (
     <BrowserRouter>

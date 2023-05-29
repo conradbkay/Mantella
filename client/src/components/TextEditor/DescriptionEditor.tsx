@@ -116,7 +116,9 @@ export const Description = ({
             ErrorBoundary={LexicalErrorBoundary}
           />
           <OnChangePlugin
-            onChange={(editorState) => onChange(JSON.stringify(editorState))}
+            onChange={(editorState) =>
+              onChange(JSON.stringify(editorState.toJSON()))
+            }
           />
           <HistoryPlugin />
           <CodeHighlightPlugin />

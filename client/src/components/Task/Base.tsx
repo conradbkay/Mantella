@@ -505,7 +505,7 @@ export const BaseTask = memo(
                   borderRadius: 0
                 }}
                 variant="determinate"
-                color="secondary"
+                color="primary"
                 value={
                   task.progress === 2
                     ? 100

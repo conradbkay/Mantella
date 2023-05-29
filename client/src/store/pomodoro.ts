@@ -12,7 +12,7 @@ const pomodoroSlice = createSlice({
       } else {
         pom.paused = true
         pom.working = !pom.working
-        pom.currSeconds = !pom.working ? pom.workSeconds : pom.breakSeconds
+        pom.currSeconds = pom.working ? pom.workSeconds : pom.breakSeconds
       }
     },
     TOGGLE_TIMER: (pom) => {

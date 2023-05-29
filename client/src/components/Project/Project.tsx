@@ -533,6 +533,7 @@ export const Project = (props: Props) => {
           <DragOverlay dropAnimation={dropAnimationConfig}>
             {draggingId ? (
               <BaseTask
+                showProgress={viewType === 'lists'}
                 project={project}
                 task={project.tasks[id(project.tasks, draggingId)]}
                 openFunc={() => null}

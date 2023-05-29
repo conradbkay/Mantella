@@ -72,14 +72,13 @@ export const editTask = async (req: editTaskReq, res: editTaskRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project) {
-    const task = project.tasks.find((tsk) => tsk.id === req.body.taskId)!
+    const idx = project.tasks.findIndex((tsk) => tsk.id === req.body.taskId)
+    const task = project.tasks[idx]
 
-    task.name = req.body.task.name || task.name
-    task.points = req.body.task.points || task.points
-    task.dueDate = req.body.task.dueDate || task.dueDate
-    // task.recurrance = req.body.task.recurrance || task.recurrance
-    task.color = req.body.task.color || task.color
-    task.description = req.body.task.description
+    project.tasks[idx] = {
+      ...task,
+      ...req.body.task
+    }
 
     project.markModified('tasks') // mongo won't notice that tasks were modified without this since it's so nested
 
