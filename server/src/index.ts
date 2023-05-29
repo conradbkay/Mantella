@@ -1,4 +1,4 @@
-import express, { Express /*NextFunction, Request, Response*/ } from 'express'
+import express, { Express, NextFunction, Request, Response } from 'express'
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import path from 'path'
@@ -11,13 +11,20 @@ import { Strategy } from 'passport-local'
 import session from 'express-session'
 import { v4 as uuid } from 'uuid'
 import 'reflect-metadata'
-import http from 'http'
+import https from 'https'
 import { ChatModel } from './models/Chat'
+import fs from 'fs'
 
 const debug = require('debug')
 const FileStore = require('session-file-store')(session)
 const compression = require('compression')
 const { Server } = require('socket.io')
+
+const cert = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.crt'))
+const ca = fs.readFileSync(
+  path.join(__dirname, '../ssl/conradkay_com.ca-bundle')
+)
+const key = fs.readFileSync(path.join(__dirname, '../ssl/server.key'))
 
 require('dotenv').config() // Injects .env variables into process.env object
 // eslint-disable-next-line import/first
@@ -56,7 +63,7 @@ app.use(
   })
 )
 
-const server = http.createServer()
+const server = https.createServer({ cert, ca, key })
 
 const io = new Server(server)
 
@@ -168,21 +175,18 @@ passport.serializeUser(serializeUser)
 passport.deserializeUser(deserializeUser)
 
 app.use('/api/', router)
-/*
-  const redirectionFilter = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    if (req.get('X-Forwarded-Proto') === 'http') {
-      const redirectTo = `https://${req.hostname}${req.url}`
-      res.redirect(301, redirectTo)
-    } else {
-      next()
-    }
-  }
 
-  app.get('/*', redirectionFilter)*/
+const redirectionFilter = (req: Request, res: Response, next: NextFunction) => {
+  if (req.get('X-Forwarded-Proto') === 'http') {
+    const redirectTo = `https://${req.hostname}${req.url}`
+    res.redirect(301, redirectTo)
+  } else {
+    next()
+  }
+}
+
+app.get('/*', redirectionFilter)
+
 app.use(express.static(path.join(__dirname, '../../client/build')))
 
 app.get('/*', function (req, res) {
