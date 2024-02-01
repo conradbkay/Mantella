@@ -130,7 +130,7 @@ const ProjectHeader = memo(
                     {isMobile ? <Add /> : 'Create Task'}
                   </Button>*/}
                   <div ref={setNodeRef} style={{ display: 'flex' }}>
-                    {project.users.map((user, i) => (
+                    {project.users.map((user) => (
                       <DraggableAvatar user={user} key={user.id} />
                     ))}
                   </div>
@@ -138,7 +138,7 @@ const ProjectHeader = memo(
                     variant="contained"
                     color="primary"
                     onClick={() => setSharing(true)}
-                    style={{ borderRadius: 8, marginLeft: 16 }}
+                    style={{ marginLeft: 16 }}
                   >
                     <LockIcon style={{ marginRight: 8 }} />
                     <span style={{ fontSize: '13.5px' }}>Share</span>

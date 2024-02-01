@@ -17,7 +17,8 @@ const DraggableAvatar = ({ task, user, noMargin }: Props) => {
   const style = {
     // using .Transform causes short elements to get stretched
     transform: CSS.Translate.toString(transform),
-    display: 'flex'
+    display: 'flex',
+    zIndex: 100
   }
 
   return (

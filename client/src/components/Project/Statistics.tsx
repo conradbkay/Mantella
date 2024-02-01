@@ -41,7 +41,8 @@ export const ProjStats = ({ project }: OwnProps) => {
               ? theme.palette.text.secondary
               : theme.palette.text.primary
 
-          const percentOf = +((col[0] / cols[0][0]) * 100).toFixed(2) // + is to convert to number which will remove trailing zeros
+          let percentOf = +((col[0] / cols[0][0]) * 100).toFixed(2) // + is to convert to number which will remove trailing zeros
+          if (isNaN(percentOf)) percentOf = 0
           return (
             <div
               key={i}
