@@ -25,7 +25,6 @@
     "strict": true,
     "strictFunctionTypes": false,
     "pretty": true,
-    "watch": true,
     "removeComments": false,
     "sourceMap": true,
     "skipLibCheck": true,

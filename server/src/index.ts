@@ -20,11 +20,15 @@ const FileStore = require('session-file-store')(session)
 const compression = require('compression')
 const { Server } = require('socket.io')
 
-const cert = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.crt'))
-const ca = fs.readFileSync(
-  path.join(__dirname, '../ssl/conradkay_com.ca-bundle')
-)
-const key = fs.readFileSync(path.join(__dirname, '../ssl/server.key'))
+let cert,
+  ca,
+  key = undefined
+
+if (process.env.NODE_ENV === 'production') {
+  cert = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.crt'))
+  ca = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.ca-bundle'))
+  key = fs.readFileSync(path.join(__dirname, '../ssl/server.key'))
+}
 
 require('dotenv').config() // Injects .env variables into process.env object
 // eslint-disable-next-line import/first

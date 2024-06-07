@@ -34,7 +34,6 @@
     "strict": true,
     "strictFunctionTypes": false,
     "pretty": true,
-    "watch": true,
     "sourceMap": true,
     "removeComments": false,
     "baseUrl": ".",
