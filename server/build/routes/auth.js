@@ -21,7 +21,7 @@ const login = async (req, res, next) => {
     }
 };
 exports.login = login;
-const SALT_LENGTH = process.env.NODE_ENV === 'production' ? 10 : 4;
+const SALT_LENGTH = 10;
 const register = async (req, res) => {
     try {
         const salt = await bcryptjs_1.default.genSalt(SALT_LENGTH);
@@ -41,13 +41,11 @@ const register = async (req, res) => {
                 projectId: projectId
             })
         ]);
-        if (req.body.persist) {
-            req.login(newUser, (err) => {
-                if (err) {
-                    console.log('could not passport login during signup', err);
-                }
-            });
-        }
+        req.login(newUser, { session: req.body.persist }, (err) => {
+            if (err) {
+                console.log('could not passport login during signup', err);
+            }
+        });
         res.json({
             user: Object.assign(Object.assign({}, newUser.toObject()), { password: undefined, _id: undefined, projects: [project.toObject()] })
         });
@@ -88,7 +86,7 @@ const guestLogin = async (req, res) => {
                 messages: []
             })
         ]);
-        req.login(user, (err) => {
+        req.login(user, { session: true }, (err) => {
             if (err) {
                 console.log('could not passport login during signup', err);
             }

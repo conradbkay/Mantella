@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/austin-UW/Mantella.git"
+    "url": "git+https://github.com/conradbkay/Mantella.git"
   },
-  "author": "ak",
+  "author": "Conrad Kay",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/austin-UW/Mantella/issues"
+    "url": "https://github.com/conradbkay/Mantella/issues"
   },
-  "homepage": "https://mantella.herokuapp.com",
+  "homepage": "https://mantella.conradkay.com",
   "dependencies": {
     "@typegoose/typegoose": "^9.2.0",
     "bcrypt-nodejs": "^0.0.3",

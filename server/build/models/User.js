@@ -6,6 +6,7 @@ const bcryptjs_1 = tslib_1.__importDefault(require("bcryptjs"));
 const typegoose_1 = require("@typegoose/typegoose");
 let User = class User {
 };
+exports.User = User;
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),
     tslib_1.__metadata("design:type", String)
@@ -34,10 +35,9 @@ tslib_1.__decorate([
     (0, typegoose_1.prop)({ unique: true }),
     tslib_1.__metadata("design:type", String)
 ], User.prototype, "email", void 0);
-User = tslib_1.__decorate([
+exports.User = User = tslib_1.__decorate([
     (0, typegoose_1.modelOptions)({ options: { allowMixed: 0 } })
 ], User);
-exports.User = User;
 const getUserByEmail = async (email) => {
     return await exports.UserModel.findOne({ email });
 };

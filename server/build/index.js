@@ -14,14 +14,13 @@ const passport_local_1 = require("passport-local");
 const express_session_1 = tslib_1.__importDefault(require("express-session"));
 const uuid_1 = require("uuid");
 require("reflect-metadata");
-const http_1 = tslib_1.__importDefault(require("http"));
+const https_1 = tslib_1.__importDefault(require("https"));
 const Chat_1 = require("./models/Chat");
 const debug = require('debug');
 const FileStore = require('session-file-store')(express_session_1.default);
 const compression = require('compression');
 const { Server } = require('socket.io');
-require('dotenv').config(); // Injects .env variables into process.env object
-// eslint-disable-next-line import/first
+require('dotenv').config();
 debug('ts-express:server');
 function onListening() {
     console.log(`🚀 ${process.env.NODE_ENV} worker ready, listening on port ${process.env.PORT || 4000}`);
@@ -44,8 +43,8 @@ app.use((0, cors_1.default)({
         return callback(null, true);
     }
 }));
-const server = http_1.default.createServer();
-const io = new Server(server);
+const websocketServer = https_1.default.createServer();
+const io = new Server(websocketServer);
 io.on('connection', (socket) => {
     socket.on('send_message', async ({ chatId, message, userId, id }) => {
         const messageObj = {
@@ -67,39 +66,41 @@ io.on('connection', (socket) => {
         }
     });
 });
-server.listen(3000, () => {
-    console.log('websocket listening on port 3000');
-});
+const websocketPort = process.env.WEBSOCKET_PORT || 3000;
+// ! todo set vite proxy up and pick a unique port for this too
+if (process.env.NODE_ENV !== 'production') {
+    websocketServer.listen(websocketPort, () => {
+        console.log(`websocket listening on port ${websocketPort}`);
+    });
+}
 app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)(process.env.PRIVATE));
 app.use(express_1.default.urlencoded({ extended: true }));
-const WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 if (process.env.NODE_ENV === 'production') {
-    app.set('trust proxy', 1); // heroku
+    app.set('trust proxy', 1); // heroku, maybe not still needed?
 }
+const WEEK_IN_SECONDS = 60 * 60 * 24 * 7;
 app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     genid: () => {
         return (0, uuid_1.v4)();
     },
-    name: 'connect',
-    cookie: process.env.NODE_ENV == 'production'
-        ? {
-            domain: 'conradkay.com',
-            sameSite: 'none',
-            httpOnly: true,
-            secure: true
-        }
-        : undefined,
+    name: 'Mantella',
+    cookie: {
+        sameSite: 'lax',
+        secure: 'auto',
+        httpOnly: process.env.NODE_ENV === 'production',
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    },
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
 }));
 app.use((0, express_session_1.default)({
     secret: process.env.PRIVATE || 'test',
     resave: false,
-    proxy: process.env.NODE_ENV == 'production' ? true : false,
+    proxy: process.env.NODE_ENV == 'production' ? true : false, // required for heroku
     saveUninitialized: false,
     name: 'mantella',
     cookie: process.env.NODE_ENV == 'production'
@@ -131,24 +132,19 @@ passport_1.default.use(new passport_local_1.Strategy({ usernameField: 'email', p
 passport_1.default.serializeUser(passport_2.serializeUser);
 passport_1.default.deserializeUser(passport_2.deserializeUser);
 app.use('/api/', router_1.router);
-/*
-  const redirectionFilter = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+const redirectionFilter = (req, res, next) => {
     if (req.get('X-Forwarded-Proto') === 'http') {
-      const redirectTo = `https://${req.hostname}${req.url}`
-      res.redirect(301, redirectTo)
-    } else {
-      next()
+        const redirectTo = `https://${req.hostname}${req.url}`;
+        res.redirect(301, redirectTo);
     }
-  }
-
-  app.get('/*', redirectionFilter)*/
-app.use(express_1.default.static(path_1.default.join(__dirname, '../../client/build')));
+    else {
+        next();
+    }
+};
+app.get('/*', redirectionFilter);
+app.use(express_1.default.static(path_1.default.resolve(__dirname, '../dist')));
 app.get('/*', function (req, res) {
-    res.sendFile(path_1.default.join(__dirname, '../../client/build', 'index.html'));
+    res.sendFile(path_1.default.resolve(__dirname, '../dist/index.html'));
 });
 app.use((err, req, res, next) => {
     console.error('Error: ', err);

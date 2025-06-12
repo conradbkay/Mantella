@@ -5,6 +5,7 @@ const tslib_1 = require("tslib");
 const typegoose_1 = require("@typegoose/typegoose");
 let Chat = class Chat {
 };
+exports.Chat = Chat;
 tslib_1.__decorate([
     (0, typegoose_1.prop)(),
     tslib_1.__metadata("design:type", Array)
@@ -21,9 +22,8 @@ tslib_1.__decorate([
     (0, typegoose_1.prop)(),
     tslib_1.__metadata("design:type", String)
 ], Chat.prototype, "projectId", void 0);
-Chat = tslib_1.__decorate([
+exports.Chat = Chat = tslib_1.__decorate([
     (0, typegoose_1.modelOptions)({ options: { allowMixed: 0 } })
 ], Chat);
-exports.Chat = Chat;
 exports.ChatModel = (0, typegoose_1.getModelForClass)(Chat);
 //# sourceMappingURL=Chat.js.map

@@ -13,22 +13,11 @@ import { v4 as uuid } from 'uuid'
 import 'reflect-metadata'
 import https from 'https'
 import { ChatModel } from './models/Chat'
-import fs from 'fs'
 
 const debug = require('debug')
 const FileStore = require('session-file-store')(session)
 const compression = require('compression')
 const { Server } = require('socket.io')
-
-let cert,
-  ca,
-  key = undefined
-
-if (process.env.NODE_ENV === 'production') {
-  cert = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.crt'))
-  ca = fs.readFileSync(path.join(__dirname, '../ssl/conradkay_com.ca-bundle'))
-  key = fs.readFileSync(path.join(__dirname, '../ssl/server.key'))
-}
 
 require('dotenv').config()
 
@@ -66,9 +55,9 @@ app.use(
   })
 )
 
-const server = https.createServer({ cert, ca, key })
+const websocketServer = https.createServer()
 
-const io = new Server(server)
+const io = new Server(websocketServer)
 
 io.on('connection', (socket: any) => {
   socket.on('send_message', async ({ chatId, message, userId, id }: any) => {
@@ -100,7 +89,7 @@ const websocketPort = process.env.WEBSOCKET_PORT || 3000
 
 // ! todo set vite proxy up and pick a unique port for this too
 if (process.env.NODE_ENV !== 'production') {
-  server.listen(websocketPort, () => {
+  websocketServer.listen(websocketPort, () => {
     console.log(`websocket listening on port ${websocketPort}`)
   })
 }
@@ -194,10 +183,10 @@ const redirectionFilter = (req: Request, res: Response, next: NextFunction) => {
 
 app.get('/*', redirectionFilter)
 
-app.use(express.static(path.join(__dirname, '../../client/build')))
+app.use(express.static(path.resolve(__dirname, '../dist')))
 
 app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, '../../client/build', 'index.html'))
+  res.sendFile(path.resolve(__dirname, '../dist/index.html'))
 })
 
 app.use((err: Error, req: any, res: any, next: any) => {

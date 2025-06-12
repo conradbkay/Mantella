@@ -1,7 +1,7 @@
 {
-  "name": "mantellaserver",
+  "name": "mantella-server",
   "version": "1.0.0",
-  "description": "best typescript",
+  "description": "Mantella server",
   "main": "index.js",
   "tasks": [
     {
@@ -18,13 +18,13 @@
     "npm": "10.9.0"
   },
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=460 ./build/index.js",
+    "start": "pm2-runtime start ./ecosystem.config.js --env production",
     "dev": "nodemon",
-    "build": "tsc --project tsconfig.prod.json",
+    "test": "jest --runInBand --watchAll",
     "fix": "tslint --fix -c ./tslint.json 'src/**/*{.ts,.tsx}'",
-    "test": "jest --runInBand --watchAll"
+    "clean": "rimraf build",
+    "build": "npm run clean && tsc"
   },
-  "author": "USA-Kay",
   "license": "ISC",
   "dependencies": {
     "@typegoose/typegoose": "^10.3.0",
@@ -52,6 +52,7 @@
     "react-router": "^6.9.0",
     "react-router-dom": "^6.9.0",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^6.0.1",
     "session-file-store": "^1.5.0",
     "socket.io": "^4.6.1",
     "throng": "^5.0.0",
