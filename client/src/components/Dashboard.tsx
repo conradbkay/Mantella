@@ -45,7 +45,8 @@ export const Dashboard = () => {
     <div
       style={{
         backgroundColor: theme.palette.background.paper,
-        minHeight: 'calc(100vh - 58.5px)'
+        minHeight: 'calc(100vh - 58.5px)',
+        padding: '12px 24px'
       }}
     >
       <div
@@ -55,7 +56,8 @@ export const Dashboard = () => {
           alignItems: 'center',
           textAlign: 'center',
           justifyContent: 'center',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          marginBottom: 24
         }}
       >
         <Typography
@@ -72,52 +74,32 @@ export const Dashboard = () => {
         <div
           style={{
             display: 'flex',
-            marginLeft: 24,
-            marginTop: 16,
-            justifyContent: 'center'
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 32
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <Typography
-              variant="h5"
-              gutterBottom
-              style={{ fontWeight: 600, color: theme.palette.text.secondary }}
-            >
-              Your Tasks
-            </Typography>
-
-            {tasks.map((task, i) => (
-              <BaseTask
-                key={task.id}
-                style={{}}
-                project={
-                  projects[
-                    id(projects, getProjectIdFromTaskId(projects, task.id))
-                  ]
-                }
-                openFunc={() => setEditingTaskId(task.id)}
-                task={task}
-              />
-            ))}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div style={{ width: '100%' }}>
             <Typography
               variant="h5"
               gutterBottom
               style={{
                 fontWeight: 600,
+                color: theme.palette.text.secondary,
                 textAlign: 'center',
-                color: theme.palette.text.secondary
+                marginBottom: 16
               }}
             >
-              Projects
+              Your Projects
             </Typography>
-            <div style={{ margin: '0px 40px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                overflowX: 'auto',
+                paddingBottom: 16
+              }}
+            >
               {projects.map((project, i) => {
                 const cols: [number, string][] = [
                   [project.tasks.length, 'Tasks'],
@@ -145,9 +127,9 @@ export const Dashboard = () => {
                       flexDirection: 'column',
                       padding: 16,
                       borderRadius: 4,
-                      marginBottom: 16,
+                      marginRight: 16,
                       minWidth: 300,
-                      backgroundColor: color
+                      border: `1px solid ${color}`
                     }}
                     key={project.id}
                   >
@@ -155,29 +137,31 @@ export const Dashboard = () => {
                       gutterBottom
                       variant="h5"
                       component="h2"
-                      style={{ color: '#FFFFFF' }}
+                      style={{ color: color, fontFamily: 'Viga' }}
                     >
                       {project.name}
                     </Typography>
-                    <ul
-                      style={{
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        fontSize: 15
-                      }}
-                    >
+                    <ul>
                       {cols.map((col, i) => (
                         <div key={i}>
-                          <span
+                          <Typography
+                            display="inline-flex"
                             style={{
                               fontWeight: 500,
-                              fontSize: 17,
-                              marginRight: 4,
-                              color: '#FFFFFF'
+                              fontSize: 22
                             }}
+                            color="text.secondary"
                           >
-                            {col[0]}
-                          </span>{' '}
-                          {col[1]}
+                            <span style={{ minWidth: '30px' }}>{col[0]}</span>{' '}
+                            <span
+                              style={{
+                                fontSize: 14,
+                                margin: 'auto 8px'
+                              }}
+                            >
+                              {col[1]}
+                            </span>
+                          </Typography>
                         </div>
                       ))}
                     </ul>
@@ -185,6 +169,34 @@ export const Dashboard = () => {
                 )
               })}
             </div>
+          </div>
+          <div style={{ width: '100%', maxWidth: 800 }}>
+            <Typography
+              variant="h5"
+              gutterBottom
+              style={{
+                fontWeight: 600,
+                color: theme.palette.text.secondary,
+                textAlign: 'center',
+                marginBottom: 16
+              }}
+            >
+              Your Tasks
+            </Typography>
+
+            {tasks.map((task, i) => (
+              <BaseTask
+                key={task.id}
+                style={{}}
+                project={
+                  projects[
+                    id(projects, getProjectIdFromTaskId(projects, task.id))
+                  ]
+                }
+                openFunc={() => setEditingTaskId(task.id)}
+                task={task}
+              />
+            ))}
           </div>
         </div>
       ) : (

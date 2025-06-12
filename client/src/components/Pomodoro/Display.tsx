@@ -7,10 +7,9 @@ import { Circle } from '../../utils/Circle'
 
 type Props = {
   toggleWorking: () => void
-  timeLeft: string
 }
 
-export const Display = ({ timeLeft }: Props) => {
+export const Display = ({}: Props) => {
   const { pomodoro, projects } = useAppSelector((state) => ({
     pomodoro: state.pomodoro,
     projects: state.projects
@@ -41,7 +40,7 @@ export const Display = ({ timeLeft }: Props) => {
     >
       <Circle
         progress={percentLeft}
-        text={timeLeft}
+        text={pomodoro.time}
         showPercentageSymbol={false}
         progressColor={pomodoro.working ? 'red' : 'green'}
         textColor={pomodoro.working ? 'red' : 'green'}
@@ -89,7 +88,7 @@ export const Display = ({ timeLeft }: Props) => {
       </Paper>
       <div style={{ display: 'flex' }}>
         <Button
-          onClick={() => dispatch(TOGGLE_TIMER())}
+          onClick={() => dispatch(TOGGLE_TIMER(Date.now()))}
           color="primary"
           fullWidth
           variant="outlined"

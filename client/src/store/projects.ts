@@ -127,11 +127,14 @@ const projectSlice = createSlice({
 
     TICK: (
       projects,
-      { payload }: PayloadAction<{ taskId: string; projectId: string }>
+      {
+        payload
+      }: PayloadAction<{ taskId: string; projectId: string; seconds: number }>
     ) => {
       if (payload.taskId && payload.projectId) {
         const proj = projects[id(projects, payload.projectId)]
-        proj.tasks[id(proj.tasks, payload.taskId)].timeWorkedOn += 1
+        proj.tasks[id(proj.tasks, payload.taskId)].timeWorkedOn +=
+          payload.seconds
       }
     }
   }

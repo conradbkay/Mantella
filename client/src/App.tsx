@@ -1,4 +1,4 @@
-import { useMemo, useState, createContext, useEffect } from 'react'
+import { useMemo, useState, createContext, useEffect, useRef } from 'react'
 import { Provider, useSelector } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
@@ -27,7 +27,7 @@ import { Chat } from './components/Chat/Chat'
 import useTitle from './components/useTitle'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { TICK } from './store/projects'
-import { TICK as POM_TICK } from './store/pomodoro'
+import { SYNC_TIMER, SET_TIME } from './store/pomodoro'
 import { id, toDaysHHMMSS } from './utils/utilities'
 import { APIEditTask } from './API/task'
 import { getPersistAuth, getTheme, setTheme } from './localStorage'
@@ -89,6 +89,7 @@ const Router = () => {
   }
 
   const projects = useSelector(selectProjects)
+  const lastTickTimestampRef = useRef(0)
 
   const [connected, setConnected] = useState(false)
 
@@ -106,12 +107,16 @@ const Router = () => {
   }))
 
   // since this component is always mounted when a project is open, for now we include this code here instead of in the Pomodoro component which can be unmounted
-  // we could put this in the base component (App) if we want it to always run
   useEffect(() => {
     clearInterval(interval)
 
     interval = setInterval(() => {
+      const now = Date.now()
       if (!pomodoro.paused) {
+        if (lastTickTimestampRef.current === 0) {
+          lastTickTimestampRef.current = pomodoro.startTime || now
+        }
+
         if (pomodoro.selectedTaskId && pomodoro.working) {
           const project = projects.find((proj) =>
             proj.tasks.some((task) => task.id === pomodoro.selectedTaskId)
@@ -120,30 +125,47 @@ const Router = () => {
           const task =
             project.tasks[id(project.tasks, pomodoro.selectedTaskId!)]
 
-          if ((task.timeWorkedOn + 1) % 60 === 0) {
+          const elapsedSeconds = Math.round(
+            (now - lastTickTimestampRef.current) / 1000
+          )
+          // persist to server every minute
+          if (
+            Math.floor(task.timeWorkedOn / 60) <
+            Math.floor((task.timeWorkedOn + elapsedSeconds) / 60)
+          ) {
             APIEditTask(
-              { ...task, timeWorkedOn: task.timeWorkedOn + 1 },
+              { ...task, timeWorkedOn: task.timeWorkedOn + elapsedSeconds },
               project.id
             )
           }
 
-          // ends up being 1 second extra if we don't do this
-          if (pomodoro.currSeconds !== 1) {
+          if (elapsedSeconds > 0) {
             dispatch(
               TICK({
                 taskId: pomodoro.selectedTaskId!,
-                projectId: project.id
+                projectId: project.id,
+                seconds: elapsedSeconds
               })
             )
           }
         }
-        dispatch(POM_TICK())
+        dispatch(SYNC_TIMER(now))
+        lastTickTimestampRef.current = now
+      } else {
+        lastTickTimestampRef.current = 0
       }
+      const remainingSeconds =
+        pomodoro.currSeconds -
+        Math.floor((Date.now() - pomodoro.startTime) / 1000)
+
+      const displayTime = toDaysHHMMSS(
+        remainingSeconds < 0 ? 0 : remainingSeconds
+      )
+      dispatch(SET_TIME(displayTime))
+
       document.title = pomodoro.paused
         ? 'Mantella'
-        : `${pomodoro.working ? 'Work ' : 'Break '} ${toDaysHHMMSS(
-            pomodoro.currSeconds - 1
-          )}`
+        : `${pomodoro.working ? 'Work ' : 'Break '} ${displayTime}`
 
       return () => {
         document.title = 'Mantella'

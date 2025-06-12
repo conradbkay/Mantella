@@ -20,6 +20,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/roboto": "^4.5.8",
+    "@fontsource/viga": "^5.2.6",
     "@lexical/react": "^0.9.1",
     "@mui/base": "^5.0.0-alpha.122",
     "@mui/icons-material": "^5.11.11",

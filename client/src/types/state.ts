@@ -1,13 +1,6 @@
 import { TFilterData } from '../components/Project/types'
 import { TProject } from './project'
 
-export type TStopWatch = {
-  pastTimes: number[]
-  time: number
-  paused: boolean
-  highest: number
-}
-
 export type TPomodoro = {
   paused: boolean
   working: boolean
@@ -16,7 +9,8 @@ export type TPomodoro = {
   workSeconds: number
   selectingTask: boolean
   selectedTaskId: null | string
-  stopWatch: TStopWatch
+  startTime: number
+  time: string
 }
 
 export type TProfile = {

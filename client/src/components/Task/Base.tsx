@@ -491,8 +491,11 @@ export const BaseTask = memo(
                     className={classes.play}
                     onClick={(e) => {
                       e.stopPropagation()
-                      dispatch(SELECT_POMODORO_TASK(task.id))
-                      dispatch(TOGGLE_TIMER())
+                      if (pomodoro.selectedTaskId !== task.id) {
+                        dispatch(SELECT_POMODORO_TASK(task.id))
+                      } else if (pomodoro.selectedTaskId === task.id) {
+                        dispatch(TOGGLE_TIMER(Date.now()))
+                      }
                     }}
                   />
                 </div>

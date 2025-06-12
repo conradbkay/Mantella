@@ -6,16 +6,40 @@ const pomodoroSlice = createSlice({
   name: 'pomodoro',
   initialState: defaultState.pomodoro,
   reducers: {
-    TICK: (pom) => {
-      if (pom.currSeconds > 0 && !pom.paused) {
-        pom.currSeconds -= 1
-      } else {
-        pom.paused = true
-        pom.working = !pom.working
-        pom.currSeconds = pom.working ? pom.workSeconds : pom.breakSeconds
+    SYNC_TIMER: (pom, { payload: now }: PayloadAction<number>) => {
+      if (pom.paused || pom.startTime === 0) {
+        return
+      }
+
+      const elapsedSeconds = Math.floor((now - pom.startTime) / 1000)
+
+      if (elapsedSeconds >= pom.currSeconds) {
+        // Timer finished. Switch session.
+        const newSessionIsWork = !pom.working
+        const timeOver = elapsedSeconds - pom.currSeconds
+        const newDuration = newSessionIsWork
+          ? pom.workSeconds
+          : pom.breakSeconds
+
+        pom.working = newSessionIsWork
+        pom.currSeconds = newDuration - timeOver
+        pom.startTime = now - timeOver * 1000
       }
     },
-    TOGGLE_TIMER: (pom) => {
+    SET_TIME: (pom, { payload }: PayloadAction<string>) => {
+      pom.time = payload
+    },
+    TOGGLE_TIMER: (pom, { payload: now }: PayloadAction<number>) => {
+      if (pom.paused) {
+        // un-pausing
+        pom.startTime = now
+      } else {
+        // pausing
+        const elapsedSeconds = Math.round((now - pom.startTime) / 1000)
+        pom.currSeconds -= elapsedSeconds
+        if (pom.currSeconds < 0) pom.currSeconds = 0
+        pom.startTime = 0
+      }
       pom.paused = !pom.paused
     },
 
@@ -35,24 +59,6 @@ const pomodoroSlice = createSlice({
       pom.selectingTask = !pom.selectingTask
     },
 
-    TICK_STOPWATCH: (pom) => {
-      pom.stopWatch.time += 1
-      pom.stopWatch.highest = Math.max(
-        pom.stopWatch.time,
-        pom.stopWatch.highest
-      )
-    },
-
-    TOGGLE_STOPWATCH: (pom) => {
-      pom.stopWatch.paused = !pom.stopWatch.paused
-    },
-
-    RESET_STOPWATCH: (pom) => {
-      // don't reset highscore!
-      pom.stopWatch.time = 0
-      pom.stopWatch.paused = true
-    },
-
     SET_LENGTH_MINUTES: (
       pom,
       {
@@ -69,30 +75,29 @@ const pomodoroSlice = createSlice({
         (payload.operationType === 'WORK' && pom.working) ||
         (payload.operationType === 'BREAK' && !pom.working)
 
-      const result = pom[slice] + payload.minutes * 60
+      // only allow changing if paused
+      if (pom.paused) {
+        const result = pom[slice] + payload.minutes * 60
 
-      if (result > 0) {
-        const newSeconds = changingCurrent
-          ? pom.currSeconds + payload.minutes * 60
-          : pom.currSeconds
-
-        pom.currSeconds = newSeconds
-        pom[slice] = result
+        if (result > 0) {
+          pom[slice] = result
+          if (changingCurrent) {
+            pom.currSeconds = result
+          }
+        }
       }
     }
   }
 })
 
 export const {
-  TICK,
+  SYNC_TIMER,
   TOGGLE_TIMER,
   RESET_POMODORO,
   SELECT_POMODORO_TASK,
   TOGGLE_SELECTING_TASK,
-  TICK_STOPWATCH,
-  TOGGLE_STOPWATCH,
-  RESET_STOPWATCH,
-  SET_LENGTH_MINUTES
+  SET_LENGTH_MINUTES,
+  SET_TIME
 } = pomodoroSlice.actions
 
 export const selectPomodoro = (state: RootState) => state.pomodoro

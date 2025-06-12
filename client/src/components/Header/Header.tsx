@@ -60,7 +60,6 @@ const noAuthItems = [
 
 const authItems = [
   { label: 'Home', pathname: '/dashboard', menuIcon: Home },
-  { label: 'Settings', pathname: '/settings', menuIcon: Settings },
   {
     label: 'Calendar',
     pathname: '/calendar',
@@ -70,7 +69,8 @@ const authItems = [
     label: 'Chat',
     pathname: '/chat',
     menuIcon: Chat
-  }
+  },
+  { label: 'Settings', pathname: '/settings', menuIcon: Settings }
 ]
 
 const useStyles = makeStyles((theme: Theme) => ({

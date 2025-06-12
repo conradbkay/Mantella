@@ -87,7 +87,7 @@ export const FeatureGallery = () => {
                   color: theme.palette.primary.main
                 }}
               >
-                <Icon style={{ fontSize: 36, marginRight: 4 }}>
+                <Icon style={{ fontSize: 20, marginRight: 8 }}>
                   {galleryOption.icon}
                 </Icon>
                 <p style={{ fontWeight: 700, fontSize: 22 }}>

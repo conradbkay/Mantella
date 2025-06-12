@@ -1,8 +1,6 @@
-import { toDaysHHMMSS } from '../../utils/utilities'
 import { Swal } from './Swal'
 import { Controls } from './Controls'
 import { Display } from './Display'
-import { Stopwatch } from './Stopwatch'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { TOGGLE_TIMER } from '../../store/pomodoro'
 
@@ -12,22 +10,20 @@ type Props = {
 
 export const Pomodoro = ({ onClose }: Props) => {
   const dispatch = useAppDispatch()
+  const { pomodoro } = useAppSelector((state) => ({
+    pomodoro: state.pomodoro
+  }))
 
   const toggleWorking = () => {
-    dispatch(TOGGLE_TIMER())
+    dispatch(TOGGLE_TIMER(Date.now()))
   }
-
-  const pomodoro = useAppSelector((state) => state.pomodoro)
-
-  const time = toDaysHHMMSS(pomodoro.currSeconds)
 
   Swal(pomodoro, onClose, () => toggleWorking())
 
   return (
     <div>
-      <Display toggleWorking={() => toggleWorking()} timeLeft={time} />
+      <Display toggleWorking={() => toggleWorking()} />
       <Controls />
-      <Stopwatch />
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import { TSnackbar, TState } from '../types/state'
+import { toDaysHHMMSS } from '../utils/utilities'
 
 export const defaultSnackbar: TSnackbar = {
   open: false,
@@ -16,12 +17,8 @@ export const defaultState: TState = {
     currSeconds: 60 * 25,
     breakSeconds: 60 * 5,
     workSeconds: 60 * 25,
-    stopWatch: {
-      pastTimes: [],
-      time: 0,
-      paused: true,
-      highest: 0
-    }
+    startTime: 0,
+    time: toDaysHHMMSS(60 * 25)
   },
   snackbar: defaultSnackbar,
   loading: false,
