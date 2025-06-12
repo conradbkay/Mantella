@@ -98,9 +98,12 @@ io.on('connection', (socket: any) => {
 
 const websocketPort = process.env.WEBSOCKET_PORT || 3000
 
-server.listen(websocketPort, () => {
-  console.log(`websocket listening on port ${websocketPort}`)
-})
+// ! todo set vite proxy up and pick a unique port for this too
+if (process.env.NODE_ENV !== 'production') {
+  server.listen(websocketPort, () => {
+    console.log(`websocket listening on port ${websocketPort}`)
+  })
+}
 
 app.use(morgan('dev'))
 app.use(express.json())
@@ -108,7 +111,7 @@ app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
 
 if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1) // heroku
+  app.set('trust proxy', 1) // heroku, maybe not still needed?
 }
 
 const WEEK_IN_SECONDS = 60 * 60 * 24 * 7

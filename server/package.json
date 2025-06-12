@@ -60,9 +60,6 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
-    "@swc/core": "^1.2.113",
-    "@swc/helpers": "^0.2.14",
-    "@swc/jest": "^0.2.10",
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "^1.17.0",
     "@types/cookie-parser": "^1.4.1",
