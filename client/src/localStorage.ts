@@ -16,5 +16,5 @@ export const getPersistAuth = () => {
 }
 
 export const setPersistAuth = (persist: boolean) => {
-  localStorage.setItem(localStorageKeys.noPersist, persist.toString())
+  localStorage.setItem(localStorageKeys.noPersist, (!persist).toString())
 }

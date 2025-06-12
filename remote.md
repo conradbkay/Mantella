@@ -2,6 +2,8 @@
 
 Instructions for setting up a deployment server
 
+Setup A record in DNS settings
+
 cd /var/www/conradkay.com
 
 mkdir Mantella

@@ -25,6 +25,9 @@ COPY --from=builder /home/node/app/ecosystem.config.js ./
 COPY --from=builder /home/node/app/build ./build
 COPY --from=builder /home/node/app/dist ./dist
 
+# Create sessions directory with proper permissions
+RUN mkdir -p /home/node/app/sessions && chown -R node:node /home/node/app/sessions
+
 # Set environment variables for Docker deployment
 ENV NODE_ENV=production
 ENV DOCKER=true
