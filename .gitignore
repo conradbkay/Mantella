@@ -13,3 +13,5 @@ server/ssl
 npm-debug.log*
 server/sessions
 deploy.sh
+server/image.tar
+server/dist

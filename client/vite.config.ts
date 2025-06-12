@@ -14,19 +14,15 @@ export default defineConfig(({ command }) => ({
     react(),
     viteTsconfigPaths(),
     svgrPlugin(),
-    checker({ typescript: true }) /*ssr()*/
+    checker({ typescript: true })
   ],
   build: {
-    outDir: 'build'
+    emptyOutDir: true,
+    outDir: '../server/dist'
   },
   server: {
     open: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:4008',
-        changeOrigin: true
-      }
-    }
+    proxy: { '/api': { target: 'http://localhost:4001', changeOrigin: true } }
   },
   test: {
     globals: true,
