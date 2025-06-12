@@ -11,7 +11,7 @@ import {
   ListItemText
 } from '@mui/material'
 import { formatDueDate } from '../../utils/formatDueDate'
-import { toDaysHHMMSS } from '../../utils/utilities'
+import { toDaysHHMMSS } from '../../utils/utils'
 import PlayArrow from '@mui/icons-material/PlayArrow'
 import Pause from '@mui/icons-material/Pause'
 import Comment from '@mui/icons-material/Comment'
@@ -22,7 +22,7 @@ import { isBefore } from 'date-fns'
 import { APISetSubtask } from '../../API/project'
 import { makeStyles } from '@mui/styles'
 import { SubtaskMap } from './SubtaskMap'
-import { id } from '../../utils/utilities'
+import { id } from '../../utils/utils'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableAvatar from './DraggableAvatar'
 import { taskDummyOpacity } from '../Project/Project'
@@ -32,30 +32,9 @@ import { SET_SUBTASK } from '../../store/projects'
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
-import { colorForLightMode } from '../../colors'
+import { useTaskColor } from '../../utils/color'
 import { Description } from '../TextEditor/DescriptionEditor'
 import { deleteTask } from '../../actions/task'
-import { inverse } from '../Chat/Chat'
-
-const invertColor = (hex: string) => {
-  if (hex.indexOf('#') === 0) {
-    hex = hex.slice(1)
-  }
-  // convert 3-digit hex to 6-digits.
-  if (hex.length === 3) {
-    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2]
-  }
-
-  var r = parseInt(hex.slice(0, 2), 16),
-    g = parseInt(hex.slice(2, 4), 16),
-    b = parseInt(hex.slice(4, 6), 16)
-
-  return r * 0.299 + g * 0.587 + b * 0.114 > 186 ? '#000000' : '#FFFFFF'
-}
-
-const transformDefault = (color: string, mode: 'dark' | 'light') => {
-  return color === '#FFFFFF' ? (mode === 'dark' ? '#121212' : '#FFFFFF') : color
-}
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -127,8 +106,6 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
-// TODO: make every color correct for background color
-
 export const BaseTask = memo(
   ({
     task,
@@ -147,6 +124,9 @@ export const BaseTask = memo(
     const { pomodoro } = useAppSelector((state) => ({
       pomodoro: state.pomodoro
     }))
+
+    const { backgroundColor, textColor, secondary } = useTaskColor(task.color)
+    const finalTextColor = isDragging ? secondary : textColor
 
     const isCurrentTask = pomodoro.selectedTaskId === task.id.toString()
 
@@ -185,23 +165,6 @@ export const BaseTask = memo(
     if (!task) {
       return null
     }
-
-    const backgroundColor =
-      task.color &&
-      task.color.toUpperCase() !== '#FFFFFF' &&
-      task.color !== '#121212'
-        ? theme.palette.mode === 'dark'
-          ? task.color
-          : colorForLightMode(task.color)
-        : theme.palette.background.paper
-
-    const taskColor = transformDefault(backgroundColor, theme.palette.mode)
-
-    const textColor = isDragging
-      ? inverse(invertColor(taskColor), 0.2)
-      : invertColor(taskColor) // make a bit darker on dark mode?
-
-    const secondary = inverse(textColor, 0.2)
 
     return (
       <>
@@ -337,7 +300,7 @@ export const BaseTask = memo(
                     style={{
                       fontSize: 18,
                       maxWidth: '94%',
-                      color: textColor,
+                      color: finalTextColor,
                       marginLeft: 4,
                       marginTop: 4
                     }}
@@ -477,7 +440,8 @@ export const BaseTask = memo(
                       style={{
                         alignSelf: 'center',
                         fontSize: 13,
-                        marginLeft: 6
+                        marginLeft: 6,
+                        color: secondary
                       }}
                     >
                       Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}

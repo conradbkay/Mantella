@@ -1,5 +1,5 @@
 import { ProjectModel } from '../models/Project'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import { router } from './router'
 import {
   createListReq,
@@ -55,14 +55,14 @@ export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
 router.post('/deleteList', isAuthenticated, deleteList)
 
 export const createList = async (req: createListReq, res: createListRes) => {
-  const newId = uuid()
+  const newId = nanoid()
 
   const project = await ProjectModel.findOne({ id: req.body.projId })
 
   if (project) {
     project.lists.push({
       id: newId,
-      name: req.body.name || 'new list',
+      name: req.body.name || 'New List',
       taskIds: [[], [], []]
     })
 

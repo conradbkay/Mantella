@@ -6,8 +6,10 @@ import app from '../index'
 import { editProjectReqObj, loginReqObj, registerReqObj } from './types'
 
 // ids must be mocked for snapshot testing
-jest.mock('uuid', () => {
-  return () => 'MOCK_ID'
+jest.mock('nanoid', () => {
+  return {
+    nanoid: () => 'MOCK_ID'
+  }
 })
 
 // users will always be authenticated

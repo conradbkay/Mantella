@@ -1,6 +1,6 @@
 import { Button, Paper } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { getAllTasks, id, toDaysHHMMSS } from '../../utils/utilities'
+import { getAllTasks, id, toDaysHHMMSS } from '../../utils/utils'
 import { useMemo } from 'react'
 import { TOGGLE_SELECTING_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
 import { Circle } from '../../utils/Circle'

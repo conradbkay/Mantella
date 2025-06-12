@@ -8,7 +8,7 @@ import { SET_PROJECT, SET_TASK } from '../store/projects'
 import { OPEN_SNACKBAR } from '../store/snackbar'
 import { AppDispatch } from '../store/store'
 import { TList, TProject, TTask } from '../types/project'
-import { id } from '../utils/utilities'
+import { id } from '../utils/utils'
 
 export const createTask = async (
   dispatch: AppDispatch,

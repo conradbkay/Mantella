@@ -1,6 +1,6 @@
 import { UserModel } from '../models/User'
 import { ProjectModel } from '../models/Project'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import {
   createProjectReq,
   createProjectRes,
@@ -23,10 +23,10 @@ export const createProject = async (
   req: createProjectReq,
   res: createProjectRes
 ) => {
-  const creatingId = uuid()
-  const listId = uuid()
-  const chatId = uuid()
-  const adminRoleId = uuid()
+  const creatingId = nanoid()
+  const listId = nanoid()
+  const chatId = nanoid()
+  const adminRoleId = nanoid()
 
   if (req.user) {
     ;(req.user as any).projects.push(creatingId)

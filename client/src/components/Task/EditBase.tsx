@@ -12,8 +12,8 @@ import {
   IconButton,
   useTheme
 } from '@mui/material'
-import uuid from 'uuid'
-import { id } from '../../utils/utilities'
+import { nanoid } from 'nanoid'
+import { id } from '../../utils/utils'
 import { ChooseColor } from '../ChooseColor'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
@@ -234,7 +234,7 @@ export const EditTaskBase = (props: OwnProps) => {
               marginLeft: 'auto'
             }}
             onClick={() => {
-              const subTaskId = uuid()
+              const subTaskId = nanoid()
               setSubtask(subTaskId, {
                 id: subTaskId,
                 completed: false,
@@ -303,7 +303,7 @@ export const EditTaskBase = (props: OwnProps) => {
           <Button
             color="inherit"
             onClick={() => {
-              const newCommentId = uuid()
+              const newCommentId = nanoid()
               setComment(newCommentId, {
                 id: newCommentId,
                 comment: 'Comment',

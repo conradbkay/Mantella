@@ -9,7 +9,7 @@ import {
   Typography
 } from '@mui/material'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
-import { formalize } from '../utils/utilities'
+import { formalize } from '../utils/utils'
 import { makeStyles } from '@mui/styles'
 import { useAppSelector } from '../store/hooks'
 import { selectProjects } from '../store/projects'

@@ -28,7 +28,7 @@ import useTitle from './components/useTitle'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 import { TICK } from './store/projects'
 import { SYNC_TIMER, SET_TIME } from './store/pomodoro'
-import { id, toDaysHHMMSS } from './utils/utilities'
+import { id, toDaysHHMMSS } from './utils/utils'
 import { APIEditTask } from './API/task'
 import { getPersistAuth, getTheme, setTheme } from './localStorage'
 

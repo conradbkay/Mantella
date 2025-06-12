@@ -14,11 +14,11 @@ import { useSelector } from 'react-redux'
 import { TState } from '../../types/state'
 import axios from 'axios'
 import { Scrollbar } from 'react-scrollbars-custom'
-import { inverse } from './Chat'
-import uuid from 'uuid'
+import { nanoid } from 'nanoid'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { formatDate } from '../../utils/formatDueDate'
+import { inverse } from '../../utils/color'
 
 type Message = {
   id: string
@@ -90,7 +90,7 @@ export const ChatMessages = ({
   const [message, setMessage] = useState('')
 
   const sendMessage = () => {
-    const id = uuid()
+    const id = nanoid()
     socket.emit('send_message', { chatId: channelId, message, userId, id })
     setMessage('')
   }

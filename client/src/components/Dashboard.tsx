@@ -7,8 +7,8 @@ import {
   useTheme
 } from '@mui/material'
 import { useState } from 'react'
-import { colors } from '../colors'
-import { getAllTasks, getProjectIdFromTaskId, id } from '../utils/utilities'
+import { colors, colorForLightMode, transformDefault } from '../utils/color'
+import { getAllTasks, getProjectIdFromTaskId, id } from '../utils/utils'
 import { BaseTask } from './Task/Base'
 import { EditTaskModal } from './Task/Edit'
 import { Link } from 'react-router-dom'
@@ -16,13 +16,14 @@ import Add from '@mui/icons-material/Add'
 import { useAppSelector } from '../store/hooks'
 import { selectProjects } from '../store/projects'
 import { format, getHours } from 'date-fns'
-import Color from 'color'
 import useTitle from './useTitle'
 
-const genColors = () => {
-  return Object.values({ ...colors }).map((c) =>
-    new Color(c).lightness(21).toString()
-  )
+const genColors = (theme: any) => {
+  return Object.values({ ...colors }).map((c) => {
+    const backgroundColor =
+      theme.palette.mode === 'dark' ? c : colorForLightMode(c)
+    return transformDefault(backgroundColor, theme.palette.mode)
+  })
 }
 
 export const Dashboard = () => {
@@ -30,9 +31,8 @@ export const Dashboard = () => {
   const projects = useAppSelector(selectProjects)
   const user = useAppSelector((state) => state.user)
   const tasks = getAllTasks(projects)
-  let betterColors = genColors()
-
   const theme = useTheme()
+  let betterColors = genColors(theme)
 
   const hours = getHours(new Date())
 
@@ -115,7 +115,7 @@ export const Dashboard = () => {
 
                 const color = betterColors.splice(i, 1)[0]
                 if (!betterColors.length) {
-                  betterColors = genColors()
+                  betterColors = genColors(theme)
                 }
 
                 return (
@@ -152,7 +152,15 @@ export const Dashboard = () => {
                             }}
                             color="text.secondary"
                           >
-                            <span style={{ minWidth: '30px' }}>{col[0]}</span>{' '}
+                            <span
+                              style={{
+                                minWidth: '30px',
+                                color: color,
+                                fontFamily: 'Viga'
+                              }}
+                            >
+                              {col[0]}
+                            </span>{' '}
                             <span
                               style={{
                                 fontSize: 14,

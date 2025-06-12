@@ -1,6 +1,6 @@
 import { formatRelative } from 'date-fns'
 import { TTask } from '../types/project'
-import { toDaysHHMMSS } from './utilities'
+import { toDaysHHMMSS } from './utils'
 
 export const formatDate = (date: Date) => {
   let str = formatRelative(date, new Date())

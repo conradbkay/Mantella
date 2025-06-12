@@ -1,7 +1,7 @@
 import { Button } from '@mui/material'
 import Add from '@mui/icons-material/Add'
 import Remove from '@mui/icons-material/Remove'
-import { toDaysHHMMSS } from '../../utils/utilities'
+import { toDaysHHMMSS } from '../../utils/utils'
 import { useTheme } from '@mui/material'
 import { selectPomodoro, SET_LENGTH_MINUTES } from '../../store/pomodoro'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'

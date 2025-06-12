@@ -7,7 +7,7 @@ import { makeStyles } from '@mui/styles'
 import { TTask } from '../../types/project'
 import { useAppSelector } from '../../store/hooks'
 import { selectProjects } from '../../store/projects'
-import { id } from '../../utils/utilities'
+import { id } from '../../utils/utils'
 
 /** Gets the day behind the passed date, the passed date, and the 5 dates after passed date */
 const getDays = (start: Date): Date[] => {

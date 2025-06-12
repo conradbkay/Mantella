@@ -1,6 +1,6 @@
 import { getDay } from 'date-fns'
 import { BaseTask } from '../Task/Base'
-import { getProjectIdFromTaskId, id } from '../../utils/utilities'
+import { getProjectIdFromTaskId, id } from '../../utils/utils'
 import { useState } from 'react'
 import { EditTaskModal } from '../Task/Edit'
 import { TTask } from '../../types/project'

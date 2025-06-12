@@ -1,9 +1,10 @@
 import { ProjectModel } from '../models/Project'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import { router } from './router'
 import { isAuthenticated } from '../passport'
 import { Request, Response } from 'express'
 import { ChatModel } from '../models/Chat'
+import { Server } from 'socket.io'
 
 export const getChat = async (req: Request, res: Response) => {
   const chat = await ChatModel.findOne({ id: req.body.id })
@@ -14,7 +15,7 @@ export const getChat = async (req: Request, res: Response) => {
 router.post('/chat', isAuthenticated, getChat)
 
 export const sendMessage = async (req: Request, res: Response) => {
-  const messageId = uuid()
+  const messageId = nanoid()
 
   const chat = await ChatModel.findOne({ id: req.body.chatId })
 
@@ -42,7 +43,7 @@ export const createChannel = async (req: Request, res: Response) => {
   if (proj) {
     const name = req.body.name || 'New Channel'
 
-    const chatId = uuid()
+    const chatId = nanoid()
 
     await ChatModel.create({
       id: chatId,
@@ -102,3 +103,13 @@ export const editChannel = async (req: Request, res: Response) => {
 }
 
 router.post('/editChannel', isAuthenticated, editChannel)
+
+export const createChat = async (projectId: string) => {
+  const chatId = nanoid()
+  await ChatModel.create({
+    id: chatId,
+    messages: [],
+    projectId: projectId
+  })
+  return [chatId, 'General']
+}

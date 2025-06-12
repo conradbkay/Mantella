@@ -12,7 +12,6 @@ import {
   TextField,
   useTheme
 } from '@mui/material'
-import Color from 'color'
 import { Socket } from 'socket.io-client'
 import { ChatMembers } from './Members'
 import { ChatMessages } from './Messages'
@@ -26,17 +25,9 @@ import Add from '@mui/icons-material/Add'
 import Close from '@mui/icons-material/Close'
 import { createChannel, deleteChannel, editChannel } from '../../actions/chat'
 import Settings from '@mui/icons-material/SettingsOutlined'
-import { id } from '../../utils/utilities'
+import { id } from '../../utils/utils'
 import useTitle from '../useTitle'
-export const inverse = (color: string, by: number) => {
-  const manip = new Color(color)
-
-  const dark = manip.isDark()
-
-  const func = dark ? 'lighten' : 'darken'
-
-  return manip[func](dark ? by : by / 6).toString()
-}
+import { inverse } from '../../utils/color'
 
 export const Chat = ({ socket }: { socket: Socket }) => {
   const theme = useTheme()

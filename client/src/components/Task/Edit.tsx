@@ -1,5 +1,5 @@
 import { Button } from '@mui/material'
-import { id } from '../../utils/utilities'
+import { id } from '../../utils/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import Delete from '@mui/icons-material/Delete'
 import { TTask } from '../../types/project'

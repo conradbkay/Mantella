@@ -19,8 +19,8 @@ import { useAppDispatch, useAppSelector } from '../store/hooks'
 import axios from 'axios'
 import { transformUser } from '../store/auth'
 import useTitle from './useTitle'
-import { inverse } from './Chat/Chat'
 import { getPersistAuth, setPersistAuth } from '../localStorage'
+import { inverse } from '../utils/color'
 
 // https://stackoverflow.com/questions/20771794/mailrfc822address-regex
 const emailRegex =

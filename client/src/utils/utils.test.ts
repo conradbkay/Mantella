@@ -1,4 +1,4 @@
-import { moveInArray } from './utilities'
+import { moveInArray } from './utils'
 
 test('moveInArray', () => {
   let arr = [1, 2, 3, 4, 5]

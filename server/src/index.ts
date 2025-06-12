@@ -9,7 +9,7 @@ import passport from 'passport'
 import { deserializeUser, passportStrategy, serializeUser } from './passport'
 import { Strategy } from 'passport-local'
 import session from 'express-session'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import 'reflect-metadata'
 import https from 'https'
 import { ChatModel } from './models/Chat'
@@ -65,7 +65,7 @@ io.on('connection', (socket: any) => {
       message,
       senderId: userId,
       createdAt: new Date().getTime(),
-      id: id || uuid()
+      id: id || nanoid()
     }
 
     io.in(chatId).emit('message', messageObj)
@@ -82,6 +82,10 @@ io.on('connection', (socket: any) => {
     for (let chatId of chatIds) {
       socket.join(chatId)
     }
+  })
+
+  socket.on('join', (room) => {
+    socket.join(room)
   })
 })
 
@@ -111,7 +115,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     genid: () => {
-      return uuid()
+      return nanoid()
     },
     name: 'Mantella',
     cookie: {
@@ -141,7 +145,7 @@ app.use(
           }
         : undefined,
     genid: () => {
-      return uuid()
+      return nanoid()
     },
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
   })

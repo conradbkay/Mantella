@@ -1,5 +1,5 @@
 import { ProjectModel } from '../models/Project'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import {
   createTaskReq,
   createTaskRes,
@@ -19,7 +19,7 @@ import { isAuthenticated } from '../passport'
 import { Request, Response } from 'express'
 
 export const createTask = async (req: createTaskReq, res: createTaskRes) => {
-  const taskId = uuid()
+  const taskId = nanoid()
 
   const proj = await ProjectModel.findOne({ id: req.body.projId })
 
@@ -37,7 +37,7 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
       subTasks: req.body.taskInfo.subTasks
         ? req.body.taskInfo.subTasks.map((subT: any) => ({
             ...subT,
-            id: uuid()
+            id: nanoid()
           }))
         : [],
       comments: [],
@@ -231,7 +231,7 @@ export const setComment = async (req: setCommentReq, res: setCommentRes) => {
       task.comments.push({
         dateAdded: new Date().toString(),
         comment: req.body.description || 'Comment',
-        id: uuid()
+        id: nanoid()
       })
     }
     const newProj = await proj.save()

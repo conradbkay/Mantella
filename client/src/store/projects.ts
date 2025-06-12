@@ -1,5 +1,5 @@
 import { TList, TProject, TSubtask, TTask } from '../types/project'
-import { id } from '../utils/utilities'
+import { id } from '../utils/utils'
 import { defaultState } from './defaultState'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from './store'

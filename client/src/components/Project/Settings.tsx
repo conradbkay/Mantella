@@ -33,7 +33,7 @@ import { MyPointerSensor } from './Project'
 import { cloneDeep } from 'lodash'
 import { ChooseColor } from '../ChooseColor'
 import Add from '@mui/icons-material/Add'
-import uuid from 'uuid'
+import { nanoid } from 'nanoid'
 import Color from 'color'
 import Edit from '@mui/icons-material/Edit'
 
@@ -165,7 +165,7 @@ export const ProjectSettings = ({ project }: Props) => {
       <div style={{ marginLeft: 'auto' }}>
         <IconButton
           style={{ position: 'absolute', left: 20 }}
-          onClick={() => setCreatingRole({ ...defaultRole, id: uuid() })}
+          onClick={() => setCreatingRole({ ...defaultRole, id: nanoid() })}
         >
           <Add />
         </IconButton>

@@ -19,7 +19,7 @@ import Add from '@mui/icons-material/Add'
 import Create from '@mui/icons-material/Create'
 import { NoMatch } from '../404/NoMatch'
 import Helmet from 'react-helmet'
-import { id } from '../../utils/utilities'
+import { id } from '../../utils/utils'
 import { ProjectCell } from './Cell'
 import { CreateTask } from '../Task/Create'
 import { EditTaskModal } from '../Task/Edit'
@@ -28,7 +28,6 @@ import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 
 import {
   rectIntersection,
-  closestCorners,
   defaultDropAnimationSideEffects,
   DndContext,
   DragEndEvent,
@@ -164,7 +163,7 @@ const customCollisionDetection = ({
   }
 
   // Compute other collisions
-  return closestCorners({
+  return rectIntersection({
     ...args,
     droppableContainers: droppableContainers.filter(
       ({ id }: any) => id !== 'trash'

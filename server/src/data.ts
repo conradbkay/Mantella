@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 import { Project, Task } from './models/Project'
 
 export const defaultTask = {
@@ -90,7 +90,7 @@ export const taskObjects = (ids: string[], userId: string): Task[] => [
     ...defaultTask,
     id: ids[11],
     name: 'Tasks can include subtasks',
-    subTasks: [{ name: 'This is a subtask!', completed: false, id: uuid() }]
+    subTasks: [{ name: 'This is a subtask!', completed: false, id: nanoid() }]
   },
   // advanced
   {
@@ -133,7 +133,7 @@ export const taskObjects = (ids: string[], userId: string): Task[] => [
 export const generateIds = (length: number): string[] => {
   let ids = []
   for (let i = 0; i < length; i++) {
-    ids.push(uuid())
+    ids.push(nanoid())
   }
   return ids
 }
@@ -159,8 +159,8 @@ export const generateDefaultProject = (
   projectId: string,
   chat: [string, string]
 ): Project => {
-  const listIds = [uuid(), uuid(), uuid()]
-  const roleId = uuid()
+  const listIds = [nanoid(), nanoid(), nanoid()]
+  const roleId = nanoid()
   const ids = generateIds(19)
   const tasks = taskObjects(ids, newUser.id)
   return {
@@ -220,7 +220,7 @@ export const generateDefaultProject = (
 export const generateGuestUser = (projectId: string, userId: string) => {
   return {
     id: userId,
-    email: uuid() + '.gmail.com',
+    email: nanoid() + '.gmail.com',
     username: 'Guest',
     projects: [projectId],
     guest: true,

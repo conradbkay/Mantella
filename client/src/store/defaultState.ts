@@ -1,5 +1,5 @@
 import { TSnackbar, TState } from '../types/state'
-import { toDaysHHMMSS } from '../utils/utilities'
+import { toDaysHHMMSS } from '../utils/utils'
 
 export const defaultSnackbar: TSnackbar = {
   open: false,
