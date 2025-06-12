@@ -154,7 +154,7 @@ export const EditTaskBase = (props: OwnProps) => {
           </div>
           <Description
             color={theme.palette.text.primary}
-            initialState={props.task.description || undefined}
+            description={props.task.description}
             onChange={(newDescription) =>
               setTask({ ...task, description: newDescription })
             }

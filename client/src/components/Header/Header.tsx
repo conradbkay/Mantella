@@ -240,7 +240,7 @@ export const Header = withRouter((props: Props) => {
                             href="https://github.com/USA-Kay/Mantella"
                             style={{
                               ...trailProps,
-                              color: theme.palette.text.secondary,
+                              color: theme.palette.text.primary,
                               textDecoration: 'none',
                               paddingRight: 5
                             }}

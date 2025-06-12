@@ -25,6 +25,7 @@ import { OPEN_SNACKBAR } from '../store/snackbar'
 import { SET_PROJECTS } from '../store/projects'
 import { LOGIN, REGISTER } from '../store/user'
 import useTitle from './useTitle'
+import { setPersistAuth } from '../localStorage'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
   return <TextField margin="dense" fullWidth required {...inputProps} />
@@ -75,7 +76,7 @@ export const AuthRender = ({ authType }: Props) => {
           onSubmit={async (e) => {
             e.preventDefault()
 
-            localStorage.setItem('persist', persist.toString())
+            setPersistAuth(persist)
 
             if (authType === 'Register') {
               const user = await APIRegister({

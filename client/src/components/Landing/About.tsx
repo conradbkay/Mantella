@@ -23,6 +23,7 @@ import GitHub from '@mui/icons-material/GitHub'
 import Balance from '@mui/icons-material/Balance'
 import Star from '@mui/icons-material/StarOutline'
 import Code from '@mui/icons-material/Code'
+import { setPersistAuth } from '../../localStorage'
 
 const useStyles = makeStyles((theme: Theme) => ({
   heroContent: {
@@ -76,7 +77,7 @@ export const About = ({ showLinkedin }: Props) => {
   const navigate = useHistory()
   const dispatch = useAppDispatch()
   const loginAsGuest = async () => {
-    localStorage.setItem('preserve', 'true')
+    setPersistAuth(true)
     const res = await APIGuestLogin()
     if (res) {
       const authUser = transformUser(res)

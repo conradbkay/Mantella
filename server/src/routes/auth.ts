@@ -39,7 +39,7 @@ export const login = async (
   }
 }
 
-const SALT_LENGTH = process.env.NODE_ENV === 'production' ? 10 : 4
+const SALT_LENGTH = 10
 
 export const register = async (req: registerReq, res: registerRes) => {
   try {
@@ -75,13 +75,11 @@ export const register = async (req: registerReq, res: registerRes) => {
       })
     ])
 
-    if (req.body.persist) {
-      req.login(newUser, (err: any) => {
-        if (err) {
-          console.log('could not passport login during signup', err)
-        }
-      })
-    }
+    req.login(newUser, { session: req.body.persist }, (err: any) => {
+      if (err) {
+        console.log('could not passport login during signup', err)
+      }
+    })
 
     res.json({
       user: {
@@ -135,7 +133,7 @@ export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
       })
     ])
 
-    req.login(user, (err: any) => {
+    req.login(user, { session: true }, (err: any) => {
       if (err) {
         console.log('could not passport login during signup', err)
       }

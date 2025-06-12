@@ -12,3 +12,4 @@ server/ssl
 .DS_Store
 npm-debug.log*
 server/sessions
+deploy.sh

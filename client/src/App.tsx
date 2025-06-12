@@ -30,6 +30,7 @@ import { TICK } from './store/projects'
 import { TICK as POM_TICK } from './store/pomodoro'
 import { id, toDaysHHMMSS } from './utils/utilities'
 import { APIEditTask } from './API/task'
+import { getPersistAuth, getTheme, setTheme } from './localStorage'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
@@ -53,13 +54,14 @@ const AllCalendarWeek = () => {
   )
 }
 
+// ! this won't work in prod, need to do a different address then just proxy to correct in vite config
 const socket = io('http://localhost:3000', {
   transports: ['websocket', 'polling'],
   reconnectionDelayMax: 10000
 })
 
-const secondary = '#cc1100'
-const primary = '#7289da'
+const secondary = '#9D7CD0'
+export const primary = '#7289da'
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
@@ -70,8 +72,7 @@ const Router = () => {
   const dispatch = useAppDispatch()
   window.onload = async () => {
     try {
-      const preserve = localStorage.getItem('preserve') === 'true'
-      if (preserve) {
+      if (getPersistAuth()) {
         const loginRes = await APICookieLogin()
 
         if (loginRes) {
@@ -241,12 +242,12 @@ const Router = () => {
 }
 
 export const Wrapper = () => {
-  const [mode, setMode] = useState(localStorage.getItem('theme') || 'dark')
+  const [mode, setMode] = useState(getTheme() || 'dark')
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
         const newMode = mode === 'light' ? 'dark' : 'light'
-        localStorage.setItem('theme', newMode)
+        setTheme(newMode)
         setMode(newMode)
       }
     }),

@@ -6,41 +6,35 @@ Mantella is a fully-fledged project management website. Feel free to visit the w
 
 ## Quickstart
 
-To run the site locally, download the repository and in the terminal:
+### Client
 
-`> cd client`
+React app using redux for most of the global state. `Material-ui` is used as a UI framework and although large, is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
 
 `> npm i`
-
 `> npm start`
 
-`> cd ../server && npm i`
-
-Make a .env file with the following contents:
-
-PORT=any port number such as 4000
-
-DB_CONNECT=a connection string to a mongo database, .env files do not require quotes
-
-PRIVATE=a string that will be used as a secret for cookies/sessions
-
-`> npm run dev`
-
 ### Server
+
+`npm i`
+`npm run dev`
 
 The API structure can be found in /server/routes/types.ts where every routes request and response data is detailed
 
 We are using `Node.js` to run server-side javascript with `Express` as the RESTful framework, `Mongoose` to access the Mongo database, and `Passport` to handle authentication. Websockets will soon be implemented, but for now the server is mostly CRUD.
 
-### Client
+## Deployment
 
-The client is running on `React.js` which means that our UI is divided into components, and state update is automatically reflected in the DOM. State can be local in the component, or in the `Redux` store which is a giant immutable object. `Material-ui` is used as a UI framework and although large, is very extensive and presents without much effort. Drag and drop is implemented by `dnd-kit` and is the one of the more complex parts of the client.
+In Linux or using `wsl -e`
+
+`bash deploy.sh`
 
 ## Direction
 
 Instead of subtasks, everything will be it's own task, and prerequisites will be a fundemental feature, wired together.
 
 ## Todos
+
+Port addresses are duplicated on client and server which is annoying
 
 More integration with roles
 
@@ -56,7 +50,7 @@ Drag area over several tasks and have right click context apply to all of them, 
 
 Entirely separate tab
 
-Separate from projects but can give all project members access 
+Separate from projects but can give all project members access
 
 Similar to docs
 

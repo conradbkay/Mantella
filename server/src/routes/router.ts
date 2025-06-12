@@ -11,7 +11,6 @@ export const router = Router()
 
 router.post('/logout', logout)
 router.post('/register', register)
-// doesn't work without {session: true}
 router.post('/login', passport.authenticate('local', { session: true }), login)
 router.post('/cookieLogin', isAuthenticated, login)
 router.post('/guestLogin', guestLogin)

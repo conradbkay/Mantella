@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   }
 }))
 
-// its fine that completed tasks are shown because it's close to the day they are viewingv
+// its fine that completed tasks are shown because it's close to the day they are viewing
 export const CalendarWeek = ({ projectId }: { projectId?: string }) => {
   const [filterProjectId, setFilterProjectId] = useState(['-1'])
   const [baseDay, setBaseDay] = useState(new Date())

@@ -30,8 +30,7 @@ if (process.env.NODE_ENV === 'production') {
   key = fs.readFileSync(path.join(__dirname, '../ssl/server.key'))
 }
 
-require('dotenv').config() // Injects .env variables into process.env object
-// eslint-disable-next-line import/first
+require('dotenv').config()
 
 debug('ts-express:server')
 
@@ -97,37 +96,38 @@ io.on('connection', (socket: any) => {
   })
 })
 
-server.listen(3000, () => {
-  console.log('websocket listening on port 3000')
+const websocketPort = process.env.WEBSOCKET_PORT || 3000
+
+server.listen(websocketPort, () => {
+  console.log(`websocket listening on port ${websocketPort}`)
 })
 
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(cookieParser(process.env.PRIVATE))
 app.use(express.urlencoded({ extended: true }))
-const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
+
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1) // heroku
 }
 
+const WEEK_IN_SECONDS = 60 * 60 * 24 * 7
+
 app.use(
   session({
     secret: process.env.PRIVATE || 'test',
-    resave: true,
-    saveUninitialized: true,
+    resave: false,
+    saveUninitialized: false,
     genid: () => {
       return uuid()
     },
-    name: 'connect',
-    cookie:
-      process.env.NODE_ENV == 'production'
-        ? {
-            domain: 'conradkay.com',
-            sameSite: 'none',
-            httpOnly: true,
-            secure: true
-          }
-        : undefined,
+    name: 'Mantella',
+    cookie: {
+      sameSite: 'lax',
+      secure: 'auto',
+      httpOnly: process.env.NODE_ENV === 'production',
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    },
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
   })
 )

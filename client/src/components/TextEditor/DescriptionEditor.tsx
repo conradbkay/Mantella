@@ -19,6 +19,7 @@ import {
   CodeHighlightNode,
   CodeNode
 } from '@lexical/code'
+import { $getRoot, $createParagraphNode } from 'lexical'
 import './text-editor.css'
 import { useTheme } from '@mui/material'
 
@@ -50,16 +51,53 @@ function CodeHighlightPlugin() {
   return null
 }
 
+function DescriptionUpdatePlugin({
+  description
+}: {
+  description?: string | null
+}) {
+  const [editor] = useLexicalComposerContext()
+
+  useEffect(() => {
+    if (description !== undefined) {
+      editor.update(() => {
+        try {
+          if (description) {
+            // Parse the JSON string and set the editor state
+            const editorState = editor.parseEditorState(description)
+            editor.setEditorState(editorState)
+          } else {
+            // Clear the editor if description is null or empty
+            const root = $getRoot()
+            root.clear()
+            root.append($createParagraphNode())
+          }
+        } catch (error) {
+          console.error('Failed to parse description:', error)
+          // If parsing fails, clear the editor
+          const root = $getRoot()
+          root.clear()
+          root.append($createParagraphNode())
+        }
+      })
+    }
+  }, [editor, description])
+
+  return null
+}
+
 export const Description = ({
   onChange,
   initialState,
   readOnly,
-  color
+  color,
+  description
 }: {
   onChange: (newStr: string) => void
   initialState?: string
   readOnly?: boolean
   color: string
+  description?: string | null
 }) => {
   const theme = useTheme()
 
@@ -67,7 +105,6 @@ export const Description = ({
 
   const initialConfig: InitialConfigType = {
     namespace: 'Description',
-    editorState: initialState,
     theme: {},
     editable: !readOnly,
     nodes: [AutoLinkNode, CodeHighlightNode, CodeNode, ListNode, ListItemNode],
@@ -76,6 +113,7 @@ export const Description = ({
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <DescriptionUpdatePlugin description={description} />
       <div style={{ margin: readOnly ? 4 : '12px 4px' }}>
         <div style={{ textAlign: 'left', position: 'relative' }}>
           <RichTextPlugin

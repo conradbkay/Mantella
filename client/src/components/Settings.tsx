@@ -20,6 +20,7 @@ import axios from 'axios'
 import { transformUser } from '../store/auth'
 import useTitle from './useTitle'
 import { inverse } from './Chat/Chat'
+import { getPersistAuth, setPersistAuth } from '../localStorage'
 
 // https://stackoverflow.com/questions/20771794/mailrfc822address-regex
 const emailRegex =
@@ -47,9 +48,7 @@ export const Settings = () => {
   const [name, setName] = useState(user!.username)
   const [email, setEmail] = useState(user!.guest ? '' : user!.email)
   const [password, setPassword] = useState('')
-  const [persist, setPersist] = useState(
-    localStorage.getItem('persist') === 'true'
-  )
+  const [persist, setPersist] = useState(getPersistAuth())
 
   const [migrating, setMigrating] = useState(false)
 
@@ -213,10 +212,7 @@ export const Settings = () => {
                     checked={persist}
                     onChange={(e) => {
                       setPersist(e.target.checked)
-                      localStorage.setItem(
-                        'persist',
-                        e.target.checked.toString()
-                      )
+                      setPersistAuth(e.target.checked)
                     }}
                     defaultChecked
                     style={{ marginRight: 4 }}

@@ -351,7 +351,7 @@ export const BaseTask = memo(
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
                     <Description
                       color={secondary}
-                      initialState={task.description}
+                      description={task.description}
                       readOnly
                       onChange={() => null}
                     />

@@ -14,7 +14,6 @@ export default defineConfig(({ command }) => ({
     react(),
     viteTsconfigPaths(),
     svgrPlugin(),
-    eslint(),
     checker({ typescript: true }) /*ssr()*/
   ],
   build: {
@@ -24,7 +23,7 @@ export default defineConfig(({ command }) => ({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'http://localhost:4008',
         changeOrigin: true
       }
     }
