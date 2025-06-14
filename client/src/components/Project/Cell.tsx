@@ -1,4 +1,11 @@
-import { ChangeEvent, CSSProperties, memo, useState } from 'react'
+import {
+  ChangeEvent,
+  CSSProperties,
+  memo,
+  useState,
+  useRef,
+  useEffect
+} from 'react'
 import { TList, TProject, TTask } from '../../types/project'
 import { BaseTask } from '../Task/Base'
 import {
@@ -83,7 +90,8 @@ export const ProjectCell = memo(
       left: number
     }>(null)
     const [deletingList, setDeletingList] = useState(false)
-    const [editingList, setEditingList] = useState(['', ''])
+    const [editingList, setEditingList] = useState(['', '']) // id, name
+    const editInputRef = useRef<HTMLInputElement>(null)
     //const [collapsed, setCollapsed] = useState(false)
     const collapsed = false // TODO: a bunch of problems
 
@@ -121,6 +129,13 @@ export const ProjectCell = memo(
 
     const editingName =
       progress === 0 && list.id === editingList[0] ? editingList[1] : ''
+
+    // Focus the input when editing starts
+    useEffect(() => {
+      if (editingName && editInputRef.current) {
+        editInputRef.current.focus()
+      }
+    }, [editingName])
 
     const { setNodeRef } = useDroppable({ id: `${list.id}|${progress}` })
 
@@ -291,9 +306,15 @@ export const ProjectCell = memo(
               )}
               {editingName ? (
                 <input
+                  ref={editInputRef}
                   style={{ width: '100%', ...input(theme) }}
                   value={editingName}
                   onBlur={() => editList()}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      editList()
+                    }
+                  }}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     setEditingList([list.id, e.target.value])
                   }

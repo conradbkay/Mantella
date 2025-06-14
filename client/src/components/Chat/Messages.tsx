@@ -42,7 +42,7 @@ export const ChatMessages = ({
   users,
   topMargin
 }: {
-  socket: Socket
+  socket: Socket | null
   channel: [string, string]
   open: boolean
   users: TProject['users']
@@ -70,6 +70,7 @@ export const ChatMessages = ({
   }, [channelId])
 
   useEffect(() => {
+    if (!socket) return
     socket.on('message', (data) => {
       setMessagesReceived((state) => [
         ...state,
@@ -83,6 +84,7 @@ export const ChatMessages = ({
     })
 
     return () => {
+      if (!socket) return
       socket.off('message')
     }
   }, [socket])
@@ -91,6 +93,7 @@ export const ChatMessages = ({
 
   const sendMessage = () => {
     const id = nanoid()
+    if (!socket) return
     socket.emit('send_message', { chatId: channelId, message, userId, id })
     setMessage('')
   }

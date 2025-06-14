@@ -51,11 +51,14 @@ const AllCalendarWeek = () => {
   )
 }
 
-// ! this won't work in prod, need to do a different address then just proxy to correct in vite config
-const socket = io('http://localhost:3000', {
-  transports: ['websocket', 'polling'],
-  reconnectionDelayMax: 10000
-})
+const useSocket = process.env.NODE_ENV === 'development'
+
+const socket = useSocket
+  ? io('/socket', {
+      transports: ['websocket', 'polling'],
+      reconnectionDelayMax: 10000
+    })
+  : null
 
 const secondary = '#9D7CD0'
 export const primary = '#7289da'
@@ -90,7 +93,7 @@ const Router = () => {
   useTimer()
 
   useEffect(() => {
-    if (!connected && projects.length > 0) {
+    if (!connected && projects.length > 0 && socket) {
       socket.emit('login', {
         chatIds: projects.map((proj) => proj.channels.map((c) => c[0])).flat()
       })

@@ -26,7 +26,7 @@ const listItems = [
 ]
 
 export const Sidebar = memo(
-  ({ project, socket }: { project: TProject; socket: Socket }) => {
+  ({ project, socket }: { project: TProject; socket: Socket | null }) => {
     const [open, setOpen] = useState(null as null | string)
     const theme = useTheme()
 

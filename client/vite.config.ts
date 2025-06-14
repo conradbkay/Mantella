@@ -22,7 +22,11 @@ export default defineConfig(({ command }) => ({
   },
   server: {
     open: true,
-    proxy: { '/api': { target: 'http://localhost:4008', changeOrigin: true } }
+
+    proxy: {
+      '/socket': { target: 'http://localhost:3000', changeOrigin: true },
+      '/api': { target: 'http://localhost:4008', changeOrigin: true }
+    }
   },
   test: {
     globals: true,
