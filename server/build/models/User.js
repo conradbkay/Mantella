@@ -4,6 +4,7 @@ exports.UserModel = exports.comparePassword = exports.getUserById = exports.getU
 const tslib_1 = require("tslib");
 const bcryptjs_1 = tslib_1.__importDefault(require("bcryptjs"));
 const typegoose_1 = require("@typegoose/typegoose");
+// ! before updating this make sure userResolver doesn't leak anything sensitive
 let User = class User {
 };
 exports.User = User;
@@ -28,7 +29,7 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:type", Boolean)
 ], User.prototype, "guest", void 0);
 tslib_1.__decorate([
-    (0, typegoose_1.prop)(),
+    (0, typegoose_1.prop)({ index: true, unique: true }),
     tslib_1.__metadata("design:type", String)
 ], User.prototype, "id", void 0);
 tslib_1.__decorate([

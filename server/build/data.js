@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateGuestUser = exports.generateDefaultProject = exports.defaultColors = exports.generateIds = exports.taskObjects = exports.tags = exports.defaultTask = void 0;
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
 exports.defaultTask = {
     name: 'Task',
     points: 0,
     subTasks: [],
-    timeWorkedOn: 0,
+    workedOnMs: 0,
     comments: [],
     color: '#FFFFFF',
     assignedTo: [],
@@ -35,7 +35,7 @@ const taskObjects = (ids, userId) => [
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[8], name: 'Tasks can be assigned a Point importance', points: 2 }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[9], name: 'Drag member icons from the top right onto tasks to assign them or multiple members', assignedTo: [userId] }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[10], name: 'You can add, delete, and edit comments to Tasks' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[11], name: 'Tasks can include subtasks', subTasks: [{ name: 'This is a subtask!', completed: false, id: (0, uuid_1.v4)() }] }),
+    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[11], name: 'Tasks can include subtasks', subTasks: [{ name: 'This is a subtask!', completed: false, id: (0, nanoid_1.nanoid)() }] }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[12], name: '(Coming Soon) all changes will be tracked in the project history, and you can revert to any point in time!' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[13], name: 'Log time on tasks by pressing the button on the bottom right of each task or use the pomodoro tab (the last icon in the sidebar) to include breaks' }),
     Object.assign(Object.assign({}, exports.defaultTask), { id: ids[14], name: 'Tasks can be filtered by points, color, due date, and (soon) members' }),
@@ -48,7 +48,7 @@ exports.taskObjects = taskObjects;
 const generateIds = (length) => {
     let ids = [];
     for (let i = 0; i < length; i++) {
-        ids.push((0, uuid_1.v4)());
+        ids.push((0, nanoid_1.nanoid)());
     }
     return ids;
 };
@@ -64,8 +64,8 @@ exports.defaultColors = [
     '#D0CD00'
 ];
 const generateDefaultProject = (newUser, projectId, chat) => {
-    const listIds = [(0, uuid_1.v4)(), (0, uuid_1.v4)(), (0, uuid_1.v4)()];
-    const roleId = (0, uuid_1.v4)();
+    const listIds = [(0, nanoid_1.nanoid)(), (0, nanoid_1.nanoid)(), (0, nanoid_1.nanoid)()];
+    const roleId = (0, nanoid_1.nanoid)();
     const ids = (0, exports.generateIds)(19);
     const tasks = (0, exports.taskObjects)(ids, newUser.id);
     return {
@@ -125,7 +125,7 @@ exports.generateDefaultProject = generateDefaultProject;
 const generateGuestUser = (projectId, userId) => {
     return {
         id: userId,
-        email: (0, uuid_1.v4)() + '.gmail.com',
+        email: (0, nanoid_1.nanoid)() + '.gmail.com',
         username: 'Guest',
         projects: [projectId],
         guest: true,

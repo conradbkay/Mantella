@@ -6,41 +6,45 @@ const pomodoroSlice = createSlice({
   name: 'pomodoro',
   initialState: defaultState.pomodoro,
   reducers: {
-    SYNC_TIMER: (pom, { payload: now }: PayloadAction<number>) => {
-      if (pom.paused || pom.startTime === 0) {
+    SYNC_TIMER: (
+      pom,
+      { payload }: PayloadAction<{ elapsedMs: number; now: number }>
+    ) => {
+      if (pom.isPaused) {
         return
       }
 
-      const elapsedSeconds = Math.floor((now - pom.startTime) / 1000)
+      pom.timeLeftMs = Math.max(0, pom.timeLeftMs! - payload.elapsedMs)
+      pom.lastTickMs = payload.now
 
-      if (elapsedSeconds >= pom.currSeconds) {
-        // Timer finished. Switch session.
-        const newSessionIsWork = !pom.working
-        const timeOver = elapsedSeconds - pom.currSeconds
-        const newDuration = newSessionIsWork
-          ? pom.workSeconds
-          : pom.breakSeconds
-
-        pom.working = newSessionIsWork
-        pom.currSeconds = newDuration - timeOver
-        pom.startTime = now - timeOver * 1000
+      if (pom.timeLeftMs! <= 0) {
+        pom.isPaused = true
       }
     },
-    SET_TIME: (pom, { payload }: PayloadAction<string>) => {
-      pom.time = payload
-    },
-    TOGGLE_TIMER: (pom, { payload: now }: PayloadAction<number>) => {
-      if (pom.paused) {
-        // un-pausing
-        pom.startTime = now
+    TOGGLE_TIMER: (pom) => {
+      if (pom.isPaused) {
+        // resuming/starting
+        pom.isPaused = false
+        pom.lastStartMs = Date.now()
+        pom.lastTickMs = Date.now()
       } else {
         // pausing
-        const elapsedSeconds = Math.round((now - pom.startTime) / 1000)
-        pom.currSeconds -= elapsedSeconds
-        if (pom.currSeconds < 0) pom.currSeconds = 0
-        pom.startTime = 0
+        pom.isPaused = true
+        pom.lastStartMs = undefined
+        pom.lastTickMs = undefined
       }
-      pom.paused = !pom.paused
+    },
+    PAUSE_TIMER: (pom) => {
+      pom.isPaused = true
+      pom.lastStartMs = undefined
+      pom.lastTickMs = undefined
+    },
+    SWITCH_SESSION: (pom) => {
+      pom.isBreak = !pom.isBreak
+      pom.timeLeftMs =
+        (pom.isBreak ? pom.breakDurationSec : pom.workDurationSec) * 1000
+      pom.isPaused = false
+      pom.lastStartMs = Date.now()
     },
 
     RESET_POMODORO: () => defaultState.pomodoro,
@@ -68,21 +72,22 @@ const pomodoroSlice = createSlice({
         minutes: number
       }>
     ) => {
-      const slice =
-        payload.operationType === 'WORK' ? 'workSeconds' : 'breakSeconds'
+      if (!pom.isPaused) return
 
-      const changingCurrent =
-        (payload.operationType === 'WORK' && pom.working) ||
-        (payload.operationType === 'BREAK' && !pom.working)
-
-      // only allow changing if paused
-      if (pom.paused) {
-        const result = pom[slice] + payload.minutes * 60
-
-        if (result > 0) {
-          pom[slice] = result
-          if (changingCurrent) {
-            pom.currSeconds = result
+      if (payload.operationType === 'WORK') {
+        const newWorkDuration = pom.workDurationSec + payload.minutes * 60
+        if (newWorkDuration > 0) {
+          pom.workDurationSec = newWorkDuration
+          if (!pom.isBreak) {
+            pom.timeLeftMs = newWorkDuration * 1000
+          }
+        }
+      } else {
+        const newBreakDuration = pom.breakDurationSec + payload.minutes * 60
+        if (newBreakDuration > 0) {
+          pom.breakDurationSec = newBreakDuration
+          if (pom.isBreak) {
+            pom.timeLeftMs = newBreakDuration * 1000
           }
         }
       }
@@ -97,7 +102,8 @@ export const {
   SELECT_POMODORO_TASK,
   TOGGLE_SELECTING_TASK,
   SET_LENGTH_MINUTES,
-  SET_TIME
+  SWITCH_SESSION,
+  PAUSE_TIMER
 } = pomodoroSlice.actions
 
 export const selectPomodoro = (state: RootState) => state.pomodoro

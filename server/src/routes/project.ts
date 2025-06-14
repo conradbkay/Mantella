@@ -18,6 +18,7 @@ import { router } from './router'
 import { isAuthenticated } from '../passport'
 import { ChatModel } from '../models/Chat'
 import { defaultColors } from '../data'
+import { resolveProjectUsers } from '../utils/userResolver'
 
 export const createProject = async (
   req: createProjectReq,
@@ -50,9 +51,6 @@ export const createProject = async (
         users: [
           {
             id: (req.user as any).id,
-            username: (req.user as any).username,
-            email: (req.user as any).email,
-            profileImg: (req.user as any).profileImg,
             roles: [adminRoleId]
           }
         ],
@@ -72,7 +70,10 @@ export const createProject = async (
       (req.user as any).save(),
       ChatModel.create({ id: chatId, messages: [], projectId: creatingId })
     ])
-    res.json({ project: created.toObject() })
+
+    // Resolve users before returning
+    const resolvedProject = await resolveProjectUsers(created.toObject())
+    res.json({ project: resolvedProject })
   } else {
     throw new Error('user id not provided in token')
   }
@@ -95,7 +96,8 @@ export const editProject = async (req: editProjectReq, res: editProjectRes) => {
       const newProj = await project.save()
 
       if (newProj) {
-        res.json({ project: newProj.toObject() })
+        const resolvedProject = await resolveProjectUsers(newProj.toObject())
+        res.json({ project: resolvedProject })
       }
     }
   } else {
@@ -211,7 +213,8 @@ export const kickUserFromProject = async (
     project = await project.save()
     kicking.markModified('projects')
     await kicking.save()
-    res.json({ project: project.toObject() })
+    const resolvedProject = await resolveProjectUsers(project.toObject())
+    res.json({ project: resolvedProject })
   } else {
     throw new Error('User not signed in')
   }
@@ -223,7 +226,8 @@ export const getProjectById = async (req: Request, res: Response) => {
   const proj = await ProjectModel.findOne({ id: req.body.id })
 
   if (proj) {
-    return proj.toObject()
+    const resolvedProject = await resolveProjectUsers(proj.toObject())
+    res.json({ project: resolvedProject })
   } else {
     throw new Error('proj not found')
   }
@@ -251,9 +255,6 @@ export const shareProject = async (req: Request, res: Response) => {
   }
 
   project.users.push({
-    email: user.email,
-    username: user.username,
-    profileImg: user.profileImg || '',
     id: user.id,
     roles: []
   })
@@ -265,7 +266,9 @@ export const shareProject = async (req: Request, res: Response) => {
 
   await user.save()
 
-  res.status(200).json({ message: 'Success', project })
+  // Resolve users before returning
+  const resolvedProject = await resolveProjectUsers(project.toObject())
+  res.status(200).json({ message: 'Success', project: resolvedProject })
 }
 
 router.post('/shareProject', isAuthenticated, shareProject)
@@ -302,9 +305,10 @@ export const setRole = async (req: Request, res: Response) => {
   }
 
   project.markModified('roles')
-  await project.save()
+  const savedProject = await project.save()
 
-  res.json({ project })
+  const resolvedProject = await resolveProjectUsers(savedProject.toObject())
+  res.json({ project: resolvedProject })
 }
 
 router.post('/setRole', isAuthenticated, setRole)
@@ -323,9 +327,10 @@ export const setUserRoles = async (req: Request, res: Response) => {
   project.users[userIdx].roles = req.body.roles
 
   project.markModified('users')
-  await project.save()
+  const savedProject = await project.save()
 
-  res.json({ project })
+  const resolvedProject = await resolveProjectUsers(savedProject.toObject())
+  res.json({ project: resolvedProject })
 }
 
 router.post('/setUserRoles', isAuthenticated, setUserRoles)

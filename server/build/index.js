@@ -12,7 +12,7 @@ const passport_1 = tslib_1.__importDefault(require("passport"));
 const passport_2 = require("./passport");
 const passport_local_1 = require("passport-local");
 const express_session_1 = tslib_1.__importDefault(require("express-session"));
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
 require("reflect-metadata");
 const https_1 = tslib_1.__importDefault(require("https"));
 const Chat_1 = require("./models/Chat");
@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
             message,
             senderId: userId,
             createdAt: new Date().getTime(),
-            id: id || (0, uuid_1.v4)()
+            id: id || (0, nanoid_1.nanoid)()
         };
         io.in(chatId).emit('message', messageObj);
         const chat = await Chat_1.ChatModel.findOne({ id: chatId });
@@ -64,6 +64,9 @@ io.on('connection', (socket) => {
         for (let chatId of chatIds) {
             socket.join(chatId);
         }
+    });
+    socket.on('join', (room) => {
+        socket.join(room);
     });
 });
 const websocketPort = process.env.WEBSOCKET_PORT || 3000;
@@ -86,7 +89,7 @@ app.use((0, express_session_1.default)({
     resave: false,
     saveUninitialized: false,
     genid: () => {
-        return (0, uuid_1.v4)();
+        return (0, nanoid_1.nanoid)();
     },
     name: 'Mantella',
     cookie: {
@@ -112,7 +115,7 @@ app.use((0, express_session_1.default)({
         }
         : undefined,
     genid: () => {
-        return (0, uuid_1.v4)();
+        return (0, nanoid_1.nanoid)();
     },
     store: new FileStore({ ttl: WEEK_IN_SECONDS })
 }));

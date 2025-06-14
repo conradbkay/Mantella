@@ -3,16 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.moveRole = exports.setUserRoles = exports.setRole = exports.getProjectMembers = exports.shareProject = exports.getProjectById = exports.kickUserFromProject = exports.leaveProject = exports.deleteProject = exports.editProject = exports.createProject = void 0;
 const User_1 = require("../models/User");
 const Project_1 = require("../models/Project");
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
 const Chat_1 = require("../models/Chat");
 const data_1 = require("../data");
+const userResolver_1 = require("../utils/userResolver");
 const createProject = async (req, res) => {
-    const creatingId = (0, uuid_1.v4)();
-    const listId = (0, uuid_1.v4)();
-    const chatId = (0, uuid_1.v4)();
-    const adminRoleId = (0, uuid_1.v4)();
+    const creatingId = (0, nanoid_1.nanoid)();
+    const listId = (0, nanoid_1.nanoid)();
+    const chatId = (0, nanoid_1.nanoid)();
+    const adminRoleId = (0, nanoid_1.nanoid)();
     if (req.user) {
         ;
         req.user.projects.push(creatingId);
@@ -35,9 +36,6 @@ const createProject = async (req, res) => {
                 users: [
                     {
                         id: req.user.id,
-                        username: req.user.username,
-                        email: req.user.email,
-                        profileImg: req.user.profileImg,
                         roles: [adminRoleId]
                     }
                 ],
@@ -57,7 +55,9 @@ const createProject = async (req, res) => {
             req.user.save(),
             Chat_1.ChatModel.create({ id: chatId, messages: [], projectId: creatingId })
         ]);
-        res.json({ project: created.toObject() });
+        // Resolve users before returning
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(created.toObject());
+        res.json({ project: resolvedProject });
     }
     else {
         throw new Error('user id not provided in token');
@@ -77,7 +77,8 @@ const editProject = async (req, res) => {
                 : project.colors;
             const newProj = await project.save();
             if (newProj) {
-                res.json({ project: newProj.toObject() });
+                const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
+                res.json({ project: resolvedProject });
             }
         }
     }
@@ -162,7 +163,8 @@ const kickUserFromProject = async (req, res) => {
         project = await project.save();
         kicking.markModified('projects');
         await kicking.save();
-        res.json({ project: project.toObject() });
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(project.toObject());
+        res.json({ project: resolvedProject });
     }
     else {
         throw new Error('User not signed in');
@@ -173,7 +175,8 @@ router_1.router.post('/kickUser', passport_1.isAuthenticated, exports.kickUserFr
 const getProjectById = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.id });
     if (proj) {
-        return proj.toObject();
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(proj.toObject());
+        res.json({ project: resolvedProject });
     }
     else {
         throw new Error('proj not found');
@@ -196,9 +199,6 @@ const shareProject = async (req, res) => {
         throw new Error('project does not exist');
     }
     project.users.push({
-        email: user.email,
-        username: user.username,
-        profileImg: user.profileImg || '',
         id: user.id,
         roles: []
     });
@@ -206,7 +206,9 @@ const shareProject = async (req, res) => {
     project = await project.save();
     user.projects.push(req.body.projectId);
     await user.save();
-    res.status(200).json({ message: 'Success', project });
+    // Resolve users before returning
+    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(project.toObject());
+    res.status(200).json({ message: 'Success', project: resolvedProject });
 };
 exports.shareProject = shareProject;
 router_1.router.post('/shareProject', passport_1.isAuthenticated, exports.shareProject);
@@ -237,8 +239,9 @@ const setRole = async (req, res) => {
         project.roles[roleIdx] = role;
     }
     project.markModified('roles');
-    await project.save();
-    res.json({ project });
+    const savedProject = await project.save();
+    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(savedProject.toObject());
+    res.json({ project: resolvedProject });
 };
 exports.setRole = setRole;
 router_1.router.post('/setRole', passport_1.isAuthenticated, exports.setRole);
@@ -252,8 +255,9 @@ const setUserRoles = async (req, res) => {
     });
     project.users[userIdx].roles = req.body.roles;
     project.markModified('users');
-    await project.save();
-    res.json({ project });
+    const savedProject = await project.save();
+    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(savedProject.toObject());
+    res.json({ project: resolvedProject });
 };
 exports.setUserRoles = setUserRoles;
 router_1.router.post('/setUserRoles', passport_1.isAuthenticated, exports.setUserRoles);

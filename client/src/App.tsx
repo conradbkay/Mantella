@@ -1,4 +1,4 @@
-import { useMemo, useState, createContext, useEffect, useRef } from 'react'
+import { useMemo, useState, createContext, useEffect } from 'react'
 import { Provider, useSelector } from 'react-redux'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import { Switch, Route, BrowserRouter } from 'react-router-dom'
@@ -25,12 +25,9 @@ import { SET_PROJECTS, selectProjects } from './store/projects'
 import { LOGIN } from './store/user'
 import { Chat } from './components/Chat/Chat'
 import useTitle from './components/useTitle'
-import { useAppDispatch, useAppSelector } from './store/hooks'
-import { TICK } from './store/projects'
-import { SYNC_TIMER, SET_TIME } from './store/pomodoro'
-import { id, toDaysHHMMSS } from './utils/utils'
-import { APIEditTask } from './API/task'
+import { useAppDispatch } from './store/hooks'
 import { getPersistAuth, getTheme, setTheme } from './localStorage'
+import { useTimer } from './hooks/useTimer'
 
 const AllCalendarWeek = () => {
   const theme = useTheme()
@@ -65,8 +62,6 @@ export const primary = '#7289da'
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
-let interval: NodeJS.Timeout = setInterval(() => null, Infinity)
-
 const Router = () => {
   const [loaded, setLoaded] = useState(false)
   const dispatch = useAppDispatch()
@@ -89,9 +84,10 @@ const Router = () => {
   }
 
   const projects = useSelector(selectProjects)
-  const lastTickTimestampRef = useRef(0)
 
   const [connected, setConnected] = useState(false)
+
+  useTimer()
 
   useEffect(() => {
     if (!connected && projects.length > 0) {
@@ -101,78 +97,6 @@ const Router = () => {
       setConnected(true)
     }
   }, [connected, projects])
-
-  const { pomodoro } = useAppSelector((state) => ({
-    pomodoro: state.pomodoro
-  }))
-
-  // since this component is always mounted when a project is open, for now we include this code here instead of in the Pomodoro component which can be unmounted
-  useEffect(() => {
-    clearInterval(interval)
-
-    interval = setInterval(() => {
-      const now = Date.now()
-      if (!pomodoro.paused) {
-        if (lastTickTimestampRef.current === 0) {
-          lastTickTimestampRef.current = pomodoro.startTime || now
-        }
-
-        if (pomodoro.selectedTaskId && pomodoro.working) {
-          const project = projects.find((proj) =>
-            proj.tasks.some((task) => task.id === pomodoro.selectedTaskId)
-          )!
-
-          const task =
-            project.tasks[id(project.tasks, pomodoro.selectedTaskId!)]
-
-          const elapsedSeconds = Math.round(
-            (now - lastTickTimestampRef.current) / 1000
-          )
-          // persist to server every minute
-          if (
-            Math.floor(task.timeWorkedOn / 60) <
-            Math.floor((task.timeWorkedOn + elapsedSeconds) / 60)
-          ) {
-            APIEditTask(
-              { ...task, timeWorkedOn: task.timeWorkedOn + elapsedSeconds },
-              project.id
-            )
-          }
-
-          if (elapsedSeconds > 0) {
-            dispatch(
-              TICK({
-                taskId: pomodoro.selectedTaskId!,
-                projectId: project.id,
-                seconds: elapsedSeconds
-              })
-            )
-          }
-        }
-        dispatch(SYNC_TIMER(now))
-        lastTickTimestampRef.current = now
-      } else {
-        lastTickTimestampRef.current = 0
-      }
-      const remainingSeconds =
-        pomodoro.currSeconds -
-        Math.floor((Date.now() - pomodoro.startTime) / 1000)
-
-      const displayTime = toDaysHHMMSS(
-        remainingSeconds < 0 ? 0 : remainingSeconds
-      )
-      dispatch(SET_TIME(displayTime))
-
-      document.title = pomodoro.paused
-        ? 'Mantella'
-        : `${pomodoro.working ? 'Work ' : 'Break '} ${displayTime}`
-
-      return () => {
-        document.title = 'Mantella'
-        clearInterval(interval)
-      }
-    }, 1000)
-  })
 
   return (
     <BrowserRouter>

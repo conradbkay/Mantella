@@ -1,7 +1,7 @@
 import { getModelForClass, modelOptions, prop } from '@typegoose/typegoose'
 @modelOptions({ options: { allowMixed: 0 } })
 export class Project {
-  @prop()
+  @prop({ index: true, unique: true })
   public id!: string
   @prop()
   public name!: string
@@ -19,7 +19,13 @@ export class Project {
     id: string
     name: string
     points: number
-    timeWorkedOn: number
+    // Time estimates in hours (fractional allowed)
+    timeEstimate?: {
+      estimate: number // The main estimate (always 50th percentile)
+      low: { value?: number; percentile: number } // Optional low-end estimate
+      high: { value?: number; percentile: number } // Optional high-end estimate
+    }
+    workedOnMs: number
     color: string
     createdAt: string
     dueDate?: string
@@ -39,9 +45,6 @@ export class Project {
   @prop()
   public users!: Array<{
     id: string
-    profileImg: string
-    username: string
-    email: string
     roles: string[]
   }>
   @prop()

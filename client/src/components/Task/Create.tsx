@@ -17,7 +17,7 @@ const defaultTask: TTask = {
   id: '',
   createdAt: new Date().toString(),
   progress: 0,
-  timeWorkedOn: 0,
+  workedOnMs: 0,
   comments: [],
   dueDate: null,
   color: '#FFFFFF',

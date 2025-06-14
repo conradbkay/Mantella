@@ -2,15 +2,15 @@ import { TFilterData } from '../components/Project/types'
 import { TProject } from './project'
 
 export type TPomodoro = {
-  paused: boolean
-  working: boolean
-  currSeconds: number
-  breakSeconds: number
-  workSeconds: number
+  isPaused: boolean
+  isBreak: boolean
+  timeLeftMs?: number
+  lastStartMs?: number
+  lastTickMs?: number
+  breakDurationSec: number
+  workDurationSec: number
   selectingTask: boolean
   selectedTaskId: null | string
-  startTime: number
-  time: string
 }
 
 export type TProfile = {

@@ -27,6 +27,8 @@ import { useSelector } from 'react-redux'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import Grid2 from '@mui/material/Unstable_Grid2'
+import { TimeEstimateEditor } from './TimeEstimateEditor'
 
 type OwnProps = {
   onClose: () => void
@@ -159,22 +161,21 @@ export const EditTaskBase = (props: OwnProps) => {
               setTask({ ...task, description: newDescription })
             }
           />
-          <div style={{ display: 'flex', margin: '12px 4px 8px 6px' }}>
-            <ChooseColor
-              project={project}
-              selected={task.color || '#FFFFFF'}
-              onChange={(color: string) => {
-                setTask({ ...task, color })
-              }}
-            />
 
-            <div style={{ width: 24 }} />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
+          <TimeEstimateEditor
+            timeEstimate={task.timeEstimate}
+            onChange={(timeEstimate) => setTask({ ...task, timeEstimate })}
+          />
+
+          <ChooseColor
+            project={project}
+            selected={task.color || '#FFFFFF'}
+            onChange={(color: string) => {
+              setTask({ ...task, color })
+            }}
+          />
+          <Grid2 container spacing={2} style={{ margin: '12px 4px 8px 6px' }}>
+            <Grid2 sm={12} md={6}>
               <FormControl fullWidth>
                 <FormHelperText>Task's List</FormHelperText>
 
@@ -196,23 +197,23 @@ export const EditTaskBase = (props: OwnProps) => {
                   })}
                 </Select>
               </FormControl>
-              <div style={{ marginTop: 8, marginLeft: 'auto' }}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DateTimePicker
-                    ampm={false}
-                    label="Due Date"
-                    value={task.dueDate ? new Date(task.dueDate) : null}
-                    onChange={(date) => {
-                      setTask({
-                        ...task,
-                        dueDate: date ? date.toString() : null
-                      })
-                    }}
-                  />
-                </LocalizationProvider>
-              </div>
-            </div>
-          </div>
+            </Grid2>
+            <Grid2 sm={12} md={6} sx={{ mt: 'auto' }}>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DateTimePicker
+                  ampm={false}
+                  label="Due Date"
+                  value={task.dueDate ? new Date(task.dueDate) : null}
+                  onChange={(date) => {
+                    setTask({
+                      ...task,
+                      dueDate: date ? date.toString() : null
+                    })
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid2>
+          </Grid2>
 
           <Typography
             style={{

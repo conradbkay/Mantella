@@ -7,7 +7,7 @@ let Project = class Project {
 };
 exports.Project = Project;
 tslib_1.__decorate([
-    (0, typegoose_1.prop)(),
+    (0, typegoose_1.prop)({ index: true, unique: true }),
     tslib_1.__metadata("design:type", String)
 ], Project.prototype, "id", void 0);
 tslib_1.__decorate([

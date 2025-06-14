@@ -9,11 +9,11 @@ export const Swal = (
   stateFunc: (b: boolean) => void,
   toggleWorking: () => void
 ) => {
-  if (pomodoro.currSeconds === 0) {
-    const toggleButtonText = `Start ${pomodoro.working ? 'Break' : 'Working'}`
-    const title = `${pomodoro.working ? 'Work' : 'Break'} Completed`
-    const text = pomodoro.working ? WORK_DONE_MESSAGE : BREAK_DONE_MESSAGE
-    const icon = pomodoro.working ? 'success' : 'warning'
+  if (pomodoro.timeLeftMs === 0) {
+    const toggleButtonText = `Start ${!pomodoro.isBreak ? 'Break' : 'Working'}`
+    const title = `${!pomodoro.isBreak ? 'Work' : 'Break'} Completed`
+    const text = !pomodoro.isBreak ? WORK_DONE_MESSAGE : BREAK_DONE_MESSAGE
+    const icon = !pomodoro.isBreak ? 'success' : 'warning'
     Dialog({
       title,
       text,

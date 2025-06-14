@@ -1,14 +1,16 @@
 export type TProjectUser = {
-  username: string
-  email: string
   id: string
-  profileImg: string
+  roles: string[]
+  // These fields are resolved dynamically from the User model
+  username?: string
+  email?: string
+  profileImg?: string
 }
 
 export type TRole = {
+  id: string
   name: string
   color: string
-  id: string
 }
 
 export interface TProject {
@@ -40,7 +42,13 @@ export interface TTask {
   id: string
   name: string
   points: number
-  timeWorkedOn: number
+  // Time estimates in hours (fractional allowed)
+  timeEstimate?: {
+    estimate: number // The main estimate (always 50th percentile)
+    low: { value?: number; percentile: number } // Optional low-end estimate
+    high: { value?: number; percentile: number } // Optional high-end estimate
+  }
+  workedOnMs: number
   color: string
   createdAt: string // date
   dueDate?: string | null // date
@@ -62,8 +70,6 @@ export interface TTask {
   } | null
 }
 
-export type TList = TProject['lists'][0]
-
 export type TComment = TTask['comments'][0]
-
 export type TSubtask = TTask['subTasks'][0]
+export type TList = TProject['lists'][0]

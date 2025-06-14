@@ -1,5 +1,4 @@
 import { TSnackbar, TState } from '../types/state'
-import { toDaysHHMMSS } from '../utils/utils'
 
 export const defaultSnackbar: TSnackbar = {
   open: false,
@@ -10,15 +9,14 @@ export const defaultSnackbar: TSnackbar = {
 export const defaultState: TState = {
   user: null,
   pomodoro: {
-    paused: true,
-    working: true,
+    isPaused: true,
+    isBreak: false,
     selectingTask: false,
     selectedTaskId: null,
-    currSeconds: 60 * 25,
-    breakSeconds: 60 * 5,
-    workSeconds: 60 * 25,
-    startTime: 0,
-    time: toDaysHHMMSS(60 * 25)
+    breakDurationSec: 60 * 5,
+    workDurationSec: 60 * 25,
+    timeLeftMs: 60 * 25 * 1000,
+    lastTickMs: undefined
   },
   snackbar: defaultSnackbar,
   loading: false,

@@ -242,11 +242,13 @@ export const Project = (props: Props) => {
           )
         } else {
           fromList.taskIds[fromProgress].splice(fromIdx, 1)
-          toList.taskIds[toProgress].splice(
-            fromIdx > toIdx ? toIdx + 1 : toIdx,
-            0,
-            taskId
-          )
+          if (!toList.taskIds[toProgress].includes(taskId)) {
+            toList.taskIds[toProgress].splice(
+              fromIdx > toIdx ? toIdx + 1 : toIdx,
+              0,
+              taskId
+            )
+          }
         }
 
         dispatch(

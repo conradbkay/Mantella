@@ -1,0 +1,5 @@
+This project is separated into a client and server directory, each with their own package.json. Do not run scripts or installs in the project base.
+
+As a default assume you are in windows, and use powershell syntax (no &&)
+
+The database is using Mongodb/mongoose at the moment. Most state should be saved there, excluding pomodoro which is local to the client

@@ -5,7 +5,7 @@ export const defaultTask = {
   name: 'Task',
   points: 0,
   subTasks: [],
-  timeWorkedOn: 0,
+  workedOnMs: 0,
   comments: [],
   color: '#FFFFFF',
   assignedTo: [],

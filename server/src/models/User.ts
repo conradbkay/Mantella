@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs'
 import { prop, getModelForClass, modelOptions } from '@typegoose/typegoose'
 import { Project } from './Project'
+
+// ! before updating this make sure userResolver doesn't leak anything sensitive
 @modelOptions({ options: { allowMixed: 0 } })
 export class User {
   @prop()
@@ -13,7 +15,7 @@ export class User {
   public projects!: string[]
   @prop()
   public guest?: boolean
-  @prop()
+  @prop({ index: true, unique: true })
   public id!: string
   @prop({ unique: true })
   public email!: string

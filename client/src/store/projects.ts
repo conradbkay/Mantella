@@ -129,12 +129,12 @@ const projectSlice = createSlice({
       projects,
       {
         payload
-      }: PayloadAction<{ taskId: string; projectId: string; seconds: number }>
+      }: PayloadAction<{ taskId: string; projectId: string; elapsedMs: number }>
     ) => {
       if (payload.taskId && payload.projectId) {
         const proj = projects[id(projects, payload.projectId)]
-        proj.tasks[id(proj.tasks, payload.taskId)].timeWorkedOn +=
-          payload.seconds
+        proj.tasks[id(proj.tasks, payload.taskId)].workedOnMs +=
+          payload.elapsedMs
       }
     }
   }

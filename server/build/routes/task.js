@@ -2,11 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.assignUserToTask = exports.setComment = exports.setSubtask = exports.replaceListIds = exports.dragTask = exports.deleteTask = exports.editTask = exports.createTask = void 0;
 const Project_1 = require("../models/Project");
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
+const userResolver_1 = require("../utils/userResolver");
 const createTask = async (req, res) => {
-    const taskId = (0, uuid_1.v4)();
+    const taskId = (0, nanoid_1.nanoid)();
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (proj) {
         proj.tasks.push({
@@ -14,13 +15,14 @@ const createTask = async (req, res) => {
             id: taskId,
             name: req.body.taskInfo.name || 'Unnamed Task',
             points: req.body.taskInfo.points || 0,
-            timeWorkedOn: 0,
+            timeEstimate: req.body.taskInfo.timeEstimate || undefined,
+            workedOnMs: 0,
             color: req.body.taskInfo.color || '#FFFFFF',
             dueDate: req.body.taskInfo.dueDate
                 ? new Date(req.body.taskInfo.dueDate).toString()
                 : undefined,
             subTasks: req.body.taskInfo.subTasks
-                ? req.body.taskInfo.subTasks.map((subT) => (Object.assign(Object.assign({}, subT), { id: (0, uuid_1.v4)() })))
+                ? req.body.taskInfo.subTasks.map((subT) => (Object.assign(Object.assign({}, subT), { id: (0, nanoid_1.nanoid)() })))
                 : [],
             comments: [],
             description: req.body.taskInfo.description,
@@ -31,14 +33,12 @@ const createTask = async (req, res) => {
         proj.markModified('tasks');
         proj.markModified('lists');
         const newProj = await proj.save();
-        const pure = newProj.toObject();
-        if (pure) {
-            const task = pure.tasks.find((tk) => taskId === tk.id);
-            res.json({
-                project: pure,
-                task: task
-            });
-        }
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
+        const task = resolvedProject.tasks.find((tk) => taskId === tk.id);
+        res.json({
+            project: resolvedProject,
+            task: task
+        });
     }
     else {
         throw new Error('proj id not exist');
@@ -54,17 +54,15 @@ const editTask = async (req, res) => {
         project.tasks[idx] = Object.assign(Object.assign({}, task), req.body.task);
         project.markModified('tasks'); // mongo won't notice that tasks were modified without this since it's so nested
         const newProj = await project.save();
-        const pure = await newProj.toObject();
-        if (pure) {
-            if (task) {
-                res.json({
-                    project: pure,
-                    task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
-                });
-            }
-            else {
-                throw new Error('Task not created');
-            }
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
+        if (task) {
+            res.json({
+                project: resolvedProject,
+                task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
+            });
+        }
+        else {
+            throw new Error('Task not created');
         }
     }
     else {
@@ -87,7 +85,8 @@ const deleteTask = async (req, res) => {
         proj.markModified('tasks');
         proj.markModified('lists');
         const newProj = await proj.save();
-        res.json({ project: newProj.toObject(), task: null });
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
+        res.json({ project: resolvedProject, task: null });
     }
     else {
         throw new Error('project not defined');
@@ -104,7 +103,8 @@ const dragTask = async (req, res) => {
         proj.lists[newListIdx].taskIds[req.body.to[1]] = req.body.to[2];
         proj.markModified('lists'); // mongoose does not watch subarrays this deep
         const newProj = await proj.save();
-        res.json({ project: newProj.toObject() });
+        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
+        res.json({ project: resolvedProject });
     }
     else {
         throw new Error('project not defined');
@@ -182,7 +182,7 @@ const setComment = async (req, res) => {
             task.comments.push({
                 dateAdded: new Date().toString(),
                 comment: req.body.description || 'Comment',
-                id: (0, uuid_1.v4)()
+                id: (0, nanoid_1.nanoid)()
             });
         }
         const newProj = await proj.save();

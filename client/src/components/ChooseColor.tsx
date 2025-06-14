@@ -37,18 +37,23 @@ export const ChooseColor = ({ selected, project, onChange }: OwnProps) => {
           />
         ))}
         {adding ? (
-          <Button
-            onClick={async () => {
-              setAdding('')
-              onChange(adding)
-              await setProjectColors(dispatch, project, [
-                ...colors,
-                adding as string
-              ])
-            }}
-          >
-            Confirm
-          </Button>
+          <>
+            <Button onClick={() => setAdding('')}>Cancel</Button>
+            <Button
+              variant="outlined"
+              sx={{ ml: 1 }}
+              onClick={async () => {
+                setAdding('')
+                onChange(adding)
+                await setProjectColors(dispatch, project, [
+                  ...colors,
+                  adding as string
+                ])
+              }}
+            >
+              Add
+            </Button>
+          </>
         ) : (
           <IconButton
             onClick={() => {

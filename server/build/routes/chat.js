@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editChannel = exports.deleteChannel = exports.createChannel = exports.sendMessage = exports.getChat = void 0;
+exports.createChat = exports.editChannel = exports.deleteChannel = exports.createChannel = exports.sendMessage = exports.getChat = void 0;
 const Project_1 = require("../models/Project");
-const uuid_1 = require("uuid");
+const nanoid_1 = require("nanoid");
 const router_1 = require("./router");
 const passport_1 = require("../passport");
 const Chat_1 = require("../models/Chat");
@@ -13,7 +13,7 @@ const getChat = async (req, res) => {
 exports.getChat = getChat;
 router_1.router.post('/chat', passport_1.isAuthenticated, exports.getChat);
 const sendMessage = async (req, res) => {
-    const messageId = (0, uuid_1.v4)();
+    const messageId = (0, nanoid_1.nanoid)();
     const chat = await Chat_1.ChatModel.findOne({ id: req.body.chatId });
     if (chat) {
         chat.messages.unshift({
@@ -36,7 +36,7 @@ const createChannel = async (req, res) => {
     const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
     if (proj) {
         const name = req.body.name || 'New Channel';
-        const chatId = (0, uuid_1.v4)();
+        const chatId = (0, nanoid_1.nanoid)();
         await Chat_1.ChatModel.create({
             id: chatId,
             projectId: req.body.projId,
@@ -86,4 +86,14 @@ const editChannel = async (req, res) => {
 };
 exports.editChannel = editChannel;
 router_1.router.post('/editChannel', passport_1.isAuthenticated, exports.editChannel);
+const createChat = async (projectId) => {
+    const chatId = (0, nanoid_1.nanoid)();
+    await Chat_1.ChatModel.create({
+        id: chatId,
+        messages: [],
+        projectId: projectId
+    });
+    return [chatId, 'General'];
+};
+exports.createChat = createChat;
 //# sourceMappingURL=chat.js.map

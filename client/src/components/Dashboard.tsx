@@ -80,18 +80,6 @@ export const Dashboard = () => {
           }}
         >
           <div style={{ width: '100%' }}>
-            <Typography
-              variant="h5"
-              gutterBottom
-              style={{
-                fontWeight: 600,
-                color: theme.palette.text.secondary,
-                textAlign: 'center',
-                marginBottom: 16
-              }}
-            >
-              Your Projects
-            </Typography>
             <div
               style={{
                 display: 'flex',

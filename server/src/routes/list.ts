@@ -11,6 +11,7 @@ import {
 } from './types'
 import { Request, Response } from 'express'
 import { isAuthenticated } from '../passport'
+import { resolveProjectUsers } from '../utils/userResolver'
 
 export const editList = async (req: editListReq, res: editListRes) => {
   const project = await ProjectModel.findOne({ id: req.body.projId })
@@ -25,10 +26,10 @@ export const editList = async (req: editListReq, res: editListRes) => {
 
     const newProj = await project.save()
 
-    const pure = newProj.toObject()
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
 
     res.json({
-      project: pure,
+      project: resolvedProject,
       list: newProj.lists.find((l) => l.id === req.body.listId)!
     })
   } else {
@@ -68,11 +69,11 @@ export const createList = async (req: createListReq, res: createListRes) => {
 
     const newProj = await project.save()
 
-    const pure = newProj.toObject()
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
 
     res.json({
-      project: pure,
-      list: pure.lists.find((l) => l.id === newId)
+      project: resolvedProject,
+      list: resolvedProject.lists.find((l: any) => l.id === newId)
     })
   } else {
     throw new Error('proj not found')

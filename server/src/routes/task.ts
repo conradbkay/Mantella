@@ -17,6 +17,7 @@ import {
 import { router } from './router'
 import { isAuthenticated } from '../passport'
 import { Request, Response } from 'express'
+import { resolveProjectUsers } from '../utils/userResolver'
 
 export const createTask = async (req: createTaskReq, res: createTaskRes) => {
   const taskId = nanoid()
@@ -29,7 +30,8 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
       id: taskId,
       name: req.body.taskInfo.name || 'Unnamed Task',
       points: req.body.taskInfo.points || 0,
-      timeWorkedOn: 0,
+      timeEstimate: req.body.taskInfo.timeEstimate || undefined,
+      workedOnMs: 0,
       color: req.body.taskInfo.color || '#FFFFFF',
       dueDate: req.body.taskInfo.dueDate
         ? new Date(req.body.taskInfo.dueDate).toString()
@@ -52,15 +54,13 @@ export const createTask = async (req: createTaskReq, res: createTaskRes) => {
     proj.markModified('lists')
     const newProj = await proj.save()
 
-    const pure = newProj.toObject()
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
+    const task = resolvedProject.tasks.find((tk: any) => taskId === tk.id)
 
-    if (pure) {
-      const task = pure.tasks.find((tk) => taskId === tk.id)
-      res.json({
-        project: pure,
-        task: task!
-      })
-    }
+    res.json({
+      project: resolvedProject,
+      task: task!
+    })
   } else {
     throw new Error('proj id not exist')
   }
@@ -83,16 +83,15 @@ export const editTask = async (req: editTaskReq, res: editTaskRes) => {
     project.markModified('tasks') // mongo won't notice that tasks were modified without this since it's so nested
 
     const newProj = await project.save()
-    const pure = await newProj.toObject()
-    if (pure) {
-      if (task) {
-        res.json({
-          project: pure,
-          task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
-        })
-      } else {
-        throw new Error('Task not created')
-      }
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
+
+    if (task) {
+      res.json({
+        project: resolvedProject,
+        task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
+      })
+    } else {
+      throw new Error('Task not created')
     }
   } else {
     throw new Error('project not able to be updated')
@@ -116,7 +115,8 @@ export const deleteTask = async (req: deleteTaskReq, res: deleteTaskRes) => {
     proj.markModified('tasks')
     proj.markModified('lists')
     const newProj = await proj.save()
-    res.json({ project: newProj.toObject(), task: null })
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
+    res.json({ project: resolvedProject, task: null })
   } else {
     throw new Error('project not defined')
   }
@@ -141,8 +141,9 @@ export const dragTask = async (req: dragTaskReq, res: dragTaskRes) => {
     proj.markModified('lists') // mongoose does not watch subarrays this deep
 
     const newProj = await proj.save()
+    const resolvedProject = await resolveProjectUsers(newProj.toObject())
 
-    res.json({ project: newProj.toObject() })
+    res.json({ project: resolvedProject })
   } else {
     throw new Error('project not defined')
   }

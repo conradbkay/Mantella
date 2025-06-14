@@ -19,6 +19,7 @@ export const createTask = async (
   try {
     const res = await APICreateTask(projectId, listId, {
       points: task.points,
+      timeEstimate: task.timeEstimate,
       color: task.color,
       name: task.name,
       description: task.description,
@@ -84,6 +85,7 @@ export const deleteTask = (
     })
   )
 
+  // undo will refresh the page causing this to not trigger
   setTimeout(() => {
     APIDeleteTask(id, projectId)
   }, 5500)

@@ -8,7 +8,9 @@ import {
   MenuItem,
   Popover,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Chip,
+  Box
 } from '@mui/material'
 import { formatDueDate } from '../../utils/formatDueDate'
 import { toDaysHHMMSS } from '../../utils/utils'
@@ -106,6 +108,57 @@ const useStyles = makeStyles(() => ({
   }
 }))
 
+// Helper component to render time estimate info
+const TimeEstimateDisplay = ({
+  timeEstimate
+}: {
+  timeEstimate?: TTask['timeEstimate']
+}) => {
+  if (!timeEstimate || timeEstimate.estimate === undefined) return null
+
+  return (
+    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
+      <Chip
+        label={`${timeEstimate.estimate}hr`}
+        size="small"
+        variant="filled"
+        sx={{
+          fontSize: '0.7rem',
+          height: 20,
+          color: 'text.secondary',
+          borderColor: 'divider'
+        }}
+      />
+      {Boolean(timeEstimate.low.value) && (
+        <Chip
+          label={`${timeEstimate.low.value}hr p${timeEstimate.low.percentile}`}
+          size="small"
+          variant="outlined"
+          sx={{
+            fontSize: '0.7rem',
+            height: 20,
+            color: 'text.secondary',
+            borderColor: 'divider'
+          }}
+        />
+      )}
+      {Boolean(timeEstimate.high.value) && (
+        <Chip
+          label={`${timeEstimate.high.value}hr p${timeEstimate.high.percentile}`}
+          size="small"
+          variant="outlined"
+          sx={{
+            fontSize: '0.7rem',
+            height: 20,
+            color: 'text.secondary',
+            borderColor: 'divider'
+          }}
+        />
+      )}
+    </Box>
+  )
+}
+
 export const BaseTask = memo(
   ({
     task,
@@ -160,7 +213,7 @@ export const BaseTask = memo(
 
     const border = '1px solid ' + theme.palette.divider
 
-    const TimeIcon = isCurrentTask ? Pause : PlayArrow
+    const TimeIcon = isCurrentTask && !pomodoro.isPaused ? Pause : PlayArrow
 
     if (!task) {
       return null
@@ -310,6 +363,10 @@ export const BaseTask = memo(
                     </div>
                   </span>
                 </div>
+
+                {/* Time Estimate Display */}
+                <TimeEstimateDisplay timeEstimate={task.timeEstimate} />
+
                 {task.description && (
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
                     <Description
@@ -435,7 +492,7 @@ export const BaseTask = memo(
                       <List />
                     </IconButton>
                   )}
-                  {task.timeWorkedOn !== 0 && (
+                  {task.workedOnMs !== 0 && (
                     <span
                       style={{
                         alignSelf: 'center',
@@ -444,7 +501,8 @@ export const BaseTask = memo(
                         color: secondary
                       }}
                     >
-                      Worked on for {toDaysHHMMSS(task.timeWorkedOn, true)}
+                      Worked on for{' '}
+                      {toDaysHHMMSS(Math.floor(task.workedOnMs / 1000), true)}
                     </span>
                   )}
                   <TimeIcon
@@ -457,9 +515,9 @@ export const BaseTask = memo(
                       e.stopPropagation()
                       if (pomodoro.selectedTaskId !== task.id) {
                         dispatch(SELECT_POMODORO_TASK(task.id))
-                      } else if (pomodoro.selectedTaskId === task.id) {
-                        dispatch(TOGGLE_TIMER(Date.now()))
                       }
+
+                      dispatch(TOGGLE_TIMER())
                     }}
                   />
                 </div>

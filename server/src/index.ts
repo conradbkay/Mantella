@@ -84,7 +84,7 @@ io.on('connection', (socket: any) => {
     }
   })
 
-  socket.on('join', (room) => {
+  socket.on('join', (room: string) => {
     socket.join(room)
   })
 })

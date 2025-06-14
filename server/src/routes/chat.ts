@@ -4,7 +4,6 @@ import { router } from './router'
 import { isAuthenticated } from '../passport'
 import { Request, Response } from 'express'
 import { ChatModel } from '../models/Chat'
-import { Server } from 'socket.io'
 
 export const getChat = async (req: Request, res: Response) => {
   const chat = await ChatModel.findOne({ id: req.body.id })

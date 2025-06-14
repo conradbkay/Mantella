@@ -1,11 +1,15 @@
 import { Tooltip, Avatar } from '@mui/material'
-import { TProjectUser } from '../types/project'
+
+type UserLike = {
+  username?: string
+  profileImg?: string
+}
 
 export const HoverableAvatar = ({
   user,
   noMargin
 }: {
-  user: TProjectUser
+  user: UserLike
   noMargin?: boolean
 }) => {
   return (
@@ -16,7 +20,7 @@ export const HoverableAvatar = ({
         }}
       >
         <span style={{ position: 'absolute' }}>
-          {user.username![0].toUpperCase()}
+          {user.username?.[0]?.toUpperCase()}
         </span>
         <img height={40} width={40} src={user.profileImg} alt="profile" />
       </Avatar>
