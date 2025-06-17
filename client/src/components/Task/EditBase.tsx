@@ -10,7 +10,8 @@ import {
   FormHelperText,
   Typography,
   IconButton,
-  useTheme
+  useTheme,
+  Grid
 } from '@mui/material'
 import { nanoid } from 'nanoid'
 import { id } from '../../utils/utils'
@@ -18,17 +19,16 @@ import { ChooseColor } from '../ChooseColor'
 import Add from '@mui/icons-material/Add'
 import Delete from '@mui/icons-material/Delete'
 import { formatDueDate } from '../../utils/formatDueDate'
-import { cloneDeep } from 'lodash'
 import { EditSubtask } from './Subtask'
-import { TComment, TSubtask, TTask } from '../../types/project'
+import { TComment, TTask } from '../../types/project'
 import { Description } from '../TextEditor/DescriptionEditor'
-import { TState } from '../../types/state'
-import { useSelector } from 'react-redux'
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
-import Grid2 from '@mui/material/Unstable_Grid2'
 import { TimeEstimateEditor } from './TimeEstimateEditor'
+import { useGetProjectsQuery } from '../../store/api'
+import { clone } from 'remeda'
+import { ApiSubtask } from '@shared/types'
 
 type OwnProps = {
   onClose: () => void
@@ -47,9 +47,13 @@ type OwnProps = {
  */
 
 export const EditTaskBase = (props: OwnProps) => {
-  const [task, setTask] = useState(cloneDeep(props.task))
+  const [task, setTask] = useState(clone(props.task))
 
-  const projects = useSelector((state: TState) => state.projects)
+  const { data: projects } = useGetProjectsQuery()
+
+  if (!projects) {
+    return null
+  }
 
   const project = projects[id(projects, props.projectId)]
 
@@ -57,15 +61,15 @@ export const EditTaskBase = (props: OwnProps) => {
 
   const setSubtask = (
     id: string,
-    toMergeSubtask: Partial<Exclude<TSubtask, 'id'>> | null
+    toMergeSubtask: Partial<Exclude<ApiSubtask, 'id'>> | null
   ) => {
-    const newTask = cloneDeep(task)
+    const newTask = clone(task)
     let subtaskIndex = newTask.subTasks.findIndex((sub) => {
       return sub.id === id
     })
 
     if (subtaskIndex < 0) {
-      newTask.subTasks.push(toMergeSubtask as TSubtask)
+      newTask.subTasks.push(toMergeSubtask as ApiSubtask)
     } else if (toMergeSubtask) {
       newTask.subTasks[subtaskIndex] = {
         ...newTask.subTasks[subtaskIndex],
@@ -78,7 +82,7 @@ export const EditTaskBase = (props: OwnProps) => {
   }
 
   const setComment = (id: string, newComment: Partial<TComment> | null) => {
-    const newTask = cloneDeep(task)
+    const newTask = clone(task)
 
     let commentIndex = newTask.comments.findIndex((com) => com.id === id)
 
@@ -163,8 +167,8 @@ export const EditTaskBase = (props: OwnProps) => {
           />
 
           <TimeEstimateEditor
-            timeEstimate={task.timeEstimate}
-            onChange={(timeEstimate) => setTask({ ...task, timeEstimate })}
+            task={task}
+            onChange={(merge) => setTask({ ...task, ...merge })}
           />
 
           <ChooseColor
@@ -174,8 +178,8 @@ export const EditTaskBase = (props: OwnProps) => {
               setTask({ ...task, color })
             }}
           />
-          <Grid2 container spacing={2} style={{ margin: '12px 4px 8px 6px' }}>
-            <Grid2 sm={12} md={6}>
+          <Grid container spacing={2} style={{ margin: '12px 4px 8px 6px' }}>
+            <Grid size={{ sm: 12, md: 6 }}>
               <FormControl fullWidth>
                 <FormHelperText>Task's List</FormHelperText>
 
@@ -197,8 +201,8 @@ export const EditTaskBase = (props: OwnProps) => {
                   })}
                 </Select>
               </FormControl>
-            </Grid2>
-            <Grid2 sm={12} md={6} sx={{ mt: 'auto' }}>
+            </Grid>
+            <Grid size={{ sm: 12, md: 6 }} style={{ marginTop: 'auto' }}>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DateTimePicker
                   ampm={false}
@@ -212,8 +216,8 @@ export const EditTaskBase = (props: OwnProps) => {
                   }}
                 />
               </LocalizationProvider>
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
 
           <Typography
             style={{
@@ -224,7 +228,7 @@ export const EditTaskBase = (props: OwnProps) => {
           >
             Subtasks
           </Typography>
-          {task.subTasks.map((subtask, i) => (
+          {task.subTasks.map((subtask) => (
             <EditSubtask setSubtask={setSubtask} subtask={subtask} />
           ))}
           <Button
@@ -261,7 +265,7 @@ export const EditTaskBase = (props: OwnProps) => {
               <TextField
                 key={comment.id}
                 margin="dense"
-                onBlur={(e) => {
+                onBlur={() => {
                   setComment(comment.id, {
                     comment: task.comments[i].comment,
                     lastEdited: new Date().toString()
@@ -274,7 +278,7 @@ export const EditTaskBase = (props: OwnProps) => {
                 label={formatDueDate({
                   ...task,
                   dueDate: comment.dateAdded,
-                  recurrance: undefined
+                  recurrenceInterval: null
                 }).slice(4)}
                 onChange={(e) => {
                   const newComments = [...task.comments]

@@ -1,32 +1,21 @@
-import { Route, Redirect, RouteProps } from 'react-router'
-import { useAppSelector } from '../store/hooks'
-import { selectUser } from '../store/user'
+import { Navigate } from '@tanstack/react-router'
+import { useAuthUser } from './PrivateRoute'
 
-interface TProps extends RouteProps {
-  component: any
-  componentProps: any
+interface TProps<T> {
+  component: React.ComponentType<T>
+  componentProps: T
 }
 
-export const PublicOnlyRoute = ({
+export const PublicOnlyRoute = <T,>({
   component: PropComponent,
   componentProps,
   ...rest
-}: TProps) => {
-  const user = useAppSelector(selectUser)
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        user === null ? (
-          <PropComponent
-            {...componentProps}
-            params={props.match.params}
-            {...componentProps}
-          />
-        ) : (
-          <Redirect to="/dashboard" />
-        )
-      }
-    />
-  )
+}: TProps<T>) => {
+  const { user } = useAuthUser()
+
+  if (!user) {
+    return <PropComponent {...componentProps} {...rest} />
+  }
+
+  return <Navigate to="/dashboard" />
 }

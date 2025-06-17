@@ -10,13 +10,6 @@ import {
 import { FeatureTable } from './FeatureTable'
 import { Helmet } from 'react-helmet'
 import { FeatureGallery } from './FeatureGallery'
-import { APIGuestLogin } from '../../API/auth'
-import makeStyles from '@mui/styles/makeStyles'
-import { useHistory } from 'react-router'
-import { transformUser } from '../../store/auth'
-import { useAppDispatch } from '../../store/hooks'
-import { SET_PROJECTS } from '../../store/projects'
-import { LOGIN } from '../../store/user'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import GitHub from '@mui/icons-material/GitHub'
@@ -24,40 +17,8 @@ import Balance from '@mui/icons-material/Balance'
 import Star from '@mui/icons-material/StarOutline'
 import Code from '@mui/icons-material/Code'
 import { setPersistAuth } from '../../localStorage'
-
-const useStyles = makeStyles((theme: Theme) => ({
-  heroContent: {
-    minHeight: 200,
-    padding: '80px 40px',
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: theme.palette.background.paper,
-    color: theme.palette.primary.main,
-    justifyContent: 'space-between',
-    position: 'relative'
-  },
-  heroTitle: {
-    fontSize: 64,
-    textAlign: 'center'
-  },
-  title: {
-    fontWeight: 700,
-    fontSize: '2.75rem',
-    zIndex: 2
-  },
-  description: {
-    fontWeight: 400,
-    fontSize: '1.25rem',
-    zIndex: 2
-  },
-  guestButton: {
-    backgroundColor: theme.palette.primary.main
-  }
-}))
-
-type Props = {
-  showLinkedin?: boolean
-}
+import { useGuestLoginMutation } from '../../store/api'
+import { useNavigate } from '@tanstack/react-router'
 
 type TRepo = {
   ownerName: string
@@ -73,24 +34,33 @@ type TRepo = {
   licenseName: string
 }
 
-export const About = ({ showLinkedin }: Props) => {
-  const navigate = useHistory()
-  const dispatch = useAppDispatch()
+export const About = () => {
+  const navigate = useNavigate()
+  const [guestLogin] = useGuestLoginMutation()
+
   const loginAsGuest = async () => {
     setPersistAuth(true)
-    const res = await APIGuestLogin()
-    if (res) {
-      const authUser = transformUser(res)
-
-      dispatch(LOGIN({ user: authUser }))
-      dispatch(SET_PROJECTS(res.projects))
-      navigate.push('/project/' + res.projects[0].id)
+    try {
+      const result = await guestLogin().unwrap()
+      if (result?.user) {
+        // Authentication successful
+        if (result.user.projectIds && result.user.projectIds.length > 0) {
+          // Navigate to the first project if available
+          navigate({
+            to: '/project/$id',
+            params: { id: result.user.projectIds[0] }
+          })
+        } else {
+          // No projects, navigate to dashboard
+          navigate({ to: '/dashboard' })
+        }
+      }
+    } catch (error) {
+      console.error('Guest login failed:', error)
     }
   }
 
   const theme = useTheme()
-
-  const classes = useStyles()
 
   const [repo, setRepo] = useState<null | TRepo>(null)
 
@@ -151,25 +121,51 @@ export const About = ({ showLinkedin }: Props) => {
           content="Mantella is the most innovative open-source task manager and kanban Board!"
         />
       </Helmet>
-      <Grid container className={classes.heroContent}>
+      <Grid
+        container
+        sx={{
+          minHeight: 200,
+          padding: '80px 40px',
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'background.paper',
+          color: 'primary.main',
+          justifyContent: 'space-between',
+          position: 'relative'
+        }}
+      >
         <Grid
-          item
-          md={6}
-          sm={12}
+          size={{ md: 6, sm: 12 }}
           style={{
             alignItems: 'center',
             display: 'flex',
             flexDirection: 'column'
           }}
         >
-          <div className={classes.title}>Mantella</div>
-          <div className={classes.description}>
+          <div
+            style={{
+              fontWeight: 700,
+              fontSize: '2.75rem',
+              zIndex: 2
+            }}
+          >
+            Mantella
+          </div>
+          <div
+            style={{
+              fontWeight: 400,
+              fontSize: '1.25rem',
+              zIndex: 2
+            }}
+          >
             Elegant Project Management and Time Tracking
           </div>
           <Button
             variant="contained"
             size="large"
-            className={classes.guestButton}
+            sx={{
+              backgroundColor: 'primary.main'
+            }}
             onClick={() => loginAsGuest()}
             style={{ marginTop: 16, padding: '11px 26px', fontSize: 16 }}
           >
@@ -242,14 +238,14 @@ export const About = ({ showLinkedin }: Props) => {
                     }}
                   >
                     <Icon style={{ marginRight: 8 }} />
-                    {name}
+                    {name as string}
                   </div>
                 ))}
               </a>
             )}
           </ButtonBase>
         </Grid>
-        <Grid item md={6} sm={12}>
+        <Grid size={{ md: 6, sm: 12 }}>
           <FeatureGallery />
         </Grid>
       </Grid>

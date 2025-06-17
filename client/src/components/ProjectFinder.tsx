@@ -3,44 +3,27 @@ import {
   TextField,
   List,
   ListSubheader,
-  ListItem,
   ListItemText,
   Button,
-  Typography
+  Typography,
+  ListItemButton
 } from '@mui/material'
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
-import { formalize } from '../utils/utils'
-import { makeStyles } from '@mui/styles'
-import { useAppSelector } from '../store/hooks'
-import { selectProjects } from '../store/projects'
+import { Link } from '@tanstack/react-router'
+import { useGetProjectsQuery } from '../store/api'
 
-const useStyles = makeStyles(() => ({
-  list: {
-    margin: '25px auto 0px auto',
-    borderRadius: 0,
-    width: '100%'
-  }
-}))
-
-interface TProps extends RouteComponentProps {
+interface TProps {
   variant?: 'menu'
   noButton?: true
   onClick?(): void
 }
 
-export const ProjectFinder = withRouter((props: TProps) => {
+export const ProjectFinder = (props: TProps) => {
   const [search, setSearch] = useState('')
-  const rawProjects = useAppSelector(selectProjects)
-  const classes = useStyles()
+  const { data: projects } = useGetProjectsQuery()
 
-  let projects = [...Object.values(rawProjects)]
-
-  projects = projects.filter((project) => {
-    const myString: string = formalize(project.name)
-    const searchInput = formalize(search)
-
-    return myString.indexOf(searchInput) > -1
-  })
+  if (!projects) {
+    return null
+  }
 
   return (
     <div
@@ -66,7 +49,11 @@ export const ProjectFinder = withRouter((props: TProps) => {
         onChange={(e) => setSearch(e.target.value)}
       />
       <List
-        className={classes.list}
+        sx={{
+          margin: '25px auto 0px auto',
+          borderRadius: 0,
+          width: '100%'
+        }}
         subheader={
           <ListSubheader
             style={{
@@ -80,22 +67,21 @@ export const ProjectFinder = withRouter((props: TProps) => {
           </ListSubheader>
         }
       >
-        {projects.map((project, i) => {
+        {projects.map((project) => {
           const isLink = project.id === ('create-project' as any)
           const urlPrefix = isLink ? '' : '/project/'
           return (
             <div key={project.id} style={{ whiteSpace: 'nowrap' }}>
-              <ListItem
-                button
+              <ListItemButton
                 disabled={
-                  props.location.pathname.split('/project/')[1] === project.id
+                  window.location.pathname.split('/project/')[1] === project.id
                 }
                 to={urlPrefix + project.id.toString()}
                 onClick={props.onClick}
                 component={Link}
               >
                 <ListItemText primary={project.name} />
-              </ListItem>
+              </ListItemButton>
             </div>
           )
         })}
@@ -115,4 +101,4 @@ export const ProjectFinder = withRouter((props: TProps) => {
       </div>
     </div>
   )
-})
+}

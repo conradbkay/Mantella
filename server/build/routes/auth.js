@@ -1,19 +1,37 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAccount = exports.guestLogin = exports.logout = exports.register = exports.login = void 0;
-const tslib_1 = require("tslib");
-const bcryptjs_1 = tslib_1.__importDefault(require("bcryptjs"));
-const User_1 = require("../models/User");
-const Project_1 = require("../models/Project");
-const data_1 = require("../data");
-const Chat_1 = require("../models/Chat");
+exports.deleteAccount = exports.guestLogin = exports.logout = exports.register = exports.login = exports.validateLogin = exports.validateRegister = void 0;
+const zod_1 = require("zod");
+const project_1 = require("../db/project");
+const user_1 = require("../db/user");
+const toApi_1 = require("../db/toApi");
+const validate_1 = require("../middleware/validate");
+const nanoid_1 = require("nanoid");
+// Zod validation schemas
+const registerSchema = zod_1.z.object({
+    email: zod_1.z.string().email('Invalid email format'),
+    username: zod_1.z.string().min(1, 'Username is required'),
+    password: zod_1.z.string().min(6, 'Password must be at least 6 characters'),
+    persist: zod_1.z.boolean()
+});
+const loginSchema = zod_1.z.object({
+    email: zod_1.z.string().email('Invalid email format'),
+    password: zod_1.z.string().min(1, 'Password is required'),
+    persist: zod_1.z.boolean()
+});
+exports.validateRegister = (0, validate_1.validateRequest)(registerSchema);
+exports.validateLogin = (0, validate_1.validateRequest)(loginSchema);
 const login = async (req, res, next) => {
     try {
-        const projects = await Project_1.ProjectModel.find({
-            id: req.user.projects
-        }).lean();
+        const user = req.user;
+        const projects = await (0, project_1.findProjectsByUserId)(user.id);
+        const fullProjects = await Promise.all(projects.map((p) => (0, toApi_1.getFullProject)(p.id)));
         res.json({
-            user: Object.assign(Object.assign({}, req.user.toObject()), { password: undefined, _id: undefined, projects: projects })
+            user: {
+                ...user,
+                password: undefined,
+                projects: fullProjects
+            }
         });
     }
     catch (err) {
@@ -21,37 +39,51 @@ const login = async (req, res, next) => {
     }
 };
 exports.login = login;
-const SALT_LENGTH = 10;
-const register = async (req, res) => {
+// Helper function to create user with default project and handle login
+async function createUserWithDefaultProject(userData, loginOptions, req, res, next) {
     try {
-        const salt = await bcryptjs_1.default.genSalt(SALT_LENGTH);
-        const password = await bcryptjs_1.default.hash(req.body.password, salt);
-        const [projectId, userId, chatId] = (0, data_1.generateIds)(3);
-        const [project, newUser] = await Promise.all([
-            Project_1.ProjectModel.create((0, data_1.generateDefaultProject)({
-                id: userId,
-                email: req.body.email,
-                username: req.body.username,
-                profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId, [chatId, 'General'])),
-            await User_1.UserModel.create(Object.assign(Object.assign({}, (0, data_1.generateGuestUser)(projectId, userId)), { password, email: req.body.email, username: req.body.username })),
-            await Chat_1.ChatModel.create({
-                id: chatId,
-                messages: [],
-                projectId: projectId
-            })
-        ]);
-        req.login(newUser, { session: req.body.persist }, (err) => {
+        const newUser = await (0, user_1.createUser)(userData);
+        const project = await (0, project_1.createProjectWithDefaults)({
+            name: 'Tutorial Project',
+            ownerId: newUser.id,
+            colors: [],
+            securityPublic: true
+        }, {
+            id: newUser.id,
+            email: userData.email,
+            username: userData.username,
+            profileImg: userData.profileImg
+        });
+        req.login(newUser, { session: loginOptions.persist }, (err) => {
             if (err) {
                 console.log('could not passport login during signup', err);
+                return next(err);
             }
-        });
-        res.json({
-            user: Object.assign(Object.assign({}, newUser.toObject()), { password: undefined, _id: undefined, projects: [project.toObject()] })
+            res.json({
+                user: {
+                    ...newUser,
+                    password: undefined,
+                    projects: [project]
+                }
+            });
         });
     }
     catch (err) {
-        throw new Error('Could not register, is that email address already in use?');
+        next(err);
+    }
+}
+const register = async (req, res, next) => {
+    try {
+        const { email, username, password, persist } = registerSchema.parse(req.body);
+        await createUserWithDefaultProject({
+            username,
+            email,
+            password,
+            profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+        }, { persist }, req, res, next);
+    }
+    catch (err) {
+        next(err);
     }
 };
 exports.register = register;
@@ -70,38 +102,22 @@ const logout = async (req, res) => {
     }
 };
 exports.logout = logout;
-const guestLogin = async (req, res) => {
+const guestLogin = async (req, res, next) => {
     try {
-        const [projectId, userId, chatId] = (0, data_1.generateIds)(3);
-        const [project, user] = await Promise.all([
-            Project_1.ProjectModel.create((0, data_1.generateDefaultProject)({
-                email: 'No Email Registered',
-                username: 'Guest',
-                id: userId,
-                profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-            }, projectId, [chatId, 'General'])),
-            await User_1.UserModel.create((0, data_1.generateGuestUser)(projectId, userId)),
-            await Chat_1.ChatModel.create({
-                id: chatId,
-                messages: []
-            })
-        ]);
-        req.login(user, { session: true }, (err) => {
-            if (err) {
-                console.log('could not passport login during signup', err);
-            }
-        });
-        res.json({
-            user: Object.assign(Object.assign({}, user.toObject()), { projects: [project.toObject()] })
-        });
+        const guestEmail = `guest_${(0, nanoid_1.nanoid)(8)}@example.com`;
+        await createUserWithDefaultProject({
+            username: 'Guest',
+            email: guestEmail,
+            profileImg: 'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+        }, { persist: true }, req, res, next);
     }
     catch (err) {
-        throw new Error('Could not create guest, sorry!');
+        next(err);
     }
 };
 exports.guestLogin = guestLogin;
 const deleteAccount = async (req, res) => {
-    await User_1.UserModel.deleteOne({ id: req.user.id });
+    await (0, user_1.deleteUser)(req.user.id);
     res.status(200);
 };
 exports.deleteAccount = deleteAccount;

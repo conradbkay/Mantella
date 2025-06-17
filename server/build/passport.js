@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deserializeUser = exports.serializeUser = exports.passportStrategy = exports.isAuthenticated = void 0;
-const User_1 = require("./models/User");
+const user_1 = require("./db/user");
 const isAuthenticated = (req, res, next) => {
     if (req.user)
         return next();
@@ -13,11 +13,11 @@ const isAuthenticated = (req, res, next) => {
 exports.isAuthenticated = isAuthenticated;
 const passportStrategy = async (req, email, password, done) => {
     try {
-        const user = await User_1.UserModel.findOne({ email });
+        const user = await (0, user_1.findUserByEmail)(email);
         if (!user) {
             return done(null, false, { message: 'Incorrect username.' });
         }
-        const matches = await (0, User_1.comparePassword)(password, user.password);
+        const matches = await (0, user_1.comparePassword)(password, user.password);
         if (!matches) {
             return done(null, false, { message: 'Incorrect password.' });
         }
@@ -34,7 +34,7 @@ const serializeUser = (user, done) => {
 exports.serializeUser = serializeUser;
 const deserializeUser = async (id, done) => {
     try {
-        const user = await User_1.UserModel.findOne({ id });
+        const user = await (0, user_1.findUserById)(id);
         done(null, user);
     }
     catch (err) {

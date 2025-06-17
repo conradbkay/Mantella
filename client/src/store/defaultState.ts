@@ -7,7 +7,6 @@ export const defaultSnackbar: TSnackbar = {
 }
 
 export const defaultState: TState = {
-  user: null,
   pomodoro: {
     isPaused: true,
     isBreak: false,
@@ -19,8 +18,6 @@ export const defaultState: TState = {
     lastTickMs: undefined
   },
   snackbar: defaultSnackbar,
-  loading: false,
-  projects: [],
   filter: {
     dueDate: [null, null],
     color: ['all'],

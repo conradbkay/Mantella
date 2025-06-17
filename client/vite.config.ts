@@ -2,17 +2,17 @@
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import viteTsconfigPaths from 'vite-tsconfig-paths'
+import tsconfigPaths from 'vite-tsconfig-paths'
 import svgrPlugin from 'vite-plugin-svgr'
-//import ssr from 'vite-plugin-ssr/plugin'
-import eslint from 'vite-plugin-eslint'
 import checker from 'vite-plugin-checker'
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig(() => ({
   plugins: [
+    tanstackRouter({ autoCodeSplitting: true, target: 'react' }),
     react(),
-    viteTsconfigPaths(),
+    tsconfigPaths(),
     svgrPlugin(),
     checker({ typescript: true })
   ],
@@ -24,17 +24,15 @@ export default defineConfig(({ command }) => ({
     open: true,
 
     proxy: {
-      '/socket': { target: 'http://localhost:3000', changeOrigin: true },
       '/api': { target: 'http://localhost:4008', changeOrigin: true }
     }
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
     coverage: {
       reporter: ['text', 'html'],
-      exclude: ['node_modules/', 'src/setupTests.ts']
+      exclude: ['node_modules/']
     }
   }
 }))

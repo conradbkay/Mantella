@@ -4,8 +4,7 @@ import { getProjectIdFromTaskId, id } from '../../utils/utils'
 import { useState } from 'react'
 import { EditTaskModal } from '../Task/Edit'
 import { TTask } from '../../types/project'
-import { useAppSelector } from '../../store/hooks'
-import { selectProjects } from '../../store/projects'
+import { useGetProjectsQuery } from '../../store/api'
 
 function sameDay(d1: Date, d2: Date) {
   return (
@@ -27,7 +26,12 @@ type Props = {
 export const WeekDay = (props: Props) => {
   const { day, index, tasks } = props
   const [editingTaskId, setEditingTaskId] = useState('')
-  const projects = useAppSelector(selectProjects)
+
+  const { data: projects } = useGetProjectsQuery()
+
+  if (!projects) {
+    return null
+  }
 
   return (
     <div
@@ -56,7 +60,7 @@ export const WeekDay = (props: Props) => {
           height: '100%'
         }}
       >
-        {tasks.map((task, i) => (
+        {tasks.map((task) => (
           <BaseTask
             project={
               projects[id(projects, getProjectIdFromTaskId(projects, task.id))]

@@ -1,5 +1,5 @@
 import './styles.css'
-import { Link } from 'react-router-dom'
+import { Link } from '@tanstack/react-router'
 import { Button } from '@mui/material'
 
 export const NoMatch = () => (

@@ -1,11 +1,12 @@
-import { TProjectUser, TTask } from '../../types/project'
+import { TTask } from '../../types/project'
 import { HoverableAvatar } from '../HoverableAvatar'
 import { CSS } from '@dnd-kit/utilities'
 import { useDraggable } from '@dnd-kit/core'
+import { TProfile } from '../../types/state'
 
 type Props = {
   task?: TTask
-  user: TProjectUser
+  user: TProfile
   noMargin?: boolean
 }
 
@@ -23,7 +24,7 @@ const DraggableAvatar = ({ task, user, noMargin }: Props) => {
 
   return (
     <div ref={setNodeRef} {...listeners} {...attributes} style={style}>
-      <HoverableAvatar noMargin user={user} />
+      <HoverableAvatar noMargin={noMargin} user={user} />
     </div>
   )
 }

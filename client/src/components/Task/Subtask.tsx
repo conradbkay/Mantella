@@ -17,7 +17,7 @@ export const EditSubtask = ({ setSubtask, subtask }: Props) => {
         checked={subtask.completed}
         onChange={(e) => {
           setSubtask(subtask.id, {
-            completed: !subtask.completed
+            completed: e.target.checked
           })
         }}
       />

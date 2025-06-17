@@ -1,12 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { APIEditTask } from '../API/task'
 import { toDaysHHMMSS } from '../utils/utils'
 import { SYNC_TIMER } from '../store/pomodoro'
-import { TICK } from '../store/projects'
 import { id } from '../utils/utils'
 import { TProject, TTask } from '../types/project'
 import { TPomodoro } from '../types/state'
+import { useEditTaskMutation, useGetProjectsQuery } from '../store/api'
 
 export const getDisplayTimeLeft = (pomodoro: TPomodoro) => {
   return toDaysHHMMSS(Math.ceil((pomodoro.timeLeftMs ?? 0) / 1000)) // if 1100ms passed then timeLeft is 23900. If we ceil this and floor the other it works out
@@ -15,14 +14,19 @@ export const getDisplayTimeLeft = (pomodoro: TPomodoro) => {
 // generally we have to maintain pomodoro and task timing separately, since we can switch tasks during the same pomodoro
 export const useTimer = () => {
   const dispatch = useAppDispatch()
-  const { pomodoro, projects } = useAppSelector((state) => ({
-    pomodoro: state.pomodoro,
-    projects: state.projects
-  }))
+  const { data: projects } = useGetProjectsQuery()
+
+  const [editTask] = useEditTaskMutation()
+
+  const pomodoro = useAppSelector((state) => state.pomodoro)
 
   const savedCallback = useRef(() => {})
 
   useEffect(() => {
+    if (!projects) {
+      return
+    }
+
     savedCallback.current = () => {
       const now = Date.now()
       const elapsedMs =
@@ -52,18 +56,14 @@ export const useTimer = () => {
       const oldSeconds = Math.floor((task.workedOnMs || 0) / 1000)
       const newSeconds = Math.floor(newWorkedOnMs / 1000)
 
-      // persist to server every 15 seconds
-      if (Math.floor(newSeconds / 15) > Math.floor(oldSeconds / 15)) {
-        APIEditTask({ ...task, workedOnMs: newWorkedOnMs }, project.id)
-      }
-
-      dispatch(
-        TICK({
-          taskId: pomodoro.selectedTaskId,
-          projectId: project.id,
-          elapsedMs: elapsedMs
+      // persist to server every 10 seconds. means task won't appear to update until this though...
+      if (Math.floor(newSeconds / 10) > Math.floor(oldSeconds / 10)) {
+        editTask({
+          taskId: task.id,
+          projId: project.id,
+          task: { ...task, workedOnMs: newWorkedOnMs }
         })
-      )
+      }
     }
   }, [pomodoro, projects, dispatch])
 

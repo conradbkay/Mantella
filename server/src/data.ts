@@ -1,14 +1,56 @@
 import { nanoid } from 'nanoid'
-import { Project, Task } from './models/Project'
+
+// Define local types that match the mongoose structure for backwards compatibility
+type Task = {
+  id: string
+  name: string
+  points: number
+  subTasks: Array<{ name: string; completed: boolean; id: string }>
+  workedOnMs: number
+  comments: Array<{
+    comment: string
+    dateAdded: string
+    lastEdited?: string
+    id: string
+  }>
+  color: string
+  assignedTo: string[]
+  createdAt: string
+  description?: string
+  dueDate?: string
+}
+
+type Project = {
+  id: string
+  name: string
+  ownerId: string
+  lists: Array<{
+    taskIds: [string[], string[], string[]]
+    name: string
+    id: string
+  }>
+  tasks: Task[]
+  history: Array<{}>
+  users: Array<{
+    id: string
+  }>
+  security?: { public: boolean }
+  data: {}
+  colors: string[]
+}
+
+type User = {
+  id: string
+}
 
 export const defaultTask = {
   name: 'Task',
   points: 0,
-  subTasks: [],
+  subTasks: [] as any,
   workedOnMs: 0,
-  comments: [],
+  comments: [] as any,
   color: '#FFFFFF',
-  assignedTo: [],
+  assignedTo: [] as any,
   createdAt: new Date().toString()
 }
 
@@ -34,6 +76,7 @@ export const taskObjects = (ids: string[], userId: string): Task[] => [
     ...defaultTask,
     id: ids[1],
     name: 'Tasks can be dragged to other lists or reordered within a list',
+    // lexical raw output
     description:
       '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Hold space on a focused task to move it ","type":"code-highlight","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"with","type":"code-highlight","version":1,"highlightType":"keyword"},{"detail":0,"format":0,"mode":"normal","style":"","text":" keyboard arrows","type":"code-highlight","version":1}],"direction":"ltr","format":"","indent":0,"type":"code","version":1,"language":"javascript"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
   },
@@ -115,13 +158,8 @@ export const taskObjects = (ids: string[], userId: string): Task[] => [
   },
   {
     ...defaultTask,
-    id: ids[16],
-    name: 'Create and assign member roles in the project settings'
-  },
-  {
-    ...defaultTask,
     id: ids[17],
-    name: "Each project comes with its own messaging system. View a project's chat by clicking the chat icon in the sidebar, or view all projects with the Chat tab in the main header"
+    name: "Focus on productivity and project management with Mantella's task-focused approach"
   },
   {
     ...defaultTask,
@@ -156,16 +194,13 @@ export const generateDefaultProject = (
     profileImg: string
     username: string
   },
-  projectId: string,
-  chat: [string, string]
+  projectId: string
 ): Project => {
   const listIds = [nanoid(), nanoid(), nanoid()]
-  const roleId = nanoid()
   const ids = generateIds(19)
   const tasks = taskObjects(ids, newUser.id)
   return {
     colors: defaultColors,
-    channels: [chat],
     history: [],
     name: 'Tutorial Project',
     lists: [
@@ -190,7 +225,6 @@ export const generateDefaultProject = (
             ids[13],
             ids[14],
             ids[15],
-            ids[16],
             ids[17],
             ids[18]
           ],
@@ -205,14 +239,7 @@ export const generateDefaultProject = (
     ownerId: newUser.id,
     id: projectId,
     tasks: tasks,
-    users: [{ ...newUser, roles: [roleId] }],
-    roles: [
-      {
-        id: roleId,
-        name: 'Admin',
-        color: '#FF0000'
-      }
-    ],
+    users: [{ id: newUser.id }],
     data: {}
   }
 }

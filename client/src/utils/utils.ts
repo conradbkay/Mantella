@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash'
 import { TProject, TTask } from '../types/project'
 
 export const toDaysHHMMSS = (s: number, verbose?: true): string => {
@@ -47,21 +46,6 @@ export const id = (
 
 export const formalize = (str: string): string => {
   return str.toLowerCase().replace(/,/g, '').replace(/ /g, '')
-}
-
-export const filterItemsFromIds = <T = any>(
-  ids: number[],
-  items: { [id: string]: any } & T // add index signature
-): T => {
-  const newItems = cloneDeep(items) // changed in past :()
-  Object.keys(newItems)
-    .map((key) => parseInt(key, 10)) // Object.keys returns strings nomatter what
-    .forEach((key: any) => {
-      if (!ids.includes(key)) {
-        delete newItems[key]
-      }
-    })
-  return newItems
 }
 
 export const getAllTasks = (projects: TProject[]): TTask[] => {

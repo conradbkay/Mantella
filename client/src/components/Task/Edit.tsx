@@ -1,14 +1,14 @@
 import { Button } from '@mui/material'
 import { id } from '../../utils/utils'
-import { useDispatch, useSelector } from 'react-redux'
 import Delete from '@mui/icons-material/Delete'
 import { TTask } from '../../types/project'
-import { APIEditTask } from '../../API/task'
-//import { convertToRaw } from 'draft-js'
 import { EditTaskBase } from './EditBase'
-import { TState } from '../../types/state'
-import { SET_TASK } from '../../store/projects'
-import { deleteTask, dragTask } from '../../actions/task'
+import {
+  useDeleteTaskMutation,
+  useGetProjectsQuery,
+  useEditTaskMutation,
+  useDragTaskMutation
+} from '../../store/api'
 
 type OwnProps = {
   onClose: () => void
@@ -23,10 +23,15 @@ type OwnProps = {
  */
 
 export const EditTaskModal = (props: OwnProps) => {
-  const dispatch = useDispatch()
-  const { projects } = useSelector((state: TState) => ({
-    projects: state.projects
-  }))
+  const { data: projects } = useGetProjectsQuery()
+
+  const [deleteTaskMutation] = useDeleteTaskMutation()
+  const [editTaskMutation] = useEditTaskMutation()
+  const [dragTaskMutation] = useDragTaskMutation()
+  if (!projects) {
+    return null
+  }
+
   const project = projects[id(projects, props.projectId)]
   const task = project.tasks[id(project.tasks, props.taskId)]
 
@@ -50,19 +55,21 @@ export const EditTaskModal = (props: OwnProps) => {
       })
     })
 
-    dragTask(dispatch, project, progress, ownerList, newId, props.taskId)
+    dragTaskMutation({
+      taskId: props.taskId,
+      projectId: project.id,
+      toListId: newId,
+      toProgress: progress,
+      toIdx: 0
+    })
   }
 
   const confirmChanges = (task: TTask, listId: string) => {
-    dispatch(
-      SET_TASK({
-        id: props.taskId,
-        projectId: props.projectId,
-        newTask: task
-      })
-    )
-
-    APIEditTask(task, props.projectId)
+    editTaskMutation({
+      taskId: props.taskId,
+      projId: project.id,
+      task: task
+    })
 
     if (listId !== ownerList.id) {
       drag(listId)
@@ -80,7 +87,10 @@ export const EditTaskModal = (props: OwnProps) => {
         <Button
           onClick={() => {
             props.onClose()
-            deleteTask(dispatch, props.taskId, project.id)
+            deleteTaskMutation({
+              id: props.taskId,
+              projId: project.id
+            })
           }}
           style={{ backgroundColor: 'red', color: 'white', marginRight: 8 }}
         >

@@ -4,19 +4,17 @@ import {
   useTheme,
   ToggleButton,
   ToggleButtonGroup,
-  Button
+  Button,
+  Typography
 } from '@mui/material'
-import { input } from './styles'
 import DraggableAvatar from '../Task/DraggableAvatar'
 import { memo, useState } from 'react'
 import { TProject } from '../../types/project'
 import { useDroppable } from '@dnd-kit/core'
-import { useDispatch } from 'react-redux'
 import Delete from '@mui/icons-material/Delete'
 import Calendar from '@mui/icons-material/CalendarToday'
 import ViewList from '@mui/icons-material/ViewList'
 import ViewDay from '@mui/icons-material/ViewDay'
-import { setProjectName } from '../../actions/project'
 import LockIcon from '@mui/icons-material/LockOutlined'
 import { ShareProjectDialog } from './Share'
 
@@ -24,24 +22,13 @@ type Props = {
   project: TProject
   viewType: string
   setViewType: (newType: string) => void
-  setCreating: () => void
   isMobile: boolean
   deleteMode: boolean // when dragging a task, whole header becomes a trash can
 }
 
 const ProjectHeader = memo(
-  ({
-    project,
-    deleteMode,
-    viewType,
-    setViewType,
-    setCreating,
-    isMobile
-  }: Props) => {
-    const [name, setName] = useState(project.name)
+  ({ project, deleteMode, viewType, setViewType, isMobile }: Props) => {
     const [sharing, setSharing] = useState(false)
-
-    const dispatch = useDispatch()
 
     const { setNodeRef } = useDroppable({ id: 'users' })
 
@@ -78,25 +65,28 @@ const ProjectHeader = memo(
               </div>
             ) : (
               <>
-                <input
-                  aria-label="project name"
+                <Typography
+                  variant="h6"
+                  component="h1"
                   style={{
-                    ...input(theme),
-                    width: /*`${windowWidth - 300}px`*/ isMobile ? 120 : 200
+                    color: theme.palette.text.primary,
+                    fontWeight: 500,
+                    fontSize: 18,
+                    width: isMobile ? 120 : 200,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                   }}
-                  value={name}
-                  onBlur={() => {
-                    setProjectName(dispatch, project, name)
-                  }}
-                  onChange={(e: any) => setName(e.target.value)}
-                />
+                >
+                  {project.name}
+                </Typography>
                 <ToggleButtonGroup
                   color="primary"
                   style={{ marginLeft: 16 }}
                   value={viewType}
                   size="small"
                   exclusive
-                  onChange={(e, newVal) => {
+                  onChange={(_, newVal) => {
                     if (newVal) {
                       setViewType(newVal)
                     }
@@ -121,14 +111,6 @@ const ProjectHeader = memo(
                 </ToggleButtonGroup>
 
                 <div style={{ marginLeft: 'auto', display: 'flex' }}>
-                  {/* todo: hide button when enoguh users exist that header is too wide */}
-                  {/*<Button
-                    variant="outlined"
-                    onClick={() => setCreating()}
-                    style={{ marginRight: 16 }}
-                  >
-                    {isMobile ? <Add /> : 'Create Task'}
-                  </Button>*/}
                   <div ref={setNodeRef} style={{ display: 'flex' }}>
                     {project.users.map((user) => (
                       <DraggableAvatar user={user} key={user.id} />

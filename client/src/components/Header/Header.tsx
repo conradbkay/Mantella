@@ -1,42 +1,36 @@
-import { useState, Fragment, useContext } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import MenuIcon from '@mui/icons-material/Menu'
-import { ColorModeContext } from '../../App'
+import React, { Fragment, useContext, ReactElement, useState } from 'react'
 import {
-  Theme,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Drawer,
+  AppBar,
+  Slide,
+  useScrollTrigger,
+  Grid,
+  Tabs,
   Tab,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Drawer,
   Button,
   Menu,
   Typography,
-  Grid,
-  AppBar,
-  Tabs,
   useTheme,
   useMediaQuery
 } from '@mui/material'
-import { Slide, useScrollTrigger } from '@mui/material'
-import { ReactElement } from 'react'
-import { Trail } from 'react-spring/renderprops'
+import MenuIcon from '@mui/icons-material/Menu'
+import { Link, useLocation } from '@tanstack/react-router'
+import { ColorModeContext } from '../../App'
+import Home from '@mui/icons-material/Home'
 import HowToReg from '@mui/icons-material/HowToReg'
-import CalendarToday from '@mui/icons-material/CalendarToday'
 import Help from '@mui/icons-material/Help'
 import Settings from '@mui/icons-material/Settings'
-import Home from '@mui/icons-material/Home'
-import { Link as NavLink } from 'react-router-dom'
+import CalendarToday from '@mui/icons-material/CalendarToday'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
-import Chat from '@mui/icons-material/Chat'
 import { ProjectFinder } from '../ProjectFinder'
 import { HoverableAvatar } from '../HoverableAvatar'
-import { makeStyles } from '@mui/styles'
-import { useAppSelector } from '../../store/hooks'
-import { selectUser } from '../../store/user'
+import { useAuthUser } from '../PrivateRoute'
 import { HeaderSearchBar } from './SearchBar'
 import PageView from '@mui/icons-material/PageView'
 
@@ -65,66 +59,8 @@ const authItems = [
     pathname: '/calendar',
     menuIcon: CalendarToday
   },
-  {
-    label: 'Chat',
-    pathname: '/chat',
-    menuIcon: Chat
-  },
   { label: 'Settings', pathname: '/settings', menuIcon: Settings }
 ]
-
-const useStyles = makeStyles((theme: Theme) => ({
-  appBar: {
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    backgroundColor: 'white'
-  },
-  fullHeight: {
-    height: '100%'
-  },
-  mainHeader: {
-    width: '100%',
-    padding: '0px 18px',
-    height: 81.5,
-    maxWidth: '100vw',
-    [theme.breakpoints.down('sm')]: {
-      padding: '0px 12px'
-    }
-  },
-  inline: {
-    display: 'inline'
-  },
-  flex: {
-    display: 'flex'
-  },
-  link: {
-    textDecoration: 'none',
-    color: 'inherit'
-  },
-  tagline: {
-    display: 'inline-block',
-    marginLeft: 10
-  },
-  iconContainer: {
-    display: 'none',
-    [theme.breakpoints.down('md')]: {
-      display: 'block'
-    }
-  },
-  tabContainer: {
-    height: '100%',
-    marginLeft: 8,
-    [theme.breakpoints.down('md')]: {
-      display: 'none'
-    }
-  },
-  tabItem: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    minWidth: 'auto',
-    height: '100%'
-  },
-  iconButton: {}
-}))
 
 type HideOnScrollProps = {
   children: ReactElement
@@ -140,19 +76,17 @@ const HideOnScroll: React.FC<HideOnScrollProps> = ({ children }) => {
   )
 }
 
-interface Props extends RouteComponentProps {}
-
-export const Header = withRouter((props: Props) => {
+export const Header = () => {
   const [drawer, setDrawer] = useState(false)
   const [anchorEl, setAnchorEl] = useState(null as any)
 
-  const authenticated = useAppSelector(selectUser)
-  const classes = useStyles()
+  const { user: authenticated } = useAuthUser()
+  const location = useLocation()
 
   const MenuItems = authenticated !== null ? authItems : noAuthItems
 
   const value = MenuItems.map((menuItem) => menuItem.pathname).indexOf(
-    props.location.pathname
+    location.pathname
   )
 
   const colorMode = useContext(ColorModeContext)
@@ -167,7 +101,11 @@ export const Header = withRouter((props: Props) => {
         <AppBar
           position="fixed"
           color="default"
-          className={classes.appBar}
+          sx={{
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            backgroundColor: 'background.paper'
+          }}
           style={{
             boxShadow: 'none'
           }}
@@ -176,19 +114,26 @@ export const Header = withRouter((props: Props) => {
             container
             spacing={3}
             alignItems="center"
-            className={classes.mainHeader}
+            sx={{
+              width: '100%',
+              padding: { xs: '0px 12px', sm: '0px 18px' },
+              maxWidth: '100vw'
+            }}
           >
             <Grid
-              item
-              xs={12}
-              style={{ alignItems: 'center', height: '100%' }}
-              className={classes.flex}
+              size={{ xs: 12 }}
+              sx={{
+                alignItems: 'center',
+                height: '100%',
+                display: 'flex'
+              }}
             >
-              <div className={classes.iconContainer}>
-                <IconButton
-                  onClick={() => setDrawer(true)}
-                  className={classes.iconButton}
-                >
+              <div
+                style={{
+                  display: isMobile ? 'block' : 'none'
+                }}
+              >
+                <IconButton onClick={() => setDrawer(true)}>
                   <MenuIcon />
                 </IconButton>
               </div>
@@ -225,57 +170,58 @@ export const Header = withRouter((props: Props) => {
                 </>
               )}
               {!isMobile && (
-                <div className={classes.inline}>
+                <div style={{ display: 'inline' }}>
                   <Typography variant="h6" color="inherit" noWrap>
-                    <Trail
-                      items={'Mantella'}
-                      from={{ transform: 'translate3d(0,-40px,0)' }}
-                      to={{ transform: 'translate3d(0,0px,0)' }}
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/USA-Kay/Mantella"
+                      style={{
+                        color: theme.palette.text.primary,
+                        textDecoration: 'none',
+                        paddingRight: 5,
+                        display: 'inline-block',
+                        marginLeft: 10
+                      }}
                     >
-                      {(item) => (trailProps) =>
-                        (
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            href="https://github.com/USA-Kay/Mantella"
-                            style={{
-                              ...trailProps,
-                              color: theme.palette.text.primary,
-                              textDecoration: 'none',
-                              paddingRight: 5
-                            }}
-                            className={classes.tagline}
-                          >
-                            Mantella
-                          </a>
-                        )}
-                    </Trail>
+                      Mantella
+                    </a>
                   </Typography>
                 </div>
               )}
               <Fragment>
                 {authenticated !== null && <HeaderSearchBar />}
                 <div
-                  className={classes.tabContainer}
-                  style={{ marginLeft: authenticated ? undefined : 'auto' }}
+                  style={{
+                    height: '100%',
+                    marginLeft: authenticated ? 8 : 'auto',
+                    display: isMobile ? 'none' : 'block'
+                  }}
                 >
                   <Tabs
                     value={value === -1 ? false : value}
                     indicatorColor="primary"
                     textColor="primary"
-                    classes={{ flexContainer: classes.fullHeight }}
+                    sx={{
+                      '& .MuiTabs-flexContainer': {
+                        height: '100%'
+                      }
+                    }}
                     style={{ height: '100%' }}
                   >
                     {MenuItems.map((item, index) => (
                       <Tab
-                        disabled={
-                          window.location.href.slice(1) === item.pathname
-                        }
+                        disabled={location.pathname === item.pathname}
+                        sx={{
+                          paddingTop: 2.5,
+                          paddingBottom: 2.5,
+                          minWidth: 'auto',
+                          height: '100%'
+                        }}
                         style={{ minWidth: 96, height: '100%' }}
                         key={index}
-                        to={item.pathname}
-                        component={NavLink}
-                        classes={{ root: classes.tabItem }}
+                        component={Link}
+                        to={item.pathname as any}
                         label={item.label}
                       />
                     ))}
@@ -305,22 +251,21 @@ export const Header = withRouter((props: Props) => {
         <div style={{ width: 'auto' }}>
           <List>
             {MenuItems.map((menuItem, index) => (
-              <ListItem
+              <ListItemButton
                 onClick={() => setDrawer(false)}
-                to={menuItem.pathname}
-                component={NavLink}
-                button
+                component={Link}
+                to={menuItem.pathname as any}
                 key={index}
               >
                 <ListItemIcon>
                   <menuItem.menuIcon />
                 </ListItemIcon>
                 <ListItemText primary={menuItem.label} />
-              </ListItem>
+              </ListItemButton>
             ))}
           </List>
         </div>
       </Drawer>
     </>
   )
-})
+}

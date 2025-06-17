@@ -2,9 +2,8 @@ import { Button, ButtonBase, IconButton } from '@mui/material'
 import { useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 import Add from '@mui/icons-material/Add'
-import { setProjectColors } from '../actions/project'
-import { useDispatch } from 'react-redux'
 import { TProject } from '../types/project'
+import { useEditProjectMutation } from '../store/api'
 
 type OwnProps = {
   selected?: string
@@ -14,28 +13,27 @@ type OwnProps = {
 
 export const ChooseColor = ({ selected, project, onChange }: OwnProps) => {
   const [adding, setAdding] = useState('')
-
-  const dispatch = useDispatch()
-
-  const { colors } = project
+  const [editProject] = useEditProjectMutation()
 
   return (
     <div>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {colors.map((color, i) => (
-          <ButtonBase
-            onClick={() => onChange(color)}
-            key={i}
-            style={{
-              backgroundColor: color,
-              borderRadius: 4,
-              margin: 4,
-              outline: color === selected ? '2px solid #FFF' : undefined,
-              width: 32,
-              height: 32
-            }}
-          />
-        ))}
+        {project.colors
+          ? project.colors.map((color, i) => (
+              <ButtonBase
+                onClick={() => onChange(color)}
+                key={i}
+                style={{
+                  backgroundColor: color,
+                  borderRadius: 4,
+                  margin: 4,
+                  outline: color === selected ? '2px solid #FFF' : undefined,
+                  width: 32,
+                  height: 32
+                }}
+              />
+            ))
+          : null}
         {adding ? (
           <>
             <Button onClick={() => setAdding('')}>Cancel</Button>
@@ -45,10 +43,12 @@ export const ChooseColor = ({ selected, project, onChange }: OwnProps) => {
               onClick={async () => {
                 setAdding('')
                 onChange(adding)
-                await setProjectColors(dispatch, project, [
-                  ...colors,
-                  adding as string
-                ])
+                await editProject({
+                  id: project.id,
+                  newProj: {
+                    colors: [...(project.colors || []), adding]
+                  }
+                })
               }}
             >
               Add

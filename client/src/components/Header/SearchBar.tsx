@@ -2,12 +2,11 @@ import Paper from '@mui/material/Paper'
 import InputBase from '@mui/material/InputBase'
 import IconButton from '@mui/material/IconButton'
 import { useState } from 'react'
-import { useAppSelector } from '../../store/hooks'
-import { selectProjects } from '../../store/projects'
 import Close from '@mui/icons-material/Close'
 import fuzzysort from 'fuzzysort'
-import { List, ListItem } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { List, ListItemButton } from '@mui/material'
+import { Link } from '@tanstack/react-router'
+import { useGetProjectsQuery } from '../../store/api'
 
 type TResult = {
   title: string
@@ -19,7 +18,12 @@ type TResult = {
 export const HeaderSearchBar = () => {
   const [value, setValue] = useState('')
   const [results, setResults] = useState<TResult[]>([])
-  const projects = useAppSelector(selectProjects)
+
+  const { data: projects } = useGetProjectsQuery()
+
+  if (!projects) {
+    return null
+  }
 
   const populateResults = (search: string) => {
     let possibleResults: TResult[] = []
@@ -105,8 +109,7 @@ export const HeaderSearchBar = () => {
           >
             <List>
               {results.map((result, i) => (
-                <ListItem
-                  button
+                <ListItemButton
                   key={result.title + i + result.toId}
                   component={Link}
                   onClick={() => {
@@ -140,7 +143,7 @@ export const HeaderSearchBar = () => {
                   to={`/project/${result.projectId}`}
                 >
                   {result.title}
-                </ListItem>
+                </ListItemButton>
               ))}
             </List>
           </Paper>

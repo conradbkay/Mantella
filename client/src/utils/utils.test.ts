@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest'
 import { moveInArray } from './utils'
 
 test('moveInArray', () => {

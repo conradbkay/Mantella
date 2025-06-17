@@ -1,9 +1,9 @@
 import {
-  Theme,
   SnackbarContent,
   Snackbar,
   IconButton,
-  Button
+  Button,
+  useTheme
 } from '@mui/material'
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
@@ -12,45 +12,23 @@ import ErrorIcon from '@mui/icons-material/Error'
 import CloseIcon from '@mui/icons-material/Close'
 import { TVariant } from '../types/state'
 import Info from '@mui/icons-material/Info'
-import { makeStyles } from '@mui/styles'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
 import { CLOSE_SNACKBAR, selectSnackbar } from '../store/snackbar'
 
-type Classes = {
-  success: string
-  warning: string
-  error: string
-  standard: string
-}
-const getClassSnackbarVariant = (variant: TVariant, classes: Classes) => {
+const getBackgroundColor = (variant: TVariant, theme: any) => {
   if (variant === 'success') {
-    return classes.success
+    return '#43A047'
   } else if (variant === 'warning' || variant === 'undo') {
-    return classes.warning
+    return '#FFA000'
   } else if (variant === 'error') {
-    return classes.error
+    return theme.palette.error.dark
   } else {
-    return classes.standard
+    return theme.palette.primary.dark
   }
 }
 
 const FULL_WIDTH_POINT_PX = 960
 const AUTO_HIDE_POINT_MS = 3000
-
-const useStyles = makeStyles((theme: Theme) => ({
-  success: { backgroundColor: '#43A047' },
-  warning: { backgroundColor: '#FFA000' },
-  standard: { backgroundColor: theme.palette.primary.dark },
-  error: { backgroundColor: theme.palette.error.dark },
-  close: { width: 24, height: 24 },
-  message: { display: 'flex', alignItems: 'center' },
-  icon: { fontSize: 20, marginRight: theme.spacing(1) },
-  snackbar: {
-    [theme.breakpoints.down(FULL_WIDTH_POINT_PX)]: {
-      marginBottom: '0px !important'
-    }
-  }
-}))
 
 export const SnackbarRoot = () => {
   const variantIcon = {
@@ -61,9 +39,9 @@ export const SnackbarRoot = () => {
     undo: WarningIcon
   }
   const { open, message, variant } = useAppSelector(selectSnackbar)
-  const classes = useStyles()
+  const theme = useTheme()
   const dispatch = useAppDispatch()
-  const backgroundClass: string = getClassSnackbarVariant(variant, classes)
+  const backgroundColor = getBackgroundColor(variant, theme)
 
   const Icon = variantIcon[variant]
   return (
@@ -71,15 +49,19 @@ export const SnackbarRoot = () => {
       anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       open={open}
       style={{ marginBottom: 20 }}
-      className={classes.snackbar}
+      sx={{
+        [`@media (max-width: ${FULL_WIDTH_POINT_PX}px)`]: {
+          marginBottom: '0px !important'
+        }
+      }}
       autoHideDuration={variant === 'undo' ? 5000 : AUTO_HIDE_POINT_MS}
       onClose={() => dispatch(CLOSE_SNACKBAR())}
     >
       <SnackbarContent
-        className={backgroundClass}
+        sx={{ backgroundColor }}
         message={
-          <span className={classes.message}>
-            <Icon className={classes.icon} />
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            <Icon sx={{ fontSize: 20, marginRight: theme.spacing(1) }} />
             <span style={{ marginLeft: 15, fontSize: 15 }}>{message}</span>
           </span>
         }
@@ -90,12 +72,12 @@ export const SnackbarRoot = () => {
           <IconButton
             key="close"
             color="inherit"
-            className={classes.icon}
+            sx={{ fontSize: 20, marginRight: theme.spacing(1) }}
             onClick={() => {
               dispatch(CLOSE_SNACKBAR())
             }}
           >
-            <CloseIcon className={classes.close} />
+            <CloseIcon sx={{ width: 24, height: 24 }} />
           </IconButton>
         ]}
       />

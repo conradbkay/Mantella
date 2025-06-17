@@ -11,12 +11,12 @@ import { colors, colorForLightMode, transformDefault } from '../utils/color'
 import { getAllTasks, getProjectIdFromTaskId, id } from '../utils/utils'
 import { BaseTask } from './Task/Base'
 import { EditTaskModal } from './Task/Edit'
-import { Link } from 'react-router-dom'
+import { Link } from '@tanstack/react-router'
 import Add from '@mui/icons-material/Add'
-import { useAppSelector } from '../store/hooks'
-import { selectProjects } from '../store/projects'
 import { format, getHours } from 'date-fns'
 import useTitle from './useTitle'
+import { useGetProjectsQuery } from '../store/api'
+import { useAuthUser } from './PrivateRoute'
 
 const genColors = (theme: any) => {
   return Object.values({ ...colors }).map((c) => {
@@ -28,9 +28,9 @@ const genColors = (theme: any) => {
 
 export const Dashboard = () => {
   const [editingTaskId, setEditingTaskId] = useState('')
-  const projects = useAppSelector(selectProjects)
-  const user = useAppSelector((state) => state.user)
-  const tasks = getAllTasks(projects)
+  const { data: projects } = useGetProjectsQuery()
+  const { user } = useAuthUser()
+  const tasks = getAllTasks(projects || [])
   const theme = useTheme()
   let betterColors = genColors(theme)
 
@@ -41,11 +41,15 @@ export const Dashboard = () => {
   const dateDisplay =
     hours < 5 || hours >= 17 ? 'Evening' : hours >= 12 ? 'Afternoon' : 'Morning'
 
+  if (!projects || !user) {
+    return null
+  }
+
   return (
     <div
       style={{
         backgroundColor: theme.palette.background.paper,
-        minHeight: 'calc(100vh - 58.5px)',
+        minHeight: 'calc(100vh - 57.5px)',
         padding: '12px 24px'
       }}
     >
@@ -67,7 +71,7 @@ export const Dashboard = () => {
           {format(new Date(), 'h:mm a')}
         </Typography>
         <Typography variant="h3" style={{ color: theme.palette.text.primary }}>
-          Good {dateDisplay}, {user!.username.split(' ')[0]}
+          Good {dateDisplay}, {user?.username?.split(' ')[0] || 'User'}
         </Typography>
       </div>
       {projects.length ? (
@@ -180,7 +184,7 @@ export const Dashboard = () => {
               Your Tasks
             </Typography>
 
-            {tasks.map((task, i) => (
+            {tasks.map((task) => (
               <BaseTask
                 key={task.id}
                 style={{}}

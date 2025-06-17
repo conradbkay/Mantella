@@ -1,20 +1,18 @@
 import { configureStore } from '@reduxjs/toolkit'
 import snackbarReducer from './snackbar'
-import userReducer from './user'
 import filterReducer from './filter'
-import loadingReducer from './loading'
 import pomodoroReducer from './pomodoro'
-import projectsReducer from './projects'
+import { api } from './api'
 
 export const store = configureStore({
   reducer: {
-    user: userReducer,
     filter: filterReducer,
-    loading: loadingReducer,
     pomodoro: pomodoroReducer,
-    projects: projectsReducer,
-    snackbar: snackbarReducer
-  }
+    snackbar: snackbarReducer,
+    [api.reducerPath]: api.reducer
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(api.middleware)
 })
 
 export type RootState = ReturnType<typeof store.getState>

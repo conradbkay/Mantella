@@ -5,6 +5,7 @@ node_modules
 /coverage
 client/node_modules
 server/node_modules
+client/.tanstack
 client/.env
 server/.env
 server/ssl
@@ -16,3 +17,4 @@ deploy.sh
 server/image.tar
 server/dist
 server/build
+server/db

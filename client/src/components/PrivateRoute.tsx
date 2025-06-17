@@ -1,31 +1,18 @@
-import { Route, Redirect, RouteProps } from 'react-router'
-import { useAppSelector } from '../store/hooks'
-import { selectUser } from '../store/user'
-interface TProps extends RouteProps {
-  component?: any
-  componentProps: any
-}
+import { useCookieLoginMutation } from '../store/api'
+import { useEffect } from 'react'
 
-export const PrivateRoute = ({
-  component: PropComponent,
-  componentProps,
-  ...rest
-}: TProps) => {
-  const user = useAppSelector(selectUser)
+// Hook to get the current user from the latest auth query
+export const useAuthUser = () => {
+  const [cookieLogin, { data: userData, isLoading, error }] =
+    useCookieLoginMutation()
 
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        user !== null ? (
-          <PropComponent
-            params={props.match.params}
-            {...(componentProps as (typeof PropComponent)['props'])}
-          />
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
-  )
+  useEffect(() => {
+    cookieLogin()
+  }, [cookieLogin])
+
+  return {
+    user: userData?.user || null,
+    isLoading,
+    error
+  }
 }

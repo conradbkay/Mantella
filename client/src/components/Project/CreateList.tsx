@@ -9,38 +9,25 @@ import {
   IconButton
 } from '@mui/material'
 import Close from '@mui/icons-material/Close'
-import { TProject } from '../../types/project'
 import { useState } from 'react'
-import { APICreateList } from '../../API/list'
-import { useAppDispatch } from '../../store/hooks'
-import { SET_LIST } from '../../store/projects'
+import { useCreateListMutation } from '../../store/api'
 
 interface Props {
-  project: TProject
+  projectId: string
+  open: boolean
   onClose(): void
 }
 
-export const CreateList = ({ project, onClose }: Props) => {
+export const CreateList = ({ projectId, open, onClose }: Props) => {
   const [name, setName] = useState('')
-
-  const dispatch = useAppDispatch()
+  const [createList] = useCreateListMutation()
 
   return (
-    <Dialog open={true} onClose={onClose}>
+    <Dialog open={open} onClose={onClose}>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
-
-          const list = await APICreateList(project.id, name || 'List')
-
-          dispatch(
-            SET_LIST({
-              id: list.id,
-              projectId: project.id,
-              newList: list
-            })
-          )
-
+          createList({ projId: projectId, name: name || 'List' })
           onClose()
         }}
       >

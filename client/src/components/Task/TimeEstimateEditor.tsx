@@ -9,51 +9,53 @@ import {
 } from '@mui/material'
 import { TTask } from '../../types/project'
 
-type TimeEstimate = TTask['timeEstimate']
-
 interface TimeEstimateEditorProps {
-  timeEstimate?: TimeEstimate
-  onChange: (timeEstimate: TimeEstimate | undefined) => void
+  onChange: (merge: Partial<TTask>) => void
+  task: TTask
 }
 
 export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
-  timeEstimate,
-  onChange
+  onChange,
+  task
 }) => {
-  const [enabled, setEnabled] = useState(!!timeEstimate)
+  const [enabled, setEnabled] = useState(false)
 
   const handleEstimateChange = (value: number) => {
     if (!enabled) return
 
     onChange(
-      timeEstimate
+      task.timeEstimateValue
         ? {
-            ...timeEstimate,
-            estimate: value
+            ...task,
+            timeEstimateValue: value
           }
         : {
-            estimate: value,
-            low: { value: undefined, percentile: 10 },
-            high: { value: undefined, percentile: 90 }
+            timeEstimateValue: value,
+            timeEstimateLowValue: undefined,
+            timeEstimateLowPercentile: 10,
+            timeEstimateHighValue: undefined,
+            timeEstimateHighPercentile: 90
           }
     )
   }
 
   const handleLowChange = (value: number, percentile: number) => {
-    if (!enabled || !timeEstimate) return
+    if (!enabled || !task.timeEstimateValue) return
 
     onChange({
-      ...timeEstimate,
-      low: { value, percentile }
+      ...task,
+      timeEstimateLowValue: value,
+      timeEstimateLowPercentile: percentile
     })
   }
 
   const handleHighChange = (value: number, percentile: number) => {
-    if (!enabled || !timeEstimate) return
+    if (!enabled || !task.timeEstimateValue) return
 
     onChange({
-      ...timeEstimate,
-      high: { value, percentile }
+      ...task,
+      timeEstimateHighValue: value,
+      timeEstimateHighPercentile: percentile
     })
   }
 
@@ -61,12 +63,20 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
     setEnabled(enabled)
     if (enabled) {
       onChange({
-        estimate: 1,
-        low: { value: undefined, percentile: 10 },
-        high: { value: undefined, percentile: 90 }
+        timeEstimateValue: 1,
+        timeEstimateLowValue: undefined,
+        timeEstimateLowPercentile: 10,
+        timeEstimateHighValue: undefined,
+        timeEstimateHighPercentile: 90
       })
     } else {
-      onChange(undefined)
+      onChange({
+        timeEstimateValue: undefined,
+        timeEstimateLowValue: undefined,
+        timeEstimateLowPercentile: undefined,
+        timeEstimateHighValue: undefined,
+        timeEstimateHighPercentile: undefined
+      })
     }
   }
 
@@ -88,7 +98,7 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
             <TextField
               type="number"
               label="Median Estimate (hours)"
-              value={timeEstimate?.estimate || ''}
+              value={task.timeEstimateValue || ''}
               onChange={(e) =>
                 handleEstimateChange(parseFloat(e.target.value) || 0)
               }
@@ -103,11 +113,11 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
             <TextField
               type="number"
               label="Low Estimate (hours)"
-              value={timeEstimate?.low?.value || ''}
+              value={task.timeEstimateLowValue || ''}
               onChange={(e) =>
                 handleLowChange(
                   parseFloat(e.target.value) || 0,
-                  timeEstimate?.low?.percentile || 10
+                  task.timeEstimateLowPercentile || 10
                 )
               }
               InputProps={{
@@ -118,10 +128,10 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
             <TextField
               type="number"
               label="Percentile"
-              value={timeEstimate?.low?.percentile || ''}
+              value={task.timeEstimateLowPercentile || ''}
               onChange={(e) =>
                 handleLowChange(
-                  timeEstimate?.low?.value || 0,
+                  task.timeEstimateLowValue || 0,
                   parseInt(e.target.value) || 10
                 )
               }
@@ -139,11 +149,11 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
             <TextField
               type="number"
               label="High Estimate (hours)"
-              value={timeEstimate?.high?.value || ''}
+              value={task.timeEstimateHighValue || ''}
               onChange={(e) =>
                 handleHighChange(
                   parseFloat(e.target.value) || 0,
-                  timeEstimate?.high?.percentile || 90
+                  task.timeEstimateHighPercentile || 90
                 )
               }
               InputProps={{
@@ -154,10 +164,10 @@ export const TimeEstimateEditor: React.FC<TimeEstimateEditorProps> = ({
             <TextField
               type="number"
               label="Percentile"
-              value={timeEstimate?.high?.percentile || ''}
+              value={task.timeEstimateHighPercentile || ''}
               onChange={(e) =>
                 handleHighChange(
-                  timeEstimate?.high?.value || 0,
+                  task.timeEstimateHighValue || 0,
                   parseInt(e.target.value) || 90
                 )
               }

@@ -1,218 +1,291 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assignUserToTask = exports.setComment = exports.setSubtask = exports.replaceListIds = exports.dragTask = exports.deleteTask = exports.editTask = exports.createTask = void 0;
-const Project_1 = require("../models/Project");
+exports.assignUserToTask = exports.setComment = exports.setSubtask = exports.replaceListIds = exports.dragTask = exports.deleteTask = exports.editTask = exports.createTask = exports.validateAssignUserToTask = exports.validateSetComment = exports.validateSetSubtask = exports.validateDragTask = exports.validateDeleteTask = exports.validateEditTask = exports.validateCreateTask = void 0;
+const project_1 = require("../db/project");
 const nanoid_1 = require("nanoid");
-const router_1 = require("./router");
-const passport_1 = require("../passport");
-const userResolver_1 = require("../utils/userResolver");
-const createTask = async (req, res) => {
-    const taskId = (0, nanoid_1.nanoid)();
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (proj) {
-        proj.tasks.push({
-            createdAt: new Date().toString(),
+const taskPositions_1 = require("../db/taskPositions");
+const toApi_1 = require("../db/toApi");
+const db_1 = require("../db/db");
+const zod_1 = require("zod");
+const validate_1 = require("../middleware/validate");
+// Zod validation schemas
+const createTaskSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    listId: zod_1.z.string().min(1, 'List ID is required'),
+    taskInfo: zod_1.z.object({
+        name: zod_1.z.string().optional(),
+        points: zod_1.z.number().optional(),
+        color: zod_1.z.string().optional(),
+        dueDate: zod_1.z.string().optional(),
+        description: zod_1.z.string().optional(),
+        subTasks: zod_1.z.array(zod_1.z.any()).optional()
+    })
+});
+const editTaskSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    taskId: zod_1.z.string().min(1, 'Task ID is required'),
+    task: zod_1.z.any()
+});
+const deleteTaskSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    id: zod_1.z.string().min(1, 'Task ID is required')
+});
+const dragTaskSchema = zod_1.z.object({
+    projectId: zod_1.z.string().min(1, 'Project ID is required'),
+    taskId: zod_1.z.string().min(1, 'Task ID is required'),
+    toListId: zod_1.z.string().min(1, 'List ID is required'),
+    toProgress: zod_1.z.number(),
+    toIdx: zod_1.z.number()
+});
+const setSubtaskSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    taskId: zod_1.z.string().min(1, 'Task ID is required'),
+    subtaskId: zod_1.z.string().min(1, 'Subtask ID is required'),
+    info: zod_1.z
+        .object({
+        name: zod_1.z.string().optional(),
+        completed: zod_1.z.boolean().optional(),
+        orderIndex: zod_1.z.number().optional()
+    })
+        .optional()
+});
+const setCommentSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    taskId: zod_1.z.string().min(1, 'Task ID is required'),
+    commentId: zod_1.z.string().min(1, 'Comment ID is required'),
+    description: zod_1.z.string().min(1, 'Description is required')
+});
+const assignUserToTaskSchema = zod_1.z.object({
+    projId: zod_1.z.string().min(1, 'Project ID is required'),
+    taskId: zod_1.z.string().min(1, 'Task ID is required'),
+    userId: zod_1.z.string().min(1, 'User ID is required')
+});
+exports.validateCreateTask = (0, validate_1.validateRequest)(createTaskSchema);
+exports.validateEditTask = (0, validate_1.validateRequest)(editTaskSchema);
+exports.validateDeleteTask = (0, validate_1.validateRequest)(deleteTaskSchema);
+exports.validateDragTask = (0, validate_1.validateRequest)(dragTaskSchema);
+exports.validateSetSubtask = (0, validate_1.validateRequest)(setSubtaskSchema);
+exports.validateSetComment = (0, validate_1.validateRequest)(setCommentSchema);
+exports.validateAssignUserToTask = (0, validate_1.validateRequest)(assignUserToTaskSchema);
+const createTask = async (req, res, next) => {
+    try {
+        const { projId, listId, taskInfo } = createTaskSchema.parse(req.body);
+        const project = await (0, project_1.findProjectById)(projId);
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+        const taskId = (0, nanoid_1.nanoid)();
+        const task = await (0, project_1.createTask)(projId, {
             id: taskId,
-            name: req.body.taskInfo.name || 'Unnamed Task',
-            points: req.body.taskInfo.points || 0,
-            timeEstimate: req.body.taskInfo.timeEstimate || undefined,
+            name: taskInfo.name || 'Unnamed Task',
+            points: taskInfo.points || 0,
             workedOnMs: 0,
-            color: req.body.taskInfo.color || '#FFFFFF',
-            dueDate: req.body.taskInfo.dueDate
-                ? new Date(req.body.taskInfo.dueDate).toString()
-                : undefined,
-            subTasks: req.body.taskInfo.subTasks
-                ? req.body.taskInfo.subTasks.map((subT) => (Object.assign(Object.assign({}, subT), { id: (0, nanoid_1.nanoid)() })))
-                : [],
-            comments: [],
-            description: req.body.taskInfo.description,
-            assignedTo: []
+            color: taskInfo.color || '#FFFFFF',
+            dueDate: taskInfo.dueDate
+                ? new Date(taskInfo.dueDate).toISOString()
+                : null,
+            description: taskInfo.description || null
         });
-        const list = proj.lists.find((col) => col.id === req.body.listId);
-        list.taskIds[0] = [...list.taskIds[0], taskId];
-        proj.markModified('tasks');
-        proj.markModified('lists');
-        const newProj = await proj.save();
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
-        const task = resolvedProject.tasks.find((tk) => taskId === tk.id);
-        res.json({
-            project: resolvedProject,
-            task: task
-        });
+        if (taskInfo.subTasks && taskInfo.subTasks.length > 0) {
+            const subtaskPromises = taskInfo.subTasks.map((subT, index) => db_1.db
+                .insertInto('subtasks')
+                .values({
+                id: subT.id || (0, nanoid_1.nanoid)(),
+                taskId: task.id,
+                name: subT.name,
+                completed: subT.completed ? 1 : 0,
+                orderIndex: index
+            })
+                .execute());
+            await Promise.all(subtaskPromises);
+        }
+        await (0, taskPositions_1.addTaskToColumn)(task.id, listId, 0); // Add to "todo" column by default
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
+        }
+        const newTask = updatedProject.tasks.find((t) => t.id === taskId);
+        res.json({ project: updatedProject, task: newTask });
     }
-    else {
-        throw new Error('proj id not exist');
+    catch (error) {
+        next(error);
     }
 };
 exports.createTask = createTask;
-router_1.router.post('/createTask', passport_1.isAuthenticated, exports.createTask);
-const editTask = async (req, res) => {
-    const project = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (project) {
-        const idx = project.tasks.findIndex((tsk) => tsk.id === req.body.taskId);
-        const task = project.tasks[idx];
-        project.tasks[idx] = Object.assign(Object.assign({}, task), req.body.task);
-        project.markModified('tasks'); // mongo won't notice that tasks were modified without this since it's so nested
-        const newProj = await project.save();
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
-        if (task) {
-            res.json({
-                project: resolvedProject,
-                task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId)
-            });
+const editTask = async (req, res, next) => {
+    try {
+        const { projId, taskId, task } = editTaskSchema.parse(req.body);
+        const updatedTask = await (0, project_1.updateTask)(taskId, task);
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
         }
-        else {
-            throw new Error('Task not created');
-        }
+        res.json({ project: updatedProject, task: updatedTask });
     }
-    else {
-        throw new Error('project not able to be updated');
+    catch (error) {
+        next(error);
     }
 };
 exports.editTask = editTask;
-router_1.router.post('/editTask', passport_1.isAuthenticated, exports.editTask);
-const deleteTask = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (proj) {
-        proj.tasks = proj.tasks.filter((task) => task.id !== req.body.id);
-        proj.lists.forEach((list) => {
-            list.taskIds.forEach((ids, i) => {
-                if (ids.includes(req.body.id)) {
-                    list.taskIds[i].splice(ids.indexOf(req.body.id), 1);
-                }
-            });
-        });
-        proj.markModified('tasks');
-        proj.markModified('lists');
-        const newProj = await proj.save();
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
-        res.json({ project: resolvedProject, task: null });
+const deleteTask = async (req, res, next) => {
+    try {
+        const { projId, id } = deleteTaskSchema.parse(req.body);
+        await db_1.db.deleteFrom('tasks').where('id', '=', id).execute(); // Cascade delete will handle related data
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
+        }
+        res.json({ project: updatedProject, task: null });
     }
-    else {
-        throw new Error('project not defined');
+    catch (error) {
+        next(error);
     }
 };
 exports.deleteTask = deleteTask;
-router_1.router.post('/deleteTask', passport_1.isAuthenticated, exports.deleteTask);
-const dragTask = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (proj) {
-        const oldListIdx = proj.lists.findIndex((list) => list.id === req.body.from[0]);
-        const newListIdx = proj.lists.findIndex((list) => list.id === req.body.to[0]);
-        proj.lists[oldListIdx].taskIds[req.body.from[1]] = req.body.from[2];
-        proj.lists[newListIdx].taskIds[req.body.to[1]] = req.body.to[2];
-        proj.markModified('lists'); // mongoose does not watch subarrays this deep
-        const newProj = await proj.save();
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
-        res.json({ project: resolvedProject });
+const dragTask = async (req, res, next) => {
+    try {
+        const { projectId, taskId, toListId, toProgress, toIdx } = dragTaskSchema.parse(req.body);
+        await (0, taskPositions_1.moveTaskToPosition)(taskId, toListId, toProgress, toIdx);
+        const updatedProject = await (0, toApi_1.getFullProject)(projectId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
+        }
+        res.json({ project: updatedProject });
     }
-    else {
-        throw new Error('project not defined');
+    catch (error) {
+        next(error);
     }
 };
 exports.dragTask = dragTask;
-router_1.router.post('/dragTask', passport_1.isAuthenticated, exports.dragTask);
 const replaceListIds = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (proj) {
-        for (let list of req.body.lists) {
-            const listIdx = proj.lists.findIndex((l) => l.id === list.id);
-            proj.lists[listIdx].taskIds = list.taskIds;
+    // This function updates task positions based on list changes
+    const { lists, projectId } = req.body;
+    if (lists && projectId) {
+        // Update task positions based on the new list structure
+        await (0, taskPositions_1.updateTaskPositions)(lists);
+        const updatedProject = await (0, toApi_1.getFullProject)(projectId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
         }
-        proj.markModified('lists'); // mongoose does not watch subarrays this deep
-        await proj.save();
-        res.json({ message: 'success' });
+        res.json({ project: updatedProject });
     }
     else {
-        throw new Error('project not defined');
+        res.status(400).json({ error: 'Missing lists or projectId' });
     }
 };
 exports.replaceListIds = replaceListIds;
-router_1.router.post('/replaceListIds', passport_1.isAuthenticated, exports.replaceListIds);
-const setSubtask = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (proj) {
-        const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId);
-        const subTask = task.subTasks.find((subT) => subT.id === req.body.subtaskId);
-        if (!subTask) {
-            task.subTasks.push({
-                completed: false,
-                name: req.body.info.name || 'Subtask',
-                id: req.body.subtaskId
-            });
-        }
-        else if (!req.body.info) {
-            task.subTasks = task.subTasks.filter((sub) => sub.id !== req.body.subtaskId);
+const setSubtask = async (req, res, next) => {
+    try {
+        const { projId, taskId, subtaskId, info } = setSubtaskSchema.parse(req.body);
+        const existingSubtask = await db_1.db
+            .selectFrom('subtasks')
+            .selectAll()
+            .where('id', '=', subtaskId)
+            .executeTakeFirst();
+        if (info) {
+            if (existingSubtask) {
+                await db_1.db
+                    .updateTable('subtasks')
+                    .set({
+                    name: info.name,
+                    completed: info.completed ? 1 : 0
+                })
+                    .where('id', '=', subtaskId)
+                    .execute();
+            }
+            else {
+                await db_1.db
+                    .insertInto('subtasks')
+                    .values({
+                    id: subtaskId,
+                    name: info.name || 'New subtask',
+                    completed: info.completed ? 1 : 0,
+                    taskId: taskId,
+                    orderIndex: info.orderIndex || 0
+                })
+                    .execute();
+            }
         }
         else {
-            subTask.completed =
-                req.body.info.completed !== null &&
-                    req.body.info.completed !== undefined
-                    ? req.body.info.completed
-                    : subTask.completed;
-            subTask.name =
-                req.body.info.name !== null && req.body.info.name !== undefined
-                    ? req.body.info.name
-                    : subTask.name;
+            await db_1.db.deleteFrom('subtasks').where('id', '=', subtaskId).execute();
         }
-        const newProj = await proj.save();
-        res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) });
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
+        }
+        const updatedTask = updatedProject.tasks.find((t) => t.id === taskId);
+        res.json({ project: updatedProject, task: updatedTask });
     }
-    else {
-        throw new Error('project not defined');
+    catch (error) {
+        next(error);
     }
 };
 exports.setSubtask = setSubtask;
-router_1.router.post('/setSubtask', passport_1.isAuthenticated, exports.setSubtask);
-const setComment = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (proj) {
-        const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId);
-        if (req.body.commentId) {
-            const comment = task.comments.find((com) => com.id === req.body.commentId);
-            if (!req.body.description) {
-                ;
-                comment.remove();
-            }
-            else {
-                comment.comment = req.body.description;
-            }
+const setComment = async (req, res, next) => {
+    try {
+        const { projId, taskId, commentId, description } = setCommentSchema.parse(req.body);
+        // Upsert comment
+        await db_1.db
+            .insertInto('comments')
+            .values({
+            id: commentId,
+            taskId,
+            comment: description,
+            lastEdited: new Date().toISOString()
+        })
+            .onConflict((oc) => oc.column('id').doUpdateSet({
+            comment: description,
+            lastEdited: new Date().toISOString()
+        }))
+            .execute();
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
         }
-        else {
-            task.comments.push({
-                dateAdded: new Date().toString(),
-                comment: req.body.description || 'Comment',
-                id: (0, nanoid_1.nanoid)()
-            });
-        }
-        const newProj = await proj.save();
-        res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) });
+        const updatedTask = updatedProject.tasks.find((t) => t.id === taskId);
+        res.json({ project: updatedProject, task: updatedTask });
     }
-    else {
-        throw new Error('project not defined');
+    catch (error) {
+        next(error);
     }
 };
 exports.setComment = setComment;
-router_1.router.post('/setComment', passport_1.isAuthenticated, exports.setComment);
-const assignUserToTask = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.projId });
-    if (!proj) {
-        throw new Error('Project does not exist');
+const assignUserToTask = async (req, res, next) => {
+    try {
+        const { projId, taskId, userId } = assignUserToTaskSchema.parse(req.body);
+        // Check if assignment already exists
+        const existing = await db_1.db
+            .selectFrom('taskAssignments')
+            .where('taskId', '=', taskId)
+            .where('userId', '=', userId)
+            .select('id')
+            .executeTakeFirst();
+        if (!existing) {
+            await db_1.db
+                .insertInto('taskAssignments')
+                .values({ taskId, userId })
+                .execute();
+        }
+        // Note: No functionality to un-assign in this endpoint
+        const updatedProject = await (0, toApi_1.getFullProject)(projId);
+        if (!updatedProject) {
+            res.status(404).json({ error: 'Project not found after update' });
+            return;
+        }
+        const updatedTask = updatedProject.tasks.find((t) => t.id === taskId);
+        res.json({ project: updatedProject, task: updatedTask });
     }
-    const task = proj.tasks.find((tsk) => tsk.id === req.body.taskId);
-    if (!task) {
-        throw new Error('task not in project');
+    catch (error) {
+        next(error);
     }
-    if (task.assignedTo.includes(req.body.userId)) {
-        task.assignedTo.splice(task.assignedTo.indexOf(req.body.userId), 1);
-    }
-    else {
-        task.assignedTo.push(req.body.userId);
-    }
-    proj.markModified('tasks');
-    const newProj = await proj.save();
-    res.json({ task: newProj.tasks.find((tsk) => tsk.id === req.body.taskId) });
 };
 exports.assignUserToTask = assignUserToTask;
-router_1.router.post('/assignUserToTask', passport_1.isAuthenticated, exports.assignUserToTask);
 //# sourceMappingURL=task.js.map

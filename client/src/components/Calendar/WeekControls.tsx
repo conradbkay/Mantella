@@ -1,22 +1,11 @@
 import { CSSProperties } from 'react'
 import { TProject } from '../../types/project'
-import { Select, MenuItem, IconButton, Theme } from '@mui/material'
+import { Select, MenuItem, IconButton, useTheme, Box } from '@mui/material'
 import NavigateNext from '@mui/icons-material/NavigateNext'
 import NavigateBefore from '@mui/icons-material/NavigateBefore'
 import { format, addDays, subDays } from 'date-fns'
-import { makeStyles } from '@mui/styles'
-const mobilePx = 750
 
-const useStyles = makeStyles((theme: Theme) => ({
-  nav: {
-    [theme.breakpoints.up(mobilePx)]: {
-      ...boxStyle
-    },
-    [theme.breakpoints.down(mobilePx)]: {
-      marginRight: 'auto'
-    }
-  }
-}))
+const mobilePx = 750
 
 const boxStyle: CSSProperties = {
   alignItems: 'center',
@@ -35,8 +24,7 @@ interface Props {
 
 export const WeekControls = (props: Props) => {
   const { projects, toggleProject, currIds } = props
-
-  const classes = useStyles()
+  const theme = useTheme()
 
   return (
     <div
@@ -69,7 +57,16 @@ export const WeekControls = (props: Props) => {
           </MenuItem>
         ))}
       </Select>
-      <div className={classes.nav}>
+      <Box
+        sx={{
+          [theme.breakpoints.up(mobilePx)]: {
+            ...boxStyle
+          },
+          [theme.breakpoints.down(mobilePx)]: {
+            marginRight: 'auto'
+          }
+        }}
+      >
         <IconButton onClick={() => props.setDate(subDays(props.startDay, 6))}>
           <NavigateBefore />
         </IconButton>
@@ -82,7 +79,7 @@ export const WeekControls = (props: Props) => {
         <IconButton onClick={() => props.setDate(addDays(props.startDay, 8))}>
           <NavigateNext />
         </IconButton>
-      </div>
+      </Box>
       {window.innerWidth >= mobilePx && <div style={boxStyle} />}
     </div>
   )

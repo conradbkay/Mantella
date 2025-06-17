@@ -19,21 +19,25 @@ import {
 } from '@mui/material'
 import { id } from '../../utils/utils'
 import Menu from '@mui/icons-material/Menu'
-import { filterTask /*filterTasks*/ } from '../../utils/filterTasks'
+import { filterTask } from '../../utils/filterTasks'
 import { input } from './styles'
 import { useDroppable } from '@dnd-kit/core'
 import DraggableTask from '../Task/Draggable'
 import { PROJECT_BORDER, PROJECT_BORDER_COLOR } from './Project'
-import { TState } from '../../types/state'
-import { useDispatch, useSelector } from 'react-redux'
-import { SortableContext } from '@dnd-kit/sortable'
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import ArrowDownward from '@mui/icons-material/ArrowDownward'
 import ArrowUpward from '@mui/icons-material/ArrowUpward'
-import { APIDeleteList, APISetListIdx } from '../../API/list'
-import { SET_LIST, SET_LIST_IDX } from '../../store/projects'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
 import Add from '@mui/icons-material/Add'
+import {
+  useDeleteListMutation,
+  useGetProjectsQuery,
+  useEditListMutation,
+  useSetListIdxMutation
+} from '../../store/api'
+import { useAppSelector } from '../../store/hooks'
+
 interface Props {
   project: TProject
   list: TList
@@ -95,20 +99,18 @@ export const ProjectCell = memo(
     //const [collapsed, setCollapsed] = useState(false)
     const collapsed = false // TODO: a bunch of problems
 
-    const { filter } = useSelector((state: TState) => ({
-      filter: state.filter
-    }))
+    const filter = useAppSelector((state) => state.filter)
 
-    const dispatch = useDispatch()
+    const [editListMutation] = useEditListMutation()
+    const [setListIdxMutation] = useSetListIdxMutation()
+    const [deleteListMutation] = useDeleteListMutation()
 
     const editList = () => {
-      dispatch(
-        SET_LIST({
-          id: editingList[0],
-          projectId: project.id,
-          newList: { name: editingList[1] }
-        })
-      )
+      editListMutation({
+        listId: editingList[0],
+        projId: project.id,
+        newList: { name: editingList[1] }
+      })
       setEditingList(['', ''])
     }
 
@@ -140,24 +142,21 @@ export const ProjectCell = memo(
     const { setNodeRef } = useDroppable({ id: `${list.id}|${progress}` })
 
     const deleteList = () => {
-      dispatch(
-        SET_LIST({
-          id: list.id,
-          projectId: project.id,
-          newList: undefined
-        })
-      )
-
-      APIDeleteList({ id: list.id, projId: project.id })
+      deleteListMutation({ id: list.id, projId: project.id })
     }
 
     const setListIdx = (id: string, offset: number) => {
-      dispatch(SET_LIST_IDX({ id, offset, projectId: project.id }))
+      setListIdxMutation({ listId: id, offset: offset, projId: project.id })
       setAnchorEl(null)
-      APISetListIdx({ id, offset, projId: project.id })
     }
 
     const theme = useTheme()
+
+    const { data: projects } = useGetProjectsQuery()
+
+    if (!projects) {
+      return null
+    }
 
     const menuItems = (
       <div>
@@ -364,7 +363,7 @@ export const ProjectCell = memo(
           <SortableContext
             id={`${list.id}|${progress}`}
             items={tasks.map((task) => task.id)}
-            strategy={(() => {}) as any}
+            strategy={verticalListSortingStrategy}
           >
             <div ref={setNodeRef} style={{ height: '100%', maxWidth: '100%' }}>
               <div
@@ -376,7 +375,7 @@ export const ProjectCell = memo(
                 }}
               >
                 {!collapsed
-                  ? tasks.map((task, i) => (
+                  ? tasks.map((task) => (
                       <DraggableTask id={task.id} key={task.id}>
                         <BaseTask
                           showProgress={viewType === 'lists'}

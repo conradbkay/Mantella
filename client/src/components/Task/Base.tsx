@@ -18,11 +18,9 @@ import PlayArrow from '@mui/icons-material/PlayArrow'
 import Pause from '@mui/icons-material/Pause'
 import Comment from '@mui/icons-material/Comment'
 import List from '@mui/icons-material/List'
-import { Transition, animated } from 'react-spring/renderprops'
+import { Transition, animated } from 'react-spring'
 import { TProject } from '../../types/project'
 import { isBefore } from 'date-fns'
-import { APISetSubtask } from '../../API/project'
-import { makeStyles } from '@mui/styles'
 import { SubtaskMap } from './SubtaskMap'
 import { id } from '../../utils/utils'
 import { useDroppable } from '@dnd-kit/core'
@@ -30,13 +28,14 @@ import DraggableAvatar from './DraggableAvatar'
 import { taskDummyOpacity } from '../Project/Project'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { SELECT_POMODORO_TASK, TOGGLE_TIMER } from '../../store/pomodoro'
-import { SET_SUBTASK } from '../../store/projects'
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline'
 import Edit from '@mui/icons-material/Edit'
 import Delete from '@mui/icons-material/Delete'
 import { useTaskColor } from '../../utils/color'
 import { Description } from '../TextEditor/DescriptionEditor'
-import { deleteTask } from '../../actions/task'
+import { useDeleteTaskMutation } from '../../store/api'
+import { useSetSubtaskMutation } from '../../store/api'
+import { ApiTask } from '@shared/types'
 
 const useInterval = (callback: () => void, delay: number) => {
   const savedCallback = useRef(undefined as any)
@@ -81,45 +80,22 @@ const getProgress = (id: string, project: TProject) => {
 
   return 0
 }
-
-const useStyles = makeStyles(() => ({
-  badgeColor: {
-    backgroundColor: '#4caf50'
-  },
-  badge: {
-    marginTop: 15,
-    marginRight: 15
-  },
-  input: {
-    cursor: 'inherit',
-    position: 'absolute',
-    opacity: 0,
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    margin: 0,
-    padding: 0
-  },
-  play: {
-    padding: 6,
-    marginRight: 2,
-    color: 'rgba(0, 0, 0, 0.54)'
-  }
-}))
-
 // Helper component to render time estimate info
-const TimeEstimateDisplay = ({
-  timeEstimate
-}: {
-  timeEstimate?: TTask['timeEstimate']
-}) => {
-  if (!timeEstimate || timeEstimate.estimate === undefined) return null
+const TimeEstimateDisplay = ({ task }: { task: ApiTask }) => {
+  const {
+    timeEstimateValue,
+    timeEstimateLowPercentile,
+    timeEstimateHighPercentile,
+    timeEstimateLowValue,
+    timeEstimateHighValue
+  } = task
+
+  if (!timeEstimateValue) return null
 
   return (
     <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
       <Chip
-        label={`${timeEstimate.estimate}hr`}
+        label={`${timeEstimateValue}hr`}
         size="small"
         variant="filled"
         sx={{
@@ -129,9 +105,9 @@ const TimeEstimateDisplay = ({
           borderColor: 'divider'
         }}
       />
-      {Boolean(timeEstimate.low.value) && (
+      {timeEstimateLowValue ? (
         <Chip
-          label={`${timeEstimate.low.value}hr p${timeEstimate.low.percentile}`}
+          label={`${timeEstimateLowValue}hr p${timeEstimateLowPercentile}`}
           size="small"
           variant="outlined"
           sx={{
@@ -141,10 +117,10 @@ const TimeEstimateDisplay = ({
             borderColor: 'divider'
           }}
         />
-      )}
-      {Boolean(timeEstimate.high.value) && (
+      ) : null}
+      {timeEstimateHighValue ? (
         <Chip
-          label={`${timeEstimate.high.value}hr p${timeEstimate.high.percentile}`}
+          label={`${timeEstimateHighValue}hr p${timeEstimateHighPercentile}`}
           size="small"
           variant="outlined"
           sx={{
@@ -154,7 +130,7 @@ const TimeEstimateDisplay = ({
             borderColor: 'divider'
           }}
         />
-      )}
+      ) : null}
     </Box>
   )
 }
@@ -167,16 +143,16 @@ export const BaseTask = memo(
     isDragging,
     hidden,
     style,
-    showProgress,
-    isDraggingUser
+    showProgress
   }: OwnProps) => {
+    const [deleteTaskMutation] = useDeleteTaskMutation()
+    const [setSubtaskMutation] = useSetSubtaskMutation()
+
     const [rightClickAnchorEl, setRightClickAnchorEl] =
       useState<null | EventTarget>(null)
 
     const dispatch = useAppDispatch()
-    const { pomodoro } = useAppSelector((state) => ({
-      pomodoro: state.pomodoro
-    }))
+    const pomodoro = useAppSelector((state) => state.pomodoro)
 
     const { backgroundColor, textColor, secondary } = useTaskColor(task.color)
     const finalTextColor = isDragging ? secondary : textColor
@@ -198,8 +174,6 @@ export const BaseTask = memo(
     }, 1000)
 
     const MIN_HEIGHT = 20
-
-    const classes = useStyles()
 
     const { setNodeRef } = useDroppable({
       id: /*'ASSIGNED|' + */ task.id,
@@ -253,7 +227,10 @@ export const BaseTask = memo(
           <MenuItem
             onClick={() => {
               setRightClickAnchorEl(null)
-              deleteTask(dispatch, task.id, project.id)
+              deleteTaskMutation({
+                id: task.id,
+                projId: project.id
+              })
             }}
           >
             <ListItemIcon>
@@ -301,9 +278,14 @@ export const BaseTask = memo(
             }}
           >
             <Badge
-              classes={{
-                colorSecondary: classes.badgeColor,
-                badge: classes.badge
+              sx={{
+                '& .MuiBadge-colorSecondary': {
+                  backgroundColor: '#4caf50'
+                },
+                '& .MuiBadge-badge': {
+                  marginTop: 2,
+                  marginRight: 2
+                }
               }}
               color={'primary'}
               badgeContent={task.points}
@@ -339,7 +321,7 @@ export const BaseTask = memo(
                     }}
                   >
                     {task.assignedTo &&
-                      task.assignedTo.map((userId, i) => (
+                      task.assignedTo.map((userId) => (
                         <DraggableAvatar
                           noMargin
                           key={userId}
@@ -365,7 +347,7 @@ export const BaseTask = memo(
                 </div>
 
                 {/* Time Estimate Display */}
-                <TimeEstimateDisplay timeEstimate={task.timeEstimate} />
+                <TimeEstimateDisplay task={task} />
 
                 {task.description && (
                   <div style={{ marginTop: 4, marginLeft: 4 }}>
@@ -380,21 +362,15 @@ export const BaseTask = memo(
                 <SubtaskMap
                   show={showSubTasks}
                   subTasks={task.subTasks}
-                  taskId={task.id}
                   onCheckbox={(newSub: TSubtask) => {
-                    dispatch(
-                      SET_SUBTASK({
-                        taskId: task.id,
-                        projectId: project.id,
-                        id: newSub.id,
-                        newSubtask: newSub
-                      })
-                    )
-                    APISetSubtask({
+                    setSubtaskMutation({
                       projId: project.id,
                       taskId: task.id,
                       subtaskId: newSub.id,
-                      info: { name: newSub.name, completed: newSub.completed }
+                      info: {
+                        name: newSub.name,
+                        completed: newSub.completed
+                      }
                     })
                   }}
                 />
@@ -432,7 +408,7 @@ export const BaseTask = memo(
                                     formatDueDate({
                                       ...task,
                                       dueDate: comment.dateAdded,
-                                      recurrance: undefined
+                                      recurrenceInterval: null
                                     }).split('Due')[1]
                                   }
                                 </span>
@@ -469,7 +445,11 @@ export const BaseTask = memo(
                   {Object.values(task.comments).length !== 0 && (
                     <IconButton
                       aria-label="show comments"
-                      className={classes.play}
+                      sx={{
+                        padding: 0.75,
+                        marginRight: 0.25,
+                        color: 'rgba(0, 0, 0, 0.54)'
+                      }}
                       onClick={(e) => {
                         e.stopPropagation()
                         setShowComments(!showComments)
@@ -481,8 +461,11 @@ export const BaseTask = memo(
                   {Object.values(task.subTasks).length !== 0 && (
                     <IconButton
                       aria-label="show subtasks"
-                      style={{ marginRight: 8 }}
-                      className={classes.play}
+                      sx={{
+                        padding: 0.75,
+                        marginRight: 1,
+                        color: 'rgba(0, 0, 0, 0.54)'
+                      }}
                       onClick={(e) => {
                         // eventually have it toggle icon based on current showSubtasks(same with comments)
                         e.stopPropagation()
@@ -492,7 +475,7 @@ export const BaseTask = memo(
                       <List />
                     </IconButton>
                   )}
-                  {task.workedOnMs !== 0 && (
+                  {task.workedOnMs ? (
                     <span
                       style={{
                         alignSelf: 'center',
@@ -504,13 +487,15 @@ export const BaseTask = memo(
                       Worked on for{' '}
                       {toDaysHHMMSS(Math.floor(task.workedOnMs / 1000), true)}
                     </span>
-                  )}
+                  ) : null}
                   <TimeIcon
                     style={{
                       marginLeft: 'auto',
-                      color: theme.palette.text.secondary
+                      color: theme.palette.text.secondary,
+                      padding: 6,
+                      marginRight: 2,
+                      cursor: 'pointer'
                     }}
-                    className={classes.play}
                     onClick={(e) => {
                       e.stopPropagation()
                       if (pomodoro.selectedTaskId !== task.id) {
@@ -532,7 +517,7 @@ export const BaseTask = memo(
                 variant="determinate"
                 color="primary"
                 value={
-                  task.progress === 2
+                  getProgress(task.id, project) === 2
                     ? 100
                     : (task.subTasks.filter((subTask) => subTask.completed)
                         .length /

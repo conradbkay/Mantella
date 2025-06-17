@@ -1,4 +1,4 @@
-import { comparePassword, UserModel } from './models/User'
+import { findUserByEmail, findUserById, comparePassword } from './db/user'
 import { Request } from 'express'
 
 export const isAuthenticated = (req: any, res: any, next: any) => {
@@ -16,7 +16,7 @@ export const passportStrategy = async (
   done: Function
 ) => {
   try {
-    const user = await UserModel.findOne({ email })
+    const user = await findUserByEmail(email)
     if (!user) {
       return done(null, false, { message: 'Incorrect username.' })
     }
@@ -37,7 +37,7 @@ export const serializeUser = (user: any, done: any) => {
 
 export const deserializeUser = async (id: string, done: any) => {
   try {
-    const user = await UserModel.findOne({ id })
+    const user = await findUserById(id)
     done(null, user)
   } catch (err) {
     done(err)

@@ -1,6 +1,6 @@
 import { TProject } from '../../types/project'
 import { useTheme } from '@mui/material'
-import { Circle } from '../../utils/Circle'
+import { Circle } from '../Circle'
 import Color from 'color'
 
 type OwnProps = {
@@ -36,10 +36,10 @@ export const ProjStats = ({ project }: OwnProps) => {
             i === 3
               ? theme.palette.success.main
               : i === 2
-              ? theme.palette.warning.main
-              : i === 1
-              ? theme.palette.text.secondary
-              : theme.palette.text.primary
+                ? theme.palette.warning.main
+                : i === 1
+                  ? theme.palette.text.secondary
+                  : theme.palette.text.primary
 
           let percentOf = +((col[0] / cols[0][0]) * 100).toFixed(2) // + is to convert to number which will remove trailing zeros
           if (isNaN(percentOf)) percentOf = 0

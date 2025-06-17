@@ -1,64 +1,63 @@
 import CheckBox from '@mui/icons-material/CheckBox'
 import CheckBoxOutlineBlankOutlined from '@mui/icons-material/CheckBoxOutlineBlankOutlined'
-import { Transition, animated } from 'react-spring/renderprops'
+import { animated, useTransition } from 'react-spring'
 import { TSubtask } from '../../types/project'
 
 export const SubtaskMap = ({
   subTasks,
   onCheckbox,
-  taskId,
   show
 }: {
   subTasks: TSubtask[]
   onCheckbox: (newSub: TSubtask) => void
-  taskId: string
   show: boolean
-}) => (
-  <div style={{ marginLeft: 30 }}>
-    <Transition
-      initial={null}
-      native
-      items={show ? subTasks : []}
-      keys={show ? subTasks.map((subTask) => subTask.id) : []}
-      from={{ opacity: 1, height: 0, overflow: 'hidden' }}
-      enter={{ opacity: 1, height: 'auto' }}
-      leave={{ opacity: 0, height: 0, overflow: 'hidden' }}
-    >
-      {(subTask) => (props) =>
-        (
-          <animated.div
+}) => {
+  const transition = useTransition(subTasks, {
+    from: { opacity: 1, height: 0, overflow: 'hidden' },
+    enter: { opacity: 1, height: 'auto' },
+    leave: { opacity: 0, height: 0, overflow: 'hidden' }
+  })
+
+  if (!show) {
+    return null
+  }
+
+  return (
+    <div style={{ marginLeft: 30 }}>
+      {transition((style, subTask) => (
+        <animated.div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            ...style
+          }}
+        >
+          <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              ...props
+              marginTop: 6
             }}
           >
-            <div
-              style={{
-                marginTop: 6
-              }}
-            >
-              {subTask.completed ? (
-                <CheckBox
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: false })
-                  }}
-                />
-              ) : (
-                <CheckBoxOutlineBlankOutlined
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onCheckbox({ ...subTask, completed: true })
-                  }}
-                />
-              )}
-            </div>
-            <span style={{ marginLeft: 8, userSelect: 'none' }}>
-              {subTask.name}
-            </span>
-          </animated.div>
-        )}
-    </Transition>
-  </div>
-)
+            {subTask.completed ? (
+              <CheckBox
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onCheckbox({ ...subTask, completed: false })
+                }}
+              />
+            ) : (
+              <CheckBoxOutlineBlankOutlined
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onCheckbox({ ...subTask, completed: true })
+                }}
+              />
+            )}
+          </div>
+          <span style={{ marginLeft: 8, userSelect: 'none' }}>
+            {subTask.name}
+          </span>
+        </animated.div>
+      ))}
+    </div>
+  )
+}

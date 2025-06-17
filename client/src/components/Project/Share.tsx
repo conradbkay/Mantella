@@ -14,11 +14,10 @@ import {
   ListItemSecondaryAction
 } from '@mui/material'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { TState } from '../../types/state'
 import Delete from '@mui/icons-material/Delete'
 import { TProject } from '../../types/project'
-import { kickUser, shareProject } from '../../actions/project'
+import { useAuthUser } from '../PrivateRoute'
+import { useKickUserMutation, useShareProjectMutation } from '../../store/api'
 
 type Props = {
   project: TProject
@@ -29,10 +28,12 @@ export const ShareProject = ({
   onClose
 }: Props & { onClose?: () => void }) => {
   const [senderEmail, setSenderEmail] = useState('')
-  const dispatch = useDispatch()
+  const { user } = useAuthUser()
 
-  const user = useSelector((state: TState) => state.user)
   const theme = useTheme()
+
+  const [shareProjectMutation] = useShareProjectMutation()
+  const [kickUserMutation] = useKickUserMutation()
 
   return (
     <DialogContent
@@ -49,15 +50,17 @@ export const ShareProject = ({
       <List>
         {project.users.map((member) => (
           <ListItem key={member.id}>
-            <ListItemAvatar>
-              <img
-                alt="profile"
-                style={{ borderRadius: '50%' }}
-                width={32}
-                height={32}
-                src={member.profileImg}
-              />
-            </ListItemAvatar>
+            {member.profileImg && (
+              <ListItemAvatar>
+                <img
+                  alt="profile"
+                  style={{ borderRadius: '50%' }}
+                  width={32}
+                  height={32}
+                  src={member.profileImg}
+                />
+              </ListItemAvatar>
+            )}
             <ListItemText
               style={{ color: theme.palette.text.primary }}
               primary={member.username}
@@ -65,9 +68,14 @@ export const ShareProject = ({
             />
             <ListItemSecondaryAction>
               <IconButton
-                onClick={() => kickUser(dispatch, project.id, member.id)}
+                onClick={() =>
+                  kickUserMutation({
+                    projectId: project.id,
+                    userId: member.id
+                  })
+                }
                 disabled={
-                  project.ownerId !== user!.id || member.id === user!.id
+                  project.ownerId !== user?.id || member.id === user?.id
                 }
                 edge="end"
                 aria-label="delete"
@@ -94,7 +102,10 @@ export const ShareProject = ({
         />
         <Button
           onClick={() => {
-            shareProject(dispatch, project.id, senderEmail)
+            shareProjectMutation({
+              projectId: project.id,
+              email: senderEmail
+            })
             if (onClose) {
               onClose()
             }

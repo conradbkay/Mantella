@@ -1,276 +1,194 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.moveRole = exports.setUserRoles = exports.setRole = exports.getProjectMembers = exports.shareProject = exports.getProjectById = exports.kickUserFromProject = exports.leaveProject = exports.deleteProject = exports.editProject = exports.createProject = void 0;
-const User_1 = require("../models/User");
-const Project_1 = require("../models/Project");
+exports.getProjects = exports.getProjectMembers = exports.shareProject = exports.getProjectById = exports.kickUserFromProject = exports.leaveProject = exports.deleteProject = exports.editProject = exports.createProject = exports.validateGetProjectMembers = exports.validateGetProjectById = exports.validateShareProject = exports.validateRemoveMember = exports.validateLeaveProject = exports.validateDeleteProject = exports.validateEditProject = exports.validateCreateProject = void 0;
+const zod_1 = require("zod");
+const user_1 = require("../db/user");
+const project_1 = require("../db/project");
 const nanoid_1 = require("nanoid");
-const router_1 = require("./router");
-const passport_1 = require("../passport");
-const Chat_1 = require("../models/Chat");
 const data_1 = require("../data");
-const userResolver_1 = require("../utils/userResolver");
-const createProject = async (req, res) => {
-    const creatingId = (0, nanoid_1.nanoid)();
-    const listId = (0, nanoid_1.nanoid)();
-    const chatId = (0, nanoid_1.nanoid)();
-    const adminRoleId = (0, nanoid_1.nanoid)();
-    if (req.user) {
-        ;
-        req.user.projects.push(creatingId);
-        const [created] = await Promise.all([
-            Project_1.ProjectModel.create({
-                colors: data_1.defaultColors,
-                privacy: {
-                    public: req.body.public || false
-                },
-                roles: [
-                    {
-                        name: 'Admin',
-                        color: '#FF0000',
-                        id: adminRoleId
-                    }
-                ],
-                id: creatingId,
-                name: req.body.name,
-                ownerId: req.user.id,
-                users: [
-                    {
-                        id: req.user.id,
-                        roles: [adminRoleId]
-                    }
-                ],
-                lists: [
-                    {
-                        id: listId,
-                        name: 'Generic',
-                        taskIds: [[], [], []]
-                    }
-                ],
-                tasks: [],
-                channels: [[chatId, 'General']],
-                enrolledUsers: [],
-                columnOrder: [listId],
-                isPrivate: false
-            }),
-            req.user.save(),
-            Chat_1.ChatModel.create({ id: chatId, messages: [], projectId: creatingId })
-        ]);
-        // Resolve users before returning
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(created.toObject());
-        res.json({ project: resolvedProject });
+const db_1 = require("../db/db");
+const toApi_1 = require("../db/toApi");
+const validate_1 = require("../middleware/validate");
+// Zod validation schemas
+const createProjectSchema = zod_1.z.object({
+    name: zod_1.z.string().min(1, 'Project name is required'),
+    public: zod_1.z.boolean().optional()
+});
+const editProjectSchema = zod_1.z.object({
+    id: zod_1.z.string().min(1, 'Project ID is required'),
+    newProj: zod_1.z.object({
+        name: zod_1.z.string().optional(),
+        colors: zod_1.z.array(zod_1.z.string()).optional()
+    })
+});
+const deleteProjectSchema = zod_1.z.object({
+    id: zod_1.z.string().min(1, 'Project ID is required')
+});
+const leaveProjectSchema = zod_1.z.object({
+    projectId: zod_1.z.string().min(1, 'Project ID is required')
+});
+const removeMemberSchema = zod_1.z.object({
+    projectId: zod_1.z.string().min(1, 'Project ID is required'),
+    userId: zod_1.z.string().min(1, 'User ID is required')
+});
+const shareProjectSchema = zod_1.z.object({
+    projectId: zod_1.z.string().min(1, 'Project ID is required'),
+    email: zod_1.z.string().email('Valid email is required')
+});
+const getProjectByIdSchema = zod_1.z.object({
+    id: zod_1.z.string().min(1, 'Project ID is required')
+});
+const getProjectMembersSchema = zod_1.z.object({
+    projectId: zod_1.z.string().min(1, 'Project ID is required')
+});
+exports.validateCreateProject = (0, validate_1.validateRequest)(createProjectSchema);
+exports.validateEditProject = (0, validate_1.validateRequest)(editProjectSchema);
+exports.validateDeleteProject = (0, validate_1.validateRequest)(deleteProjectSchema);
+exports.validateLeaveProject = (0, validate_1.validateRequest)(leaveProjectSchema);
+exports.validateRemoveMember = (0, validate_1.validateRequest)(removeMemberSchema);
+exports.validateShareProject = (0, validate_1.validateRequest)(shareProjectSchema);
+exports.validateGetProjectById = (0, validate_1.validateRequest)(getProjectByIdSchema);
+exports.validateGetProjectMembers = (0, validate_1.validateRequest)(getProjectMembersSchema);
+const createProject = async (req, res, next) => {
+    try {
+        const { name, public: isPublic } = createProjectSchema.parse(req.body);
+        const user = req.user;
+        const listId = (0, nanoid_1.nanoid)();
+        const created = await (0, project_1.createProject)({
+            name,
+            ownerId: user.id,
+            colors: data_1.defaultColors,
+            securityPublic: isPublic || false
+        });
+        await (0, project_1.addUserToProject)(created.id, user.id);
+        await db_1.db
+            .insertInto('lists')
+            .values({
+            id: listId,
+            projectId: created.id,
+            name: 'Generic',
+            orderIndex: 0
+        })
+            .execute();
+        const fullProject = await (0, toApi_1.getFullProject)(created.id);
+        res.json({ project: fullProject });
     }
-    else {
-        throw new Error('user id not provided in token');
+    catch (error) {
+        next(error);
     }
 };
 exports.createProject = createProject;
-router_1.router.post('/createProject', passport_1.isAuthenticated, exports.createProject);
-const editProject = async (req, res) => {
-    if (req.body.id) {
-        const project = await Project_1.ProjectModel.findOne({ id: req.body.id });
-        if (project) {
-            project.name = req.body.newProj.name
-                ? req.body.newProj.name
-                : project.name;
-            project.colors = req.body.newProj.colors
-                ? req.body.newProj.colors
-                : project.colors;
-            const newProj = await project.save();
-            if (newProj) {
-                const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(newProj.toObject());
-                res.json({ project: resolvedProject });
-            }
+const editProject = async (req, res, next) => {
+    try {
+        const { id, newProj } = editProjectSchema.parse(req.body);
+        const updates = {};
+        if (newProj.name) {
+            updates.name = newProj.name;
         }
+        if (newProj.colors) {
+            updates.colors = JSON.stringify(newProj.colors);
+        }
+        await (0, project_1.updateProject)(id, updates);
+        const fullProject = await (0, toApi_1.getFullProject)(id);
+        res.json({ project: fullProject });
     }
-    else {
-        throw new Error('not signed in');
+    catch (error) {
+        next(error);
     }
 };
 exports.editProject = editProject;
-router_1.router.post('/editProject', passport_1.isAuthenticated, exports.editProject);
-const deleteProject = async (req, res) => {
-    const users = await User_1.UserModel.find({ projects: req.body.id });
-    if (users) {
-        for (const user of users) {
-            user.projects = user.projects.filter((proj) => proj !== req.body.id);
-            await user.save();
-        }
+const deleteProject = async (req, res, next) => {
+    try {
+        const { id } = deleteProjectSchema.parse(req.body);
+        await (0, project_1.deleteProject)(id);
+        res.json({ id });
     }
-    const deleted = await Project_1.ProjectModel.findOneAndDelete({ id: req.body.id });
-    if (deleted) {
-        res.json({
-            id: deleted.id
-        });
-    }
-    else {
-        throw new Error('proj not found');
+    catch (error) {
+        next(error);
     }
 };
 exports.deleteProject = deleteProject;
-router_1.router.post('/deleteProject', passport_1.isAuthenticated, exports.deleteProject);
-const leaveProject = async (req, res) => {
-    const id = req.user.id;
-    if (id) {
-        const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-        if (!project) {
-            throw new Error('Project does not exist');
-        }
-        const user = await User_1.UserModel.findOneAndUpdate({ id: id }, {
-            $pull: {
-                projects: project.id
-            }
-        });
-        if (user) {
-            res.json({ project: project.toObject() });
-        }
-        else {
-            throw new Error('could not join project');
-        }
+const leaveProject = async (req, res, next) => {
+    try {
+        const { projectId } = leaveProjectSchema.parse(req.body);
+        const user = req.user;
+        await db_1.db
+            .deleteFrom('projectUsers')
+            .where('projectId', '=', projectId)
+            .where('userId', '=', user.id)
+            .execute();
+        res.json({ message: 'Successfully left project' });
     }
-    else {
-        throw new Error('User not signed in');
+    catch (error) {
+        next(error);
     }
 };
 exports.leaveProject = leaveProject;
-router_1.router.post('/leaveProject', passport_1.isAuthenticated, exports.leaveProject);
-const kickUserFromProject = async (req, res) => {
-    const id = req.body.userId;
-    if (id) {
-        let project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-        if (!project) {
-            throw new Error('Project does not exist');
-        }
-        if (project.ownerId !== req.user.id) {
-            throw new Error('You cannot kick members from this project');
-        }
-        const kicking = await User_1.UserModel.findOne({ id });
-        if (!kicking) {
-            throw new Error('User does not exist');
-        }
-        kicking.projects = kicking.projects.filter((proj) => proj !== project.id);
-        project.users.splice(project.users.findIndex((user) => user.id === id), 1);
-        let modifiedTasks = false;
-        for (let i = 0; i < project.tasks.length; i++) {
-            if (project.tasks[i].assignedTo.includes(id)) {
-                project.tasks[i].assignedTo.splice(project.tasks[i].assignedTo.indexOf(id), 1);
-                modifiedTasks = true;
-            }
-        }
-        if (modifiedTasks) {
-            project.markModified('tasks');
-        }
-        project.markModified('users');
-        project = await project.save();
-        kicking.markModified('projects');
-        await kicking.save();
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(project.toObject());
-        res.json({ project: resolvedProject });
+const kickUserFromProject = async (req, res, next) => {
+    try {
+        const { projectId, userId } = removeMemberSchema.parse(req.body);
+        await db_1.db
+            .deleteFrom('projectUsers')
+            .where('projectId', '=', projectId)
+            .where('userId', '=', userId)
+            .execute();
+        const fullProject = await (0, toApi_1.getFullProject)(projectId);
+        res.json({ project: fullProject });
     }
-    else {
-        throw new Error('User not signed in');
+    catch (error) {
+        next(error);
     }
 };
 exports.kickUserFromProject = kickUserFromProject;
-router_1.router.post('/kickUser', passport_1.isAuthenticated, exports.kickUserFromProject);
-const getProjectById = async (req, res) => {
-    const proj = await Project_1.ProjectModel.findOne({ id: req.body.id });
-    if (proj) {
-        const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(proj.toObject());
-        res.json({ project: resolvedProject });
+const getProjectById = async (req, res, next) => {
+    try {
+        const { id } = getProjectByIdSchema.parse(req.body);
+        const project = await (0, toApi_1.getFullProject)(id);
+        res.json({ project });
     }
-    else {
-        throw new Error('proj not found');
+    catch (error) {
+        next(error);
     }
 };
 exports.getProjectById = getProjectById;
-router_1.router.get('/getProjectById', passport_1.isAuthenticated, exports.getProjectById);
-const shareProject = async (req, res) => {
-    let user = await User_1.UserModel.findOne({ email: req.body.email });
-    if (!user) {
-        res.status(400).json({ message: 'User could not be found' });
-        return;
+const shareProject = async (req, res, next) => {
+    try {
+        const { projectId, email } = shareProjectSchema.parse(req.body);
+        const userToShareWith = await (0, user_1.findUserByEmail)(email);
+        if (!userToShareWith) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+        await (0, project_1.addUserToProject)(projectId, userToShareWith.id);
+        const fullProject = await (0, toApi_1.getFullProject)(projectId);
+        res.json({ project: fullProject });
     }
-    if (user.projects.includes(req.body.projectId)) {
-        res.status(400).json({ message: 'User already in project' });
-        return;
+    catch (error) {
+        next(error);
     }
-    let project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (!project) {
-        throw new Error('project does not exist');
-    }
-    project.users.push({
-        id: user.id,
-        roles: []
-    });
-    project.markModified('users');
-    project = await project.save();
-    user.projects.push(req.body.projectId);
-    await user.save();
-    // Resolve users before returning
-    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(project.toObject());
-    res.status(200).json({ message: 'Success', project: resolvedProject });
 };
 exports.shareProject = shareProject;
-router_1.router.post('/shareProject', passport_1.isAuthenticated, exports.shareProject);
-const getProjectMembers = async (req, res) => {
-    let users = await User_1.UserModel.find({ projects: { $in: [req.body.projectId] } });
-    res.json({ users });
+const getProjectMembers = async (req, res, next) => {
+    try {
+        const { projectId } = getProjectMembersSchema.parse(req.body);
+        const project = await (0, toApi_1.getFullProject)(projectId);
+        res.json({ users: project?.users || [] });
+    }
+    catch (error) {
+        next(error);
+    }
 };
 exports.getProjectMembers = getProjectMembers;
-router_1.router.post('/getProjectMembers', passport_1.isAuthenticated, exports.getProjectMembers);
-const setRole = async (req, res) => {
-    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (!project) {
-        throw new Error('project does not exist');
+const getProjects = async (req, res, next) => {
+    try {
+        const user = req.user;
+        const projects = await (0, project_1.findProjectsByUserId)(user.id);
+        const fullProjects = await Promise.all(projects.map((p) => (0, toApi_1.getFullProject)(p.id)));
+        res.json(fullProjects);
     }
-    const role = req.body.role;
-    const roleIdx = project.roles.findIndex((compare) => {
-        return typeof role === 'string'
-            ? compare.id === role
-            : compare.id === role.id;
-    });
-    if (roleIdx === -1) {
-        project.roles.push(role);
+    catch (error) {
+        next(error);
     }
-    else if (typeof role === 'string') {
-        project.roles.splice(roleIdx, 1);
-    }
-    else {
-        project.roles[roleIdx] = role;
-    }
-    project.markModified('roles');
-    const savedProject = await project.save();
-    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(savedProject.toObject());
-    res.json({ project: resolvedProject });
 };
-exports.setRole = setRole;
-router_1.router.post('/setRole', passport_1.isAuthenticated, exports.setRole);
-const setUserRoles = async (req, res) => {
-    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (!project) {
-        throw new Error('project does not exist');
-    }
-    const userIdx = project.users.findIndex((compare) => {
-        return compare.id === req.body.userId;
-    });
-    project.users[userIdx].roles = req.body.roles;
-    project.markModified('users');
-    const savedProject = await project.save();
-    const resolvedProject = await (0, userResolver_1.resolveProjectUsers)(savedProject.toObject());
-    res.json({ project: resolvedProject });
-};
-exports.setUserRoles = setUserRoles;
-router_1.router.post('/setUserRoles', passport_1.isAuthenticated, exports.setUserRoles);
-const moveRole = async (req, res) => {
-    const project = await Project_1.ProjectModel.findOne({ id: req.body.projectId });
-    if (!project) {
-        throw new Error('project does not exist');
-    }
-    project.roles.splice(req.body.to, 0, project.roles.splice(req.body.from, 1)[0]);
-    project.markModified('roles');
-    await project.save();
-    res.json({ message: 'done' });
-};
-exports.moveRole = moveRole;
-router_1.router.post('/moveRole', passport_1.isAuthenticated, exports.moveRole);
+exports.getProjects = getProjects;
 //# sourceMappingURL=project.js.map

@@ -1,41 +1,39 @@
 import { Button } from '@mui/material'
-import { TProject, TTask } from '../../types/project'
 import { EditTaskBase } from './EditBase'
-import { useAppDispatch } from '../../store/hooks'
-import { createTask } from '../../actions/task'
+import { useCreateTaskMutation } from '../../store/api'
+import { ApiTask } from '@shared/types'
 
 type OwnProps = {
   onClose: () => void
-  project: TProject
+  projectId: string
   listId: string
 }
 
-const defaultTask: TTask = {
+const defaultTask: ApiTask = {
   name: '',
   points: 0,
   subTasks: [],
   id: '',
   createdAt: new Date().toString(),
-  progress: 0,
   workedOnMs: 0,
   comments: [],
-  dueDate: null,
   color: '#FFFFFF',
-  assignedTo: []
+  assignedTo: [],
+  projectId: ''
 }
 
 export const CreateTask = (props: OwnProps) => {
-  const dispatch = useAppDispatch()
+  const [createTask] = useCreateTaskMutation()
 
-  const createTaskExec = async (task: TTask, listId: string) => {
-    createTask(dispatch, task, listId, props.project.id)
+  const createTaskExec = async (task: ApiTask, listId: string) => {
+    createTask({ taskInfo: task, listId, projId: props.projectId })
     props.onClose()
   }
 
   return (
     <EditTaskBase
       title="Create Task"
-      projectId={props.project.id}
+      projectId={props.projectId}
       onClose={() => props.onClose()}
       task={defaultTask}
       ownerListId={props.listId}

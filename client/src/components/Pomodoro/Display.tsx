@@ -1,25 +1,30 @@
 import { Button, Paper, Stack, Typography, useTheme, Box } from '@mui/material'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { getAllTasks, id, toDaysHHMMSS } from '../../utils/utils'
-import { useMemo } from 'react'
 import {
   PAUSE_TIMER,
   TOGGLE_SELECTING_TASK,
   TOGGLE_TIMER
 } from '../../store/pomodoro'
-import { Circle } from '../../utils/Circle'
+import { Circle } from '../Circle'
 import { getDisplayTimeLeft } from '../../hooks/useTimer'
+import { useGetProjectsQuery } from '../../store/api'
 
 export const Display = () => {
-  const { pomodoro, projects } = useAppSelector((state) => ({
-    pomodoro: state.pomodoro,
-    projects: state.projects
+  const { pomodoro } = useAppSelector((state) => ({
+    pomodoro: state.pomodoro
   }))
-
   const dispatch = useAppDispatch()
   const theme = useTheme()
 
-  const tasks = useMemo(() => getAllTasks(projects), [projects])
+  const { data: projects } = useGetProjectsQuery()
+
+  if (!projects) {
+    return null
+  }
+
+  // todo memoize
+  const tasks = getAllTasks(projects)
 
   const buttonText = `${pomodoro.isPaused ? 'Start' : 'Stop'} ${
     !pomodoro.isBreak ? 'Work' : 'Break'
@@ -61,8 +66,8 @@ export const Display = () => {
             {pomodoro.selectingTask
               ? 'Selecting Task...'
               : pomodoro.selectedTaskId
-              ? tasks[id(tasks, pomodoro.selectedTaskId!)].name
-              : 'Select Task'}
+                ? tasks[id(tasks, pomodoro.selectedTaskId!)].name
+                : 'Select Task'}
           </Typography>
           {pomodoro.selectedTaskId && !pomodoro.selectingTask && (
             <Typography variant="caption" color="text.secondary">
@@ -87,8 +92,8 @@ export const Display = () => {
           {pomodoro.selectingTask
             ? 'Cancel'
             : pomodoro.selectedTaskId
-            ? 'New'
-            : 'Select'}
+              ? 'New'
+              : 'Select'}
         </Button>
       </Paper>
       <Button

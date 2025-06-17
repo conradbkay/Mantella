@@ -1,7 +1,6 @@
 import { ComponentProps, useState } from 'react'
 import {
   Paper,
-  Grid,
   Button,
   Avatar,
   Typography,
@@ -9,23 +8,23 @@ import {
   TextField,
   InputAdornment,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
+  Box,
+  Stack
 } from '@mui/material'
 import LockOpen from '@mui/icons-material/LockOpen'
-import { useFormStyles } from './styles/formStyles'
-import { Link } from 'react-router-dom'
+import {
+  formStyleAvatar,
+  formStyleLayout,
+  formStylePaper
+} from './styles/formStyles'
 import Helmet from 'react-helmet'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import { APILogin, APIRegister } from '../API/auth'
-import { useHistory } from 'react-router'
-import { useAppDispatch } from '../store/hooks'
-import { transformUser } from '../store/auth'
-import { OPEN_SNACKBAR } from '../store/snackbar'
-import { SET_PROJECTS } from '../store/projects'
-import { LOGIN, REGISTER } from '../store/user'
 import useTitle from './useTitle'
 import { setPersistAuth } from '../localStorage'
+import { useLoginMutation, useRegisterMutation } from '../store/api'
+import { useNavigate } from '@tanstack/react-router'
 
 const AuthInput = (inputProps: ComponentProps<any>) => {
   return <TextField margin="dense" fullWidth required {...inputProps} />
@@ -59,188 +58,302 @@ export const AuthRender = ({ authType }: Props) => {
   const [username, setUsername] = useState('')
   const [persist, setPersist] = useState(true)
 
-  const navigate = useHistory()
-  const classes = useFormStyles()
-  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+
+  const [login, loginResult] = useLoginMutation()
+  const [register, registerResult] = useRegisterMutation()
 
   useTitle(authType)
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPersistAuth(persist)
+
+    try {
+      let result
+      if (authType === 'Register') {
+        result = await register({
+          email,
+          username,
+          password,
+          persist
+        }).unwrap()
+      } else {
+        result = await login({ email, password, persist }).unwrap()
+      }
+
+      if (result?.user) {
+        // Authentication successful
+        if (result.user.projectIds && result.user.projectIds.length > 0) {
+          // Navigate to the first project if available
+          navigate({
+            to: '/project/$id',
+            params: { id: result.user.projectIds[0] }
+          })
+        } else {
+          // No projects, navigate to dashboard
+          navigate({ to: '/dashboard' })
+        }
+      }
+    } catch (error) {
+      // RTK Query provides error details in the mutation result
+      console.error('Auth error:', error)
+    }
+  }
+
+  const isLoading = loginResult.isLoading || registerResult.isLoading
+
   return (
-    <div style={{ padding: 20 }}>
+    <Box
+      sx={{
+        minHeight: 'calc(100vh - 57.5px)',
+        backgroundColor: '#1d364c',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
       <Helmet>
         <style type="text/css">{` body { background-color: #1d364c; }`}</style>
       </Helmet>
-      <main className={classes.layout}>
-        <form
-          autoComplete="on"
-          onSubmit={async (e) => {
-            e.preventDefault()
-
-            setPersistAuth(persist)
-
-            if (authType === 'Register') {
-              const user = await APIRegister({
-                email,
-                password,
-                username,
-                persist
-              })
-              if (user) {
-                const authUser = transformUser(user)
-
-                dispatch(REGISTER({ user: authUser }))
-
-                dispatch(SET_PROJECTS(user.projects))
-                navigate.push('/project/' + user.projects[0].id)
-              } else {
-                dispatch(
-                  OPEN_SNACKBAR({
-                    message: 'User with that Email already exists, Sorry!',
-                    variant: 'error'
-                  })
-                )
-              }
-            } else {
-              const user = await APILogin(email, password, persist)
-              if (user) {
-                const authUser = transformUser(user)
-
-                dispatch(LOGIN({ user: authUser }))
-                dispatch(SET_PROJECTS(user.projects))
-              } else {
-                dispatch(
-                  OPEN_SNACKBAR({
-                    message: 'Could not login',
-                    variant: 'error'
-                  })
-                )
-              }
-            }
+      <Box component="main" sx={formStyleLayout}>
+        <Paper
+          elevation={6}
+          sx={{
+            ...formStylePaper,
+            borderRadius: 3,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
           }}
         >
-          <Paper className={classes.paper}>
-            <Avatar className={classes.avatar}>
-              <LockOpen />
-            </Avatar>
-            <Typography style={{ fontSize: 17 }}>{authType}</Typography>
-            {authType === 'Register' && (
-              <Button
-                component={Link}
-                to="/login"
-                variant="outlined"
-                style={{ marginTop: 10 }}
+          <form
+            autoComplete="on"
+            onSubmit={handleSubmit}
+            style={{ width: '100%' }}
+          >
+            <Stack spacing={2} alignItems="center">
+              <Avatar
+                sx={{
+                  ...formStyleAvatar,
+                  width: 56,
+                  height: 56,
+                  mb: 1
+                }}
               >
-                Login Instead
-              </Button>
-            )}
-            {authType === 'Register' && (
-              <AuthInput
-                onChange={(e: any) => setUsername(e.target.value)}
-                autoComplete="off"
-                value={username}
-                label="Full Name"
-              />
-            )}
-            <AuthInput
-              name="email"
-              autoComplete="on"
-              value={email}
-              onChange={(e: any) => {
-                setEmail(e.target.value)
-              }}
-              label="Email"
-              type="email"
-            />
-            <AuthInput
-              autoComplete="on"
-              label="Password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-              value={password}
-              onChange={(e: any) => setPassword(e.target.value)}
-            />
-            {authType === 'Register' && (
-              <AuthInput
-                type="password"
-                autoComplete="off"
-                label="Confirm Password"
-                error={confirmText !== password}
-                value={confirmText}
-                onChange={(e: any) => setConfirmText(e.target.value)}
-              />
-            )}
-            <div style={{ width: '100%', marginTop: 4 }}>
-              {/* show a "stay logged in" toggle checkbox with MUI */}
-              <FormControlLabel
-                style={{ marginLeft: 0 }}
-                control={
-                  <Checkbox
-                    checked={persist}
-                    onChange={(e) => setPersist(e.target.checked)}
-                    defaultChecked
-                    style={{ marginRight: 4 }}
-                  />
-                }
-                label="Stay Logged In"
-              />
-            </div>
+                <LockOpen sx={{ fontSize: 28 }} />
+              </Avatar>
 
-            <Grid
-              container
-              justifyContent="center"
-              style={{ marginTop: '10px' }}
-            >
+              <Typography
+                variant="h6"
+                component="h1"
+                sx={{
+                  fontWeight: 500,
+                  color: 'text.secondary',
+                  mb: 1
+                }}
+              >
+                {authType}
+              </Typography>
+            </Stack>
+
+            <Box sx={{ mt: 2, width: '100%' }}>
+              {authType === 'Register' && (
+                <AuthInput
+                  onChange={(e: any) => setUsername(e.target.value)}
+                  autoComplete="name"
+                  value={username}
+                  label="Full Name"
+                  variant="outlined"
+                />
+              )}
+
+              <AuthInput
+                name="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e: any) => {
+                  setEmail(e.target.value)
+                }}
+                label="Email Address"
+                type="email"
+                variant="outlined"
+              />
+
+              <AuthInput
+                autoComplete="current-password"
+                label="Password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        edge="end"
+                        size="large"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                value={password}
+                onChange={(e: any) => setPassword(e.target.value)}
+              />
+
+              {authType === 'Register' && (
+                <AuthInput
+                  type="password"
+                  autoComplete="new-password"
+                  label="Confirm Password"
+                  variant="outlined"
+                  error={confirmText !== '' && confirmText !== password}
+                  helperText={
+                    confirmText !== '' && confirmText !== password
+                      ? 'Passwords do not match'
+                      : ''
+                  }
+                  value={confirmText}
+                  onChange={(e: any) => setConfirmText(e.target.value)}
+                />
+              )}
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  mt: 1,
+                  mb: 1
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={persist}
+                      onChange={(e) => setPersist(e.target.checked)}
+                      defaultChecked
+                      color="secondary"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2" color="text.secondary">
+                      Stay Logged In
+                    </Typography>
+                  }
+                />
+              </Box>
+
               <Button
                 variant="contained"
                 color="secondary"
                 fullWidth
                 disabled={
-                  authType === 'Register'
-                    ? password.trim() === '' || password !== confirmText
-                    : false
+                  isLoading ||
+                  (authType === 'Register'
+                    ? password.trim() === '' ||
+                      password !== confirmText ||
+                      username.trim() === ''
+                    : email.trim() === '' || password.trim() === '')
                 }
                 type="submit"
-                style={{
-                  marginTop: 10
+                size="large"
+                sx={{
+                  mt: 1,
+                  mb: 1,
+                  py: 1,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  borderRadius: 2,
+                  boxShadow: '0 4px 14px 0 rgba(0,118,255,0.39)'
                 }}
               >
-                {authType}
+                {isLoading ? 'Please wait...' : authType}
               </Button>
-            </Grid>
-            <Grid
-              container
-              style={{ marginTop: 15 }}
-              alignContent="space-between"
-            >
-              {false &&
-                socialProviders.map((media, i) => (
-                  <IconButton onClick={() => null}>
-                    <img
-                      src={media.imageUrl}
-                      style={{ height: 50, width: 50 }}
-                      alt=""
-                    />
-                  </IconButton>
-                ))}
-            </Grid>
-          </Paper>
-        </form>
-      </main>
-    </div>
+
+              {/* Error messages */}
+              {loginResult.error && (
+                <Box sx={{ textAlign: 'center', mt: 2 }}>
+                  <Typography
+                    color="error"
+                    variant="body2"
+                    sx={{
+                      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      padding: 1.5,
+                      borderRadius: 1,
+                      border: '1px solid rgba(244, 67, 54, 0.3)'
+                    }}
+                  >
+                    Unable to login. Please check your credentials.
+                  </Typography>
+                </Box>
+              )}
+
+              {registerResult.error && (
+                <Box sx={{ textAlign: 'center', mt: 2 }}>
+                  <Typography
+                    color="error"
+                    variant="body2"
+                    sx={{
+                      backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                      padding: 1.5,
+                      borderRadius: 1,
+                      border: '1px solid rgba(244, 67, 54, 0.3)'
+                    }}
+                  >
+                    User with that email already exists. Please try logging in
+                    instead.
+                  </Typography>
+                </Box>
+              )}
+
+              {false && (
+                <Box
+                  sx={{
+                    mt: 3,
+                    pt: 2,
+                    borderTop: '1px solid',
+                    borderColor: 'divider',
+                    textAlign: 'center'
+                  }}
+                >
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
+                    Or continue with
+                  </Typography>
+                  <Stack direction="row" spacing={2} justifyContent="center">
+                    {socialProviders.map((media, i) => (
+                      <IconButton
+                        key={i}
+                        onClick={() => null}
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 2,
+                          p: 1.5
+                        }}
+                      >
+                        <img
+                          src={media.imageUrl}
+                          style={{ height: 24, width: 24 }}
+                          alt={`${media.provider} login`}
+                        />
+                      </IconButton>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+            </Box>
+          </form>
+        </Paper>
+      </Box>
+    </Box>
   )
 }

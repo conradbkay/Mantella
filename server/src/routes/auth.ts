@@ -1,98 +1,134 @@
-import bcrypt from 'bcryptjs'
-import { UserModel } from '../models/User'
-import { ProjectModel } from '../models/Project'
-import { generateDefaultProject, generateGuestUser, generateIds } from '../data'
-import {
-  guestLoginReq,
-  guestLoginRes,
-  guestLoginResObj,
-  loginReq,
-  loginRes,
-  loginResObj,
-  registerReq,
-  registerRes,
-  registerResObj
-} from './types'
+import { z } from 'zod'
 import { NextFunction, Request, Response } from 'express'
-import { ChatModel } from '../models/Chat'
+import { findProjectsByUserId, createProjectWithDefaults } from '../db/project'
+import { createUser, deleteUser } from '../db/user'
+import { validateRequest } from '../middleware/validate'
+import { nanoid } from 'nanoid'
+
+// Zod validation schemas
+const registerSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  persist: z.boolean()
+})
+
+const loginSchema = z.object({
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(1, 'Password is required'),
+  persist: z.boolean()
+})
+
+export const validateRegister = validateRequest(registerSchema)
+export const validateLogin = validateRequest(loginSchema)
 
 export const login = async (
-  req: loginReq,
-  res: loginRes,
+  req: Request,
+  res: Response,
   next: NextFunction
 ) => {
   try {
-    const projects = await ProjectModel.find({
-      id: (req.user as any).projects
-    }).lean()
+    const user = req.user as any
+    const projects = await findProjectsByUserId(user.id)
+    const projectIds = projects.map((p) => p.id)
 
     res.json({
       user: {
-        ...(req.user as any).toObject(),
+        ...user,
         password: undefined,
-        _id: undefined,
-        projects: projects
+        projectIds
       }
-    } as loginResObj)
+    })
   } catch (err) {
     next(err)
   }
 }
 
-const SALT_LENGTH = 10
-
-export const register = async (req: registerReq, res: registerRes) => {
+// Helper function to create user with default project and handle login
+async function createUserWithDefaultProject(
+  userData: {
+    username: string
+    email: string
+    password?: string
+    profileImg: string
+  },
+  loginOptions: {
+    persist: boolean
+  },
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const salt = await bcrypt.genSalt(SALT_LENGTH)
-    const password = await bcrypt.hash(req.body.password, salt)
+    const newUser = await createUser(userData)
 
-    const [projectId, userId, chatId] = generateIds(3)
+    // Create default tutorial project but don't return it in response
+    await createProjectWithDefaults(
+      {
+        name: 'Tutorial Project',
+        ownerId: newUser.id!,
+        colors: [],
+        securityPublic: true
+      },
+      {
+        id: newUser.id!,
+        email: userData.email,
+        username: userData.username,
+        profileImg: userData.profileImg
+      }
+    )
 
-    const [project, newUser] = await Promise.all([
-      ProjectModel.create(
-        generateDefaultProject(
-          {
-            id: userId,
-            email: req.body.email,
-            username: req.body.username,
-            profileImg:
-              'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-          },
-          projectId,
-          [chatId, 'General']
-        )
-      ),
-      await UserModel.create({
-        ...generateGuestUser(projectId, userId),
-        password,
-        email: req.body.email,
-        username: req.body.username
-      }),
-      await ChatModel.create({
-        id: chatId,
-        messages: [],
-        projectId: projectId
-      })
-    ])
-
-    req.login(newUser, { session: req.body.persist }, (err: any) => {
+    req.login(newUser, { session: loginOptions.persist }, async (err: any) => {
       if (err) {
         console.log('could not passport login during signup', err)
+        return next(err)
       }
-    })
 
-    res.json({
-      user: {
-        ...newUser.toObject(),
-        password: undefined,
-        _id: undefined,
-        projects: [project.toObject()]
-      }
-    } as registerResObj)
+      // Get project IDs for the newly created user
+      const projects = await findProjectsByUserId(newUser.id!)
+      const projectIds = projects.map((p: any) => p.id)
+
+      res.json({
+        user: {
+          ...newUser,
+          password: undefined,
+          projectIds
+        }
+      })
+    })
   } catch (err) {
-    throw new Error('Could not register, is that email address already in use?')
+    next(err)
   }
 }
+
+export const register = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { email, username, password, persist } = registerSchema.parse(
+      req.body
+    )
+
+    await createUserWithDefaultProject(
+      {
+        username,
+        email,
+        password,
+        profileImg:
+          'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+      },
+      { persist },
+      req,
+      res,
+      next
+    )
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const logout = async (req: Request, res: Response) => {
   if (req.session) {
     req.session.destroy((err: any) => {
@@ -108,50 +144,33 @@ export const logout = async (req: Request, res: Response) => {
   }
 }
 
-export const guestLogin = async (req: guestLoginReq, res: guestLoginRes) => {
+export const guestLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const [projectId, userId, chatId] = generateIds(3)
+    const guestEmail = `guest_${nanoid()}@example.com`
 
-    const [project, user] = await Promise.all([
-      ProjectModel.create(
-        generateDefaultProject(
-          {
-            email: 'No Email Registered',
-            username: 'Guest',
-            id: userId,
-            profileImg:
-              'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
-          },
-          projectId,
-          [chatId, 'General']
-        )
-      ),
-      await UserModel.create(generateGuestUser(projectId, userId)),
-      await ChatModel.create({
-        id: chatId,
-        messages: []
-      })
-    ])
-
-    req.login(user, { session: true }, (err: any) => {
-      if (err) {
-        console.log('could not passport login during signup', err)
-      }
-    })
-
-    res.json({
-      user: {
-        ...user.toObject(),
-        projects: [project.toObject()]
-      }
-    } as guestLoginResObj)
+    await createUserWithDefaultProject(
+      {
+        username: 'Guest',
+        email: guestEmail,
+        profileImg:
+          'https://mb.cision.com/Public/12278/2797280/879bd164c711a736_800x800ar.png'
+      },
+      { persist: true },
+      req,
+      res,
+      next
+    )
   } catch (err) {
-    throw new Error('Could not create guest, sorry!')
+    next(err)
   }
 }
 
 export const deleteAccount = async (req: Request, res: Response) => {
-  await UserModel.deleteOne({ id: (req.user as any).id })
+  await deleteUser((req.user as any).id)
 
   res.status(200)
 }

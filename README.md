@@ -15,6 +15,7 @@ React app using redux for most of the global state. `Material-ui` is used as a U
 
 ### Server
 
+`npm i better-sqlite3 kysely-codegen better-sqlite3-session-store --legacy-peer-deps`
 `npm i`
 `npm run dev`
 
@@ -35,8 +36,6 @@ Instead of subtasks, everything will be it's own task, and prerequisites will be
 ## Todos
 
 Port addresses are duplicated on client and server which is annoying
-
-More integration with roles
 
 Store filters for later use
 

@@ -1,5 +1,9 @@
 import { TFilterData } from '../components/Project/types'
-import { TProject } from './project'
+import { ApiUser } from '@shared/types'
+
+// temp
+export type TProfile = ApiUser
+export type TAuthUser = ApiUser
 
 export type TPomodoro = {
   isPaused: boolean
@@ -13,19 +17,6 @@ export type TPomodoro = {
   selectedTaskId: null | string
 }
 
-export type TProfile = {
-  id: string
-  guest?: boolean
-  profileImg: string
-  username: string
-  joinedIds: string[]
-  email: string
-}
-
-export type TProfiles = {
-  [id: string]: TProfile
-}
-
 export type TVariant = 'success' | 'warning' | 'error' | 'standard' | 'undo'
 
 export type TSnackbar = {
@@ -34,13 +25,8 @@ export type TSnackbar = {
   variant: TVariant
 }
 
-export type TAuthUser = TProfile
-
 export type TState = {
   snackbar: TSnackbar
-  loading: boolean
   pomodoro: TPomodoro
-  user: TAuthUser | null
-  projects: TProject[]
   filter: TFilterData
 }

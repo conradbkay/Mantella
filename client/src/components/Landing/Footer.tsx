@@ -1,5 +1,4 @@
-import { Grid, Typography, Theme } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { Grid, Typography } from '@mui/material'
 
 const footers = [
   {
@@ -16,23 +15,20 @@ const footers = [
   }
 ]
 
-const useStyles = makeStyles((theme: Theme) => ({
-  footer: {
-    marginTop: 64,
-    borderTop: `1px solid ${theme.palette.divider}`,
-    padding: `${theme.spacing(6)}px 0`,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    [theme.breakpoints.up(1200)]: {
-      width: 1000
-    }
-  }
-}))
-
 export const AboutFooter = () => {
-  const classes = useStyles()
   return (
-    <footer className={classes.footer}>
+    <Grid
+      component="footer"
+      sx={{
+        marginTop: 8,
+        borderTop: 1,
+        borderColor: 'divider',
+        padding: 6,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        width: { xl: 1000 }
+      }}
+    >
       <Grid
         container
         spacing={1}
@@ -41,7 +37,7 @@ export const AboutFooter = () => {
         alignContent="center"
       >
         {footers.map((footer) => (
-          <Grid item xs key={footer.title}>
+          <Grid size={{ xs: 12 }} key={footer.title}>
             <Typography variant="h6" color="textPrimary" gutterBottom>
               {footer.title}
             </Typography>
@@ -53,6 +49,6 @@ export const AboutFooter = () => {
           </Grid>
         ))}
       </Grid>
-    </footer>
+    </Grid>
   )
 }

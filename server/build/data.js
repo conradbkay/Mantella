@@ -24,25 +24,104 @@ exports.tags = [
     }
 ];
 const taskObjects = (ids, userId) => [
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[0], name: 'Welcome To Mantella! Click on any task to edit it' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[1], name: 'Tasks can be dragged to other lists or reordered within a list', description: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Hold space on a focused task to move it ","type":"code-highlight","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"with","type":"code-highlight","version":1,"highlightType":"keyword"},{"detail":0,"format":0,"mode":"normal","style":"","text":" keyboard arrows","type":"code-highlight","version":1}],"direction":"ltr","format":"","indent":0,"type":"code","version":1,"language":"javascript"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[2], name: 'Create new tasks with the + button on the right of the list title' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[3], name: 'Right click a list or use the menu to the left of the + button to edit, delete, or move it' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[4], name: 'Navigate between or create new projects with the projects menu at the top left corner of your screen' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[5], name: 'You can search for projects, lists, and tasks (for all projects) with the universal search bar at the top of your screen' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[6], name: 'Create a list by pressing the large + button within a project' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[7], name: 'You can add colors to Tasks', color: '#005BD2' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[8], name: 'Tasks can be assigned a Point importance', points: 2 }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[9], name: 'Drag member icons from the top right onto tasks to assign them or multiple members', assignedTo: [userId] }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[10], name: 'You can add, delete, and edit comments to Tasks' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[11], name: 'Tasks can include subtasks', subTasks: [{ name: 'This is a subtask!', completed: false, id: (0, nanoid_1.nanoid)() }] }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[12], name: '(Coming Soon) all changes will be tracked in the project history, and you can revert to any point in time!' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[13], name: 'Log time on tasks by pressing the button on the bottom right of each task or use the pomodoro tab (the last icon in the sidebar) to include breaks' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[14], name: 'Tasks can be filtered by points, color, due date, and (soon) members' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[15], name: 'Invite and manage members with the share button in the top right corner of your screen' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[16], name: 'Create and assign member roles in the project settings' }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[17], name: "Each project comes with its own messaging system. View a project's chat by clicking the chat icon in the sidebar, or view all projects with the Chat tab in the main header" }),
-    Object.assign(Object.assign({}, exports.defaultTask), { id: ids[18], name: 'I hope you enjoy using Mantella, email me (conradkaydev@gmail.com) with feature requests or bugs, I appreciate any and all feedback!' })
+    {
+        ...exports.defaultTask,
+        id: ids[0],
+        name: 'Welcome To Mantella! Click on any task to edit it'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[1],
+        name: 'Tasks can be dragged to other lists or reordered within a list',
+        // lexical raw output
+        description: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Hold space on a focused task to move it ","type":"code-highlight","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"with","type":"code-highlight","version":1,"highlightType":"keyword"},{"detail":0,"format":0,"mode":"normal","style":"","text":" keyboard arrows","type":"code-highlight","version":1}],"direction":"ltr","format":"","indent":0,"type":"code","version":1,"language":"javascript"}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[2],
+        name: 'Create new tasks with the + button on the right of the list title'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[3],
+        name: 'Right click a list or use the menu to the left of the + button to edit, delete, or move it'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[4],
+        name: 'Navigate between or create new projects with the projects menu at the top left corner of your screen'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[5],
+        name: 'You can search for projects, lists, and tasks (for all projects) with the universal search bar at the top of your screen'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[6],
+        name: 'Create a list by pressing the large + button within a project'
+    },
+    // tasks
+    {
+        ...exports.defaultTask,
+        id: ids[7],
+        name: 'You can add colors to Tasks',
+        color: '#005BD2'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[8],
+        name: 'Tasks can be assigned a Point importance',
+        points: 2
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[9],
+        name: 'Drag member icons from the top right onto tasks to assign them or multiple members',
+        assignedTo: [userId]
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[10],
+        name: 'You can add, delete, and edit comments to Tasks'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[11],
+        name: 'Tasks can include subtasks',
+        subTasks: [{ name: 'This is a subtask!', completed: false, id: (0, nanoid_1.nanoid)() }]
+    },
+    // advanced
+    {
+        ...exports.defaultTask,
+        id: ids[12],
+        name: '(Coming Soon) all changes will be tracked in the project history, and you can revert to any point in time!'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[13],
+        name: 'Log time on tasks by pressing the button on the bottom right of each task or use the pomodoro tab (the last icon in the sidebar) to include breaks'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[14],
+        name: 'Tasks can be filtered by points, color, due date, and (soon) members'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[15],
+        name: 'Invite and manage members with the share button in the top right corner of your screen'
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[17],
+        name: "Focus on productivity and project management with Mantella's task-focused approach"
+    },
+    {
+        ...exports.defaultTask,
+        id: ids[18],
+        name: 'I hope you enjoy using Mantella, email me (conradkaydev@gmail.com) with feature requests or bugs, I appreciate any and all feedback!'
+    }
 ];
 exports.taskObjects = taskObjects;
 const generateIds = (length) => {
@@ -63,14 +142,12 @@ exports.defaultColors = [
     '#00A86C',
     '#D0CD00'
 ];
-const generateDefaultProject = (newUser, projectId, chat) => {
+const generateDefaultProject = (newUser, projectId) => {
     const listIds = [(0, nanoid_1.nanoid)(), (0, nanoid_1.nanoid)(), (0, nanoid_1.nanoid)()];
-    const roleId = (0, nanoid_1.nanoid)();
     const ids = (0, exports.generateIds)(19);
     const tasks = (0, exports.taskObjects)(ids, newUser.id);
     return {
         colors: exports.defaultColors,
-        channels: [chat],
         history: [],
         name: 'Tutorial Project',
         lists: [
@@ -95,7 +172,6 @@ const generateDefaultProject = (newUser, projectId, chat) => {
                         ids[13],
                         ids[14],
                         ids[15],
-                        ids[16],
                         ids[17],
                         ids[18]
                     ],
@@ -110,14 +186,7 @@ const generateDefaultProject = (newUser, projectId, chat) => {
         ownerId: newUser.id,
         id: projectId,
         tasks: tasks,
-        users: [Object.assign(Object.assign({}, newUser), { roles: [roleId] })],
-        roles: [
-            {
-                id: roleId,
-                name: 'Admin',
-                color: '#FF0000'
-            }
-        ],
+        users: [{ id: newUser.id }],
         data: {}
     };
 };

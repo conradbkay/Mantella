@@ -3,15 +3,13 @@ import {
   DialogContent,
   DialogContentText,
   Button,
-  Theme,
   IconButton,
   DialogTitle,
   TextField,
-  Grid
+  Box
 } from '@mui/material'
 import Close from '@mui/icons-material/Close'
 import { useState } from 'react'
-import { makeStyles } from '@mui/styles'
 
 interface Props {
   id: string
@@ -21,15 +19,6 @@ interface Props {
   deleteFunc(id: string): void
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500]
-  }
-}))
-
 const DeleteColumnDialogComponent = (props: Props) => {
   const [confirm, setConfirm] = useState('')
 
@@ -38,13 +27,19 @@ const DeleteColumnDialogComponent = (props: Props) => {
     props.onClose() // need this so it doesn't delete another column
   }
 
-  const classes = useStyles()
-
   const { onClose, name, inputName } = props
   return (
     <Dialog open={true} onClose={onClose}>
       <DialogTitle>Delete {inputName ? inputName : name}</DialogTitle>
-      <IconButton className={classes.closeButton} onClick={onClose}>
+      <IconButton
+        sx={{
+          position: 'absolute',
+          right: (theme) => theme.spacing(1),
+          top: (theme) => theme.spacing(1),
+          color: (theme) => theme.palette.grey[500]
+        }}
+        onClick={onClose}
+      >
         <Close />
       </IconButton>
       <DialogContent>
@@ -67,24 +62,26 @@ const DeleteColumnDialogComponent = (props: Props) => {
             label={`Please type in the name of the ${name} to confirm.`}
           />
         )}
-        <Grid container spacing={2}>
-          <Grid item md={6}>
-            <Button fullWidth onClick={onClose} color="secondary">
-              Cancel
-            </Button>
-          </Grid>
-          <Grid item md={6}>
-            <Button
-              onClick={onSubmit}
-              fullWidth
-              disabled={inputName ? confirm !== inputName : false}
-              variant="contained"
-              color="primary"
-            >
-              Delete {name}
-            </Button>
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            flexDirection: { xs: 'column', md: 'row' }
+          }}
+        >
+          <Button fullWidth onClick={onClose} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            onClick={onSubmit}
+            fullWidth
+            disabled={inputName ? confirm !== inputName : false}
+            variant="contained"
+            color="primary"
+          >
+            Delete {name}
+          </Button>
+        </Box>
       </div>
     </Dialog>
   )

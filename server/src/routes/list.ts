@@ -1,104 +1,151 @@
-import { ProjectModel } from '../models/Project'
-import { nanoid } from 'nanoid'
-import { router } from './router'
-import {
-  createListReq,
-  createListRes,
-  deleteListReq,
-  deleteListRes,
-  editListReq,
-  editListRes
-} from './types'
-import { Request, Response } from 'express'
-import { isAuthenticated } from '../passport'
-import { resolveProjectUsers } from '../utils/userResolver'
+import { createList as createListDb } from '../db/project'
+import { shiftListOrder, updateListOrder } from '../db/listUtils'
+import { Request, Response, NextFunction } from 'express'
+import { db } from '../db/db'
+import { z } from 'zod'
+import { getFullProject } from '../db/toApi'
+import { validateRequest } from '../middleware/validate'
 
-export const editList = async (req: editListReq, res: editListRes) => {
-  const project = await ProjectModel.findOne({ id: req.body.projId })
+// Zod validation schemas
+const editListSchema = z.object({
+  projId: z.string().min(1, 'Project ID is required'),
+  listId: z.string().min(1, 'List ID is required'),
+  newList: z.object({
+    name: z.string().min(1, 'List name is required')
+  })
+})
 
-  if (project) {
-    const list = project.lists.find((l) => {
-      return l.id === req.body.listId
-    })!
+const createListSchema = z.object({
+  projId: z.string().min(1, 'Project ID is required'),
+  name: z.string().min(1, 'List name is required')
+})
 
-    list.name = req.body.newList.name || list.name
-    list.taskIds = req.body.newList.taskIds || list.taskIds
+const deleteListSchema = z.object({
+  projId: z.string().min(1, 'Project ID is required'),
+  id: z.string().min(1, 'List ID is required')
+})
 
-    const newProj = await project.save()
+const setListIdxSchema = z.object({
+  projId: z.string().min(1, 'Project ID is required'),
+  listId: z.string().min(1, 'List ID is required'),
+  offset: z.number()
+})
 
-    const resolvedProject = await resolveProjectUsers(newProj.toObject())
+export const validateEditList = validateRequest(editListSchema)
+export const validateCreateList = validateRequest(createListSchema)
+export const validateDeleteList = validateRequest(deleteListSchema)
+export const validateSetListIdx = validateRequest(setListIdxSchema)
 
-    res.json({
-      project: resolvedProject,
-      list: newProj.lists.find((l) => l.id === req.body.listId)!
-    })
-  } else {
-    throw new Error('proj not found')
-  }
-}
+export const editList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projId, listId, newList } = editListSchema.parse(req.body)
 
-router.post('/editList', isAuthenticated, editList)
+    await db
+      .updateTable('lists')
+      .set({ name: newList.name })
+      .where('id', '=', listId)
+      .execute()
 
-export const deleteList = async (req: deleteListReq, res: deleteListRes) => {
-  const project = await ProjectModel.findOne({ id: req.body.projId })
-
-  if (project && project.lists.length > 1) {
-    project.lists = project.lists.filter((list) => list.id !== req.body.id)
-    project.markModified('lists')
-    await project.save()
-
-    res.json({ id: req.body.id })
-  } else {
-    throw new Error('cant delete final list!')
-  }
-}
-
-router.post('/deleteList', isAuthenticated, deleteList)
-
-export const createList = async (req: createListReq, res: createListRes) => {
-  const newId = nanoid()
-
-  const project = await ProjectModel.findOne({ id: req.body.projId })
-
-  if (project) {
-    project.lists.push({
-      id: newId,
-      name: req.body.name || 'New List',
-      taskIds: [[], [], []]
-    })
-
-    const newProj = await project.save()
-
-    const resolvedProject = await resolveProjectUsers(newProj.toObject())
+    const project = await getFullProject(projId)
+    const updatedList = project?.lists.find((l) => l.id === listId)
 
     res.json({
-      project: resolvedProject,
-      list: resolvedProject.lists.find((l: any) => l.id === newId)
+      project,
+      list: updatedList
     })
-  } else {
-    throw new Error('proj not found')
+  } catch (error) {
+    next(error)
   }
 }
 
-router.post('/createList', isAuthenticated, createList)
+export const createList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projId, name } = createListSchema.parse(req.body)
+    await createListDb(projId, name || 'New List')
+    const project = await getFullProject(projId)
+    // Assuming the new list is the last one created
+    const newList = project?.lists[project.lists.length - 1]
 
-export const setListIdx = async (req: Request, res: Response) => {
-  const project = await ProjectModel.findOne({ id: req.body.projId as any })
-
-  if (project) {
-    const list = project.lists.find((l) => l.id === req.body.id)
-    const idx = project.lists.indexOf(list!)
-
-    const element = project.lists.splice(idx, 1)[0]
-
-    project.lists.splice(idx + req.body.offset, 0, element!)
-    project.markModified('lists')
-    await project.save()
-
-    res.json({ id: req.body.id })
-  } else {
-    throw new Error('proj not found')
+    res.json({
+      project,
+      list: newList
+    })
+  } catch (error) {
+    next(error)
   }
 }
 
-router.post('/setListIdx', isAuthenticated, setListIdx)
+export const deleteList = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projId, id } = deleteListSchema.parse(req.body)
+    await db.deleteFrom('lists').where('id', '=', id).execute()
+    const project = await getFullProject(projId)
+    res.json({
+      project
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const setListIdx = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { projId, listId, offset } = setListIdxSchema.parse(req.body)
+
+    // Get the current list to find its current order index
+    const currentList = await db
+      .selectFrom('lists')
+      .select(['orderIndex'])
+      .where('id', '=', listId)
+      .where('projectId', '=', projId)
+      .executeTakeFirst()
+
+    if (!currentList || currentList.orderIndex === null) {
+      return res.status(404).json({ error: 'List not found' })
+    }
+
+    const currentIndex = currentList.orderIndex
+    const newIndex = currentIndex + offset
+
+    // Get all lists in the project to validate bounds
+    const allLists = await db
+      .selectFrom('lists')
+      .select(['id', 'orderIndex'])
+      .where('projectId', '=', projId)
+      .orderBy('orderIndex', 'asc')
+      .execute()
+
+    // Validate bounds
+    if (newIndex < 0 || newIndex >= allLists.length) {
+      return res
+        .status(400)
+        .json({ error: 'Invalid offset - would move list out of bounds' })
+    }
+
+    // Shift all lists between current and target position
+    await shiftListOrder(projId, currentIndex, newIndex)
+    // Then move the current list to its new position
+    await updateListOrder(listId, newIndex)
+
+    const project = await getFullProject(projId)
+    res.json({ project })
+  } catch (error) {
+    next(error)
+  }
+}

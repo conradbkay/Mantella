@@ -1,17 +1,14 @@
 import { useState } from 'react'
-import { Theme } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { subDays, addDays } from 'date-fns'
 import { WeekDay } from './WeekDay'
 import { WeekControls } from './WeekControls'
-import { makeStyles } from '@mui/styles'
-import { TTask } from '../../types/project'
-import { useAppSelector } from '../../store/hooks'
-import { selectProjects } from '../../store/projects'
-import { id } from '../../utils/utils'
+import { TTask, TProject } from '../../types/project'
+import { useGetProjectsQuery } from '../../store/api'
 
 /** Gets the day behind the passed date, the passed date, and the 5 dates after passed date */
 const getDays = (start: Date): Date[] => {
-  const result: Date[] = [subDays(start, 1), start]
+  const result: Date[] = [subDays(start, -1), start]
   for (let i = 0; i < 5; i++) {
     result.push(addDays(start, i + 1))
   }
@@ -19,38 +16,28 @@ const getDays = (start: Date): Date[] => {
   return result
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  dragContainer: {
-    border: '1px solid #dadce0',
-    borderRadius: '.8rem',
-    overflowX: 'hidden',
-    marginTop: 10
-  },
-  tasksContainer: {
-    minHeight: 200,
-    overflowX: 'auto',
-    display: 'flex',
-    flex: '1 1 auto',
-    overflowY: 'hidden'
-  }
-}))
+type Props = {
+  project?: TProject
+}
 
 // its fine that completed tasks are shown because it's close to the day they are viewing
-export const CalendarWeek = ({ projectId }: { projectId?: string }) => {
+export const CalendarWeek = ({ project }: Props) => {
   const [filterProjectId, setFilterProjectId] = useState(['-1'])
   const [baseDay, setBaseDay] = useState(new Date())
 
-  const projects = useAppSelector(selectProjects)
+  const { data: projects } = useGetProjectsQuery()
 
-  let allTasks = projectId
-    ? projects[id(projects, projectId)].tasks
-    : projects.reduce((tasks, project) => {
+  if (!projects) {
+    return null
+  }
+
+  let allTasks = project
+    ? project.tasks
+    : projects.reduce((tasks: TTask[], project: TProject) => {
         return [...tasks, ...project.tasks]
-      }, [])
+      }, [] as TTask[])
 
-  allTasks = allTasks.filter((task) => task.dueDate)
-
-  const classes = useStyles()
+  allTasks = allTasks.filter((task: TTask) => task.dueDate)
 
   const days = getDays(baseDay)
 
@@ -90,9 +77,32 @@ export const CalendarWeek = ({ projectId }: { projectId?: string }) => {
           }}
           setDate={(newDay: Date) => setBaseDay(newDay)}
         />
-
-        <div className={classes.dragContainer}>
-          <div className={classes.tasksContainer}>
+        {!allTasks.length ? (
+          <Typography
+            variant="h4"
+            color="text.secondary"
+            style={{ margin: '12px auto', textAlign: 'center' }}
+          >
+            You have no tasks with due dates
+          </Typography>
+        ) : null}
+        <Box
+          sx={{
+            border: '1px solid #dadce0',
+            borderRadius: '.8rem',
+            overflowX: 'hidden',
+            marginTop: 4
+          }}
+        >
+          <Box
+            sx={{
+              minHeight: 200,
+              overflowX: 'auto',
+              display: 'flex',
+              flex: '1 1 auto',
+              overflowY: 'hidden'
+            }}
+          >
             {days.map((day, i) => (
               <WeekDay
                 tasks={weekTasks[i]}
@@ -102,14 +112,9 @@ export const CalendarWeek = ({ projectId }: { projectId?: string }) => {
                 index={i as any}
               />
             ))}
-          </div>
-        </div>
+          </Box>
+        </Box>
       </div>
-      {!allTasks.length ? (
-        <h1 style={{ margin: '20px auto', textAlign: 'center' }}>
-          You have no tasks with due dates
-        </h1>
-      ) : null}
     </>
   )
 }

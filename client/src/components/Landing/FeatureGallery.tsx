@@ -1,4 +1,5 @@
 import { Icon, Paper, useTheme } from '@mui/material'
+import { Task, AccountTree, AccessTime } from '@mui/icons-material'
 
 const galleryOptions = [
   {
@@ -17,11 +18,6 @@ const galleryOptions = [
     name: 'Time tracking',
     description: 'Get detailed statistics of what has been done',
     icon: 'timer'
-  },
-  {
-    name: 'Member roles',
-    description: 'Assign roles to users to manage permissions',
-    icon: 'settings'
   },
   {
     name: 'Targets',
